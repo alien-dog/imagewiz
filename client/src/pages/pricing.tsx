@@ -9,6 +9,7 @@ const plans = [
   {
     name: "Basic",
     price: "$9.99",
+    priceId: "price_basic", // Replace with your actual Stripe price ID
     credits: 100,
     features: [
       "100 image credits",
@@ -20,6 +21,7 @@ const plans = [
   {
     name: "Pro",
     price: "$24.99",
+    priceId: "price_pro", // Replace with your actual Stripe price ID
     credits: 300,
     features: [
       "300 image credits",
@@ -31,6 +33,7 @@ const plans = [
   {
     name: "Business",
     price: "$49.99",
+    priceId: "price_business", // Replace with your actual Stripe price ID
     credits: 1000,
     features: [
       "1000 image credits",
@@ -44,10 +47,27 @@ const plans = [
 export default function Pricing() {
   const { user } = useAuth();
 
+  const handleSubscribe = async (priceId: string) => {
+    try {
+      const response = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ priceId }),
+      });
+
+      const { url } = await response.json();
+      window.location.href = url;
+    } catch (error) {
+      console.error('Error creating checkout session:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       <main className="max-w-6xl mx-auto px-4 py-20">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">Simple, Transparent Pricing</h1>
@@ -77,11 +97,20 @@ export default function Pricing() {
                     </li>
                   ))}
                 </ul>
-                <Link href={user ? "/dashboard" : "/auth"}>
-                  <Button className="w-full">
-                    {user ? "Upgrade Now" : "Get Started"}
+                {user ? (
+                  <Button 
+                    className="w-full"
+                    onClick={() => handleSubscribe(plan.priceId)}
+                  >
+                    Subscribe Now
                   </Button>
-                </Link>
+                ) : (
+                  <Link href="/auth">
+                    <Button className="w-full">
+                      Sign Up to Subscribe
+                    </Button>
+                  </Link>
+                )}
               </CardContent>
             </Card>
           ))}

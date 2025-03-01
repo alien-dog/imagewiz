@@ -3,6 +3,8 @@ import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import multer from "multer";
 import { storage } from "./storage";
+import { createCheckoutSession, handleWebhook } from "./stripe";
+import express from 'express';
 
 // Configure multer for handling file uploads
 const upload = multer({
@@ -12,25 +14,12 @@ const upload = multer({
   },
 });
 
-// Middleware to check if user is admin
-function isAdmin(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
-  if (!req.isAuthenticated() || req.user?.username !== 'admin') {
-    return res.status(403).send('Forbidden');
-  }
-  next();
-}
-
-// Middleware to check if user has access to the requested profile
-function isProfileOwner(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
-  const userId = parseInt(req.params.userId);
-  if (!req.isAuthenticated() || (req.user?.id !== userId && req.user?.username !== 'admin')) {
-    return res.status(403).send('Forbidden');
-  }
-  next();
-}
-
 export async function registerRoutes(app: Express): Promise<Server> {
   setupAuth(app);
+
+  // Stripe payment routes
+  app.post("/api/create-checkout-session", createCheckoutSession);
+  app.post("/api/webhook", express.raw({type: 'application/json'}), handleWebhook);
 
   // Admin routes
   app.get("/api/admin/users", isAdmin, async (req, res) => {
@@ -122,6 +111,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       url: "data:image/png;base64," + req.file.buffer.toString('base64')
     });
   });
+
+  // Middleware to check if user is admin
+  function isAdmin(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+    if (!req.isAuthenticated() || req.user?.username !== 'admin') {
+      return res.status(403).send('Forbidden');
+    }
+    next();
+  }
+
+  // Middleware to check if user has access to the requested profile
+  function isProfileOwner(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+    const userId = parseInt(req.params.userId);
+    if (!req.isAuthenticated() || (req.user?.id !== userId && req.user?.username !== 'admin')) {
+      return res.status(403).send('Forbidden');
+    }
+    next();
+  }
+
 
   const httpServer = createServer(app);
   return httpServer;
