@@ -15,6 +15,7 @@ import Credits from "@/pages/dashboard/credits";
 import Settings from "@/pages/dashboard/settings";
 import AdminDashboard from "@/pages/admin";
 import NotFound from "@/pages/not-found";
+import Pricing from "@/pages/pricing"; // Added import for Pricing page
 
 // Resource Pages
 import UseCases from "@/pages/resources/use-cases";
@@ -45,6 +46,7 @@ function Router() {
     <Switch>
       <Route path="/" component={HomePage} />
       <Route path="/auth" component={AuthPage} />
+      <Route path="/pricing" component={Pricing} />
 
       {/* Resource Pages */}
       <Route path="/resources/use-cases" component={UseCases} />
