@@ -44,4 +44,33 @@
     @apply px-4 py-2 text-sm font-medium transition-colors duration-200
     data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary;
   }
+
+  .before-after-slider {
+    @apply relative overflow-hidden cursor-col-resize;
+  }
+
+  .slider-handle {
+    @apply absolute top-0 bottom-0 w-1 bg-white;
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .testimonial-container {
+    scroll-behavior: smooth;
+  }
+
+  .dot {
+    @apply w-2 h-2 rounded-full bg-gray-300 transition-colors duration-200;
+  }
+
+  .dot.active {
+    @apply bg-primary;
+  }
 }
