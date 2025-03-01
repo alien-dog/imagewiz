@@ -275,9 +275,6 @@ export default function HomePage() {
 
               {/* Pro Plan */}
               <Card className="relative">
-                <div className="absolute -top-2 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm">
-                  Most Popular
-                </div>
                 <CardHeader>
                   <CardTitle>
                     <h3 className="text-2xl font-bold">Pro Plan</h3>
@@ -308,9 +305,6 @@ export default function HomePage() {
                           ? 'bg-primary text-primary-foreground shadow-lg'
                           : 'bg-muted/50 hover:bg-muted/70'}`}
                       >
-                        <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full text-xs">
-                          Most Popular
-                        </div>
                         <div className="font-medium text-lg">Pay Yearly</div>
                         <div className="text-sm">
                           <span className="text-destructive font-bold">Save 10%</span>
