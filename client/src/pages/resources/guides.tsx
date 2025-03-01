@@ -2,6 +2,7 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Helmet } from "react-helmet";
 import { Card, CardContent } from "@/components/ui/card";
+import { Link } from "wouter";
 import { 
   VideoIcon,
   Lightbulb,
@@ -14,25 +15,29 @@ const guides = [
     icon: <VideoIcon className="h-6 w-6" />,
     title: "Getting Started",
     description: "Learn the basics of using iMageWiz for background removal. Perfect for beginners looking to enhance their images.",
-    readTime: "5 min read"
+    readTime: "5 min read",
+    link: "/resources/guides/getting-started"
   },
   {
     icon: <Lightbulb className="h-6 w-6" />,
     title: "Advanced Techniques",
     description: "Master advanced features and get professional-quality results with our expert tips and tricks.",
-    readTime: "10 min read"
+    readTime: "10 min read",
+    link: "#"
   },
   {
     icon: <GraduationCap className="h-6 w-6" />,
     title: "Best Practices",
     description: "Learn industry best practices for image processing and optimization to achieve the best results.",
-    readTime: "8 min read"
+    readTime: "8 min read",
+    link: "#"
   },
   {
     icon: <FileText className="h-6 w-6" />,
     title: "API Integration",
     description: "Technical guide for developers on integrating iMageWiz's powerful API into their applications.",
-    readTime: "15 min read"
+    readTime: "15 min read",
+    link: "#"
   }
 ];
 
@@ -60,22 +65,26 @@ export default function Guides() {
 
           <div className="grid md:grid-cols-2 gap-8">
             {guides.map((guide, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="p-3 bg-primary/10 rounded-lg text-primary">
-                      {guide.icon}
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-semibold">{guide.title}</h2>
-                      <p className="text-sm text-muted-foreground">{guide.readTime}</p>
-                    </div>
-                  </div>
-                  <p className="text-muted-foreground">
-                    {guide.description}
-                  </p>
-                </CardContent>
-              </Card>
+              <Link key={index} href={guide.link}>
+                <a className="block">
+                  <Card className="hover:shadow-lg transition-shadow">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="p-3 bg-primary/10 rounded-lg text-primary">
+                          {guide.icon}
+                        </div>
+                        <div>
+                          <h2 className="text-2xl font-semibold">{guide.title}</h2>
+                          <p className="text-sm text-muted-foreground">{guide.readTime}</p>
+                        </div>
+                      </div>
+                      <p className="text-muted-foreground">
+                        {guide.description}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </a>
+              </Link>
             ))}
           </div>
         </div>

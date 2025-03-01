@@ -2,6 +2,7 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Helmet } from "react-helmet";
 import { Card, CardContent } from "@/components/ui/card";
+import { Link } from "wouter";
 import { 
   ShoppingBag, 
   Camera, 
@@ -14,25 +15,25 @@ const useCases = [
     icon: <ShoppingBag className="h-6 w-6" />,
     title: "E-commerce",
     description: "Perfect for online stores needing clean product photos. Remove backgrounds from product images to create consistent, professional listings.",
-    example: "https://example.com/ecommerce-demo.jpg"
+    link: "/resources/use-cases/ecommerce"
   },
   {
     icon: <Camera className="h-6 w-6" />,
     title: "Photography",
     description: "Professional photographers can quickly process portraits and create stunning composite images with clean background removal.",
-    example: "https://example.com/photography-demo.jpg"
+    link: "#"
   },
   {
     icon: <Briefcase className="h-6 w-6" />,
     title: "Marketing",
     description: "Create eye-catching marketing materials and social media content with clean, professional image editing.",
-    example: "https://example.com/marketing-demo.jpg"
+    link: "#"
   },
   {
     icon: <PenTool className="h-6 w-6" />,
     title: "Graphic Design",
     description: "Streamline your design workflow by quickly removing backgrounds from images for layouts and compositions.",
-    example: "https://example.com/design-demo.jpg"
+    link: "#"
   }
 ];
 
@@ -60,26 +61,23 @@ export default function UseCases() {
 
           <div className="grid md:grid-cols-2 gap-8 mb-16">
             {useCases.map((useCase, index) => (
-              <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="p-3 bg-primary/10 rounded-lg text-primary">
-                      {useCase.icon}
-                    </div>
-                    <h2 className="text-2xl font-semibold">{useCase.title}</h2>
-                  </div>
-                  <p className="text-muted-foreground mb-6">
-                    {useCase.description}
-                  </p>
-                  <div className="aspect-video rounded-lg overflow-hidden bg-muted">
-                    <img 
-                      src={useCase.example} 
-                      alt={`${useCase.title} example`}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                </CardContent>
-              </Card>
+              <Link key={index} href={useCase.link}>
+                <a className="block">
+                  <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="p-3 bg-primary/10 rounded-lg text-primary">
+                          {useCase.icon}
+                        </div>
+                        <h2 className="text-2xl font-semibold">{useCase.title}</h2>
+                      </div>
+                      <p className="text-muted-foreground">
+                        {useCase.description}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </a>
+              </Link>
             ))}
           </div>
         </div>
