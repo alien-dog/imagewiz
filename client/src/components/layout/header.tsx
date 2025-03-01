@@ -5,10 +5,25 @@ import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { 
+  User,
+  History,
+  CreditCard,
+  Settings,
+  LogOut
+} from "lucide-react";
 
 export function Header() {
   const { user, logoutMutation } = useAuth();
@@ -101,30 +116,58 @@ export function Header() {
             <Link href="/pricing">
               <a className="text-secondary hover:text-primary">Pricing</a>
             </Link>
-            {user && (
-              <Link href="/dashboard">
-                <a className="text-secondary hover:text-primary">Dashboard</a>
-              </Link>
-            )}
           </nav>
 
           <div className="flex items-center gap-4">
             {user ? (
-              <>
-                <Avatar className="h-8 w-8 bg-primary/10">
-                  <AvatarFallback className="text-primary">
-                    {user.username[0].toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <Button 
-                  variant="outline"
-                  onClick={() => logoutMutation.mutate()}
-                  disabled={logoutMutation.isPending}
-                  className="button-outline"
-                >
-                  Logout
-                </Button>
-              </>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8 bg-primary/10">
+                      <AvatarFallback className="text-primary">
+                        {user.username[0].toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <Link href="/dashboard/profile">
+                    <DropdownMenuItem className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Profile</span>
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link href="/dashboard/history">
+                    <DropdownMenuItem className="cursor-pointer">
+                      <History className="mr-2 h-4 w-4" />
+                      <span>Image History</span>
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link href="/dashboard/credits">
+                    <DropdownMenuItem className="cursor-pointer">
+                      <CreditCard className="mr-2 h-4 w-4" />
+                      <span>Credits & Billing</span>
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link href="/dashboard/settings">
+                    <DropdownMenuItem className="cursor-pointer">
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                    </DropdownMenuItem>
+                  </Link>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    className="cursor-pointer text-red-600 focus:text-red-600"
+                    onClick={() => logoutMutation.mutate()}
+                    disabled={logoutMutation.isPending}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <Link href="/auth">
                 <Button className="button-primary shadow-lg">
