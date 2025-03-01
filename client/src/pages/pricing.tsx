@@ -75,7 +75,7 @@ export default function Pricing() {
       <Header />
 
       <main className="max-w-7xl mx-auto px-4 py-20">
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 gap-8">
           {/* Pay as you go */}
           <Card className="relative">
             <CardHeader>
@@ -111,6 +111,9 @@ export default function Pricing() {
 
           {/* Pro Plan */}
           <Card className="relative">
+            <div className="absolute -top-2 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm">
+              Most Popular
+            </div>
             <CardHeader>
               <CardTitle>
                 <h3 className="text-2xl font-bold">Pro Plan</h3>
@@ -123,6 +126,29 @@ export default function Pricing() {
               </CardTitle>
             </CardHeader>
             <CardContent>
+              {/* Billing Toggle */}
+              <div className="mb-8 bg-muted/50 rounded-lg p-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div className={`flex-1 text-center p-3 rounded-md transition-all ${!isYearlyBilling ? 'bg-white shadow-sm' : ''}`}>
+                    <span className={`font-medium ${!isYearlyBilling ? 'text-primary' : 'text-muted-foreground'}`}>
+                      Pay Monthly
+                    </span>
+                  </div>
+                  <div 
+                    className="w-14 h-7 bg-primary rounded-full relative cursor-pointer"
+                    onClick={() => setIsYearlyBilling(!isYearlyBilling)}
+                  >
+                    <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all duration-200 ${isYearlyBilling ? 'left-8' : 'left-1'}`}></div>
+                  </div>
+                  <div className={`flex-1 text-center p-3 rounded-md transition-all ${isYearlyBilling ? 'bg-white shadow-sm' : ''}`}>
+                    <span className={`font-medium ${isYearlyBilling ? 'text-primary' : 'text-muted-foreground'}`}>
+                      Pay Yearly
+                    </span>
+                    <span className="block text-sm text-primary font-medium">Save 10%</span>
+                  </div>
+                </div>
+              </div>
+
               <ul className="space-y-4">
                 {getCurrentProOptions().map((option) => (
                   <li key={option.credits} className="flex items-center gap-2">
@@ -138,17 +164,8 @@ export default function Pricing() {
                   </li>
                 ))}
               </ul>
-              <div className="flex items-center justify-between mt-6 mb-6">
-                <span>Pay Monthly</span>
-                <div 
-                  className="w-12 h-6 bg-primary/20 rounded-full relative cursor-pointer"
-                  onClick={() => setIsYearlyBilling(!isYearlyBilling)}
-                >
-                  <div className={`absolute top-1 w-4 h-4 bg-primary rounded-full transition-all duration-200 ${isYearlyBilling ? 'left-7' : 'left-1'}`}></div>
-                </div>
-                <span>Pay Yearly <span className="text-primary">Save 10%</span></span>
-              </div>
-              <Button className="w-full">Subscribe now</Button>
+
+              <Button className="w-full mt-6">Subscribe now</Button>
               <div className="mt-4 space-y-2 text-sm text-muted-foreground">
                 <p className="flex items-center gap-2">
                   <Check className="h-4 w-4" /> Risk free: 14 Days Money Back Guarantee
@@ -160,40 +177,6 @@ export default function Pricing() {
                   <Check className="h-4 w-4" /> Fair: Unused credits roll over as long as you're subscribed
                 </p>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Business Plan */}
-          <Card className="relative">
-            <div className="absolute -top-2 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm">
-              Most Popular
-            </div>
-            <CardHeader>
-              <CardTitle>
-                <h3 className="text-2xl font-bold">Business Plan</h3>
-                <div className="mt-4">
-                  <span className="text-4xl font-bold">100,000+</span>
-                  <span className="text-muted-foreground"> Images</span>
-                  <span className="text-muted-foreground block">/year</span>
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-primary" />
-                  <span>Guaranteed best price on remove.bg</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-primary" />
-                  <span>Flexible API, credit, and rate limits</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-primary" />
-                  <span>Dedicated customer success manager</span>
-                </li>
-              </ul>
-              <Button className="w-full">Contact Sales</Button>
             </CardContent>
           </Card>
         </div>
