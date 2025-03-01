@@ -10,8 +10,6 @@ import { useState } from "react";
 export default function Pricing() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [showMorePayGo, setShowMorePayGo] = useState(false);
-  const [showMoreSubscription, setShowMoreSubscription] = useState(false);
   const [selectedPayGoCredits, setSelectedPayGoCredits] = useState(10);
   const [isYearlyBilling, setIsYearlyBilling] = useState(false);
   const [selectedProCredits, setSelectedProCredits] = useState(250);
@@ -61,6 +59,10 @@ export default function Pricing() {
     }
   };
 
+  const calculatePrice = (basePrice: number) => {
+    return isYearlyBilling ? basePrice * 0.9 : basePrice;
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -106,7 +108,7 @@ export default function Pricing() {
               <CardTitle>
                 <h3 className="text-2xl font-bold">Pro Plan</h3>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold">$0.18</span>
+                  <span className="text-4xl font-bold">${(isYearlyBilling ? 0.18 * 0.9 : 0.18).toFixed(2)}</span>
                   <span className="text-muted-foreground"> /image</span>
                 </div>
               </CardTitle>
@@ -123,7 +125,7 @@ export default function Pricing() {
                     />
                     <span>{option.credits} credits</span>
                     <span className="text-muted-foreground">/month</span>
-                    <span className="ml-auto">USD {isYearlyBilling ? (option.price * 0.9).toFixed(1) : option.price}</span>
+                    <span className="ml-auto">USD {calculatePrice(option.price).toFixed(1)}</span>
                   </li>
                 ))}
               </ul>
@@ -133,7 +135,7 @@ export default function Pricing() {
                   className="w-12 h-6 bg-primary/20 rounded-full relative cursor-pointer"
                   onClick={() => setIsYearlyBilling(!isYearlyBilling)}
                 >
-                  <div className={`absolute top-1 w-4 h-4 bg-primary rounded-full transition-all ${isYearlyBilling ? 'left-7' : 'left-1'}`}></div>
+                  <div className={`absolute top-1 w-4 h-4 bg-primary rounded-full transition-all duration-200 ${isYearlyBilling ? 'left-7' : 'left-1'}`}></div>
                 </div>
                 <span>Pay Yearly <span className="text-primary">Save 10%</span></span>
               </div>
@@ -185,7 +187,6 @@ export default function Pricing() {
               <Button className="w-full">Contact Sales</Button>
             </CardContent>
           </Card>
-
         </div>
 
         <div className="mt-16 text-center">
