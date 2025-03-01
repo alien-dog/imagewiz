@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -54,81 +54,86 @@ export function Header() {
   };
 
   return (
-    <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Link href="/">
-            <a className="flex items-center gap-2">
-              {logo ? (
-                <img src={logo} alt="Logo" className="h-8 w-8" />
-              ) : (
-                <div className="font-bold text-xl">iMageWiz</div>
-              )}
-            </a>
-          </Link>
-          {user?.username === 'admin' && (
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm">Change Logo</Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Upload Logo</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div className="grid w-full max-w-sm items-center gap-1.5">
-                    <Label htmlFor="logo">Logo Image</Label>
-                    <Input 
-                      id="logo" 
-                      type="file" 
-                      accept="image/*"
-                      onChange={handleLogoChange}
-                    />
+    <header className="fixed w-full bg-white shadow-sm z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          <div className="flex items-center">
+            <Link href="/">
+              <a className="flex items-center gap-2">
+                {logo ? (
+                  <img src={logo} alt="Logo" className="h-8 w-8" />
+                ) : (
+                  <span className="logo-text text-2xl text-primary">iMageWiz</span>
+                )}
+              </a>
+            </Link>
+            {user?.username === 'admin' && (
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="ml-4">
+                    Change Logo
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Upload Logo</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="grid w-full max-w-sm items-center gap-1.5">
+                      <Label htmlFor="logo">Logo Image</Label>
+                      <Input 
+                        id="logo" 
+                        type="file" 
+                        accept="image/*"
+                        onChange={handleLogoChange}
+                      />
+                    </div>
                   </div>
-                </div>
-              </DialogContent>
-            </Dialog>
-          )}
-        </div>
+                </DialogContent>
+              </Dialog>
+            )}
+          </div>
 
-        <nav className="flex items-center gap-6">
-          <Link href="/">
-            <a className="text-muted-foreground hover:text-foreground transition-colors">
-              Home
-            </a>
-          </Link>
-          <Link href="/pricing">
-            <a className="text-muted-foreground hover:text-foreground transition-colors">
-              Pricing
-            </a>
-          </Link>
-
-          {user ? (
-            <>
+          <nav className="hidden md:flex space-x-8">
+            <Link href="/">
+              <a className="text-secondary hover:text-primary">Home</a>
+            </Link>
+            <Link href="/pricing">
+              <a className="text-secondary hover:text-primary">Pricing</a>
+            </Link>
+            {user && (
               <Link href="/dashboard">
-                <a className="text-muted-foreground hover:text-foreground transition-colors">
-                  Dashboard
-                </a>
+                <a className="text-secondary hover:text-primary">Dashboard</a>
               </Link>
-              <div className="flex items-center gap-4">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback>{user.username[0].toUpperCase()}</AvatarFallback>
+            )}
+          </nav>
+
+          <div className="flex items-center gap-4">
+            {user ? (
+              <>
+                <Avatar className="h-8 w-8 bg-primary/10">
+                  <AvatarFallback className="text-primary">
+                    {user.username[0].toUpperCase()}
+                  </AvatarFallback>
                 </Avatar>
                 <Button 
-                  variant="outline" 
+                  variant="outline"
                   onClick={() => logoutMutation.mutate()}
                   disabled={logoutMutation.isPending}
+                  className="button-outline"
                 >
                   Logout
                 </Button>
-              </div>
-            </>
-          ) : (
-            <Link href="/auth">
-              <Button className="shadow-lg">Get Started</Button>
-            </Link>
-          )}
-        </nav>
+              </>
+            ) : (
+              <Link href="/auth">
+                <Button className="button-primary shadow-lg">
+                  Get Started
+                </Button>
+              </Link>
+            )}
+          </div>
+        </div>
       </div>
     </header>
   );

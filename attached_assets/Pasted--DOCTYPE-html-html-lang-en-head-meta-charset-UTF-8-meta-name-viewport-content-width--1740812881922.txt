@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iMageWiz - AI-Powered Image Background Removal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+primary: '#00A86B',
+secondary: '#4B5563'
+},
+borderRadius: {
+'none': '0px',
+'sm': '4px',
+DEFAULT: '8px',
+'md': '12px',
+'lg': '16px',
+'xl': '20px',
+'2xl': '24px',
+'3xl': '32px',
+'full': '9999px',
+'button': '8px'
+},
+fontFamily: {
+'poppins': ['Poppins', 'sans-serif']
+}
+}
+}
+}
+</script>
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+.before-after-slider { position: relative; overflow: hidden; }
+.slider-handle { position: absolute; top: 0; bottom: 0; width: 4px; background: #fff; cursor: col-resize; }
+.testimonial-container { scroll-behavior: smooth; }
+.dot.active { background-color: #00A86B; }
+</style>
+</head>
+<body class="font-poppins">
+<header class="fixed w-full bg-white shadow-sm z-50">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-16">
+<div class="flex items-center">
+<a href="/" class="text-2xl font-['Pacifico'] text-primary">logo</a>
+</div>
+<nav class="hidden md:flex space-x-8">
+<a href="#" class="text-secondary hover:text-primary">Home</a>
+<a href="#" class="text-secondary hover:text-primary">Features</a>
+<a href="#" class="text-secondary hover:text-primary">Pricing</a>
+<a href="#resources" class="text-secondary hover:text-primary" id="resourcesLink">Resources</a>
+<a href="#" class="text-secondary hover:text-primary">Contact</a>
+</nav>
+<div class="flex items-center">
+<button class="bg-primary text-white px-6 py-2 !rounded-button hover:bg-opacity-90 whitespace-nowrap">Try Now</button>
+</div>
+</div>
+</div>
+</header>
+<main class="pt-16">
+<section class="relative bg-gradient-to-r from-gray-50 to-white overflow-hidden">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+<div>
+<h1 class="text-5xl font-bold leading-tight mb-6">
+Effortless AI-Powered Image Background Removal
+</h1>
+<p class="text-lg text-gray-600 mb-8">
+Transform your images instantly with our advanced AI technology. Perfect for designers, marketers, and creators who need professional results in seconds.
+</p>
+<div class="flex gap-4">
+<button class="bg-primary text-white px-8 py-3 !rounded-button hover:bg-opacity-90 whitespace-nowrap text-lg">
+Get Started Free
+</button>
+<button class="border border-primary text-primary px-8 py-3 !rounded-button hover:bg-primary hover:text-white whitespace-nowrap text-lg">
+See How It Works
+</button>
+</div>
+</div>
+<div class="before-after-slider rounded-lg shadow-xl">
+<img src="https://public.readdy.ai/ai/img_res/9eabac3684a72e87dea67683d0b25398.jpg" class="w-full" alt="Before-After Demo">
+<div class="slider-handle" style="left: 50%"></div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-24 bg-white">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="text-center mb-16">
+<h2 class="text-4xl font-bold mb-4">Why Choose iMageWiz?</h2>
+<p class="text-lg text-gray-600">Powerful features that make background removal effortless</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+<div class="p-6 rounded-lg bg-gray-50 hover:shadow-lg transition-shadow">
+<div class="w-12 h-12 flex items-center justify-center bg-primary bg-opacity-10 rounded-full mb-4">
+<i class="ri-ai-generate-line text-primary text-2xl"></i>
+</div>
+<h3 class="text-xl font-semibold mb-2">AI-Powered</h3>
+<p class="text-gray-600">Advanced machine learning algorithms for precise edge detection</p>
+</div>
+<div class="p-6 rounded-lg bg-gray-50 hover:shadow-lg transition-shadow">
+<div class="w-12 h-12 flex items-center justify-center bg-primary bg-opacity-10 rounded-full mb-4">
+<i class="ri-timer-flash-line text-primary text-2xl"></i>
+</div>
+<h3 class="text-xl font-semibold mb-2">Lightning Fast</h3>
+<p class="text-gray-600">Process images in seconds with our optimized cloud infrastructure</p>
+</div>
+<div class="p-6 rounded-lg bg-gray-50 hover:shadow-lg transition-shadow">
+<div class="w-12 h-12 flex items-center justify-center bg-primary bg-opacity-10 rounded-full mb-4">
+<i class="ri-hd-line text-primary text-2xl"></i>
+</div>
+<h3 class="text-xl font-semibold mb-2">High Quality</h3>
+<p class="text-gray-600">Maintain original image quality with precise edge detection</p>
+</div>
+<div class="p-6 rounded-lg bg-gray-50 hover:shadow-lg transition-shadow">
+<div class="w-12 h-12 flex items-center justify-center bg-primary bg-opacity-10 rounded-full mb-4">
+<i class="ri-shield-check-line text-primary text-2xl"></i>
+</div>
+<h3 class="text-xl font-semibold mb-2">Secure</h3>
+<p class="text-gray-600">Enterprise-grade security for your images and data</p>
+</div>
+</div>
+</div>
+</section>
+<section class="py-24 bg-gray-50">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="text-center mb-16">
+<h2 class="text-4xl font-bold mb-4">Trusted by Industry Leaders</h2>
+<p class="text-lg text-gray-600">See what our customers have to say about iMageWiz</p>
+</div>
+<div class="relative">
+<div class="testimonial-container flex overflow-x-auto gap-6 pb-8 hide-scrollbar">
+<div class="flex-none w-96 bg-white p-6 rounded-lg shadow-sm">
+<div class="flex items-center mb-4">
+<img src="https://public.readdy.ai/ai/img_res/f834c10cf5d8a9ec1e07d810c27efbd6.jpg" class="w-12 h-12 rounded-full object-cover" alt="Sarah Mitchell">
+<div class="ml-4">
+<h4 class="font-semibold">Sarah Mitchell</h4>
+<p class="text-sm text-gray-600">Marketing Director at TechCorp</p>
+</div>
+</div>
+<p class="text-gray-600">"iMageWiz has revolutionized our product photography workflow. The AI is incredibly accurate and saves us hours of manual editing time."</p>
+</div>
+<div class="flex-none w-96 bg-white p-6 rounded-lg shadow-sm">
+<div class="flex items-center mb-4">
+<img src="https://public.readdy.ai/ai/img_res/5214d576ed2262d0a6ad564696c167f8.jpg" class="w-12 h-12 rounded-full object-cover" alt="David Chen">
+<div class="ml-4">
+<h4 class="font-semibold">David Chen</h4>
+<p class="text-sm text-gray-600">Lead Designer at CreativeHub</p>
+</div>
+</div>
+<p class="text-gray-600">"The quality and speed of background removal are unmatched. It's become an essential tool in our design workflow."</p>
+</div>
+<div class="flex-none w-96 bg-white p-6 rounded-lg shadow-sm">
+<div class="flex items-center mb-4">
+<img src="https://public.readdy.ai/ai/img_res/b902cdded3f32ba86b44c082d561ac72.jpg" class="w-12 h-12 rounded-full object-cover" alt="Michael Thompson">
+<div class="ml-4">
+<h4 class="font-semibold">Michael Thompson</h4>
+<p class="text-sm text-gray-600">E-commerce Manager at ShopStyle</p>
+</div>
+</div>
+<p class="text-gray-600">"We process thousands of product images daily, and iMageWiz handles them all perfectly. The API integration was seamless."</p>
+</div>
+</div>
+<div class="flex justify-center mt-6 gap-2">
+<button class="w-2 h-2 rounded-full bg-gray-300 dot active"></button>
+<button class="w-2 h-2 rounded-full bg-gray-300 dot"></button>
+<button class="w-2 h-2 rounded-full bg-gray-300 dot"></button>
+</div>
+</div>
+</div>
+</section>
+<section class="py-24 bg-white">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="text-center mb-16">
+<h2 class="text-4xl font-bold mb-4">Simple, Transparent Pricing</h2>
+<p class="text-lg text-gray-600">Choose the plan that works best for you</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="border rounded-lg p-8 hover:shadow-lg transition-shadow">
+<h3 class="text-2xl font-bold mb-4">Basic</h3>
+<div class="mb-6">
+<span class="text-4xl font-bold">$9</span>
+<span class="text-gray-600">/month</span>
+</div>
+<ul class="space-y-4 mb-8">
+<li class="flex items-center">
+<i class="ri-check-line text-primary mr-2"></i>
+<span>100 images per month</span>
+</li>
+<li class="flex items-center">
+<i class="ri-check-line text-primary mr-2"></i>
+<span>Basic API access</span>
+</li>
+<li class="flex items-center">
+<i class="ri-check-line text-primary mr-2"></i>
+<span>Email support</span>
+</li>
+</ul>
+<button class="w-full bg-primary text-white py-2 !rounded-button hover:bg-opacity-90">Get Started</button>
+</div>
+<div class="border rounded-lg p-8 bg-primary bg-opacity-5 relative hover:shadow-lg transition-shadow">
+<div class="absolute top-4 right-4 bg-primary text-white px-3 py-1 rounded-full text-sm">Popular</div>
+<h3 class="text-2xl font-bold mb-4">Pro</h3>
+<div class="mb-6">
+<span class="text-4xl font-bold">$29</span>
+<span class="text-gray-600">/month</span>
+</div>
+<ul class="space-y-4 mb-8">
+<li class="flex items-center">
+<i class="ri-check-line text-primary mr-2"></i>
+<span>500 images per month</span>
+</li>
+<li class="flex items-center">
+<i class="ri-check-line text-primary mr-2"></i>
+<span>Advanced API access</span>
+</li>
+<li class="flex items-center">
+<i class="ri-check-line text-primary mr-2"></i>
+<span>Priority support</span>
+</li>
+<li class="flex items-center">
+<i class="ri-check-line text-primary mr-2"></i>
+<span>Batch processing</span>
+</li>
+</ul>
+<button class="w-full bg-primary text-white py-2 !rounded-button hover:bg-opacity-90">Get Started</button>
+</div>
+<div class="border rounded-lg p-8 hover:shadow-lg transition-shadow">
+<h3 class="text-2xl font-bold mb-4">Enterprise</h3>
+<div class="mb-6">
+<span class="text-4xl font-bold">Custom</span>
+</div>
+<ul class="space-y-4 mb-8">
+<li class="flex items-center">
+<i class="ri-check-line text-primary mr-2"></i>
+<span>Unlimited images</span>
+</li>
+<li class="flex items-center">
+<i class="ri-check-line text-primary mr-2"></i>
+<span>Custom API solutions</span>
+</li>
+<li class="flex items-center">
+<i class="ri-check-line text-primary mr-2"></i>
+<span>24/7 dedicated support</span>
+</li>
+<li class="flex items-center">
+<i class="ri-check-line text-primary mr-2"></i>
+<span>Custom integration</span>
+</li>
+</ul>
+<button class="w-full border border-primary text-primary py-2 !rounded-button hover:bg-primary hover:text-white">Contact Sales</button>
+</div>
+</div>
+</div>
+</section>
+<div id="resourcesModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 overflow-y-auto">
+<div class="min-h-screen px-4 text-center">
+<div class="fixed inset-0 transition-opacity" aria-hidden="true">
+<div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+</div>
+<span class="inline-block h-screen align-middle" aria-hidden="true">&#8203;</span>
+<div class="inline-block w-full max-w-7xl p-6 my-8 text-left align-middle transition-all transform bg-white shadow-xl rounded-lg">
+<div class="absolute top-0 right-0 pt-4 pr-4">
+<button type="button" class="text-gray-400 hover:text-gray-500" onclick="closeResourcesModal()">
+<span class="sr-only">Close</span>
+<i class="ri-close-line text-2xl"></i>
+</button>
+</div>
+<div class="text-center mb-16">
+<h2 class="text-4xl font-bold mb-4">Resources</h2>
+<p class="text-lg text-gray-600">Learn how to get the most out of iMageWiz</p>
+</div>
+<div class="mb-16">
+<div class="flex items-center justify-between mb-8">
+<h3 class="text-2xl font-bold">Guides</h3>
+<a href="#" class="text-primary hover:text-opacity-80 flex items-center">
+View All
+<i class="ri-arrow-right-line ml-1"></i>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="bg-gray-50 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+<img src="https://public.readdy.ai/ai/img_res/7d76d0bd200db54fb6bfed208321e435.jpg" alt="Getting Started Guide" class="w-full h-48 object-cover">
+<div class="p-6">
+<h4 class="font-semibold text-xl mb-2">Getting Started with iMageWiz</h4>
+<p class="text-gray-600 mb-4">Learn the basics of using iMageWiz for perfect background removal in minutes.</p>
+<a href="#" class="text-primary hover:text-opacity-80">Read More →</a>
+</div>
+</div>
+<div class="bg-gray-50 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+<img src="https://public.readdy.ai/ai/img_res/fde6f64f1ba140068ffc8a65d54edd91.jpg" alt="Advanced Techniques" class="w-full h-48 object-cover">
+<div class="p-6">
+<h4 class="font-semibold text-xl mb-2">Advanced Background Removal Techniques</h4>
+<p class="text-gray-600 mb-4">Master advanced features and tools for complex image editing scenarios.</p>
+<a href="#" class="text-primary hover:text-opacity-80">Read More →</a>
+</div>
+</div>
+<div class="bg-gray-50 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+<img src="https://public.readdy.ai/ai/img_res/bc9cc8459e1648b5e2fd4765eadddb06.jpg" alt="API Integration" class="w-full h-48 object-cover">
+<div class="p-6">
+<h4 class="font-semibold text-xl mb-2">API Integration Guide</h4>
+<p class="text-gray-600 mb-4">Complete guide to integrating iMageWiz API into your applications.</p>
+<a href="#" class="text-primary hover:text-opacity-80">Read More →</a>
+</div>
+</div>
+</div>
+</div>
+<div>
+<div class="flex items-center justify-between mb-8">
+<h3 class="text-2xl font-bold">Blog</h3>
+<a href="#" class="text-primary hover:text-opacity-80 flex items-center">
+View All
+<i class="ri-arrow-right-line ml-1"></i>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="bg-gray-50 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+<img src="https://public.readdy.ai/ai/img_res/41d55d7f4c90c6b272b4591f6443739e.jpg" alt="E-commerce Photography" class="w-full h-48 object-cover">
+<div class="p-6">
+<div class="flex items-center mb-4">
+<img src="https://public.readdy.ai/ai/img_res/72982c3e9b3971c82ecd204ff84ba5de.jpg" alt="Author" class="w-8 h-8 rounded-full mr-2">
+<div>
+<p class="font-medium">Emma Wilson</p>
+<p class="text-sm text-gray-500">March 1, 2025</p>
+</div>
+</div>
+<h4 class="font-semibold text-xl mb-2">Revolutionizing E-commerce Photography</h4>
+<p class="text-gray-600 mb-4">How AI is transforming product photography in online retail.</p>
+<a href="#" class="text-primary hover:text-opacity-80">Read More →</a>
+</div>
+</div>
+<div class="bg-gray-50 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+<img src="https://public.readdy.ai/ai/img_res/d296715d6bbe3834ca7e060630930ee3.jpg" alt="AI Technology" class="w-full h-48 object-cover">
+<div class="p-6">
+<div class="flex items-center mb-4">
+<img src="https://public.readdy.ai/ai/img_res/5c82fed4a4c531d0e95abb71da29cd96.jpg" alt="Author" class="w-8 h-8 rounded-full mr-2">
+<div>
+<p class="font-medium">Alex Chen</p>
+<p class="text-sm text-gray-500">February 28, 2025</p>
+</div>
+</div>
+<h4 class="font-semibold text-xl mb-2">The Future of AI in Image Processing</h4>
+<p class="text-gray-600 mb-4">Exploring upcoming trends in AI-powered image editing technology.</p>
+<a href="#" class="text-primary hover:text-opacity-80">Read More →</a>
+</div>
+</div>
+<div class="bg-gray-50 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+<img src="https://public.readdy.ai/ai/img_res/6b4943a0ef15fe374d636d8e6d782fc2.jpg" alt="Design Workflow" class="w-full h-48 object-cover">
+<div class="p-6">
+<div class="flex items-center mb-4">
+<img src="https://public.readdy.ai/ai/img_res/04c611d46ab12a08263d2b42d5b3c03b.jpg" alt="Author" class="w-8 h-8 rounded-full mr-2">
+<div>
+<p class="font-medium">Sarah Parker</p>
+<p class="text-sm text-gray-500">February 27, 2025</p>
+</div>
+</div>
+<h4 class="font-semibold text-xl mb-2">Optimizing Your Design Workflow</h4>
+<p class="text-gray-600 mb-4">Tips and tricks for streamlining your image editing process.</p>
+<a href="#" class="text-primary hover:text-opacity-80">Read More →</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<section class="py-24 bg-gray-50">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="text-center">
+<h2 class="text-4xl font-bold mb-4">Transform Your Images Today</h2>
+<p class="text-lg text-gray-600 mb-8">Join thousands of satisfied customers using iMageWiz</p>
+<a href="#" class="inline-block bg-primary text-white px-12 py-4 !rounded-button hover:bg-opacity-90 text-xl font-semibold shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1">
+Get Started Free
+<span class="block text-sm font-normal mt-1">No Credit Card Required</span>
+</a>
+</div>
+</div>
+</section>
+</main>
+<footer class="bg-gray-900 text-white py-16">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+<div class="col-span-1 md:col-span-2">
+<a href="/" class="text-2xl font-['Pacifico'] text-white mb-4 block">logo</a>
+<p class="text-gray-400 mb-6">Transform your images instantly with our advanced AI technology. Perfect for designers, marketers, and creators who need professional results in seconds.</p>
+<div class="flex space-x-4">
+<a href="#" class="text-gray-400 hover:text-white">
+<i class="ri-twitter-line text-xl"></i>
+</a>
+<a href="#" class="text-gray-400 hover:text-white">
+<i class="ri-facebook-line text-xl"></i>
+</a>
+<a href="#" class="text-gray-400 hover:text-white">
+<i class="ri-instagram-line text-xl"></i>
+</a>
+<a href="#" class="text-gray-400 hover:text-white">
+<i class="ri-linkedin-line text-xl"></i>
+</a>
+</div>
+</div>
+<div>
+<h4 class="text-lg font-semibold mb-4">Company</h4>
+<ul class="space-y-2">
+<li><a href="#" class="text-gray-400 hover:text-white">About Us</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white">Careers</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white">Press</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white">Blog</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-lg font-semibold mb-4">Legal</h4>
+<ul class="space-y-2">
+<li><a href="#" class="text-gray-400 hover:text-white">Privacy Policy</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white">Terms of Service</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white">Cookie Policy</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white">GDPR</a></li>
+</ul>
+</div>
+</div>
+<div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+<p>&copy; 2025 iMageWiz. All rights reserved.</p>
+</div>
+</div>
+</footer>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+const slider = document.querySelector('.before-after-slider');
+const handle = document.querySelector('.slider-handle');
+let isDragging = false;
+handle.addEventListener('mousedown', () => {
+isDragging = true;
+});
+document.addEventListener('mousemove', (e) => {
+if (!isDragging) return;
+const rect = slider.getBoundingClientRect();
+const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+const percentage = (x / rect.width) * 100;
+handle.style.left = `${percentage}%`;
+});
+document.addEventListener('mouseup', () => {
+isDragging = false;
+});
+const testimonialContainer = document.querySelector('.testimonial-container');
+const dots = document.querySelectorAll('.dot');
+dots.forEach((dot, index) => {
+dot.addEventListener('click', () => {
+const scrollWidth = testimonialContainer.scrollWidth;
+const containerWidth = testimonialContainer.clientWidth;
+const scrollPosition = (scrollWidth - containerWidth) * (index / (dots.length - 1));
+testimonialContainer.scrollLeft = scrollPosition;
+dots.forEach(d => d.classList.remove('active'));
+dot.classList.add('active');
+});
+});
+const form = document.querySelector('form');
+form.addEventListener('submit', (e) => {
+e.preventDefault();
+const formData = new FormData(form);
+console.log('Form submitted:', Object.fromEntries(formData));
+});
+const resourcesLink = document.getElementById('resourcesLink');
+const resourcesModal = document.getElementById('resourcesModal');
+resourcesLink.addEventListener('click', (e) => {
+e.preventDefault();
+resourcesModal.classList.remove('hidden');
+document.body.style.overflow = 'hidden';
+});
+window.closeResourcesModal = function() {
+resourcesModal.classList.add('hidden');
+document.body.style.overflow = '';
+}
+resourcesModal.addEventListener('click', (e) => {
+if (e.target === resourcesModal) {
+closeResourcesModal();
+}
+});
+});
+</script>
+</body>
+</html>
