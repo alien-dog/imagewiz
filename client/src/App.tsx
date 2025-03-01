@@ -12,7 +12,9 @@ import Profile from "@/pages/dashboard/profile";
 import ImageHistory from "@/pages/dashboard/image-history";
 import Credits from "@/pages/dashboard/credits";
 import Settings from "@/pages/dashboard/settings";
-import Pricing from "@/pages/pricing";
+import UseCases from "@/pages/resources/use-cases";
+import Guides from "@/pages/resources/guides";
+import Blog from "@/pages/resources/blog";
 import AdminDashboard from "@/pages/admin";
 
 function Router() {
@@ -20,7 +22,9 @@ function Router() {
     <Switch>
       <Route path="/" component={HomePage} />
       <Route path="/auth" component={AuthPage} />
-      <Route path="/pricing" component={Pricing} />
+      <Route path="/resources/use-cases" component={UseCases} />
+      <Route path="/resources/guides" component={Guides} />
+      <Route path="/resources/blog" component={Blog} />
       <ProtectedRoute path="/dashboard" component={Dashboard} />
       <ProtectedRoute path="/dashboard/profile" component={Profile} />
       <ProtectedRoute path="/dashboard/history" component={ImageHistory} />

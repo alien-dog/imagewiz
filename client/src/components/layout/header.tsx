@@ -11,15 +11,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { 
   User,
   History,
@@ -27,11 +18,19 @@ import {
   Settings,
   LogOut,
   LayoutDashboard,
-  Image as ImageIcon
+  Image as ImageIcon,
+  ChevronDown
 } from "lucide-react";
 
 export function Header() {
   const { user, logoutMutation } = useAuth();
+
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <header className="header">
@@ -45,20 +44,42 @@ export function Header() {
           </Link>
 
           <nav className="hidden md:flex items-center space-x-6">
-            <Link href="/">
-              <a className="nav-link">Home</a>
-            </Link>
-            {user && (
-              <Link href="/dashboard">
-                <a className="nav-link flex items-center gap-1.5">
-                  <LayoutDashboard className="h-4 w-4" />
-                  Dashboard
-                </a>
-              </Link>
-            )}
-            <Link href="/pricing">
-              <a className="nav-link">Pricing</a>
-            </Link>
+            <button 
+              onClick={() => scrollToSection('features')}
+              className="nav-link"
+            >
+              Features
+            </button>
+            <button 
+              onClick={() => scrollToSection('pricing')}
+              className="nav-link"
+            >
+              Pricing
+            </button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger className="nav-link flex items-center gap-1">
+                Resources
+                <ChevronDown className="h-4 w-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <Link href="/resources/use-cases">
+                  <DropdownMenuItem className="dropdown-nav">
+                    Use Cases
+                  </DropdownMenuItem>
+                </Link>
+                <Link href="/resources/guides">
+                  <DropdownMenuItem className="dropdown-nav">
+                    Guides
+                  </DropdownMenuItem>
+                </Link>
+                <Link href="/resources/blog">
+                  <DropdownMenuItem className="dropdown-nav">
+                    Blog
+                  </DropdownMenuItem>
+                </Link>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </nav>
         </div>
 
