@@ -1,10 +1,10 @@
 {
-  "primary": "#00FF7F",
+  "primary": "#00CED1",
   "variant": "vibrant",
   "appearance": "light",
   "radius": 0.75,
   "gradient": {
-    "start": "#00FF7F",
-    "end": "#000000"
+    "start": "#00CED1",
+    "end": "#006D70"
   }
 }
