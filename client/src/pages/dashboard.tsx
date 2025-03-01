@@ -6,6 +6,7 @@ import { UserProfile } from "@/components/dashboard/user-profile";
 import { UserCredits } from "@/components/dashboard/user-credits";
 import { TransactionHistory } from "@/components/dashboard/transaction-history";
 import { AccountSettings } from "@/components/dashboard/account-settings";
+import { ImageHistory } from "@/components/dashboard/image-history";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -25,14 +26,19 @@ export default function Dashboard() {
         <Tabs defaultValue="processor" className="space-y-4">
           <TabsList>
             <TabsTrigger value="processor">Image Processor</TabsTrigger>
+            <TabsTrigger value="history">Image History</TabsTrigger>
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="credits">Credits & Billing</TabsTrigger>
-            <TabsTrigger value="history">History</TabsTrigger>
+            <TabsTrigger value="transactions">Transaction History</TabsTrigger>
             <TabsTrigger value="settings">Account Settings</TabsTrigger>
           </TabsList>
 
           <TabsContent value="processor" className="space-y-4">
             <ImageProcessor />
+          </TabsContent>
+
+          <TabsContent value="history" className="space-y-4">
+            <ImageHistory />
           </TabsContent>
 
           <TabsContent value="profile" className="space-y-4">
@@ -43,7 +49,7 @@ export default function Dashboard() {
             <UserCredits />
           </TabsContent>
 
-          <TabsContent value="history" className="space-y-4">
+          <TabsContent value="transactions" className="space-y-4">
             <TransactionHistory />
           </TabsContent>
 

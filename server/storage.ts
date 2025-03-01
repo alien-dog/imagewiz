@@ -1,9 +1,11 @@
 import { users, userProfiles, transactions, type User, type InsertUser, type UserProfile, type Transaction } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
+import { type Image, images } from "@shared/schema"; // Assumed import
+
 
 const PostgresSessionStore = connectPg(session);
 
@@ -21,6 +23,12 @@ export interface IStorage {
   // Transaction operations
   getUserTransactions(userId: number): Promise<Transaction[]>;
   createTransaction(userId: number, transaction: Omit<Transaction, "id" | "userId">): Promise<Transaction>;
+
+  // Image operations
+  getUserImages(userId: number): Promise<Image[]>;
+  getImage(id: number): Promise<Image | undefined>;
+  createImage(image: Omit<Image, "id">): Promise<Image>;
+  deleteImage(id: number): Promise<void>;
 
   sessionStore: session.Store;
 }
@@ -145,6 +153,56 @@ export class DatabaseStorage implements IStorage {
       return newTransaction;
     } catch (error) {
       console.error('Error creating transaction:', error);
+      throw error;
+    }
+  }
+
+  async getUserImages(userId: number): Promise<Image[]> {
+    try {
+      return await db
+        .select()
+        .from(images)
+        .where(eq(images.userId, userId))
+        .orderBy(desc(images.id));
+    } catch (error) {
+      console.error('Error getting user images:', error);
+      return [];
+    }
+  }
+
+  async getImage(id: number): Promise<Image | undefined> {
+    try {
+      const [image] = await db
+        .select()
+        .from(images)
+        .where(eq(images.id, id));
+      return image;
+    } catch (error) {
+      console.error('Error getting image:', error);
+      return undefined;
+    }
+  }
+
+  async createImage(image: Omit<Image, "id">): Promise<Image> {
+    try {
+      const [newImage] = await db
+        .insert(images)
+        .values(image)
+        .returning();
+      return newImage;
+    } catch (error) {
+      console.error('Error creating image:', error);
+      throw error;
+    }
+  }
+
+  async deleteImage(id: number): Promise<void> {
+    try {
+      await db
+        .delete(images)
+        .where(eq(images.id, id));
+    } catch (error) {
+      console.error('Error deleting image:', error);
       throw error;
     }
   }

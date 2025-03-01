@@ -61,6 +61,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(transactions);
   });
 
+  // Add these routes to handle image history
+  app.get("/api/users/:userId/images", isProfileOwner, async (req, res) => {
+    const userId = parseInt(req.params.userId);
+    const images = await storage.getUserImages(userId);
+    res.json(images);
+  });
+
+  app.delete("/api/images/:imageId", async (req, res) => {
+    const imageId = parseInt(req.params.imageId);
+    const image = await storage.getImage(imageId);
+
+    if (!image) {
+      return res.status(404).send("Image not found");
+    }
+
+    if (!req.isAuthenticated() || (req.user?.id !== image.userId && req.user?.username !== 'admin')) {
+      return res.status(403).send("Forbidden");
+    }
+
+    await storage.deleteImage(imageId);
+    res.sendStatus(200);
+  });
+
+  // Update the process endpoint to create an image record
   app.post("/api/process", upload.single("image"), async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).send("Unauthorized");
@@ -70,9 +94,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(400).send("No image provided");
     }
 
+    // Create a new image record
+    const image = await storage.createImage({
+      userId: req.user.id,
+      originalUrl: "temporary-url", // In a real app, this would be the uploaded file URL
+      status: "pending"
+    });
+
     // For demo purposes, just echo back success
     // In a real app, this would integrate with an AI service
-    res.json({ success: true });
+    res.json(image);
   });
 
   const httpServer = createServer(app);
