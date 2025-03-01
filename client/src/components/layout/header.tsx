@@ -22,7 +22,8 @@ import {
   History,
   CreditCard,
   Settings,
-  LogOut
+  LogOut,
+  LayoutDashboard
 } from "lucide-react";
 
 export function Header() {
@@ -109,10 +110,18 @@ export function Header() {
             )}
           </div>
 
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden md:flex items-center space-x-8">
             <Link href="/">
               <a className="text-secondary hover:text-primary">Home</a>
             </Link>
+            {user && (
+              <Link href="/dashboard">
+                <a className="flex items-center gap-2 text-secondary hover:text-primary">
+                  <LayoutDashboard className="h-4 w-4" />
+                  Dashboard
+                </a>
+              </Link>
+            )}
             <Link href="/pricing">
               <a className="text-secondary hover:text-primary">Pricing</a>
             </Link>
@@ -133,6 +142,12 @@ export function Header() {
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  <Link href="/dashboard">
+                    <DropdownMenuItem className="cursor-pointer">
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      <span>Dashboard</span>
+                    </DropdownMenuItem>
+                  </Link>
                   <Link href="/dashboard/profile">
                     <DropdownMenuItem className="cursor-pointer">
                       <User className="mr-2 h-4 w-4" />
