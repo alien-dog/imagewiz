@@ -13,6 +13,14 @@ export async function createCheckoutSession(req: Request, res: Response) {
   const { priceId } = req.body;
 
   try {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: 'You must be logged in to subscribe' });
+    }
+
+    if (!priceId) {
+      return res.status(400).json({ error: 'Price ID is required' });
+    }
+
     const session = await stripe.checkout.sessions.create({
       line_items: [
         {
@@ -23,6 +31,7 @@ export async function createCheckoutSession(req: Request, res: Response) {
       mode: 'subscription',
       success_url: `${DOMAIN}/dashboard/credits?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${DOMAIN}/pricing`,
+      client_reference_id: req.user.id.toString(),
     });
 
     res.json({ url: session.url });

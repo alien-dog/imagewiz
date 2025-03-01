@@ -4,12 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "wouter";
+import { useToast } from "@/hooks/use-toast";
 
 const plans = [
   {
     name: "Basic",
     price: "$9.99",
-    priceId: "price_1OE6FrAKHKDHtC8pBZ9K8J1q", // Replace with your actual Stripe price ID
+    priceId: "price_H5ggYwtDq4fbrJ", // Test price ID
     credits: 100,
     features: [
       "100 image credits",
@@ -21,7 +22,7 @@ const plans = [
   {
     name: "Pro",
     price: "$24.99",
-    priceId: "price_1OE6GrAKHKDHtC8pCZ9K8J2q", // Replace with your actual Stripe price ID
+    priceId: "price_H5ggYwtDq4fbrK", // Test price ID
     credits: 300,
     features: [
       "300 image credits",
@@ -33,7 +34,7 @@ const plans = [
   {
     name: "Business",
     price: "$49.99",
-    priceId: "price_1OE6HrAKHKDHtC8pDZ9K8J3q", // Replace with your actual Stripe price ID
+    priceId: "price_H5ggYwtDq4fbrL", // Test price ID
     credits: 1000,
     features: [
       "1000 image credits",
@@ -46,6 +47,7 @@ const plans = [
 
 export default function Pricing() {
   const { user } = useAuth();
+  const { toast } = useToast();
 
   const handleSubscribe = async (priceId: string) => {
     try {
@@ -57,10 +59,24 @@ export default function Pricing() {
         body: JSON.stringify({ priceId }),
       });
 
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to create checkout session');
+      }
+
       const { url } = await response.json();
-      window.location.href = url;
-    } catch (error) {
+      if (url) {
+        window.location.href = url;
+      } else {
+        throw new Error('Invalid response from server');
+      }
+    } catch (error: any) {
       console.error('Error creating checkout session:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to process payment request",
+        variant: "destructive",
+      });
     }
   };
 
