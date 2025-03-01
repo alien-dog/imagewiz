@@ -20,18 +20,15 @@ import {
   LayoutDashboard,
   Image as ImageIcon,
   ChevronDown,
-  CircleUserRound
+  CircleUserRound,
+  Menu,
+  X
 } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 export function Header() {
   const { user, logoutMutation } = useAuth();
   const [location] = useLocation();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const scrollToSection = (sectionId: string) => {
     if (location === '/') {
@@ -48,64 +45,38 @@ export function Header() {
   };
 
   return (
-    <header className="fixed w-full bg-white shadow-sm z-50">
+    <header className="fixed w-full bg-white border-b border-gray-200 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-8">
             <Link href="/">
               <a className="flex items-center gap-2">
                 <ImageIcon className="h-6 w-6 text-primary" />
-                <span className="logo-text">iMagenWiz</span>
+                <span className="text-xl font-bold text-gray-900">iMagenWiz</span>
               </a>
             </Link>
 
+            {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      onClick={() => scrollToSection('features')}
-                      className="text-gray-800 hover:text-primary transition-colors px-3 py-2 rounded-md hover:bg-gray-50"
-                    >
-                      Features
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Explore our powerful features</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <button
+                onClick={() => scrollToSection('features')}
+                className="text-gray-900 font-medium hover:text-primary transition-colors px-3 py-2 rounded-md hover:bg-gray-50"
+              >
+                Features
+              </button>
 
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      onClick={() => scrollToSection('pricing')}
-                      className="text-gray-800 hover:text-primary transition-colors px-3 py-2 rounded-md hover:bg-gray-50"
-                    >
-                      Pricing
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>View our pricing plans</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <button
+                onClick={() => scrollToSection('pricing')}
+                className="text-gray-900 font-medium hover:text-primary transition-colors px-3 py-2 rounded-md hover:bg-gray-50"
+              >
+                Pricing
+              </button>
 
               <DropdownMenu>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <DropdownMenuTrigger className="text-gray-800 hover:text-primary transition-colors px-3 py-2 rounded-md hover:bg-gray-50 flex items-center gap-1">
-                        Resources
-                        <ChevronDown className="h-4 w-4" />
-                      </DropdownMenuTrigger>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Helpful resources and guides</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <DropdownMenuTrigger className="text-gray-900 font-medium hover:text-primary transition-colors px-3 py-2 rounded-md hover:bg-gray-50 flex items-center gap-1">
+                  Resources
+                  <ChevronDown className="h-4 w-4" />
+                </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   <Link href="/resources/use-cases">
                     <DropdownMenuItem className="cursor-pointer">
@@ -127,34 +98,40 @@ export function Header() {
             </nav>
           </div>
 
-          <div className="flex items-center gap-4">
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-gray-900 hover:text-primary p-2"
+            >
+              {isMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </button>
+          </div>
+
+          {/* Desktop Auth/User Menu */}
+          <div className="hidden md:flex items-center gap-4">
             {user ? (
               <DropdownMenu>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="relative h-10 pl-3 pr-8 rounded-full">
-                          <div className="flex items-center gap-2">
-                            <CircleUserRound className="h-5 w-5 text-primary" />
-                            <span className="text-sm font-medium text-gray-800">{user.username}</span>
-                            <span className="text-xs text-primary font-medium">
-                              {user.credits} credits
-                            </span>
-                            <Avatar className="h-8 w-8 bg-primary/10 absolute right-0">
-                              <AvatarFallback className="text-primary">
-                                {user.username[0].toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                          </div>
-                        </Button>
-                      </DropdownMenuTrigger>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Access your account</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-10 pl-3 pr-8 rounded-full">
+                    <div className="flex items-center gap-2">
+                      <CircleUserRound className="h-5 w-5 text-primary" />
+                      <span className="text-sm font-medium text-gray-900">{user.username}</span>
+                      <span className="text-xs text-primary font-medium">
+                        {user.credits} credits
+                      </span>
+                      <Avatar className="h-8 w-8 bg-primary/10 absolute right-0">
+                        <AvatarFallback className="text-primary">
+                          {user.username[0].toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
@@ -215,6 +192,54 @@ export function Header() {
             )}
           </div>
         </div>
+
+        {/* Mobile Navigation Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1">
+              <button
+                onClick={() => {
+                  scrollToSection('features');
+                  setIsMenuOpen(false);
+                }}
+                className="block w-full text-left px-3 py-2 text-gray-900 font-medium hover:text-primary hover:bg-gray-50 rounded-md"
+              >
+                Features
+              </button>
+              <button
+                onClick={() => {
+                  scrollToSection('pricing');
+                  setIsMenuOpen(false);
+                }}
+                className="block w-full text-left px-3 py-2 text-gray-900 font-medium hover:text-primary hover:bg-gray-50 rounded-md"
+              >
+                Pricing
+              </button>
+              <Link href="/resources/use-cases">
+                <a className="block px-3 py-2 text-gray-900 font-medium hover:text-primary hover:bg-gray-50 rounded-md">
+                  Use Cases
+                </a>
+              </Link>
+              <Link href="/resources/guides">
+                <a className="block px-3 py-2 text-gray-900 font-medium hover:text-primary hover:bg-gray-50 rounded-md">
+                  Guides
+                </a>
+              </Link>
+              <Link href="/resources/blog">
+                <a className="block px-3 py-2 text-gray-900 font-medium hover:text-primary hover:bg-gray-50 rounded-md">
+                  Blog
+                </a>
+              </Link>
+              {!user && (
+                <Link href="/auth">
+                  <a className="block px-3 py-2 text-gray-900 font-medium hover:text-primary hover:bg-gray-50 rounded-md">
+                    Sign In
+                  </a>
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );
