@@ -3,11 +3,11 @@ import { Footer } from "@/components/layout/footer";
 import { Helmet } from "react-helmet";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "wouter";
-import { 
-  ShoppingBag, 
-  Camera, 
-  Briefcase, 
-  PenTool 
+import {
+  ShoppingBag,
+  Camera,
+  Briefcase,
+  PenTool
 } from "lucide-react";
 
 const useCases = [
@@ -21,19 +21,19 @@ const useCases = [
     icon: <Camera className="h-6 w-6" />,
     title: "Photography",
     description: "Professional photographers can quickly process portraits and create stunning composite images with clean background removal.",
-    link: "#"
+    link: "/resources/use-cases/photography"
   },
   {
     icon: <Briefcase className="h-6 w-6" />,
     title: "Marketing",
     description: "Create eye-catching marketing materials and social media content with clean, professional image editing.",
-    link: "#"
+    link: "/resources/use-cases/marketing"
   },
   {
     icon: <PenTool className="h-6 w-6" />,
     title: "Graphic Design",
     description: "Streamline your design workflow by quickly removing backgrounds from images for layouts and compositions.",
-    link: "#"
+    link: "/resources/use-cases/graphic-design"
   }
 ];
 

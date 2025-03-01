@@ -3,7 +3,7 @@ import { Footer } from "@/components/layout/footer";
 import { Helmet } from "react-helmet";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "wouter";
-import { 
+import {
   VideoIcon,
   Lightbulb,
   GraduationCap,
@@ -23,21 +23,21 @@ const guides = [
     title: "Advanced Techniques",
     description: "Master advanced features and get professional-quality results with our expert tips and tricks.",
     readTime: "10 min read",
-    link: "#"
+    link: "/resources/guides/advanced-techniques"
   },
   {
     icon: <GraduationCap className="h-6 w-6" />,
     title: "Best Practices",
     description: "Learn industry best practices for image processing and optimization to achieve the best results.",
     readTime: "8 min read",
-    link: "#"
+    link: "/resources/guides/best-practices"
   },
   {
     icon: <FileText className="h-6 w-6" />,
     title: "API Integration",
     description: "Technical guide for developers on integrating iMageWiz's powerful API into their applications.",
     readTime: "15 min read",
-    link: "#"
+    link: "/resources/guides/api-integration"
   }
 ];
 

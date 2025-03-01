@@ -20,7 +20,7 @@ const blogPosts = [
     date: new Date(2024, 1, 28),
     author: "Michael Roberts",
     category: "E-commerce",
-    link: "#"
+    link: "/resources/blog/ecommerce-optimization"
   },
   {
     title: "Sustainability in Digital Design",
@@ -28,7 +28,7 @@ const blogPosts = [
     date: new Date(2024, 1, 25),
     author: "Emma Green",
     category: "Design",
-    link: "#"
+    link: "/resources/blog/sustainability-design"
   },
   {
     title: "Image Processing Trends in 2024",
@@ -36,7 +36,7 @@ const blogPosts = [
     date: new Date(2024, 1, 20),
     author: "David Kim",
     category: "Industry Trends",
-    link: "#"
+    link: "/resources/blog/processing-trends"
   }
 ];
 

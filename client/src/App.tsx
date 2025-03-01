@@ -22,9 +22,23 @@ import Guides from "@/pages/resources/guides";
 import Blog from "@/pages/resources/blog";
 
 // Individual Articles
+// Use Cases
 import EcommerceUseCase from "@/pages/resources/use-cases/ecommerce";
+import PhotographyUseCase from "@/pages/resources/use-cases/photography";
+import MarketingUseCase from "@/pages/resources/use-cases/marketing";
+import GraphicDesignUseCase from "@/pages/resources/use-cases/graphic-design";
+
+// Guides
 import GettingStartedGuide from "@/pages/resources/guides/getting-started";
+import AdvancedTechniquesGuide from "@/pages/resources/guides/advanced-techniques";
+import BestPracticesGuide from "@/pages/resources/guides/best-practices";
+import ApiIntegrationGuide from "@/pages/resources/guides/api-integration";
+
+// Blog Posts
 import AIFutureImageProcessing from "@/pages/resources/blog/ai-future-image-processing";
+import EcommerceOptimization from "@/pages/resources/blog/ecommerce-optimization";
+import SustainabilityDesign from "@/pages/resources/blog/sustainability-design";
+import ProcessingTrends from "@/pages/resources/blog/processing-trends";
 
 function Router() {
   return (
@@ -37,10 +51,23 @@ function Router() {
       <Route path="/resources/guides" component={Guides} />
       <Route path="/resources/blog" component={Blog} />
 
-      {/* Individual Articles */}
+      {/* Use Cases */}
       <Route path="/resources/use-cases/ecommerce" component={EcommerceUseCase} />
+      <Route path="/resources/use-cases/photography" component={PhotographyUseCase} />
+      <Route path="/resources/use-cases/marketing" component={MarketingUseCase} />
+      <Route path="/resources/use-cases/graphic-design" component={GraphicDesignUseCase} />
+
+      {/* Guides */}
       <Route path="/resources/guides/getting-started" component={GettingStartedGuide} />
+      <Route path="/resources/guides/advanced-techniques" component={AdvancedTechniquesGuide} />
+      <Route path="/resources/guides/best-practices" component={BestPracticesGuide} />
+      <Route path="/resources/guides/api-integration" component={ApiIntegrationGuide} />
+
+      {/* Blog Posts */}
       <Route path="/resources/blog/ai-future-image-processing" component={AIFutureImageProcessing} />
+      <Route path="/resources/blog/ecommerce-optimization" component={EcommerceOptimization} />
+      <Route path="/resources/blog/sustainability-design" component={SustainabilityDesign} />
+      <Route path="/resources/blog/processing-trends" component={ProcessingTrends} />
 
       {/* Dashboard Routes */}
       <ProtectedRoute path="/dashboard" component={Dashboard} />
