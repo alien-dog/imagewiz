@@ -16,12 +16,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { ArrowUpCircle, ArrowDownCircle, Loader2 } from "lucide-react";
 
 export function TransactionHistory() {
   const { user } = useAuth();
-  const { data: transactions, isLoading } = useQuery<Transaction[]>({
+  const { data: transactions, isLoading, error } = useQuery<Transaction[]>({
     queryKey: [`/api/users/${user?.id}/transactions`],
     enabled: !!user,
   });
@@ -31,6 +31,18 @@ export function TransactionHistory() {
       <div className="flex justify-center py-8">
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardContent className="py-8">
+          <div className="text-center text-muted-foreground">
+            Error loading transactions. Please try again later.
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -56,7 +68,7 @@ export function TransactionHistory() {
             {transactions?.map((transaction) => (
               <TableRow key={transaction.id}>
                 <TableCell>
-                  {format(new Date(transaction.createdAt), 'MMM d, yyyy')}
+                  {format(parseISO(transaction.createdAt.toString()), 'MMM d, yyyy')}
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">

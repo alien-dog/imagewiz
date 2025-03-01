@@ -36,77 +36,117 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUser(id: number): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user;
+    try {
+      const [user] = await db.select().from(users).where(eq(users.id, id));
+      return user;
+    } catch (error) {
+      console.error('Error getting user:', error);
+      return undefined;
+    }
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
-    return user;
+    try {
+      const [user] = await db.select().from(users).where(eq(users.username, username));
+      return user;
+    } catch (error) {
+      console.error('Error getting user by username:', error);
+      return undefined;
+    }
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values({
-        ...insertUser,
-        credits: 3 // Give new users 3 free credits
-      })
-      .returning();
-    return user;
+    try {
+      const [user] = await db
+        .insert(users)
+        .values({
+          ...insertUser,
+          credits: 3 // Give new users 3 free credits
+        })
+        .returning();
+      return user;
+    } catch (error) {
+      console.error('Error creating user:', error);
+      throw error;
+    }
   }
 
   async getAllUsers(): Promise<User[]> {
-    return await db.select().from(users);
+    try {
+      return await db.select().from(users);
+    } catch (error) {
+      console.error('Error getting all users:', error);
+      return [];
+    }
   }
 
   async getUserProfile(userId: number): Promise<UserProfile | undefined> {
-    const [profile] = await db
-      .select()
-      .from(userProfiles)
-      .where(eq(userProfiles.userId, userId));
-    return profile;
+    try {
+      const [profile] = await db
+        .select()
+        .from(userProfiles)
+        .where(eq(userProfiles.userId, userId));
+      return profile;
+    } catch (error) {
+      console.error('Error getting user profile:', error);
+      return undefined;
+    }
   }
 
   async updateUserProfile(userId: number, profile: Partial<UserProfile>): Promise<UserProfile> {
-    const [existingProfile] = await db
-      .select()
-      .from(userProfiles)
-      .where(eq(userProfiles.userId, userId));
+    try {
+      const [existingProfile] = await db
+        .select()
+        .from(userProfiles)
+        .where(eq(userProfiles.userId, userId));
 
-    if (existingProfile) {
-      const [updatedProfile] = await db
-        .update(userProfiles)
-        .set({ ...profile, updatedAt: new Date() })
-        .where(eq(userProfiles.userId, userId))
-        .returning();
-      return updatedProfile;
-    } else {
-      const [newProfile] = await db
-        .insert(userProfiles)
-        .values({ ...profile, userId })
-        .returning();
-      return newProfile;
+      if (existingProfile) {
+        const [updatedProfile] = await db
+          .update(userProfiles)
+          .set({ ...profile, updatedAt: new Date() })
+          .where(eq(userProfiles.userId, userId))
+          .returning();
+        return updatedProfile;
+      } else {
+        const [newProfile] = await db
+          .insert(userProfiles)
+          .values({ ...profile, userId })
+          .returning();
+        return newProfile;
+      }
+    } catch (error) {
+      console.error('Error updating user profile:', error);
+      throw error;
     }
   }
 
   async getUserTransactions(userId: number): Promise<Transaction[]> {
-    return await db
-      .select()
-      .from(transactions)
-      .where(eq(transactions.userId, userId))
-      .orderBy(transactions.createdAt);
+    try {
+      return await db
+        .select()
+        .from(transactions)
+        .where(eq(transactions.userId, userId))
+        .orderBy(transactions.createdAt);
+    } catch (error) {
+      console.error('Error getting user transactions:', error);
+      return [];
+    }
   }
 
   async createTransaction(
     userId: number,
     transaction: Omit<Transaction, "id" | "userId">
   ): Promise<Transaction> {
-    const [newTransaction] = await db
-      .insert(transactions)
-      .values({ ...transaction, userId })
-      .returning();
-    return newTransaction;
+    try {
+      const [newTransaction] = await db
+        .insert(transactions)
+        .values({ ...transaction, userId })
+        .returning();
+      return newTransaction;
+    } catch (error) {
+      console.error('Error creating transaction:', error);
+      throw error;
+    }
   }
 }
 
