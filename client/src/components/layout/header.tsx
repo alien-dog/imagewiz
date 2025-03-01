@@ -138,6 +138,9 @@ export function Header() {
                           <div className="flex items-center gap-2">
                             <CircleUserRound className="h-5 w-5 text-primary" />
                             <span className="text-sm font-medium">{user.username}</span>
+                            <span className="text-xs text-primary font-medium">
+                              {user.credits} credits
+                            </span>
                             <Avatar className="h-8 w-8 bg-primary/10 absolute right-0">
                               <AvatarFallback className="text-primary">
                                 {user.username[0].toUpperCase()}

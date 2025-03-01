@@ -15,20 +15,24 @@ type AuthContextType = {
   loginMutation: UseMutationResult<SelectUser, Error, LoginData>;
   logoutMutation: UseMutationResult<void, Error, void>;
   registerMutation: UseMutationResult<SelectUser, Error, InsertUser>;
+  refreshCredits: () => void;
 };
 
 type LoginData = Pick<InsertUser, "username" | "password">;
 
 export const AuthContext = createContext<AuthContextType | null>(null);
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   const {
     data: user,
     error,
     isLoading,
+    refetch: refreshCredits
   } = useQuery<SelectUser | undefined, Error>({
     queryKey: ["/api/user"],
     queryFn: getQueryFn({ on401: "returnNull" }),
+    refetchOnWindowFocus: true, // Automatically refresh when window gains focus
   });
 
   const loginMutation = useMutation({
@@ -38,6 +42,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: SelectUser) => {
       queryClient.setQueryData(["/api/user"], user);
+      toast({
+        title: "Welcome back!",
+        description: `You have ${user.credits} credits available.`,
+      });
     },
     onError: (error: Error) => {
       toast({
@@ -55,6 +63,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: SelectUser) => {
       queryClient.setQueryData(["/api/user"], user);
+      toast({
+        title: "Welcome to iMagenWiz!",
+        description: `Your account is ready with ${user.credits} free credits.`,
+      });
     },
     onError: (error: Error) => {
       toast({
@@ -71,6 +83,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: () => {
       queryClient.setQueryData(["/api/user"], null);
+      toast({
+        title: "Goodbye!",
+        description: "You've been successfully logged out.",
+      });
     },
     onError: (error: Error) => {
       toast({
@@ -90,6 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loginMutation,
         logoutMutation,
         registerMutation,
+        refreshCredits,
       }}
     >
       {children}
