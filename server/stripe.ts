@@ -21,7 +21,7 @@ export async function createCheckoutSession(req: Request, res: Response) {
         },
       ],
       mode: 'subscription',
-      success_url: `${DOMAIN}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${DOMAIN}/dashboard/credits?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${DOMAIN}/pricing`,
     });
 
