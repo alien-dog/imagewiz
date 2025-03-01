@@ -21,11 +21,18 @@ export default function Pricing() {
     { credits: 5000, price: 459.9, pricePerImage: 0.05 }
   ];
 
-  const proOptions = [
+  const proMonthlyOptions = [
     { credits: 50, price: 9.9, pricePerImage: 0.2 },
     { credits: 250, price: 24.9, pricePerImage: 0.1 },
     { credits: 1250, price: 85.9, pricePerImage: 0.07 },
     { credits: 5050, price: 239.9, pricePerImage: 0.047 }
+  ];
+
+  const proYearlyOptions = [
+    { credits: 50, price: 8.9, pricePerImage: 0.178 },
+    { credits: 250, price: 21.9, pricePerImage: 0.087 },
+    { credits: 1250, price: 76.9, pricePerImage: 0.061 },
+    { credits: 5050, price: 215.9, pricePerImage: 0.042 }
   ];
 
   const handleSubscribe = async (priceId: string) => {
@@ -59,8 +66,8 @@ export default function Pricing() {
     }
   };
 
-  const calculatePrice = (basePrice: number) => {
-    return isYearlyBilling ? basePrice * 0.9 : basePrice;
+  const getCurrentProOptions = () => {
+    return isYearlyBilling ? proYearlyOptions : proMonthlyOptions;
   };
 
   return (
@@ -108,14 +115,16 @@ export default function Pricing() {
               <CardTitle>
                 <h3 className="text-2xl font-bold">Pro Plan</h3>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold">${(isYearlyBilling ? 0.18 * 0.9 : 0.18).toFixed(2)}</span>
+                  <span className="text-4xl font-bold">
+                    ${(isYearlyBilling ? proYearlyOptions[1].pricePerImage : proMonthlyOptions[1].pricePerImage).toFixed(3)}
+                  </span>
                   <span className="text-muted-foreground"> /image</span>
                 </div>
               </CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="space-y-4">
-                {proOptions.map((option) => (
+                {getCurrentProOptions().map((option) => (
                   <li key={option.credits} className="flex items-center gap-2">
                     <input 
                       type="radio" 
@@ -125,7 +134,7 @@ export default function Pricing() {
                     />
                     <span>{option.credits} credits</span>
                     <span className="text-muted-foreground">/month</span>
-                    <span className="ml-auto">USD {calculatePrice(option.price).toFixed(1)}</span>
+                    <span className="ml-auto">USD {option.price.toFixed(1)}</span>
                   </li>
                 ))}
               </ul>
