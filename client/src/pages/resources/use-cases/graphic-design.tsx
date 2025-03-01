@@ -32,21 +32,43 @@ export default function GraphicDesignUseCase() {
             </div>
 
             <div className="prose prose-lg max-w-none">
-              <p className="lead">
+              <p className="lead text-xl text-gray-700 mb-8 border-l-4 border-primary-500 pl-4 py-2 bg-gradient-to-r from-primary-50 to-transparent">
                 Enhance your graphic design workflow with powerful AI-driven background removal. Create stunning compositions and designs faster than ever before.
               </p>
 
-              <h2>Design Workflow Integration</h2>
-              <p>
+              <h2 className="text-2xl font-semibold text-primary-700 mt-10 mb-6 flex items-center">
+                <span className="bg-primary-100 text-primary-700 p-2 rounded-lg mr-3">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 9.5L12 3L22 9.5M4 10V20H20V10M12 14V17M8 14V17M16 14V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </span>
+                Design Workflow Integration
+              </h2>
+              <p className="text-gray-700 mb-4">
                 Perfect for various design projects:
               </p>
-              <ul>
-                <li>Brand identity design</li>
-                <li>Marketing collateral</li>
-                <li>Digital and print advertisements</li>
-                <li>Social media graphics</li>
-                <li>Package design</li>
-              </ul>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div className="flex items-center bg-white p-4 rounded-lg shadow-soft hover:shadow-feature transition-shadow duration-300">
+                  <span className="text-primary-500 mr-3">●</span>
+                  <span>Brand identity design</span>
+                </div>
+                <div className="flex items-center bg-white p-4 rounded-lg shadow-soft hover:shadow-feature transition-shadow duration-300">
+                  <span className="text-primary-500 mr-3">●</span>
+                  <span>Marketing collateral</span>
+                </div>
+                <div className="flex items-center bg-white p-4 rounded-lg shadow-soft hover:shadow-feature transition-shadow duration-300">
+                  <span className="text-primary-500 mr-3">●</span>
+                  <span>Digital and print advertisements</span>
+                </div>
+                <div className="flex items-center bg-white p-4 rounded-lg shadow-soft hover:shadow-feature transition-shadow duration-300">
+                  <span className="text-primary-500 mr-3">●</span>
+                  <span>Social media graphics</span>
+                </div>
+                <div className="flex items-center bg-white p-4 rounded-lg shadow-soft hover:shadow-feature transition-shadow duration-300">
+                  <span className="text-primary-500 mr-3">●</span>
+                  <span>Package design</span>
+                </div>
+              </div>
 
               <h2>Professional Design Features</h2>
               <h3>Advanced Capabilities</h3>

@@ -58,15 +58,43 @@ export default function EcommerceOptimization() {
                 <li>Apply consistent styling across product categories</li>
               </ul>
 
-              <h2>2. Optimize Image Quality and Size</h2>
-              <p>
+              <h2 className="text-2xl font-semibold text-primary-700 mt-10 mb-4">2. Optimize Image Quality and Size</h2>
+              <p className="text-gray-700 mb-4">
                 Balance quality and loading speed for optimal user experience:
               </p>
-              <ul>
-                <li>Compress images without losing quality</li>
-                <li>Use appropriate file formats (PNG for transparency, JPEG for photos)</li>
-                <li>Implement lazy loading for faster page loads</li>
-                <li>Consider mobile device limitations</li>
+              <ul className="bg-white rounded-lg shadow-soft p-5 space-y-3 mb-8">
+                <li className="flex items-start">
+                  <span className="bg-primary-100 text-primary-700 p-1 rounded-full mr-3">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </span>
+                  <span>Compress images without losing quality</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="bg-primary-100 text-primary-700 p-1 rounded-full mr-3">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </span>
+                  <span>Use appropriate file formats (PNG for transparency, JPEG for photos)</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="bg-primary-100 text-primary-700 p-1 rounded-full mr-3">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </span>
+                  <span>Implement lazy loading for faster page loads</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="bg-primary-100 text-primary-700 p-1 rounded-full mr-3">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </span>
+                  <span>Consider mobile device limitations</span>
+                </li>
               </ul>
 
               <h2>3. Showcase Multiple Angles</h2>

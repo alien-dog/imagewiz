@@ -6,12 +6,17 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif'],
+        sans: ['"Inter"', '"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif'],
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      boxShadow: {
+        'soft': '0 4px 20px rgba(0, 0, 0, 0.05)',
+        'feature': '0 8px 30px rgba(74, 108, 247, 0.12)',
+        'button': '0 4px 14px rgba(74, 108, 247, 0.25)',
       },
       colors: {
         background: "hsl(var(--background))",
@@ -28,6 +33,16 @@ export default {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
           gradient: "linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%)",
+          50: "#F0F4FF",
+          100: "#E0E9FF",
+          200: "#C7D7FE",
+          300: "#A4BCFD",
+          400: "#819DFC",
+          500: "#4A6CF7",
+          600: "#3A56DE",
+          700: "#2A41BB",
+          800: "#1F3397",
+          900: "#162970"
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
