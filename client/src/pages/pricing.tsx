@@ -95,21 +95,18 @@ export default function Pricing() {
               >
                 Show {showMorePayGo ? 'less' : 'more'} <ChevronDown className={`ml-2 h-4 w-4 ${showMorePayGo ? 'rotate-180' : ''} transition-transform`} />
               </Button>
-              <Button className="w-full mt-4">Buy now</Button>
+              <Button className="w-full">Buy now</Button>
               <p className="text-sm text-muted-foreground mt-4 text-center">
                 Credits available for use anytime within two years of purchase
               </p>
             </CardContent>
           </Card>
 
-          {/* Subscription Plan */}
+          {/* Pro Plan */}
           <Card className="relative">
-            <div className="absolute -top-2 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm">
-              Most Popular
-            </div>
             <CardHeader>
               <CardTitle>
-                <h3 className="text-2xl font-bold">Subscription Plan</h3>
+                <h3 className="text-2xl font-bold">Pro Plan</h3>
                 <div className="mt-4">
                   <span className="text-4xl font-bold">$0.18</span>
                   <span className="text-muted-foreground"> /image</span>
@@ -177,11 +174,14 @@ export default function Pricing() {
             </CardContent>
           </Card>
 
-          {/* High-Volume Solutions */}
+          {/* Business Plan */}
           <Card className="relative">
+            <div className="absolute -top-2 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm">
+              Most Popular
+            </div>
             <CardHeader>
               <CardTitle>
-                <h3 className="text-2xl font-bold">High-Volume Solutions</h3>
+                <h3 className="text-2xl font-bold">Business Plan</h3>
                 <div className="mt-4">
                   <span className="text-4xl font-bold">100,000+</span>
                   <span className="text-muted-foreground"> Images</span>
@@ -207,6 +207,7 @@ export default function Pricing() {
               <Button className="w-full">Contact Sales</Button>
             </CardContent>
           </Card>
+
         </div>
 
         <div className="mt-16 text-center">
