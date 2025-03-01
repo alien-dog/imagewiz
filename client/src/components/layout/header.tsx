@@ -48,7 +48,7 @@ export function Header() {
   };
 
   return (
-    <header className="fixed w-full bg-white/80 backdrop-blur-lg shadow-sm z-50">
+    <header className="fixed w-full bg-white shadow-sm z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-8">
@@ -65,7 +65,7 @@ export function Header() {
                   <TooltipTrigger asChild>
                     <button
                       onClick={() => scrollToSection('features')}
-                      className="text-gray-600 hover:text-primary transition-colors px-3 py-2 rounded-md hover:bg-gray-50"
+                      className="text-gray-800 hover:text-primary transition-colors px-3 py-2 rounded-md hover:bg-gray-50"
                     >
                       Features
                     </button>
@@ -81,7 +81,7 @@ export function Header() {
                   <TooltipTrigger asChild>
                     <button
                       onClick={() => scrollToSection('pricing')}
-                      className="text-gray-600 hover:text-primary transition-colors px-3 py-2 rounded-md hover:bg-gray-50"
+                      className="text-gray-800 hover:text-primary transition-colors px-3 py-2 rounded-md hover:bg-gray-50"
                     >
                       Pricing
                     </button>
@@ -96,7 +96,7 @@ export function Header() {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <DropdownMenuTrigger className="text-gray-600 hover:text-primary transition-colors px-3 py-2 rounded-md hover:bg-gray-50 flex items-center gap-1">
+                      <DropdownMenuTrigger className="text-gray-800 hover:text-primary transition-colors px-3 py-2 rounded-md hover:bg-gray-50 flex items-center gap-1">
                         Resources
                         <ChevronDown className="h-4 w-4" />
                       </DropdownMenuTrigger>
@@ -137,7 +137,7 @@ export function Header() {
                         <Button variant="ghost" className="relative h-10 pl-3 pr-8 rounded-full">
                           <div className="flex items-center gap-2">
                             <CircleUserRound className="h-5 w-5 text-primary" />
-                            <span className="text-sm font-medium">{user.username}</span>
+                            <span className="text-sm font-medium text-gray-800">{user.username}</span>
                             <span className="text-xs text-primary font-medium">
                               {user.credits} credits
                             </span>
