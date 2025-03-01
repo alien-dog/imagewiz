@@ -4,6 +4,7 @@ import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "./lib/protected-route";
+import { Helmet } from "react-helmet";
 
 // Pages
 import HomePage from "@/pages/home-page";
@@ -48,49 +49,58 @@ import GDPR from "@/pages/gdpr";
 
 function Router() {
   return (
-    <Switch>
-      <Route path="/" component={HomePage} />
-      <Route path="/auth" component={AuthPage} />
-      <Route path="/pricing" component={Pricing} />
+    <>
+      <Helmet>
+        <title>iMagenWiz - AI image background removal</title>
+        <meta
+          name="description"
+          content="iMagenWiz is an advanced AI-powered platform for removing image backgrounds instantly. Perfect for professionals and creators."
+        />
+      </Helmet>
+      <Switch>
+        <Route path="/" component={HomePage} />
+        <Route path="/auth" component={AuthPage} />
+        <Route path="/pricing" component={Pricing} />
 
-      {/* Resource Pages */}
-      <Route path="/resources/use-cases" component={UseCases} />
-      <Route path="/resources/guides" component={Guides} />
-      <Route path="/resources/blog" component={Blog} />
+        {/* Resource Pages */}
+        <Route path="/resources/use-cases" component={UseCases} />
+        <Route path="/resources/guides" component={Guides} />
+        <Route path="/resources/blog" component={Blog} />
 
-      {/* Legal Pages */}
-      <Route path="/privacy" component={Privacy} />
-      <Route path="/terms" component={Terms} />
-      <Route path="/gdpr" component={GDPR} />
+        {/* Legal Pages */}
+        <Route path="/privacy" component={Privacy} />
+        <Route path="/terms" component={Terms} />
+        <Route path="/gdpr" component={GDPR} />
 
-      {/* Use Cases */}
-      <Route path="/resources/use-cases/ecommerce" component={EcommerceUseCase} />
-      <Route path="/resources/use-cases/photography" component={PhotographyUseCase} />
-      <Route path="/resources/use-cases/marketing" component={MarketingUseCase} />
-      <Route path="/resources/use-cases/graphic-design" component={GraphicDesignUseCase} />
+        {/* Use Cases */}
+        <Route path="/resources/use-cases/ecommerce" component={EcommerceUseCase} />
+        <Route path="/resources/use-cases/photography" component={PhotographyUseCase} />
+        <Route path="/resources/use-cases/marketing" component={MarketingUseCase} />
+        <Route path="/resources/use-cases/graphic-design" component={GraphicDesignUseCase} />
 
-      {/* Guides */}
-      <Route path="/resources/guides/getting-started" component={GettingStartedGuide} />
-      <Route path="/resources/guides/advanced-techniques" component={AdvancedTechniquesGuide} />
-      <Route path="/resources/guides/best-practices" component={BestPracticesGuide} />
-      <Route path="/resources/guides/api-integration" component={ApiIntegrationGuide} />
+        {/* Guides */}
+        <Route path="/resources/guides/getting-started" component={GettingStartedGuide} />
+        <Route path="/resources/guides/advanced-techniques" component={AdvancedTechniquesGuide} />
+        <Route path="/resources/guides/best-practices" component={BestPracticesGuide} />
+        <Route path="/resources/guides/api-integration" component={ApiIntegrationGuide} />
 
-      {/* Blog Posts */}
-      <Route path="/resources/blog/ai-future-image-processing" component={AIFutureImageProcessing} />
-      <Route path="/resources/blog/ecommerce-optimization" component={EcommerceOptimization} />
-      <Route path="/resources/blog/sustainability-design" component={SustainabilityDesign} />
-      <Route path="/resources/blog/processing-trends" component={ProcessingTrends} />
+        {/* Blog Posts */}
+        <Route path="/resources/blog/ai-future-image-processing" component={AIFutureImageProcessing} />
+        <Route path="/resources/blog/ecommerce-optimization" component={EcommerceOptimization} />
+        <Route path="/resources/blog/sustainability-design" component={SustainabilityDesign} />
+        <Route path="/resources/blog/processing-trends" component={ProcessingTrends} />
 
-      {/* Dashboard Routes */}
-      <ProtectedRoute path="/dashboard" component={Dashboard} />
-      <ProtectedRoute path="/dashboard/profile" component={Profile} />
-      <ProtectedRoute path="/dashboard/history" component={ImageHistory} />
-      <ProtectedRoute path="/dashboard/credits" component={Credits} />
-      <ProtectedRoute path="/dashboard/settings" component={Settings} />
-      <ProtectedRoute path="/admin" component={AdminDashboard} adminOnly />
+        {/* Dashboard Routes */}
+        <ProtectedRoute path="/dashboard" component={Dashboard} />
+        <ProtectedRoute path="/dashboard/profile" component={Profile} />
+        <ProtectedRoute path="/dashboard/history" component={ImageHistory} />
+        <ProtectedRoute path="/dashboard/credits" component={Credits} />
+        <ProtectedRoute path="/dashboard/settings" component={Settings} />
+        <ProtectedRoute path="/admin" component={AdminDashboard} adminOnly />
 
-      <Route component={NotFound} />
-    </Switch>
+        <Route component={NotFound} />
+      </Switch>
+    </>
   );
 }
 

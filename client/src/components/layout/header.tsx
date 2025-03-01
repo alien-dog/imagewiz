@@ -22,13 +22,26 @@ import {
   ChevronDown,
   CircleUserRound,
   Menu,
-  X
+  X,
+  Upload
 } from "lucide-react";
 
 export function Header() {
   const { user, logoutMutation } = useAuth();
   const [location] = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+
+  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setLogoUrl(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const scrollToSection = (sectionId: string) => {
     if (location === '/') {
@@ -51,12 +64,33 @@ export function Header() {
           <div className="flex items-center gap-8">
             <Link href="/">
               <a className="flex items-center gap-2">
-                <ImageIcon className="h-6 w-6 text-primary" />
-                <span className="text-xl font-bold text-gray-900">iMagenWiz</span>
+                {logoUrl ? (
+                  <img src={logoUrl} alt="Logo" className="h-8 w-auto" />
+                ) : (
+                  <ImageIcon className="h-6 w-6 text-primary" />
+                )}
+                <div>
+                  <span className="text-xl font-bold text-gray-900">iMagenWiz</span>
+                  <p className="text-sm text-gray-600">AI image background removal</p>
+                </div>
               </a>
             </Link>
 
-            {/* Desktop Navigation */}
+            {user?.id === 1 && (
+              <div className="hidden md:flex items-center">
+                <label className="cursor-pointer text-sm text-gray-600 hover:text-primary flex items-center gap-2">
+                  <Upload className="h-4 w-4" />
+                  Upload Logo
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleLogoUpload}
+                  />
+                </label>
+              </div>
+            )}
+
             <nav className="hidden md:flex items-center space-x-8">
               <button
                 onClick={() => scrollToSection('features')}
@@ -98,7 +132,6 @@ export function Header() {
             </nav>
           </div>
 
-          {/* Mobile menu button */}
           <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -112,7 +145,6 @@ export function Header() {
             </button>
           </div>
 
-          {/* Desktop Auth/User Menu */}
           <div className="hidden md:flex items-center gap-4">
             {user ? (
               <DropdownMenu>
@@ -193,7 +225,6 @@ export function Header() {
           </div>
         </div>
 
-        {/* Mobile Navigation Menu */}
         {isMenuOpen && (
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1">
