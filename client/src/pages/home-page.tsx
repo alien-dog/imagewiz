@@ -268,7 +268,7 @@ export default function HomePage() {
                   </ul>
                   <Button className="w-full mt-6">Buy now</Button>
                   <p className="text-sm text-muted-foreground mt-4 text-center">
-                    Credits available for use anytime within two years of purchase
+                    Credits never expire and can be used anytime
                   </p>
                 </CardContent>
               </Card>
@@ -278,19 +278,19 @@ export default function HomePage() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
                   <div>
                     <div className="mb-4">∞</div>
-                    <p>Unlimited free previews on remove.bg</p>
+                    <p>Unlimited free previews on iMagenWiz</p>
                   </div>
                   <div>
                     <div className="mb-4">{`</>`}</div>
-                    <p>50 free previews via API and apps per month</p>
+                    <p>50 free API previews per month</p>
                   </div>
                   <div>
                     <div className="mb-4">✨</div>
-                    <p>remove.bg for Adobe Photoshop</p>
+                    <p>iMagenWiz for Adobe Photoshop</p>
                   </div>
                   <div>
                     <div className="mb-4">💻</div>
-                    <p>remove.bg for Windows / Mac / Linux</p>
+                    <p>iMagenWiz Desktop Apps</p>
                   </div>
                 </div>
               </div>
