@@ -27,6 +27,7 @@ export async function createCheckoutSession(req: Request, res: Response) {
 
     res.json({ url: session.url });
   } catch (err: any) {
+    console.error('Stripe error:', err);
     res.status(500).json({ error: err.message });
   }
 }

@@ -9,7 +9,7 @@ const plans = [
   {
     name: "Basic",
     price: "$9.99",
-    priceId: "price_basic", // Replace with your actual Stripe price ID
+    priceId: "price_1OE6FrAKHKDHtC8pBZ9K8J1q", // Replace with your actual Stripe price ID
     credits: 100,
     features: [
       "100 image credits",
@@ -21,7 +21,7 @@ const plans = [
   {
     name: "Pro",
     price: "$24.99",
-    priceId: "price_pro", // Replace with your actual Stripe price ID
+    priceId: "price_1OE6GrAKHKDHtC8pCZ9K8J2q", // Replace with your actual Stripe price ID
     credits: 300,
     features: [
       "300 image credits",
@@ -33,7 +33,7 @@ const plans = [
   {
     name: "Business",
     price: "$49.99",
-    priceId: "price_business", // Replace with your actual Stripe price ID
+    priceId: "price_1OE6HrAKHKDHtC8pDZ9K8J3q", // Replace with your actual Stripe price ID
     credits: 1000,
     features: [
       "1000 image credits",
