@@ -1,7 +1,6 @@
-
 {
-  "primary": "#4A6CF7",
-  "variant": "modern",
+  "primary": "#7fdbca",
+  "variant": "professional",
   "appearance": "light",
   "radius": 0.75
 }
