@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -11,38 +11,33 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   }
 }
 
 @layer components {
   .logo-text {
-    font-family: 'Pacifico', cursive;
+    @apply text-xl font-bold text-primary;
   }
 
   .card {
-    @apply rounded-lg border bg-card text-card-foreground shadow-sm transition-all duration-200;
+    @apply rounded-lg border bg-white text-card-foreground shadow-sm transition-all duration-200;
   }
 
   .card-hover {
-    @apply hover:shadow-md hover:border-primary/20;
+    @apply hover:shadow-md hover:border-primary/10;
   }
 
   .nav-link {
-    @apply text-secondary hover:text-primary transition-colors duration-200;
+    @apply text-gray-600 hover:text-primary transition-colors duration-200;
   }
 
   .button-primary {
-    @apply bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors duration-200;
+    @apply bg-primary text-white px-6 py-2.5 rounded-lg hover:bg-primary/90 transition-colors duration-200 font-medium;
   }
 
   .button-outline {
-    @apply border border-primary text-primary px-6 py-2 rounded-lg hover:bg-primary hover:text-white transition-all duration-200;
-  }
-
-  .tab-button {
-    @apply px-4 py-2 text-sm font-medium transition-colors duration-200
-    data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary;
+    @apply border border-gray-200 text-gray-700 px-6 py-2.5 rounded-lg hover:border-primary hover:text-primary transition-all duration-200 font-medium;
   }
 
   .before-after-slider {
@@ -50,27 +45,26 @@
   }
 
   .slider-handle {
-    @apply absolute top-0 bottom-0 w-1 bg-white;
+    @apply absolute top-0 bottom-0 w-1 bg-white shadow-xl;
   }
 
-  .hide-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  .header {
+    @apply fixed w-full bg-white/90 backdrop-blur-lg shadow-sm z-50;
   }
 
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none;
+  .header-inner {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between;
   }
 
-  .testimonial-container {
-    scroll-behavior: smooth;
+  .dropdown-nav {
+    @apply p-2 hover:bg-gray-50 rounded-md transition-colors duration-200 flex items-center gap-2 w-full;
   }
 
-  .dot {
-    @apply w-2 h-2 rounded-full bg-gray-300 transition-colors duration-200;
+  .section {
+    @apply py-24;
   }
 
-  .dot.active {
-    @apply bg-primary;
+  .section-inner {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 }
