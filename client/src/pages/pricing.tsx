@@ -113,11 +113,9 @@ export default function Pricing() {
                       ? 'bg-primary text-primary-foreground shadow-lg' 
                       : 'bg-muted/50 hover:bg-muted/70'}`}
                   >
-                    {isYearlyBilling && (
-                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full text-xs">
-                        Most Popular
-                      </div>
-                    )}
+                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full text-xs">
+                      Most Popular
+                    </div>
                     <div className="font-medium text-lg">Pay Yearly</div>
                     <div className="text-sm">
                       <span className="text-destructive font-bold">Save 10%</span>
