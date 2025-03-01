@@ -106,6 +106,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(image);
   });
 
+  // Add this route at the end of the routes section before returning httpServer
+  app.post("/api/upload-logo", upload.single("logo"), async (req, res) => {
+    if (!req.isAuthenticated() || req.user?.username !== 'admin') {
+      return res.status(403).send("Only admin can upload logo");
+    }
+
+    if (!req.file) {
+      return res.status(400).send("No file uploaded");
+    }
+
+    // For demo purposes, we'll just return a success response
+    // In a real app, you would upload to cloud storage and return the URL
+    res.json({
+      url: "data:image/png;base64," + req.file.buffer.toString('base64')
+    });
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
