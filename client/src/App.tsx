@@ -9,6 +9,7 @@ import HomePage from "@/pages/home-page";
 import AuthPage from "@/pages/auth-page";
 import Dashboard from "@/pages/dashboard";
 import Pricing from "@/pages/pricing";
+import AdminDashboard from "@/pages/admin";
 
 function Router() {
   return (
@@ -17,6 +18,7 @@ function Router() {
       <Route path="/auth" component={AuthPage} />
       <Route path="/pricing" component={Pricing} />
       <ProtectedRoute path="/dashboard" component={Dashboard} />
+      <ProtectedRoute path="/admin" component={AdminDashboard} adminOnly />
       <Route component={NotFound} />
     </Switch>
   );
