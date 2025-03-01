@@ -35,16 +35,6 @@ export function Footer() {
                   <a className="text-gray-600 hover:text-primary">Pricing</a>
                 </Link>
               </li>
-              <li>
-                <Link href="/docs">
-                  <a className="text-gray-600 hover:text-primary">Documentation</a>
-                </Link>
-              </li>
-              <li>
-                <Link href="/guides">
-                  <a className="text-gray-600 hover:text-primary">Guides</a>
-                </Link>
-              </li>
             </ul>
           </div>
 
