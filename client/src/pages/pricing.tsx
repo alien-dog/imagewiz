@@ -1,7 +1,7 @@
 import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, ChevronDown } from "lucide-react";
+import { Check } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
@@ -34,37 +34,6 @@ export default function Pricing() {
     { credits: 1250, price: 76.9, pricePerImage: 0.061 },
     { credits: 5050, price: 215.9, pricePerImage: 0.042 }
   ];
-
-  const handleSubscribe = async (priceId: string) => {
-    try {
-      const response = await fetch('/api/create-checkout-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ priceId }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to create checkout session');
-      }
-
-      const { url } = await response.json();
-      if (url) {
-        window.location.href = url;
-      } else {
-        throw new Error('Invalid response from server');
-      }
-    } catch (error: any) {
-      console.error('Error creating checkout session:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to process payment request",
-        variant: "destructive",
-      });
-    }
-  };
 
   const getCurrentProOptions = () => {
     return isYearlyBilling ? proYearlyOptions : proMonthlyOptions;
@@ -127,24 +96,32 @@ export default function Pricing() {
             </CardHeader>
             <CardContent>
               {/* Billing Toggle */}
-              <div className="mb-8 bg-muted/50 rounded-lg p-4">
-                <div className="flex items-center justify-between gap-4">
-                  <div className={`flex-1 text-center p-3 rounded-md transition-all ${!isYearlyBilling ? 'bg-white shadow-sm' : ''}`}>
-                    <span className={`font-medium ${!isYearlyBilling ? 'text-primary' : 'text-muted-foreground'}`}>
-                      Pay Monthly
-                    </span>
+              <div className="mb-8">
+                <div className="grid grid-cols-2 gap-2">
+                  <div 
+                    onClick={() => setIsYearlyBilling(false)}
+                    className={`cursor-pointer rounded-lg p-4 text-center transition-all ${!isYearlyBilling 
+                      ? 'bg-primary text-primary-foreground shadow-lg' 
+                      : 'bg-muted/50 hover:bg-muted/70'}`}
+                  >
+                    <div className="font-medium text-lg">Pay Monthly</div>
+                    <div className="text-sm opacity-90">Regular price</div>
                   </div>
                   <div 
-                    className="w-14 h-7 bg-primary rounded-full relative cursor-pointer"
-                    onClick={() => setIsYearlyBilling(!isYearlyBilling)}
+                    onClick={() => setIsYearlyBilling(true)}
+                    className={`cursor-pointer rounded-lg p-4 text-center transition-all relative ${isYearlyBilling 
+                      ? 'bg-primary text-primary-foreground shadow-lg' 
+                      : 'bg-muted/50 hover:bg-muted/70'}`}
                   >
-                    <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all duration-200 ${isYearlyBilling ? 'left-8' : 'left-1'}`}></div>
-                  </div>
-                  <div className={`flex-1 text-center p-3 rounded-md transition-all ${isYearlyBilling ? 'bg-white shadow-sm' : ''}`}>
-                    <span className={`font-medium ${isYearlyBilling ? 'text-primary' : 'text-muted-foreground'}`}>
-                      Pay Yearly
-                    </span>
-                    <span className="block text-sm text-primary font-medium">Save 10%</span>
+                    {isYearlyBilling && (
+                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full text-xs">
+                        Most Popular
+                      </div>
+                    )}
+                    <div className="font-medium text-lg">Pay Yearly</div>
+                    <div className="text-sm">
+                      <span className="text-destructive font-bold">Save 10%</span>
+                    </div>
                   </div>
                 </div>
               </div>
