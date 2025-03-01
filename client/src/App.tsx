@@ -15,7 +15,7 @@ import Credits from "@/pages/dashboard/credits";
 import Settings from "@/pages/dashboard/settings";
 import AdminDashboard from "@/pages/admin";
 import NotFound from "@/pages/not-found";
-import Pricing from "@/pages/pricing"; // Added import for Pricing page
+import Pricing from "@/pages/pricing";
 
 // Resource Pages
 import UseCases from "@/pages/resources/use-cases";
@@ -41,6 +41,11 @@ import EcommerceOptimization from "@/pages/resources/blog/ecommerce-optimization
 import SustainabilityDesign from "@/pages/resources/blog/sustainability-design";
 import ProcessingTrends from "@/pages/resources/blog/processing-trends";
 
+// Legal Pages
+import Privacy from "@/pages/privacy";
+import Terms from "@/pages/terms";
+import GDPR from "@/pages/gdpr";
+
 function Router() {
   return (
     <Switch>
@@ -52,6 +57,11 @@ function Router() {
       <Route path="/resources/use-cases" component={UseCases} />
       <Route path="/resources/guides" component={Guides} />
       <Route path="/resources/blog" component={Blog} />
+
+      {/* Legal Pages */}
+      <Route path="/privacy" component={Privacy} />
+      <Route path="/terms" component={Terms} />
+      <Route path="/gdpr" component={GDPR} />
 
       {/* Use Cases */}
       <Route path="/resources/use-cases/ecommerce" component={EcommerceUseCase} />
