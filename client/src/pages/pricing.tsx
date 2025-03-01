@@ -1,4 +1,5 @@
 import { Header } from "@/components/layout/header";
+import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check } from "lucide-react";
@@ -40,10 +41,10 @@ export default function Pricing() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Header />
 
-      <main className="max-w-7xl mx-auto px-4 py-20">
+      <main className="flex-grow max-w-7xl mx-auto px-4 py-20">
         <div className="grid md:grid-cols-2 gap-8">
           {/* Pay as you go */}
           <Card className="relative">
@@ -60,8 +61,8 @@ export default function Pricing() {
               <ul className="space-y-4">
                 {payGoOptions.map((option) => (
                   <li key={option.credits} className="flex items-center gap-2">
-                    <input 
-                      type="radio" 
+                    <input
+                      type="radio"
                       checked={selectedPayGoCredits === option.credits}
                       onChange={() => setSelectedPayGoCredits(option.credits)}
                       className="cursor-pointer"
@@ -98,19 +99,19 @@ export default function Pricing() {
               {/* Billing Toggle */}
               <div className="mb-8">
                 <div className="grid grid-cols-2 gap-2">
-                  <div 
+                  <div
                     onClick={() => setIsYearlyBilling(false)}
-                    className={`cursor-pointer rounded-lg p-4 text-center transition-all ${!isYearlyBilling 
-                      ? 'bg-primary text-primary-foreground shadow-lg' 
+                    className={`cursor-pointer rounded-lg p-4 text-center transition-all ${!isYearlyBilling
+                      ? 'bg-primary text-primary-foreground shadow-lg'
                       : 'bg-muted/50 hover:bg-muted/70'}`}
                   >
                     <div className="font-medium text-lg">Pay Monthly</div>
                     <div className="text-sm opacity-90">Regular price</div>
                   </div>
-                  <div 
+                  <div
                     onClick={() => setIsYearlyBilling(true)}
-                    className={`cursor-pointer rounded-lg p-4 text-center transition-all relative ${isYearlyBilling 
-                      ? 'bg-primary text-primary-foreground shadow-lg' 
+                    className={`cursor-pointer rounded-lg p-4 text-center transition-all relative ${isYearlyBilling
+                      ? 'bg-primary text-primary-foreground shadow-lg'
                       : 'bg-muted/50 hover:bg-muted/70'}`}
                   >
                     <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full text-xs">
@@ -127,8 +128,8 @@ export default function Pricing() {
               <ul className="space-y-4">
                 {getCurrentProOptions().map((option) => (
                   <li key={option.credits} className="flex items-center gap-2">
-                    <input 
-                      type="radio" 
+                    <input
+                      type="radio"
                       checked={selectedProCredits === option.credits}
                       onChange={() => setSelectedProCredits(option.credits)}
                       className="cursor-pointer"
@@ -178,6 +179,8 @@ export default function Pricing() {
           </div>
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 }
