@@ -16,6 +16,7 @@ export default function Pricing() {
   const payGoOptions = [
     { credits: 10, price: 8.9, pricePerImage: 0.89 },
     { credits: 200, price: 19.9, pricePerImage: 0.1 },
+    { credits: 600, price: 59.9, pricePerImage: 0.099 },
     { credits: 1200, price: 149.9, pricePerImage: 0.075 },
     { credits: 5000, price: 459.9, pricePerImage: 0.05 }
   ];
