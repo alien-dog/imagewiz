@@ -12,6 +12,14 @@ export default function Pricing() {
   const { toast } = useToast();
   const [showMorePayGo, setShowMorePayGo] = useState(false);
   const [showMoreSubscription, setShowMoreSubscription] = useState(false);
+  const [selectedPayGoCredits, setSelectedPayGoCredits] = useState(10);
+
+  const payGoOptions = [
+    { credits: 10, price: 8.9, pricePerImage: 0.89 },
+    { credits: 200, price: 19.9, pricePerImage: 0.1 },
+    { credits: 1200, price: 149.9, pricePerImage: 0.075 },
+    { credits: 5000, price: 459.9, pricePerImage: 0.05 }
+  ];
 
   const handleSubscribe = async (priceId: string) => {
     try {
@@ -56,46 +64,27 @@ export default function Pricing() {
               <CardTitle>
                 <h3 className="text-2xl font-bold">Pay as you go</h3>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold">$0.90</span>
+                  <span className="text-4xl font-bold">${payGoOptions[0].pricePerImage.toFixed(2)}</span>
                   <span className="text-muted-foreground"> /image</span>
                 </div>
               </CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="space-y-4">
-                <li className="flex items-center gap-2">
-                  <input type="radio" checked={true} readOnly /> 1 credit
-                  <span className="ml-auto">$1.99</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <input type="radio" checked={false} readOnly /> 10 credits
-                  <span className="ml-auto">$9</span>
-                </li>
-                {showMorePayGo && (
-                  <>
-                    <li className="flex items-center gap-2">
-                      <input type="radio" checked={false} readOnly /> 75 credits
-                      <span className="ml-auto">$49</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <input type="radio" checked={false} readOnly /> 200 credits
-                      <span className="ml-auto">$99</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <input type="radio" checked={false} readOnly /> 500 credits
-                      <span className="ml-auto">$199</span>
-                    </li>
-                  </>
-                )}
+                {payGoOptions.map((option) => (
+                  <li key={option.credits} className="flex items-center gap-2">
+                    <input 
+                      type="radio" 
+                      checked={selectedPayGoCredits === option.credits}
+                      onChange={() => setSelectedPayGoCredits(option.credits)}
+                      className="cursor-pointer"
+                    />
+                    <span>{option.credits} credits</span>
+                    <span className="ml-auto">USD {option.price}</span>
+                  </li>
+                ))}
               </ul>
-              <Button
-                variant="ghost"
-                className="w-full mt-4"
-                onClick={() => setShowMorePayGo(!showMorePayGo)}
-              >
-                Show {showMorePayGo ? 'less' : 'more'} <ChevronDown className={`ml-2 h-4 w-4 ${showMorePayGo ? 'rotate-180' : ''} transition-transform`} />
-              </Button>
-              <Button className="w-full">Buy now</Button>
+              <Button className="w-full mt-6">Buy now</Button>
               <p className="text-sm text-muted-foreground mt-4 text-center">
                 Credits available for use anytime within two years of purchase
               </p>
