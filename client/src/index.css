@@ -15,7 +15,7 @@
   }
 
   .shadow-glow {
-    box-shadow: 0 0 20px rgba(52, 211, 153, 0.2);
+    box-shadow: 0 0 15px rgba(52, 211, 153, 0.1);
   }
 
   .glassmorphism {
@@ -23,6 +23,10 @@
   }
 
   .rounded-modern {
-    @apply rounded-xl shadow-lg transition-all duration-200 hover:shadow-glow;
+    @apply rounded-xl shadow-sm transition-all duration-200 hover:shadow-md;
+  }
+
+  .accent-hover {
+    @apply transition-colors duration-200 hover:text-primary/80;
   }
 }
