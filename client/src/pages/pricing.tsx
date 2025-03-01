@@ -13,12 +13,21 @@ export default function Pricing() {
   const [showMorePayGo, setShowMorePayGo] = useState(false);
   const [showMoreSubscription, setShowMoreSubscription] = useState(false);
   const [selectedPayGoCredits, setSelectedPayGoCredits] = useState(10);
+  const [isYearlyBilling, setIsYearlyBilling] = useState(false);
+  const [selectedProCredits, setSelectedProCredits] = useState(250);
 
   const payGoOptions = [
     { credits: 10, price: 8.9, pricePerImage: 0.89 },
     { credits: 200, price: 19.9, pricePerImage: 0.1 },
     { credits: 1200, price: 149.9, pricePerImage: 0.075 },
     { credits: 5000, price: 459.9, pricePerImage: 0.05 }
+  ];
+
+  const proOptions = [
+    { credits: 50, price: 9.9, pricePerImage: 0.2 },
+    { credits: 250, price: 24.9, pricePerImage: 0.1 },
+    { credits: 1250, price: 85.9, pricePerImage: 0.07 },
+    { credits: 5050, price: 239.9, pricePerImage: 0.047 }
   ];
 
   const handleSubscribe = async (priceId: string) => {
@@ -104,47 +113,27 @@ export default function Pricing() {
             </CardHeader>
             <CardContent>
               <ul className="space-y-4">
-                <li className="flex items-center gap-2">
-                  <input type="radio" checked={false} readOnly /> 40 credits
-                  <span className="text-muted-foreground">/month</span>
-                  <span className="ml-auto">$8.10</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <input type="radio" checked={true} readOnly /> 200 credits
-                  <span className="text-muted-foreground">/month</span>
-                  <span className="ml-auto">$35.10</span>
-                </li>
-                {showMoreSubscription && (
-                  <>
-                    <li className="flex items-center gap-2">
-                      <input type="radio" checked={false} readOnly /> 500 credits
-                      <span className="text-muted-foreground">/month</span>
-                      <span className="ml-auto">$80.10</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <input type="radio" checked={false} readOnly /> 1,200 credits
-                      <span className="text-muted-foreground">/month</span>
-                      <span className="ml-auto">$170.10</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <input type="radio" checked={false} readOnly /> 2,800 credits
-                      <span className="text-muted-foreground">/month</span>
-                      <span className="ml-auto">$350.10</span>
-                    </li>
-                  </>
-                )}
+                {proOptions.map((option) => (
+                  <li key={option.credits} className="flex items-center gap-2">
+                    <input 
+                      type="radio" 
+                      checked={selectedProCredits === option.credits}
+                      onChange={() => setSelectedProCredits(option.credits)}
+                      className="cursor-pointer"
+                    />
+                    <span>{option.credits} credits</span>
+                    <span className="text-muted-foreground">/month</span>
+                    <span className="ml-auto">USD {isYearlyBilling ? (option.price * 0.9).toFixed(1) : option.price}</span>
+                  </li>
+                ))}
               </ul>
-              <Button
-                variant="ghost"
-                className="w-full mt-4"
-                onClick={() => setShowMoreSubscription(!showMoreSubscription)}
-              >
-                Show {showMoreSubscription ? 'less' : 'more'} <ChevronDown className={`ml-2 h-4 w-4 ${showMoreSubscription ? 'rotate-180' : ''} transition-transform`} />
-              </Button>
-              <div className="flex items-center justify-between mt-4 mb-4">
+              <div className="flex items-center justify-between mt-6 mb-6">
                 <span>Pay Monthly</span>
-                <div className="w-12 h-6 bg-primary/20 rounded-full relative cursor-pointer">
-                  <div className="absolute left-1 top-1 w-4 h-4 bg-primary rounded-full"></div>
+                <div 
+                  className="w-12 h-6 bg-primary/20 rounded-full relative cursor-pointer"
+                  onClick={() => setIsYearlyBilling(!isYearlyBilling)}
+                >
+                  <div className={`absolute top-1 w-4 h-4 bg-primary rounded-full transition-all ${isYearlyBilling ? 'left-7' : 'left-1'}`}></div>
                 </div>
                 <span>Pay Yearly <span className="text-primary">Save 10%</span></span>
               </div>
