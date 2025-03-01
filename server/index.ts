@@ -75,12 +75,9 @@ app.use((req, res, next) => {
       }
     });
 
-    // Setup vite in development, serve static files in production
-    if (process.env.NODE_ENV === "development") {
-      await setupVite(app, server);
-    } else {
-      serveStatic(app);
-    }
+    // Always use setupVite in development mode when running with npm run dev
+    await setupVite(app, server);
+
 
     // Configure port and host from environment variables
     const port = process.env.PORT || 5000;
