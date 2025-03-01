@@ -66,7 +66,7 @@ export default function HomePage() {
       name: "Sarah Mitchell",
       role: "Marketing Director at TechCorp",
       image: "https://public.readdy.ai/ai/img_res/f834c10cf5d8a9ec1e07d810c27efbd6.jpg",
-      text: "iMageWiz has revolutionized our product photography workflow. The AI is incredibly accurate and saves us hours of manual editing time."
+      text: "iMagenWiz has revolutionized our product photography workflow. The AI is incredibly accurate and saves us hours of manual editing time."
     },
     {
       name: "David Chen",
@@ -78,7 +78,7 @@ export default function HomePage() {
       name: "Michael Thompson",
       role: "E-commerce Manager at ShopStyle",
       image: "https://public.readdy.ai/ai/img_res/b902cdded3f32ba86b44c082d561ac72.jpg",
-      text: "We process thousands of product images daily, and iMageWiz handles them all perfectly. The API integration was seamless."
+      text: "We process thousands of product images daily, and iMagenWiz handles them all perfectly. The API integration was seamless."
     }
   ];
 
@@ -177,7 +177,7 @@ export default function HomePage() {
         <section id="features" className="py-24 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4">Why Choose iMageWiz?</h2>
+              <h2 className="text-4xl font-bold mb-4">Why Choose iMagenWiz?</h2>
               <p className="text-lg text-gray-600">Powerful features that make background removal effortless</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -199,7 +199,7 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold mb-4">Trusted by Industry Leaders</h2>
-              <p className="text-lg text-gray-600">See what our customers have to say about iMageWiz</p>
+              <p className="text-lg text-gray-600">See what our customers have to say about iMagenWiz</p>
             </div>
             <div className="relative">
               <div className="flex overflow-x-auto gap-6 pb-8 hide-scrollbar">
@@ -374,7 +374,7 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <h2 className="text-4xl font-bold mb-4">Transform Your Images Today</h2>
-              <p className="text-lg text-gray-600 mb-8">Join thousands of satisfied customers using iMageWiz</p>
+              <p className="text-lg text-gray-600 mb-8">Join thousands of satisfied customers using iMagenWiz</p>
               <Link href={user ? "/dashboard" : "/auth"}>
                 <Button className="button-primary px-12 py-4 text-xl font-semibold shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1">
                   Get Started Free

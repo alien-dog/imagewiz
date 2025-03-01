@@ -5,19 +5,27 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --gradient-start: theme('colors.purple.500');
+    --gradient-end: theme('colors.yellow.400');
+  }
+
   * {
     @apply border-border;
   }
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
 }
 
 @layer components {
   .logo-text {
-    @apply text-xl font-bold text-primary;
+    @apply text-xl font-bold;
+    background: linear-gradient(135deg, #8A2BE2 0%, #FFD700 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
   .card {
@@ -33,7 +41,7 @@
   }
 
   .button-primary {
-    @apply bg-primary text-white px-6 py-2.5 rounded-lg hover:bg-primary/90 transition-colors duration-200 font-medium;
+    @apply bg-gradient-to-r from-[#8A2BE2] to-[#FFD700] text-white px-6 py-2.5 rounded-lg hover:opacity-90 transition-opacity duration-200 font-medium;
   }
 
   .button-outline {
