@@ -1,53 +1,17 @@
 import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
-
-const plans = [
-  {
-    name: "Basic",
-    price: "$9.99",
-    priceId: "price_H5ggYwtDq4fbrJ", // Test price ID
-    credits: 100,
-    features: [
-      "100 image credits",
-      "Standard processing",
-      "Email support",
-      "Valid for 30 days"
-    ]
-  },
-  {
-    name: "Pro",
-    price: "$24.99",
-    priceId: "price_H5ggYwtDq4fbrK", // Test price ID
-    credits: 300,
-    features: [
-      "300 image credits",
-      "Priority processing",
-      "24/7 support",
-      "Valid for 30 days"
-    ]
-  },
-  {
-    name: "Business",
-    price: "$49.99",
-    priceId: "price_H5ggYwtDq4fbrL", // Test price ID
-    credits: 1000,
-    features: [
-      "1000 image credits",
-      "Ultra-fast processing",
-      "Dedicated support",
-      "API access"
-    ]
-  }
-];
+import { useState } from "react";
 
 export default function Pricing() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const [showMorePayGo, setShowMorePayGo] = useState(false);
+  const [showMoreSubscription, setShowMoreSubscription] = useState(false);
 
   const handleSubscribe = async (priceId: string) => {
     try {
@@ -84,52 +48,187 @@ export default function Pricing() {
     <div className="min-h-screen bg-background">
       <Header />
 
-      <main className="max-w-6xl mx-auto px-4 py-20">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Simple, Transparent Pricing</h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Choose the plan that best fits your needs. All plans come with our AI-powered background removal technology.
-          </p>
+      <main className="max-w-7xl mx-auto px-4 py-20">
+        <div className="grid md:grid-cols-3 gap-8">
+          {/* Pay as you go */}
+          <Card className="relative">
+            <CardHeader>
+              <CardTitle>
+                <h3 className="text-2xl font-bold">Pay as you go</h3>
+                <div className="mt-4">
+                  <span className="text-4xl font-bold">$0.90</span>
+                  <span className="text-muted-foreground"> /image</span>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-4">
+                <li className="flex items-center gap-2">
+                  <input type="radio" checked={true} readOnly /> 1 credit
+                  <span className="ml-auto">$1.99</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <input type="radio" checked={false} readOnly /> 10 credits
+                  <span className="ml-auto">$9</span>
+                </li>
+                {showMorePayGo && (
+                  <>
+                    <li className="flex items-center gap-2">
+                      <input type="radio" checked={false} readOnly /> 75 credits
+                      <span className="ml-auto">$49</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <input type="radio" checked={false} readOnly /> 200 credits
+                      <span className="ml-auto">$99</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <input type="radio" checked={false} readOnly /> 500 credits
+                      <span className="ml-auto">$199</span>
+                    </li>
+                  </>
+                )}
+              </ul>
+              <Button
+                variant="ghost"
+                className="w-full mt-4"
+                onClick={() => setShowMorePayGo(!showMorePayGo)}
+              >
+                Show {showMorePayGo ? 'less' : 'more'} <ChevronDown className={`ml-2 h-4 w-4 ${showMorePayGo ? 'rotate-180' : ''} transition-transform`} />
+              </Button>
+              <Button className="w-full mt-4">Buy now</Button>
+              <p className="text-sm text-muted-foreground mt-4 text-center">
+                Credits available for use anytime within two years of purchase
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Subscription Plan */}
+          <Card className="relative">
+            <div className="absolute -top-2 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm">
+              Most Popular
+            </div>
+            <CardHeader>
+              <CardTitle>
+                <h3 className="text-2xl font-bold">Subscription Plan</h3>
+                <div className="mt-4">
+                  <span className="text-4xl font-bold">$0.18</span>
+                  <span className="text-muted-foreground"> /image</span>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-4">
+                <li className="flex items-center gap-2">
+                  <input type="radio" checked={false} readOnly /> 40 credits
+                  <span className="text-muted-foreground">/month</span>
+                  <span className="ml-auto">$8.10</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <input type="radio" checked={true} readOnly /> 200 credits
+                  <span className="text-muted-foreground">/month</span>
+                  <span className="ml-auto">$35.10</span>
+                </li>
+                {showMoreSubscription && (
+                  <>
+                    <li className="flex items-center gap-2">
+                      <input type="radio" checked={false} readOnly /> 500 credits
+                      <span className="text-muted-foreground">/month</span>
+                      <span className="ml-auto">$80.10</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <input type="radio" checked={false} readOnly /> 1,200 credits
+                      <span className="text-muted-foreground">/month</span>
+                      <span className="ml-auto">$170.10</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <input type="radio" checked={false} readOnly /> 2,800 credits
+                      <span className="text-muted-foreground">/month</span>
+                      <span className="ml-auto">$350.10</span>
+                    </li>
+                  </>
+                )}
+              </ul>
+              <Button
+                variant="ghost"
+                className="w-full mt-4"
+                onClick={() => setShowMoreSubscription(!showMoreSubscription)}
+              >
+                Show {showMoreSubscription ? 'less' : 'more'} <ChevronDown className={`ml-2 h-4 w-4 ${showMoreSubscription ? 'rotate-180' : ''} transition-transform`} />
+              </Button>
+              <div className="flex items-center justify-between mt-4 mb-4">
+                <span>Pay Monthly</span>
+                <div className="w-12 h-6 bg-primary/20 rounded-full relative cursor-pointer">
+                  <div className="absolute left-1 top-1 w-4 h-4 bg-primary rounded-full"></div>
+                </div>
+                <span>Pay Yearly <span className="text-primary">Save 10%</span></span>
+              </div>
+              <Button className="w-full">Subscribe now</Button>
+              <div className="mt-4 space-y-2 text-sm text-muted-foreground">
+                <p className="flex items-center gap-2">
+                  <Check className="h-4 w-4" /> Risk free: 14 Days Money Back Guarantee
+                </p>
+                <p className="flex items-center gap-2">
+                  <Check className="h-4 w-4" /> Flexible: Downgrade, upgrade or cancel any time
+                </p>
+                <p className="flex items-center gap-2">
+                  <Check className="h-4 w-4" /> Fair: Unused credits roll over as long as you're subscribed
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* High-Volume Solutions */}
+          <Card className="relative">
+            <CardHeader>
+              <CardTitle>
+                <h3 className="text-2xl font-bold">High-Volume Solutions</h3>
+                <div className="mt-4">
+                  <span className="text-4xl font-bold">100,000+</span>
+                  <span className="text-muted-foreground"> Images</span>
+                  <span className="text-muted-foreground block">/year</span>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-primary" />
+                  <span>Guaranteed best price on remove.bg</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-primary" />
+                  <span>Flexible API, credit, and rate limits</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-primary" />
+                  <span>Dedicated customer success manager</span>
+                </li>
+              </ul>
+              <Button className="w-full">Contact Sales</Button>
+            </CardContent>
+          </Card>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {plans.map((plan) => (
-            <Card key={plan.name} className="relative">
-              <CardHeader>
-                <CardTitle>
-                  <h3 className="text-2xl font-bold">{plan.name}</h3>
-                  <div className="mt-4">
-                    <span className="text-4xl font-bold">{plan.price}</span>
-                    <span className="text-muted-foreground">/month</span>
-                  </div>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-4 mb-8">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-center gap-2">
-                      <Check className="w-5 h-5 text-primary" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                {user ? (
-                  <Button 
-                    className="w-full"
-                    onClick={() => handleSubscribe(plan.priceId)}
-                  >
-                    Subscribe Now
-                  </Button>
-                ) : (
-                  <Link href="/auth">
-                    <Button className="w-full">
-                      Sign Up to Subscribe
-                    </Button>
-                  </Link>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+        <div className="mt-16 text-center">
+          <h2 className="text-2xl font-bold mb-8">All plans include:</h2>
+          <div className="grid grid-cols-4 gap-8 text-center">
+            <div>
+              <div className="mb-4">∞</div>
+              <p>Unlimited free previews on remove.bg</p>
+            </div>
+            <div>
+              <div className="mb-4">{`</>`}</div>
+              <p>50 free previews via API and apps per month</p>
+            </div>
+            <div>
+              <div className="mb-4">✨</div>
+              <p>remove.bg for Adobe Photoshop</p>
+            </div>
+            <div>
+              <div className="mb-4">💻</div>
+              <p>remove.bg for Windows / Mac / Linux</p>
+            </div>
+          </div>
         </div>
       </main>
     </div>
