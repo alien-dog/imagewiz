@@ -1,10 +1,6 @@
 {
   "primary": "#00CED1",
-  "variant": "vibrant",
+  "variant": "professional",
   "appearance": "light",
-  "radius": 0.75,
-  "gradient": {
-    "start": "#00CED1",
-    "end": "#006D70"
-  }
+  "radius": 0.75
 }
