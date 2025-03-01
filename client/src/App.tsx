@@ -8,6 +8,10 @@ import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home-page";
 import AuthPage from "@/pages/auth-page";
 import Dashboard from "@/pages/dashboard";
+import Profile from "@/pages/dashboard/profile";
+import ImageHistory from "@/pages/dashboard/image-history";
+import Credits from "@/pages/dashboard/credits";
+import Settings from "@/pages/dashboard/settings";
 import Pricing from "@/pages/pricing";
 import AdminDashboard from "@/pages/admin";
 
@@ -18,6 +22,10 @@ function Router() {
       <Route path="/auth" component={AuthPage} />
       <Route path="/pricing" component={Pricing} />
       <ProtectedRoute path="/dashboard" component={Dashboard} />
+      <ProtectedRoute path="/dashboard/profile" component={Profile} />
+      <ProtectedRoute path="/dashboard/history" component={ImageHistory} />
+      <ProtectedRoute path="/dashboard/credits" component={Credits} />
+      <ProtectedRoute path="/dashboard/settings" component={Settings} />
       <ProtectedRoute path="/admin" component={AdminDashboard} adminOnly />
       <Route component={NotFound} />
     </Switch>
