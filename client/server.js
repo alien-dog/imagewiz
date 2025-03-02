@@ -12,18 +12,26 @@ const PORT = process.env.PORT || 8000;
 // Enable CORS
 app.use(cors());
 
-// Optional: Remove CSP headers in development
+// Configure security headers
 app.use((req, res, next) => {
+  // Remove restrictive CSP headers in development
   res.removeHeader("Content-Security-Policy");
+  // Add permissive CSP header for development
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:;"
+  );
   next();
 });
 
-// Serve static files from the dist directory
-app.use(express.static('dist'));
+// Serve static files from the dist/public directory
+app.use(express.static(join(__dirname, '..', 'dist', 'public')));
 
 // Handle client-side routing by serving index.html for all routes
 app.get('*', (req, res) => {
-  res.sendFile(join(__dirname, 'dist', 'index.html'));
+  const indexPath = join(__dirname, '..', 'dist', 'public', 'index.html');
+  console.log('Serving index.html from:', indexPath);
+  res.sendFile(indexPath);
 });
 
 app.listen(PORT, '0.0.0.0', () => {
