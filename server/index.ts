@@ -3,22 +3,17 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import path from "path";
 
-// Create API server
-const apiApp = express();
-apiApp.use(express.json());
-apiApp.use(express.urlencoded({ extended: false }));
-
-// Create frontend server
-const frontendApp = express();
+const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 // Enable trust proxy if behind a reverse proxy
-apiApp.set("trust proxy", 1);
-frontendApp.set("trust proxy", 1);
+app.set("trust proxy", 1);
 
 // Configure CORS for production
 if (process.env.NODE_ENV === "production") {
   const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(",") : [];
-  const corsMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  app.use((req, res, next) => {
     const origin = req.headers.origin;
     if (origin && allowedOrigins.includes(origin)) {
       res.setHeader("Access-Control-Allow-Origin", origin);
@@ -26,13 +21,11 @@ if (process.env.NODE_ENV === "production") {
     res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
     next();
-  };
-  apiApp.use(corsMiddleware);
-  frontendApp.use(corsMiddleware); // Added CORS middleware to frontendApp
+  });
 }
 
 // Request logging middleware
-const requestLogger = (req: Request, res: Response, next: NextFunction) => {
+app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
   let capturedJsonResponse: Record<string, any> | undefined = undefined;
@@ -60,20 +53,17 @@ const requestLogger = (req: Request, res: Response, next: NextFunction) => {
   });
 
   next();
-};
-
-apiApp.use(requestLogger);
+});
 
 (async () => {
-  let apiServer;
-  let frontendServer;
+  let server;
   try {
-    log(`Starting servers in ${process.env.NODE_ENV || 'development'} mode...`);
+    log(`Starting server in ${process.env.NODE_ENV || 'development'} mode...`);
 
-    apiServer = await registerRoutes(apiApp);
+    server = await registerRoutes(app);
 
-    // Global error handler for API server
-    apiApp.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+    // Global error handler
+    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
       const status = err.status || err.statusCode || 500;
       const message = err.message || "Internal Server Error";
       console.error('Error:', err);
@@ -82,48 +72,33 @@ apiApp.use(requestLogger);
       }
     });
 
-    // Configure frontend server in development
     if (process.env.NODE_ENV !== 'production') {
-      await setupVite(frontendApp); // Remove frontendServer parameter
+      await setupVite(app);
     } else {
-      // In production, serve the built frontend files
-      frontendApp.use(express.static(path.join(__dirname, '../dist')));
-      frontendApp.get('*', (req, res) => {
+      app.use(express.static(path.join(__dirname, '../dist')));
+      app.get('*', (req, res) => {
         res.sendFile(path.join(__dirname, '../dist/index.html'));
       });
     }
 
-    // Configure ports
-    const apiPort = process.env.API_PORT || 5000;
-    const frontendPort = process.env.FRONTEND_PORT || 5001;
+    // Configure port and host from environment variables
+    const port = process.env.PORT || 5000;
     const host = process.env.HOST || "0.0.0.0";
 
-    // Start API server
-    apiServer.listen({
-      port: apiPort,
+    server.listen({
+      port,
       host,
       reusePort: true,
     }, () => {
-      log(`API Server running on http://${host}:${apiPort}`);
-    });
-
-    // Start frontend server
-    frontendServer = frontendApp.listen({
-      port: frontendPort,
-      host,
-    }, () => {
-      log(`Frontend Server running on http://${host}:${frontendPort}`);
+      log(`Server running on http://${host}:${port}`);
     });
 
     // Handle graceful shutdown
     const handleShutdown = () => {
-      log('Shutdown signal received: closing HTTP servers');
-      apiServer.close(() => {
-        log('API server closed');
-        frontendServer.close(() => {
-          log('Frontend server closed');
-          process.exit(0);
-        });
+      log('Shutdown signal received: closing HTTP server');
+      server.close(() => {
+        log('HTTP server closed');
+        process.exit(0);
       });
     };
 
@@ -131,7 +106,7 @@ apiApp.use(requestLogger);
     process.on('SIGINT', handleShutdown);
 
   } catch (error) {
-    console.error('Failed to start servers:', error);
+    console.error('Failed to start server:', error);
     process.exit(1);
   }
 })();
