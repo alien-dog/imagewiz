@@ -6,6 +6,7 @@ import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
 import jwt from 'jsonwebtoken';
+import { OAuth2Client } from 'google-auth-library';
 
 declare global {
   namespace Express {
@@ -28,15 +29,8 @@ async function comparePasswords(supplied: string, stored: string) {
   return timingSafeEqual(hashedBuf, suppliedBuf);
 }
 
-function generateToken(user: SelectUser) {
-  return jwt.sign(
-    { id: user.id, username: user.username },
-    process.env.SESSION_SECRET!,
-    { expiresIn: '24h' }
-  );
-}
+const googleClient = new OAuth2Client(process.env.VITE_GOOGLE_CLIENT_ID);
 
-// Middleware to validate JWT token
 export function authenticateToken(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
@@ -52,6 +46,14 @@ export function authenticateToken(req: Express.Request, res: Express.Response, n
     req.user = user;
     next();
   });
+}
+
+function generateToken(user: SelectUser) {
+  return jwt.sign(
+    { id: user.id, username: user.username },
+    process.env.SESSION_SECRET!,
+    { expiresIn: '24h' }
+  );
 }
 
 export function setupAuth(app: Express) {
@@ -77,7 +79,46 @@ export function setupAuth(app: Express) {
     })
   );
 
-  // Authentication routes
+  app.post("/api/auth/google", async (req, res) => {
+    try {
+      const { credential } = req.body;
+      const ticket = await googleClient.verifyIdToken({
+        idToken: credential,
+        audience: process.env.VITE_GOOGLE_CLIENT_ID
+      });
+
+      const payload = ticket.getPayload();
+      if (!payload) {
+        return res.status(400).json({ message: "Invalid token" });
+      }
+
+      let user = await storage.getUserByEmail(payload.email!);
+
+      if (!user) {
+        // Create a new user if they don't exist
+        user = await storage.createUser({
+          username: payload.email!.split('@')[0],
+          email: payload.email!,
+          provider: 'google',
+          credits: 10, // Default credits for new users
+        });
+      }
+
+      const token = generateToken(user);
+      res.json({ user, token });
+    } catch (error) {
+      console.error('Google auth error:', error);
+      res.status(401).json({ message: "Authentication failed" });
+    }
+  });
+
+  app.post("/api/logout", (req, res) => {
+    res.sendStatus(200);
+  });
+
+  app.get("/api/user", authenticateToken, (req, res) => {
+    res.json(req.user);
+  });
   app.post("/api/register", async (req, res, next) => {
     try {
       const existingUser = await storage.getUserByUsername(req.body.username);
@@ -109,9 +150,5 @@ export function setupAuth(app: Express) {
       const token = generateToken(user);
       return res.json({ user, token });
     })(req, res, next);
-  });
-
-  app.get("/api/user", authenticateToken, (req, res) => {
-    res.json(req.user);
   });
 }
