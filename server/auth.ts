@@ -1,12 +1,11 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { Express } from "express";
-import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
-import axios from 'axios';
+import jwt from 'jsonwebtoken';
 
 declare global {
   namespace Express {
@@ -29,26 +28,34 @@ async function comparePasswords(supplied: string, stored: string) {
   return timingSafeEqual(hashedBuf, suppliedBuf);
 }
 
-export function setupAuth(app: Express) {
-  const sessionSettings: session.SessionOptions = {
-    secret: process.env.SESSION_SECRET!,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    },
-    store: storage.sessionStore,
-  };
+function generateToken(user: SelectUser) {
+  return jwt.sign(
+    { id: user.id, username: user.username },
+    process.env.SESSION_SECRET!,
+    { expiresIn: '24h' }
+  );
+}
 
-  // Trust first proxy if in production
-  if (process.env.NODE_ENV === "production") {
-    app.set("trust proxy", 1);
+// Middleware to validate JWT token
+export function authenticateToken(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ message: "No token provided" });
   }
 
-  app.use(session(sessionSettings));
+  jwt.verify(token, process.env.SESSION_SECRET!, (err: any, user: any) => {
+    if (err) {
+      return res.status(403).json({ message: "Invalid token" });
+    }
+    req.user = user;
+    next();
+  });
+}
+
+export function setupAuth(app: Express) {
   app.use(passport.initialize());
-  app.use(passport.session());
 
   passport.use(
     new LocalStrategy(async (username, password, done) => {
@@ -70,19 +77,6 @@ export function setupAuth(app: Express) {
     })
   );
 
-  passport.serializeUser((user, done) => {
-    done(null, user.id);
-  });
-
-  passport.deserializeUser(async (id: number, done) => {
-    try {
-      const user = await storage.getUser(id);
-      done(null, user);
-    } catch (error) {
-      done(error);
-    }
-  });
-
   // Authentication routes
   app.post("/api/register", async (req, res, next) => {
     try {
@@ -96,10 +90,8 @@ export function setupAuth(app: Express) {
         password: await hashPassword(req.body.password),
       });
 
-      req.login(user, (err) => {
-        if (err) return next(err);
-        res.status(201).json(user);
-      });
+      const token = generateToken(user);
+      res.status(201).json({ user, token });
     } catch (error) {
       next(error);
     }
@@ -113,26 +105,13 @@ export function setupAuth(app: Express) {
       if (!user) {
         return res.status(401).json({ message: info?.message || "Authentication failed" });
       }
-      req.login(user, (err) => {
-        if (err) {
-          return next(err);
-        }
-        return res.json(user);
-      });
+
+      const token = generateToken(user);
+      return res.json({ user, token });
     })(req, res, next);
   });
 
-  app.post("/api/logout", (req, res, next) => {
-    req.logout((err) => {
-      if (err) return next(err);
-      res.sendStatus(200);
-    });
-  });
-
-  app.get("/api/user", (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "Not authenticated" });
-    }
+  app.get("/api/user", authenticateToken, (req, res) => {
     res.json(req.user);
   });
 }

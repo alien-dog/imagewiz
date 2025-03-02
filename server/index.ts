@@ -1,27 +1,27 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+import { log } from "./vite";
+import dotenv from "dotenv";
+
+// Load environment variables
+dotenv.config();
+
+// Validate required environment variables
+const requiredEnvVars = ['SESSION_SECRET'];
+const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+if (missingVars.length > 0) {
+  console.error(`Missing required environment variables: ${missingVars.join(', ')}`);
+  process.exit(1);
+}
 
 const app = express();
+
+// Basic middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Enable trust proxy if behind a reverse proxy
 app.set("trust proxy", 1);
-
-// Configure CORS for production
-if (process.env.NODE_ENV === "production") {
-  const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(",") : [];
-  app.use((req, res, next) => {
-    const origin = req.headers.origin;
-    if (origin && allowedOrigins.includes(origin)) {
-      res.setHeader("Access-Control-Allow-Origin", origin);
-    }
-    res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    next();
-  });
-}
 
 // Request logging middleware
 app.use((req, res, next) => {
@@ -57,7 +57,7 @@ app.use((req, res, next) => {
 (async () => {
   let server;
   try {
-    log(`Starting server in ${process.env.NODE_ENV || 'development'} mode...`);
+    log(`Starting backend server in ${process.env.NODE_ENV || 'development'} mode...`);
 
     server = await registerRoutes(app);
 
@@ -75,10 +75,6 @@ app.use((req, res, next) => {
       }
     });
 
-    // Always use setupVite in development mode when running with npm run dev
-    await setupVite(app, server);
-
-
     // Configure port and host from environment variables
     const port = process.env.PORT || 5000;
     const host = process.env.HOST || "0.0.0.0";
@@ -86,9 +82,8 @@ app.use((req, res, next) => {
     server.listen({
       port,
       host,
-      reusePort: true,
     }, () => {
-      log(`Server running in ${process.env.NODE_ENV || 'development'} mode`);
+      log(`Backend server running in ${process.env.NODE_ENV || 'development'} mode`);
       log(`Listening on http://${host}:${port}`);
     });
 
