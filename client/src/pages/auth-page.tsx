@@ -11,6 +11,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertUserSchema } from "@shared/schema";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Loader2 } from "lucide-react";
+import { GoogleLogin } from '@react-oauth/google';
+import { SiGoogle } from "react-icons/si";
+import { jwtDecode } from "jwt-decode";
 
 export default function AuthPage() {
   const [, setLocation] = useLocation();
@@ -25,6 +28,18 @@ export default function AuthPage() {
     resolver: zodResolver(insertUserSchema),
     defaultValues: { username: "", password: "" }
   });
+
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    const decoded = jwtDecode(credentialResponse.credential);
+    if (decoded.email) {
+      // Use email as username for simplicity
+      const username = decoded.email.split('@')[0];
+      registerMutation.mutate({
+        username,
+        password: `google_${decoded.sub}`, // Use Google's sub as part of password
+      });
+    }
+  };
 
   useEffect(() => {
     if (user) {
@@ -130,6 +145,26 @@ export default function AuthPage() {
                           "Register"
                         )}
                       </Button>
+
+                      <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                          <span className="w-full border-t" />
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
+                          <span className="bg-background px-2 text-muted-foreground">
+                            Or continue with
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-center">
+                        <GoogleLogin
+                          onSuccess={handleGoogleSuccess}
+                          onError={() => {
+                            console.log('Login Failed');
+                          }}
+                        />
+                      </div>
                     </div>
                   </form>
                 </Form>

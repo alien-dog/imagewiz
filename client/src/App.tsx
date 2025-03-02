@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "./lib/protected-route";
 import { Helmet } from "react-helmet";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // Pages
 import HomePage from "@/pages/home-page";
@@ -106,12 +107,14 @@ function Router() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <Router />
-        <Toaster />
-      </AuthProvider>
-    </QueryClientProvider>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <Router />
+          <Toaster />
+        </AuthProvider>
+      </QueryClientProvider>
+    </GoogleOAuthProvider>
   );
 }
 
