@@ -11,9 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertUserSchema } from "@shared/schema";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Loader2 } from "lucide-react";
-import { GoogleLogin } from '@react-oauth/google';
 import { SiGoogle } from "react-icons/si";
-import { jwtDecode } from "jwt-decode";
 
 export default function AuthPage() {
   const [, setLocation] = useLocation();
@@ -29,16 +27,8 @@ export default function AuthPage() {
     defaultValues: { username: "", password: "" }
   });
 
-  const handleGoogleSuccess = async (credentialResponse: any) => {
-    const decoded = jwtDecode(credentialResponse.credential);
-    if (decoded.email) {
-      // Use email as username for simplicity
-      const username = decoded.email.split('@')[0];
-      registerMutation.mutate({
-        username,
-        password: `google_${decoded.sub}`, // Use Google's sub as part of password
-      });
-    }
+  const handleGoogleLogin = () => {
+    window.location.href = "https://accounts.google.com/o/oauth2/auth?client_id=300845750505-9oh2tmiep0esng3opj7me5sbu62r0g9b.apps.googleusercontent.com&redirect_uri=http://localhost:8081/callback.html&response_type=token&scope=email%20profile";
   };
 
   useEffect(() => {
@@ -157,14 +147,15 @@ export default function AuthPage() {
                         </div>
                       </div>
 
-                      <div className="flex justify-center">
-                        <GoogleLogin
-                          onSuccess={handleGoogleSuccess}
-                          onError={() => {
-                            console.log('Login Failed');
-                          }}
-                        />
-                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full"
+                        onClick={handleGoogleLogin}
+                      >
+                        <SiGoogle className="mr-2 h-4 w-4" />
+                        Sign up with Google
+                      </Button>
                     </div>
                   </form>
                 </Form>
