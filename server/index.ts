@@ -1,7 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-import path from "path";
 
 const app = express();
 app.use(express.json());
@@ -66,20 +65,19 @@ app.use((req, res, next) => {
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
       const status = err.status || err.statusCode || 500;
       const message = err.message || "Internal Server Error";
+
+      // Log the error for debugging
       console.error('Error:', err);
+
+      // Only send response if headers haven't been sent already
       if (!res.headersSent) {
         res.status(status).json({ message });
       }
     });
 
-    if (process.env.NODE_ENV !== 'production') {
-      await setupVite(app);
-    } else {
-      app.use(express.static(path.join(__dirname, '../dist')));
-      app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname, '../dist/index.html'));
-      });
-    }
+    // Always use setupVite in development mode when running with npm run dev
+    await setupVite(app, server);
+
 
     // Configure port and host from environment variables
     const port = process.env.PORT || 5000;
@@ -90,20 +88,26 @@ app.use((req, res, next) => {
       host,
       reusePort: true,
     }, () => {
-      log(`Server running on http://${host}:${port}`);
+      log(`Server running in ${process.env.NODE_ENV || 'development'} mode`);
+      log(`Listening on http://${host}:${port}`);
     });
 
     // Handle graceful shutdown
-    const handleShutdown = () => {
-      log('Shutdown signal received: closing HTTP server');
+    process.on('SIGTERM', () => {
+      log('SIGTERM signal received: closing HTTP server');
       server.close(() => {
         log('HTTP server closed');
         process.exit(0);
       });
-    };
+    });
 
-    process.on('SIGTERM', handleShutdown);
-    process.on('SIGINT', handleShutdown);
+    process.on('SIGINT', () => {
+      log('SIGINT signal received: closing HTTP server');
+      server.close(() => {
+        log('HTTP server closed');
+        process.exit(0);
+      });
+    });
 
   } catch (error) {
     console.error('Failed to start server:', error);

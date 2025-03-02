@@ -5,7 +5,6 @@ import multer from "multer";
 import { storage } from "./storage";
 import { createCheckoutSession, handleWebhook } from "./stripe";
 import express from 'express';
-import path from 'path';
 
 // Configure multer for handling file uploads
 const upload = multer({
@@ -17,17 +16,6 @@ const upload = multer({
 
 export async function registerRoutes(app: Express): Promise<Server> {
   setupAuth(app);
-
-  // Add download endpoint for the ZIP file
-  app.get('/download', (req, res) => {
-    const filePath = path.join(__dirname, '..', 'clean_project.zip');
-    res.download(filePath, 'clean_project.zip', (err) => {
-      if (err) {
-        console.error('Error sending zip file:', err);
-        res.status(500).send('Error downloading file');
-      }
-    });
-  });
 
   // Stripe payment routes
   app.post("/api/create-checkout-session", createCheckoutSession);
