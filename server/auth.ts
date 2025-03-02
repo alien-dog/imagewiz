@@ -6,6 +6,7 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
+import axios from 'axios';
 
 declare global {
   namespace Express {
@@ -79,6 +80,47 @@ export function setupAuth(app: Express) {
       done(null, user);
     } catch (error) {
       done(error);
+    }
+  });
+
+  // Handle Google OAuth callback
+  app.get("/api/auth/google/callback", async (req, res) => {
+    try {
+      const accessToken = req.query.access_token as string;
+
+      // Get user info from Google
+      const response = await axios.get('https://www.googleapis.com/oauth2/v2/userinfo', {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+
+      const { email } = response.data;
+      if (!email) {
+        return res.redirect('/auth?error=no_email');
+      }
+
+      // Use email as username
+      const username = email.split('@')[0];
+
+      // Check if user exists
+      let user = await storage.getUserByUsername(username);
+
+      if (!user) {
+        // Create new user
+        const password = await hashPassword(`google_${Date.now()}`);
+        user = await storage.createUser({ username, password });
+      }
+
+      // Log user in
+      req.login(user, (err) => {
+        if (err) {
+          return res.redirect('/auth?error=login_failed');
+        }
+        res.redirect('/dashboard');
+      });
+
+    } catch (error) {
+      console.error('Google auth error:', error);
+      res.redirect('/auth?error=auth_failed');
     }
   });
 
