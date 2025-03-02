@@ -83,47 +83,7 @@ export function setupAuth(app: Express) {
     }
   });
 
-  // Handle Google OAuth callback
-  app.get("/api/auth/google/callback", async (req, res) => {
-    try {
-      const accessToken = req.query.access_token as string;
-
-      // Get user info from Google
-      const response = await axios.get('https://www.googleapis.com/oauth2/v2/userinfo', {
-        headers: { Authorization: `Bearer ${accessToken}` }
-      });
-
-      const { email } = response.data;
-      if (!email) {
-        return res.redirect('/auth?error=no_email');
-      }
-
-      // Use email as username
-      const username = email.split('@')[0];
-
-      // Check if user exists
-      let user = await storage.getUserByUsername(username);
-
-      if (!user) {
-        // Create new user
-        const password = await hashPassword(`google_${Date.now()}`);
-        user = await storage.createUser({ username, password });
-      }
-
-      // Log user in
-      req.login(user, (err) => {
-        if (err) {
-          return res.redirect('/auth?error=login_failed');
-        }
-        res.redirect('/dashboard');
-      });
-
-    } catch (error) {
-      console.error('Google auth error:', error);
-      res.redirect('/auth?error=auth_failed');
-    }
-  });
-
+  // Authentication routes
   app.post("/api/register", async (req, res, next) => {
     try {
       const existingUser = await storage.getUserByUsername(req.body.username);
@@ -151,7 +111,7 @@ export function setupAuth(app: Express) {
         return next(err);
       }
       if (!user) {
-        return res.status(401).json({ message: info.message || "Authentication failed" });
+        return res.status(401).json({ message: info?.message || "Authentication failed" });
       }
       req.login(user, (err) => {
         if (err) {
