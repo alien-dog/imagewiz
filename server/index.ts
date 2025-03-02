@@ -84,7 +84,7 @@ apiApp.use(requestLogger);
 
     // Configure frontend server in development
     if (process.env.NODE_ENV !== 'production') {
-      await setupVite(frontendApp, frontendServer);
+      await setupVite(frontendApp); // Remove frontendServer parameter
     } else {
       // In production, serve the built frontend files
       frontendApp.use(express.static(path.join(__dirname, '../dist')));
