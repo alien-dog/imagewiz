@@ -15,7 +15,7 @@ app = Flask(__name__)
 CORS(app, supports_credentials=True)
 
 # Validate required environment variables
-required_env_vars = ['SESSION_SECRET', 'DATABASE_URL']
+required_env_vars = ['SESSION_SECRET', 'MYSQL_HOST', 'MYSQL_USER', 'MYSQL_PASSWORD', 'MYSQL_DATABASE']
 missing_vars = [var for var in required_env_vars if not os.environ.get(var)]
 if missing_vars:
     logger.error(f"Missing required environment variables: {', '.join(missing_vars)}")
@@ -23,8 +23,11 @@ if missing_vars:
 
 # Configure app
 app.config['SECRET_KEY'] = os.environ.get('SESSION_SECRET')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+mysql_uri = f"mysql+pymysql://{os.environ.get('MYSQL_USER')}:{os.environ.get('MYSQL_PASSWORD')}@{os.environ.get('MYSQL_HOST')}/{os.environ.get('MYSQL_DATABASE')}"
+app.config['SQLALCHEMY_DATABASE_URI'] = mysql_uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+logger.info(f"Connecting to MySQL at {os.environ.get('MYSQL_HOST')} with user {os.environ.get('MYSQL_USER')} and database {os.environ.get('MYSQL_DATABASE')}")
 
 db = SQLAlchemy(app)
 login_manager = LoginManager()
@@ -41,6 +44,11 @@ class User(UserMixin, db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+# Basic ping endpoint to verify server is running
+@app.route('/ping')
+def ping():
+    return jsonify({"status": "ok"}), 200
 
 # Google OAuth callback route
 @app.route('/callback.html')
