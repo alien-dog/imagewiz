@@ -1,57 +1,76 @@
 import { createContext, ReactNode, useContext } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { User as SelectUser } from "@shared/schema";
+import {
+  useQuery,
+  useMutation,
+  UseMutationResult,
+} from "@tanstack/react-query";
+import { insertUserSchema, User as SelectUser, InsertUser } from "@shared/schema";
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { GoogleLogin, useGoogleLogin } from '@react-oauth/google';
-import { jwtDecode } from "jwt-decode";
 
 type AuthContextType = {
   user: SelectUser | null;
   isLoading: boolean;
   error: Error | null;
-  googleLogin: () => void;
+  loginMutation: UseMutationResult<SelectUser, Error, LoginData>;
   logoutMutation: UseMutationResult<void, Error, void>;
+  registerMutation: UseMutationResult<SelectUser, Error, InsertUser>;
+  refreshCredits: () => void;
 };
+
+type LoginData = Pick<InsertUser, "username" | "password">;
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
-
   const {
     data: user,
     error,
     isLoading,
+    refetch: refreshCredits
   } = useQuery<SelectUser | undefined, Error>({
     queryKey: ["/api/user"],
     queryFn: getQueryFn({ on401: "returnNull" }),
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: true, // Automatically refresh when window gains focus
   });
 
-  const googleLogin = useGoogleLogin({
-    onSuccess: async (response) => {
-      try {
-        const res = await apiRequest("POST", "/api/auth/google", {
-          credential: response.access_token,
-        });
-        const data = await res.json();
-        queryClient.setQueryData(["/api/user"], data);
-        toast({
-          title: "Welcome!",
-          description: "Successfully signed in with Google",
-        });
-      } catch (error) {
-        toast({
-          title: "Login failed",
-          description: error.message,
-          variant: "destructive",
-        });
-      }
+  const loginMutation = useMutation({
+    mutationFn: async (credentials: LoginData) => {
+      const res = await apiRequest("POST", "/api/login", credentials);
+      return await res.json();
     },
-    onError: (error) => {
+    onSuccess: (user: SelectUser) => {
+      queryClient.setQueryData(["/api/user"], user);
       toast({
-        title: "Google login failed",
+        title: "Welcome back!",
+        description: `You have ${user.credits} credits available.`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Login failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const registerMutation = useMutation({
+    mutationFn: async (credentials: InsertUser) => {
+      const res = await apiRequest("POST", "/api/register", credentials);
+      return await res.json();
+    },
+    onSuccess: (user: SelectUser) => {
+      queryClient.setQueryData(["/api/user"], user);
+      toast({
+        title: "Welcome to iMagenWiz!",
+        description: `Your account is ready with ${user.credits} free credits.`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Registration failed",
         description: error.message,
         variant: "destructive",
       });
@@ -84,8 +103,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user: user ?? null,
         isLoading,
         error,
-        googleLogin,
+        loginMutation,
         logoutMutation,
+        registerMutation,
+        refreshCredits,
       }}
     >
       {children}

@@ -1,36 +1,21 @@
 # iMagenWiz Deployment Guide
 
-## Splitting Frontend and Backend Deployment
+## Prerequisites
+- Node.js 20.x or later
+- PostgreSQL database
+- Environment variables setup
+- SSL certificate for HTTPS (recommended for production)
 
-### Frontend Deployment
-1. Environment Setup:
-```bash
-# Frontend environment variables
-VITE_API_URL=https://your-backend-domain.com  # Backend API URL
+## Environment Variables Required
 ```
-
-2. Build the frontend:
-```bash
-cd client
-npm install
-npm run build
-```
-
-3. Deploy the built frontend files (in `dist/`) to your web server
-   - The built files are static and can be served by any web server (Nginx, Apache, etc.)
-   - Configure your web server to serve the frontend files and handle client-side routing
-
-### Backend Deployment
-1. Environment Variables Required:
-```bash
 # Database Configuration
 DATABASE_URL=postgresql://user:password@host:port/database
 
 # Server Configuration
-PORT=5000
-HOST=0.0.0.0
+PORT=5000 # Optional, defaults to 5000
+HOST=0.0.0.0 # Optional, defaults to 0.0.0.0
 NODE_ENV=production
-ALLOWED_ORIGINS=https://your-frontend-domain.com  # Comma-separated list of allowed frontend origins
+ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
 
 # Authentication
 SESSION_SECRET=your_secure_session_secret
@@ -40,78 +25,133 @@ STRIPE_SECRET_KEY=your_stripe_secret_key
 STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
 ```
 
-2. Install dependencies and start the server:
+## Build Process
+1. Install dependencies:
 ```bash
-cd server
 npm install
+```
+
+2. Build the application:
+```bash
 npm run build
+```
+
+This will:
+- Build the frontend assets (in `dist/public`)
+- Compile the server code (in `dist/index.js`)
+
+## Database Setup
+The application uses Drizzle ORM for database management. To set up your database:
+
+1. Make sure your PostgreSQL database is running and accessible
+2. Set the `DATABASE_URL` environment variable
+3. Run migrations:
+```bash
+npm run db:push
+```
+
+## Production Deployment Steps
+
+### 1. Server Requirements
+- Minimum 512MB RAM
+- 1GB storage space
+- Node.js runtime environment
+- PostgreSQL database (version 12 or higher)
+- HTTPS support for secure sessions
+- Static file serving capability
+
+### 2. Server Setup
+1. Clone the repository or upload the built files
+2. Set up all required environment variables
+3. Install production dependencies:
+```bash
+npm install --production
+```
+
+### 3. Running in Production
+Start the production server:
+```bash
 NODE_ENV=production node dist/index.js
 ```
 
-## Security Considerations for Split Deployment
+For production deployment, we recommend using a process manager like PM2:
+```bash
+npm install -g pm2
+pm2 start dist/index.js --name imagenwiz
+```
 
-### CORS Configuration
-- The backend is configured to accept requests only from specified origins
-- Update `ALLOWED_ORIGINS` to include your frontend domain
-- Ensure `credentials: true` is set for handling authentication cookies
+### 4. Nginx Configuration (Recommended)
+If using Nginx as a reverse proxy:
 
-### Session Management
-- Session cookies are configured to work across different domains
-- Ensure proper SSL/TLS configuration on both frontend and backend
-- Set appropriate cookie security options (Secure, SameSite)
+```nginx
+server {
+    listen 80;
+    server_name yourdomain.com;
 
-### SSL/TLS
-- Both frontend and backend should use HTTPS in production
-- Configure SSL certificates for both domains
-- Update frontend API calls to use HTTPS endpoints
+    # Redirect HTTP to HTTPS
+    return 301 https://$host$request_uri;
+}
 
-## Monitoring and Maintenance
+server {
+    listen 443 ssl;
+    server_name yourdomain.com;
 
-### Frontend Monitoring
-- Set up error tracking (e.g., Sentry)
-- Configure performance monitoring
-- Implement user analytics
+    # SSL configuration
+    ssl_certificate /path/to/cert.pem;
+    ssl_certificate_key /path/to/key.pem;
 
-### Backend Monitoring
-- Monitor API endpoint performance
-- Set up database connection monitoring
-- Configure error logging and alerting
+    # Security headers
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header X-Content-Type-Options "nosniff" always;
 
-## Scaling Considerations
+    location / {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
 
-### Frontend Scaling
-- Use a CDN for static assets
-- Implement caching strategies
-- Consider regional deployments
+### 5. Health Checks
+The application provides a health check endpoint at `/api/health` that returns HTTP 200 when the application is ready to accept requests.
 
-### Backend Scaling
-- Configure load balancing
-- Implement horizontal scaling
-- Monitor and optimize database performance
+### 6. Monitoring
+For production monitoring, consider:
+- Setting up application monitoring (e.g., New Relic, Datadog)
+- Configuring log aggregation
+- Setting up alerts for error rates and response times
+
+### 7. Backup Strategy
+Ensure regular backups of:
+- PostgreSQL database
+- User uploaded content
+- Environment configuration
 
 ## Troubleshooting
+Common issues and solutions:
 
-### Frontend Issues
-1. API Connection Problems:
-   - Verify VITE_API_URL is correct
-   - Check CORS configuration
-   - Validate SSL certificates
-
-2. Build Issues:
-   - Clear build cache
-   - Update dependencies
-   - Check build logs
-
-### Backend Issues
-1. Database Connection:
+1. Database Connection Issues:
    - Verify DATABASE_URL is correct
    - Check database user permissions
-   - Ensure database is accessible
+   - Ensure database is accessible from the application server
 
-2. CORS Errors:
-   - Verify ALLOWED_ORIGINS includes frontend domain
-   - Check request headers
-   - Validate CORS configuration
+2. Static Files Not Loading:
+   - Verify the build process completed successfully
+   - Check Nginx configuration for static file serving
+   - Ensure proper file permissions
+
+3. Session Issues:
+   - Verify SESSION_SECRET is set
+   - Check cookie settings and domain configuration
+   - Ensure HTTPS is properly configured
 
 For additional support or issues, please refer to our documentation or create an issue in the repository.
 

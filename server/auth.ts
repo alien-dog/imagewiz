@@ -1,12 +1,11 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { Express } from "express";
+import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
-import jwt from 'jsonwebtoken';
-import { OAuth2Client } from 'google-auth-library';
 
 declare global {
   namespace Express {
@@ -29,35 +28,26 @@ async function comparePasswords(supplied: string, stored: string) {
   return timingSafeEqual(hashedBuf, suppliedBuf);
 }
 
-const googleClient = new OAuth2Client(process.env.VITE_GOOGLE_CLIENT_ID);
+export function setupAuth(app: Express) {
+  const sessionSettings: session.SessionOptions = {
+    secret: process.env.SESSION_SECRET!,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    },
+    store: storage.sessionStore,
+  };
 
-export function authenticateToken(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (!token) {
-    return res.status(401).json({ message: "No token provided" });
+  // Trust first proxy if in production
+  if (process.env.NODE_ENV === "production") {
+    app.set("trust proxy", 1);
   }
 
-  jwt.verify(token, process.env.SESSION_SECRET!, (err: any, user: any) => {
-    if (err) {
-      return res.status(403).json({ message: "Invalid token" });
-    }
-    req.user = user;
-    next();
-  });
-}
-
-function generateToken(user: SelectUser) {
-  return jwt.sign(
-    { id: user.id, username: user.username },
-    process.env.SESSION_SECRET!,
-    { expiresIn: '24h' }
-  );
-}
-
-export function setupAuth(app: Express) {
+  app.use(session(sessionSettings));
   app.use(passport.initialize());
+  app.use(passport.session());
 
   passport.use(
     new LocalStrategy(async (username, password, done) => {
@@ -79,46 +69,19 @@ export function setupAuth(app: Express) {
     })
   );
 
-  app.post("/api/auth/google", async (req, res) => {
+  passport.serializeUser((user, done) => {
+    done(null, user.id);
+  });
+
+  passport.deserializeUser(async (id: number, done) => {
     try {
-      const { credential } = req.body;
-      const ticket = await googleClient.verifyIdToken({
-        idToken: credential,
-        audience: process.env.VITE_GOOGLE_CLIENT_ID
-      });
-
-      const payload = ticket.getPayload();
-      if (!payload) {
-        return res.status(400).json({ message: "Invalid token" });
-      }
-
-      let user = await storage.getUserByEmail(payload.email!);
-
-      if (!user) {
-        // Create a new user if they don't exist
-        user = await storage.createUser({
-          username: payload.email!.split('@')[0],
-          email: payload.email!,
-          provider: 'google',
-          credits: 10, // Default credits for new users
-        });
-      }
-
-      const token = generateToken(user);
-      res.json({ user, token });
+      const user = await storage.getUser(id);
+      done(null, user);
     } catch (error) {
-      console.error('Google auth error:', error);
-      res.status(401).json({ message: "Authentication failed" });
+      done(error);
     }
   });
 
-  app.post("/api/logout", (req, res) => {
-    res.sendStatus(200);
-  });
-
-  app.get("/api/user", authenticateToken, (req, res) => {
-    res.json(req.user);
-  });
   app.post("/api/register", async (req, res, next) => {
     try {
       const existingUser = await storage.getUserByUsername(req.body.username);
@@ -131,8 +94,10 @@ export function setupAuth(app: Express) {
         password: await hashPassword(req.body.password),
       });
 
-      const token = generateToken(user);
-      res.status(201).json({ user, token });
+      req.login(user, (err) => {
+        if (err) return next(err);
+        res.status(201).json(user);
+      });
     } catch (error) {
       next(error);
     }
@@ -144,11 +109,28 @@ export function setupAuth(app: Express) {
         return next(err);
       }
       if (!user) {
-        return res.status(401).json({ message: info?.message || "Authentication failed" });
+        return res.status(401).json({ message: info.message || "Authentication failed" });
       }
-
-      const token = generateToken(user);
-      return res.json({ user, token });
+      req.login(user, (err) => {
+        if (err) {
+          return next(err);
+        }
+        return res.json(user);
+      });
     })(req, res, next);
+  });
+
+  app.post("/api/logout", (req, res, next) => {
+    req.logout((err) => {
+      if (err) return next(err);
+      res.sendStatus(200);
+    });
+  });
+
+  app.get("/api/user", (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+    res.json(req.user);
   });
 }
