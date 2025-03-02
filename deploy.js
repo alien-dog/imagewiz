@@ -25,3 +25,25 @@ process.on('SIGINT', () => {
   frontend.kill();
   process.exit(0);
 });
+
+// Log process errors
+backend.on('error', (err) => {
+  console.error('Backend process error:', err);
+});
+
+frontend.on('error', (err) => {
+  console.error('Frontend process error:', err);
+});
+
+// Log process exit
+backend.on('exit', (code) => {
+  console.log(`Backend process exited with code ${code}`);
+});
+
+frontend.on('exit', (code) => {
+  console.log(`Frontend process exited with code ${code}`);
+});
+
+console.log('Starting services...');
+console.log('Backend running on port 5000');
+console.log('Frontend running on port 8000');
