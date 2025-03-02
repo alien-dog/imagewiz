@@ -23,30 +23,6 @@ import UseCases from "@/pages/resources/use-cases";
 import Guides from "@/pages/resources/guides";
 import Blog from "@/pages/resources/blog";
 
-// Individual Articles
-// Use Cases
-import EcommerceUseCase from "@/pages/resources/use-cases/ecommerce";
-import PhotographyUseCase from "@/pages/resources/use-cases/photography";
-import MarketingUseCase from "@/pages/resources/use-cases/marketing";
-import GraphicDesignUseCase from "@/pages/resources/use-cases/graphic-design";
-
-// Guides
-import GettingStartedGuide from "@/pages/resources/guides/getting-started";
-import AdvancedTechniquesGuide from "@/pages/resources/guides/advanced-techniques";
-import BestPracticesGuide from "@/pages/resources/guides/best-practices";
-import ApiIntegrationGuide from "@/pages/resources/guides/api-integration";
-
-// Blog Posts
-import AIFutureImageProcessing from "@/pages/resources/blog/ai-future-image-processing";
-import EcommerceOptimization from "@/pages/resources/blog/ecommerce-optimization";
-import SustainabilityDesign from "@/pages/resources/blog/sustainability-design";
-import ProcessingTrends from "@/pages/resources/blog/processing-trends";
-
-// Legal Pages
-import Privacy from "@/pages/privacy";
-import Terms from "@/pages/terms";
-import GDPR from "@/pages/gdpr";
-
 function Router() {
   return (
     <>
@@ -58,39 +34,15 @@ function Router() {
         />
       </Helmet>
       <Switch>
-        <Route path="/" component={HomePage} />
+        {/* Public Routes */}
         <Route path="/auth" component={AuthPage} />
         <Route path="/pricing" component={Pricing} />
-
-        {/* Resource Pages */}
         <Route path="/resources/use-cases" component={UseCases} />
         <Route path="/resources/guides" component={Guides} />
         <Route path="/resources/blog" component={Blog} />
 
-        {/* Legal Pages */}
-        <Route path="/privacy" component={Privacy} />
-        <Route path="/terms" component={Terms} />
-        <Route path="/gdpr" component={GDPR} />
-
-        {/* Use Cases */}
-        <Route path="/resources/use-cases/ecommerce" component={EcommerceUseCase} />
-        <Route path="/resources/use-cases/photography" component={PhotographyUseCase} />
-        <Route path="/resources/use-cases/marketing" component={MarketingUseCase} />
-        <Route path="/resources/use-cases/graphic-design" component={GraphicDesignUseCase} />
-
-        {/* Guides */}
-        <Route path="/resources/guides/getting-started" component={GettingStartedGuide} />
-        <Route path="/resources/guides/advanced-techniques" component={AdvancedTechniquesGuide} />
-        <Route path="/resources/guides/best-practices" component={BestPracticesGuide} />
-        <Route path="/resources/guides/api-integration" component={ApiIntegrationGuide} />
-
-        {/* Blog Posts */}
-        <Route path="/resources/blog/ai-future-image-processing" component={AIFutureImageProcessing} />
-        <Route path="/resources/blog/ecommerce-optimization" component={EcommerceOptimization} />
-        <Route path="/resources/blog/sustainability-design" component={SustainabilityDesign} />
-        <Route path="/resources/blog/processing-trends" component={ProcessingTrends} />
-
-        {/* Dashboard Routes */}
+        {/* Protected Routes */}
+        <ProtectedRoute path="/" component={HomePage} />
         <ProtectedRoute path="/dashboard" component={Dashboard} />
         <ProtectedRoute path="/dashboard/profile" component={Profile} />
         <ProtectedRoute path="/dashboard/history" component={ImageHistory} />
@@ -98,6 +50,7 @@ function Router() {
         <ProtectedRoute path="/dashboard/settings" component={Settings} />
         <ProtectedRoute path="/admin" component={AdminDashboard} adminOnly />
 
+        {/* 404 Route */}
         <Route component={NotFound} />
       </Switch>
     </>
