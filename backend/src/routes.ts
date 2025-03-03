@@ -1,9 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { setupAuth } from "./auth";
 import multer from "multer";
-import { storage } from "./storage";
-import { createCheckoutSession, handleWebhook } from "./stripe";
+import { storage } from "./storage.js";
+import { createCheckoutSession, handleWebhook } from "./stripe.js";
 import express from 'express';
 
 // Configure multer for handling file uploads
@@ -15,7 +14,10 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  setupAuth(app);
+  // Health check endpoint
+  app.get("/api/health", (req, res) => {
+    res.json({ status: "ok" });
+  });
 
   // Stripe payment routes
   app.post("/api/create-checkout-session", createCheckoutSession);
@@ -43,37 +45,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(profile);
   });
 
-  // Transaction routes
-  app.get("/api/users/:userId/transactions", isProfileOwner, async (req, res) => {
-    const userId = parseInt(req.params.userId);
-    const transactions = await storage.getUserTransactions(userId);
-    res.json(transactions);
-  });
-
-  // Add these routes to handle image history
-  app.get("/api/users/:userId/images", isProfileOwner, async (req, res) => {
-    const userId = parseInt(req.params.userId);
-    const images = await storage.getUserImages(userId);
-    res.json(images);
-  });
-
-  app.delete("/api/images/:imageId", async (req, res) => {
-    const imageId = parseInt(req.params.imageId);
-    const image = await storage.getImage(imageId);
-
-    if (!image) {
-      return res.status(404).send("Image not found");
-    }
-
-    if (!req.isAuthenticated() || (req.user?.id !== image.userId && req.user?.username !== 'admin')) {
-      return res.status(403).send("Forbidden");
-    }
-
-    await storage.deleteImage(imageId);
-    res.sendStatus(200);
-  });
-
-  // Update the process endpoint to create an image record
+  // Image processing routes
   app.post("/api/process", upload.single("image"), async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).send("Unauthorized");
@@ -90,26 +62,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       status: "pending"
     });
 
-    // For demo purposes, just echo back success
-    // In a real app, this would integrate with an AI service
     res.json(image);
-  });
-
-  // Add this route at the end of the routes section before returning httpServer
-  app.post("/api/upload-logo", upload.single("logo"), async (req, res) => {
-    if (!req.isAuthenticated() || req.user?.username !== 'admin') {
-      return res.status(403).send("Only admin can upload logo");
-    }
-
-    if (!req.file) {
-      return res.status(400).send("No file uploaded");
-    }
-
-    // For demo purposes, we'll just return a success response
-    // In a real app, you would upload to cloud storage and return the URL
-    res.json({
-      url: "data:image/png;base64," + req.file.buffer.toString('base64')
-    });
   });
 
   // Middleware to check if user is admin
@@ -128,7 +81,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     next();
   }
-
 
   const httpServer = createServer(app);
   return httpServer;
