@@ -20,23 +20,21 @@ export const userProfiles = pgTable("user_profiles", {
   updatedAt: timestamp("updated_at").defaultNow().notNull()
 });
 
-export const transactions = pgTable("transactions", {
+export const images = pgTable("images", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull().references(() => users.id),
-  type: text("type").notNull(), // 'credit_purchase', 'credit_usage'
-  amount: integer("amount").notNull(),
-  description: text("description").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  userId: integer("user_id").notNull(),
+  originalUrl: text("original_url").notNull(),
+  processedUrl: text("processed_url"),
+  status: text("status").notNull().default("pending"),
   metadata: jsonb("metadata")
 });
 
 // Relations
-export const usersRelations = relations(users, ({ one, many }) => ({
+export const usersRelations = relations(users, ({ one }) => ({
   profile: one(userProfiles, {
     fields: [users.id],
     references: [userProfiles.userId],
-  }),
-  transactions: many(transactions)
+  })
 }));
 
 export const userProfilesRelations = relations(userProfiles, ({ one }) => ({
@@ -46,12 +44,6 @@ export const userProfilesRelations = relations(userProfiles, ({ one }) => ({
   })
 }));
 
-export const transactionsRelations = relations(transactions, ({ one }) => ({
-  user: one(users, {
-    fields: [transactions.userId],
-    references: [users.id],
-  })
-}));
 
 // Schemas for inserting data
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -65,29 +57,11 @@ export const insertProfileSchema = createInsertSchema(userProfiles).pick({
   avatarUrl: true
 });
 
-export const insertTransactionSchema = createInsertSchema(transactions).pick({
-  type: true,
-  amount: true,
-  description: true,
-  metadata: true
-});
-
-export const images = pgTable("images", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(),
-  originalUrl: text("original_url").notNull(),
-  processedUrl: text("processed_url"),
-  status: text("status").notNull().default("pending"),
-  metadata: jsonb("metadata")
-});
-
 export const insertImageSchema = createInsertSchema(images).pick({
   originalUrl: true
 });
 
-
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type UserProfile = typeof userProfiles.$inferSelect;
-export type Transaction = typeof transactions.$inferSelect;
 export type Image = typeof images.$inferSelect;
