@@ -13,12 +13,11 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   // Set up axios defaults - make sure the Vite proxy correctly handles all requests
-  axios.defaults.baseURL =
-    "http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:80";
+  axios.defaults.baseURL = `https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:5000`;
 
   // Debug our environment
   console.log("React environment:", import.meta.env);
-  console.log("Current axios baseURL:", axios.defaults.baseURL);
+  console.log("Current axios baseURL1:", axios.defaults.baseURL);
 
   // Set token in axios headers and localStorage
   const setAuthToken = (token) => {
@@ -63,9 +62,10 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       console.log("Login attempt for:", username);
 
-      // Set baseURL to ensure it's correct for this request
+      // Force setting baseURL to empty string in case it was changed
+      // axios.defaults.baseURL = "";
       axios.defaults.baseURL =
-        "http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:80";
+        "https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:5000";
 
       // Direct fetch instead of axios as a fallback approach
       console.log("Making fetch request to: /api/auth/login");
