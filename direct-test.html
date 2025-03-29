@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Direct Flask Backend Test</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1, h2 {
+      color: #2A9D8F;
+    }
+    .container {
+      background: #f9f9f9;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    button {
+      background: #2A9D8F;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 5px;
+    }
+    button:hover {
+      background: #238B7E;
+    }
+    pre {
+      background: #f0f0f0;
+      padding: 15px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    .response {
+      background-color: #e0f7fa;
+      border-left: 4px solid #00bcd4;
+      padding: 15px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Direct Flask Backend Test</h1>
+  
+  <div class="container">
+    <h2>Test Direct API Connection</h2>
+    <p>This page tests direct connections to the Flask backend running on Replit.</p>
+    
+    <div>
+      <h3>Test Endpoints</h3>
+      <button id="testRoot">Test Root Endpoint</button>
+      <button id="testHealth">Test Health Endpoint</button>
+      <button id="testLogin">Test Login Endpoint</button>
+    </div>
+    
+    <div class="response">
+      <h3>Response</h3>
+      <div id="requestDetails"></div>
+      <pre id="responseOutput">Response will appear here...</pre>
+    </div>
+  </div>
+  
+  <script>
+    // Flask backend URL
+    const FLASK_BACKEND = 'https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev';
+    
+    // Helper function to display response
+    function displayResponse(endpoint, method, requestData, response) {
+      const requestDetails = document.getElementById('requestDetails');
+      requestDetails.innerHTML = `
+        <strong>Endpoint:</strong> ${endpoint}<br>
+        <strong>Method:</strong> ${method}<br>
+        <strong>Request Data:</strong> ${requestData ? JSON.stringify(requestData) : 'None'}
+      `;
+      
+      document.getElementById('responseOutput').textContent = JSON.stringify(response, null, 2);
+    }
+    
+    // Test root endpoint
+    document.getElementById('testRoot').addEventListener('click', async () => {
+      try {
+        const response = await fetch(`${FLASK_BACKEND}/`);
+        const data = await response.text();
+        displayResponse('/', 'GET', null, { 
+          status: response.status, 
+          statusText: response.statusText,
+          data: data
+        });
+      } catch (error) {
+        displayResponse('/', 'GET', null, { 
+          error: error.message
+        });
+      }
+    });
+    
+    // Test health endpoint
+    document.getElementById('testHealth').addEventListener('click', async () => {
+      try {
+        const response = await fetch(`${FLASK_BACKEND}/api/health`);
+        const data = await response.text();
+        displayResponse('/api/health', 'GET', null, { 
+          status: response.status, 
+          statusText: response.statusText,
+          data: data
+        });
+      } catch (error) {
+        displayResponse('/api/health', 'GET', null, { 
+          error: error.message
+        });
+      }
+    });
+    
+    // Test login endpoint
+    document.getElementById('testLogin').addEventListener('click', async () => {
+      const loginData = {
+        username: 'testuser2',
+        password: 'password123'
+      };
+      
+      try {
+        const response = await fetch(`${FLASK_BACKEND}/api/auth/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(loginData)
+        });
+        
+        let data;
+        try {
+          data = await response.json();
+        } catch {
+          data = await response.text();
+        }
+        
+        displayResponse('/api/auth/login', 'POST', loginData, { 
+          status: response.status, 
+          statusText: response.statusText,
+          data: data
+        });
+      } catch (error) {
+        displayResponse('/api/auth/login', 'POST', loginData, { 
+          error: error.message
+        });
+      }
+    });
+  </script>
+</body>
+</html>

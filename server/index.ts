@@ -95,6 +95,10 @@ app.get('/simple-form.html', (req, res) => {
   res.sendFile(path.join(__dirname, '../simple-form.html'));
 });
 
+app.get('/direct-test.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../direct-test.html'));
+});
+
 // Catch-all route for SPA
 app.get('*', (req, res) => {
   try {
