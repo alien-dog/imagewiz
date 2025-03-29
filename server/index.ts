@@ -18,9 +18,8 @@ app.use(cors());
 app.use('/api', createProxyMiddleware({
   target: `http://localhost:${FLASK_PORT}`,
   changeOrigin: true,
-  pathRewrite: {
-    '^/api': '/api'
-  }
+  // Don't rewrite the path - Flask also uses /api prefix
+  logLevel: 'debug'
 }));
 
 // Proxy uploads requests to Flask backend
