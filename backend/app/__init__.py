@@ -20,7 +20,8 @@ def create_app():
     app = Flask(__name__, static_folder='static')
     
     # Configure the application
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+    # Use SQLite database (in-memory for development)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///imagenwiz.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(

@@ -1,0 +1,33 @@
+CREATE DATABASE IF NOT EXISTS imagenwiz;
+USE imagenwiz;
+
+CREATE TABLE IF NOT EXISTS users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(80) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  credit_balance INT DEFAULT 0 NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  is_admin BOOLEAN DEFAULT FALSE
+);
+
+CREATE TABLE IF NOT EXISTS recharge_history (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  amount DECIMAL(10, 2) NOT NULL,
+  credit_gained INT NOT NULL,
+  payment_status VARCHAR(20) NOT NULL,
+  payment_method VARCHAR(50) NOT NULL,
+  stripe_payment_id VARCHAR(100),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS matting_history (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  original_image_url VARCHAR(255) NOT NULL,
+  processed_image_url VARCHAR(255) NOT NULL,
+  credit_spent INT DEFAULT 1 NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
