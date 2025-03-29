@@ -149,7 +149,8 @@
         }
         
         try {
-          fetch('/api/auth/login', {
+          // Using direct Flask API endpoint to bypass proxy issues
+          fetch('http://localhost:5000/api/auth/login', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -186,7 +187,7 @@
       // Test fetch with XHR
       document.getElementById('fetch-xhr').addEventListener('click', function() {
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', '/api/auth/login', true);
+        xhr.open('POST', 'http://localhost:5000/api/auth/login', true);
         xhr.setRequestHeader('Content-Type', 'application/json');
         
         xhr.onload = function() {
@@ -227,9 +228,8 @@
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
         
-        // Get the current hostname and port
-        const host = window.location.origin;
-        const url = `${host}/api/auth/login`;
+        // Use direct Flask endpoint
+        const url = 'http://localhost:5000/api/auth/login';
         
         displayResponse({ attempting_fetch: url, credentials: { username, password: '******' } });
         
