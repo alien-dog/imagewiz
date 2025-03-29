@@ -1,0 +1,5 @@
+name: Python Flask Backend
+description: Runs the Python Flask backend server
+steps:
+  - name: Run Flask Server
+    command: cd backend && python run.py
