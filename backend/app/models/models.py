@@ -1,9 +1,5 @@
-from flask_sqlalchemy import SQLAlchemy
+from app import db, bcrypt
 from datetime import datetime
-from flask_bcrypt import Bcrypt
-
-db = SQLAlchemy()
-bcrypt = Bcrypt()
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -20,7 +16,7 @@ class User(db.Model):
     
     def set_password(self, password):
         self.password = bcrypt.generate_password_hash(password).decode('utf-8')
-        
+    
     def check_password(self, password):
         return bcrypt.check_password_hash(self.password, password)
     
@@ -29,9 +25,10 @@ class User(db.Model):
             'id': self.id,
             'username': self.username,
             'credit_balance': self.credit_balance,
-            'created_at': self.created_at.isoformat() if self.created_at else None
+            'created_at': self.created_at.isoformat()
         }
-        
+
+
 class RechargeHistory(db.Model):
     __tablename__ = 'recharge_history'
     
@@ -52,9 +49,9 @@ class RechargeHistory(db.Model):
             'credit_gained': self.credit_gained,
             'payment_status': self.payment_status,
             'payment_method': self.payment_method,
-            'stripe_payment_id': self.stripe_payment_id,
-            'created_at': self.created_at.isoformat() if self.created_at else None
+            'created_at': self.created_at.isoformat()
         }
+
 
 class MattingHistory(db.Model):
     __tablename__ = 'matting_history'
@@ -73,5 +70,5 @@ class MattingHistory(db.Model):
             'original_image_url': self.original_image_url,
             'processed_image_url': self.processed_image_url,
             'credit_spent': self.credit_spent,
-            'created_at': self.created_at.isoformat() if self.created_at else None
+            'created_at': self.created_at.isoformat()
         }

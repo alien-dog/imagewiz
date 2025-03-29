@@ -1,113 +1,133 @@
 import os
 import uuid
-from flask import Blueprint, request, jsonify, current_app
+from flask import request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.utils import secure_filename
-from app.models.models import User, MattingHistory, db
-from app.matting.service import process_image
-from app.utils.auth import admin_required
+from app.models.models import User, MattingHistory
+from app import db
+from app.matting import matting_bp
+from app.matting.service import process_image, generate_unique_filename
 
-matting_bp = Blueprint('matting', __name__)
-
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+# Allowed file extensions
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 def allowed_file(filename):
+    """Check if the file has an allowed extension"""
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 @matting_bp.route('/process', methods=['POST'])
 @jwt_required()
 def process_matting():
+    """Process an image to remove background"""
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
     
     if not user:
-        return jsonify({'success': False, 'message': 'User not found'}), 404
-        
+        return jsonify({'error': 'User not found'}), 404
+    
     # Check if user has enough credits
     if user.credit_balance < 1:
-        return jsonify({'success': False, 'message': 'Insufficient credits'}), 403
+        return jsonify({'error': 'Insufficient credits'}), 400
     
-    # Check if file is in the request
-    if 'image' not in request.files:
-        return jsonify({'success': False, 'message': 'No image file provided'}), 400
-        
-    file = request.files['image']
+    # Check if request has the file part
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
     
-    # Check if file is valid
+    file = request.files['file']
+    
+    # Check if file is selected
     if file.filename == '':
-        return jsonify({'success': False, 'message': 'No image selected'}), 400
+        return jsonify({'error': 'No selected file'}), 400
+    
+    if file and allowed_file(file.filename):
+        # Generate secure and unique filenames
+        secure_name = secure_filename(file.filename)
+        original_filename = generate_unique_filename(secure_name)
+        processed_filename = f"processed_{original_filename}"
         
-    if not allowed_file(file.filename):
-        return jsonify({'success': False, 'message': 'File type not allowed'}), 400
+        # Create absolute paths
+        original_path = os.path.join(current_app.config['UPLOAD_FOLDER'], original_filename)
+        processed_path = os.path.join(current_app.config['UPLOAD_FOLDER'], processed_filename)
+        
+        # Save the original file
+        file.save(original_path)
+        
+        # Process the image
+        success = process_image(original_path, processed_path)
+        
+        if not success:
+            return jsonify({'error': 'Failed to process image'}), 500
+        
+        # Calculate relative URLs
+        static_url_path = '/static/uploads/'
+        original_url = static_url_path + original_filename
+        processed_url = static_url_path + processed_filename
+        
+        # Create a matting history record
+        matting = MattingHistory(
+            user_id=user.id,
+            original_image_url=original_url,
+            processed_image_url=processed_url,
+            credit_spent=1
+        )
+        
+        # Deduct credits
+        user.credit_balance -= 1
+        
+        # Save to database
+        db.session.add(matting)
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Image processed successfully',
+            'original_url': original_url,
+            'processed_url': processed_url,
+            'credits_remaining': user.credit_balance,
+            'matting_id': matting.id
+        }), 200
     
-    # Save the original image
-    filename = secure_filename(file.filename)
-    unique_filename = f"{uuid.uuid4()}_{filename}"
-    original_path = os.path.join(current_app.config['UPLOAD_FOLDER'], unique_filename)
-    file.save(original_path)
-    
-    # Process the image (background removal, etc.)
-    processed_filename = f"processed_{unique_filename}"
-    processed_path = os.path.join(current_app.config['UPLOAD_FOLDER'], processed_filename)
-    
-    # This function would implement the actual image processing
-    process_success = process_image(original_path, processed_path)
-    
-    if not process_success:
-        return jsonify({'success': False, 'message': 'Failed to process image'}), 500
-    
-    # Create relative URLs for the images
-    original_url = f"/static/uploads/{unique_filename}"
-    processed_url = f"/static/uploads/{processed_filename}"
-    
-    # Create matting record
-    matting = MattingHistory(
-        user_id=user.id,
-        original_image_url=original_url,
-        processed_image_url=processed_url,
-        credit_spent=1
-    )
-    
-    # Deduct credits from user
-    user.credit_balance -= 1
-    
-    # Save to database
-    db.session.add(matting)
-    db.session.commit()
-    
-    return jsonify({
-        'success': True,
-        'message': 'Image processed successfully',
-        'matting': matting.to_dict(),
-        'remaining_credits': user.credit_balance
-    }), 200
+    return jsonify({'error': 'File type not allowed'}), 400
+
 
 @matting_bp.route('/history', methods=['GET'])
 @jwt_required()
 def get_history():
+    """Get user's matting history"""
     user_id = get_jwt_identity()
+    user = User.query.get(user_id)
     
-    # Get user's matting history
-    history = MattingHistory.query.filter_by(user_id=user_id).order_by(MattingHistory.created_at.desc()).all()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    # Get matting history
+    mattings = MattingHistory.query.filter_by(user_id=user.id).order_by(MattingHistory.created_at.desc()).all()
+    
+    history = [matting.to_dict() for matting in mattings]
     
     return jsonify({
-        'success': True,
-        'history': [item.to_dict() for item in history]
+        'history': history,
+        'count': len(history)
     }), 200
+
 
 @matting_bp.route('/history/<int:id>', methods=['GET'])
 @jwt_required()
 def get_matting_detail(id):
+    """Get a specific matting detail"""
     user_id = get_jwt_identity()
     
-    # Get the matting record
-    matting = MattingHistory.query.filter_by(id=id, user_id=user_id).first()
+    # Get matting record
+    matting = MattingHistory.query.get(id)
     
     if not matting:
-        return jsonify({'success': False, 'message': 'Record not found or access denied'}), 404
+        return jsonify({'error': 'Matting record not found'}), 404
+    
+    # Security check: ensure user can only access their own records
+    if matting.user_id != user_id:
+        return jsonify({'error': 'Unauthorized access'}), 403
     
     return jsonify({
-        'success': True,
         'matting': matting.to_dict()
     }), 200

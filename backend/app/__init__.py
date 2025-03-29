@@ -1,49 +1,49 @@
-import os
 from flask import Flask
 from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
-from flask_migrate import Migrate
+from flask_bcrypt import Bcrypt
+import os
 from dotenv import load_dotenv
 
-from app.models.models import db, bcrypt
-from app.auth.routes import auth_bp
-from app.matting.routes import matting_bp
-from app.payment.routes import payment_bp
-
+# Load environment variables from .env file
 load_dotenv()
 
+# Initialize extensions
+db = SQLAlchemy()
+jwt = JWTManager()
+bcrypt = Bcrypt()
+
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder='static')
     
-    # Configuration
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_key')
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
+    # Configure the app
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'mysql+pymysql://root:Ir%86241992@8.130.113.102/mat_db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['JWT_SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_key')
-    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 3600  # 1 hour
-    app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static/uploads')
+    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'your-secret-key-for-jwt')
+    app.config['UPLOAD_FOLDER'] = os.path.join(app.static_folder, 'uploads')
+    
+    # Initialize extensions with app
+    CORS(app)
+    db.init_app(app)
+    jwt.init_app(app)
+    bcrypt.init_app(app)
     
     # Ensure upload directory exists
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     
-    # Initialize extensions
-    CORS(app, supports_credentials=True)
-    db.init_app(app)
-    bcrypt.init_app(app)
-    jwt = JWTManager(app)
-    migrate = Migrate(app, db)
-    
     # Register blueprints
+    from app.auth.routes import auth_bp
+    from app.matting.routes import matting_bp
+    from app.payment.routes import payment_bp
+    
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(matting_bp, url_prefix='/api/matting')
     app.register_blueprint(payment_bp, url_prefix='/api/payment')
     
-    # Create tables if they don't exist
-    with app.app_context():
-        db.create_all()
-    
+    # Simple route for testing
     @app.route('/')
     def index():
-        return {'status': 'API is running'}
-        
+        return {'message': 'Welcome to iMagenWiz API!'}
+    
     return app

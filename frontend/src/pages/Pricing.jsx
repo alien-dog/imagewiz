@@ -1,197 +1,246 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import axios from 'axios';
 
-export function Pricing() {
-  const [isYearly, setIsYearly] = useState(false)
-  
-  const plans = [
-    {
-      name: 'Free',
-      description: 'For occasional personal use',
-      price: {
-        monthly: 0,
-        yearly: 0
-      },
-      features: [
-        '3 images per day',
-        'Standard quality',
-        'Basic customer support',
-        'Web access only',
-        'Standard processing'
-      ],
-      buttonText: 'Sign Up for Free',
-      highlighted: false
-    },
-    {
-      name: 'Pro',
-      description: 'For designers and small businesses',
-      price: {
-        monthly: 12.99,
-        yearly: 119.88 // 12.99 * 12 - discount
-      },
-      features: [
-        '100 images per month',
-        'HD quality',
-        'Priority support',
-        'Web & mobile access',
-        'Fast processing',
-        'Batch processing',
-        'Cloud storage (30 days)'
-      ],
-      buttonText: 'Get Pro',
-      highlighted: true
-    },
-    {
-      name: 'Enterprise',
-      description: 'For teams and businesses',
-      price: {
-        monthly: 49.99,
-        yearly: 479.88
-      },
-      features: [
-        'Unlimited images',
-        'Ultra HD quality',
-        '24/7 dedicated support',
-        'Web, mobile & API access',
-        'Ultra fast processing',
-        'Advanced batch processing',
-        'Cloud storage (90 days)',
-        'Custom backgrounds',
-        'Branded exports'
-      ],
-      buttonText: 'Contact Sales',
-      highlighted: false
+const pricingPlans = [
+  {
+    id: 'basic',
+    name: 'Basic',
+    credits: 10,
+    priceMonthly: 4.99,
+    priceYearly: 49.99,
+    features: [
+      '10 Image Process Credits',
+      'PNG Download with Transparency',
+      '7-day History Retention',
+      'Standard Processing Priority',
+    ],
+    mostPopular: false,
+  },
+  {
+    id: 'pro',
+    name: 'Pro',
+    credits: 50,
+    priceMonthly: 19.99,
+    priceYearly: 199.99,
+    features: [
+      '50 Image Process Credits',
+      'PNG Download with Transparency',
+      '30-day History Retention',
+      'High Processing Priority',
+      'Batch Processing (5 images)',
+    ],
+    mostPopular: true,
+  },
+  {
+    id: 'business',
+    name: 'Business',
+    credits: 200,
+    priceMonthly: 69.99,
+    priceYearly: 699.99,
+    features: [
+      '200 Image Process Credits',
+      'PNG Download with Transparency',
+      '90-day History Retention',
+      'Highest Processing Priority',
+      'Batch Processing (20 images)',
+      'API Access',
+    ],
+    mostPopular: false,
+  },
+];
+
+const Pricing = () => {
+  const [yearlyBilling, setYearlyBilling] = useState(true);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  const handlePlanSelect = (planId) => {
+    setSelectedPlan(planId);
+  };
+
+  const handleBillingToggle = () => {
+    setYearlyBilling(!yearlyBilling);
+  };
+
+  const handlePurchase = async (planId) => {
+    if (!isAuthenticated) {
+      navigate('/login', { state: { from: '/pricing', plan: planId } });
+      return;
     }
-  ]
 
-  // Calculate the yearly savings for the Pro plan
-  const monthlyCost = plans[1].price.monthly * 12
-  const yearlyCost = plans[1].price.yearly
-  const savings = monthlyCost - yearlyCost
-  const savingsPercentage = Math.round((savings / monthlyCost) * 100)
-  
+    setLoading(true);
+    setError('');
+
+    try {
+      const selectedPlan = pricingPlans.find((plan) => plan.id === planId);
+      const price = yearlyBilling ? selectedPlan.priceYearly : selectedPlan.priceMonthly;
+      
+      const response = await axios.post('/payment/create-checkout', {
+        package_id: planId,
+        price: price,
+        credits: selectedPlan.credits,
+        is_yearly: yearlyBilling,
+      });
+
+      // Redirect to Stripe checkout
+      window.location.href = response.data.checkout_url;
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to process your request. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Calculate the yearly savings percentage
+  const calculateSavings = (monthly, yearly) => {
+    const monthlyCost = monthly * 12;
+    const savings = monthlyCost - yearly;
+    const savingsPercentage = Math.round((savings / monthlyCost) * 100);
+    return savingsPercentage;
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 py-16">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Simple, Transparent Pricing</h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Choose the plan that works best for you and start transforming your images today.
+    <div className="bg-gray-50 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight">
+            Simple, Transparent Pricing
+          </h1>
+          <p className="mt-5 text-xl text-gray-500 max-w-3xl mx-auto">
+            Choose the plan that's right for you. All plans come with a 100% satisfaction guarantee.
           </p>
           
-          {/* Pricing Toggle */}
-          <div className="flex items-center justify-center mt-8">
-            <span className={`text-sm ${!isYearly ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>Monthly</span>
-            <button 
-              className="mx-4 relative inline-flex h-6 w-12 items-center rounded-full bg-teal-500 focus:outline-none"
-              onClick={() => setIsYearly(!isYearly)}
-            >
-              <span className="sr-only">Toggle yearly billing</span>
-              <span
+          {/* Billing toggle */}
+          <div className="mt-12 flex justify-center">
+            <div className="relative bg-white rounded-lg p-1 flex">
+              <button
+                type="button"
                 className={`${
-                  isYearly ? 'translate-x-6' : 'translate-x-1'
-                } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-              />
-            </button>
-            <span className={`flex items-center text-sm ${isYearly ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>
-              Yearly
-              <span className="ml-2 bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded">
-                Save {savingsPercentage}%
-              </span>
-            </span>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {plans.map((plan, index) => (
-            <div 
-              key={index}
-              className={`bg-white rounded-lg shadow-md overflow-hidden border ${plan.highlighted ? 'border-teal-500 transform md:scale-105' : 'border-gray-200'}`}
-            >
-              {plan.highlighted && (
-                <div className="bg-teal-500 text-white py-1 px-4 text-center text-sm font-medium">
-                  MOST POPULAR
+                  !yearlyBilling ? 'bg-teal-500 text-white' : 'bg-white text-gray-500'
+                } relative py-2 px-6 border-transparent rounded-md shadow-sm text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-teal-500 focus:z-10`}
+                onClick={handleBillingToggle}
+              >
+                Monthly billing
+              </button>
+              <button
+                type="button"
+                className={`${
+                  yearlyBilling ? 'bg-teal-500 text-white' : 'bg-white text-gray-500'
+                } ml-0.5 relative py-2 px-6 border-transparent rounded-md shadow-sm text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-teal-500 focus:z-10`}
+                onClick={handleBillingToggle}
+              >
+                Yearly billing
+              </button>
+              {yearlyBilling && (
+                <div className="absolute -top-3 right-10 rounded-full bg-teal-100 px-3 py-0.5 text-xs font-semibold text-teal-800">
+                  Save up to 17%
                 </div>
               )}
-              
-              <div className="p-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-1">{plan.name}</h3>
-                <p className="text-gray-500 mb-4">{plan.description}</p>
-                
-                <div className="mb-6">
-                  <span className="text-4xl font-bold text-gray-900">
-                    ${isYearly ? (plan.price.yearly / 12).toFixed(2) : plan.price.monthly}
-                  </span>
-                  <span className="text-gray-500">/month</span>
-                  
-                  {isYearly && (
-                    <div className="text-sm text-gray-500 mt-1">
-                      Billed annually (${plan.price.yearly.toFixed(2)})
-                    </div>
-                  )}
+            </div>
+          </div>
+        </div>
+
+        {error && (
+          <div className="max-w-3xl mx-auto mb-8 bg-red-50 border-l-4 border-red-500 p-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-red-700">{error}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="grid gap-6 lg:gap-8 lg:grid-cols-3 lg:max-w-7xl mx-auto">
+          {pricingPlans.map((plan) => (
+            <div
+              key={plan.id}
+              className={`bg-white rounded-lg shadow-lg divide-y divide-gray-200 ${
+                plan.mostPopular ? 'ring-2 ring-teal-500' : ''
+              }`}
+            >
+              {plan.mostPopular && (
+                <div className="bg-teal-500 rounded-t-lg py-1.5">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-white text-center">
+                    Most popular
+                  </p>
                 </div>
-                
-                <ul className="space-y-3 mb-6">
-                  {plan.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-start">
-                      <svg className="h-5 w-5 mr-2 text-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span className="text-gray-600">{feature}</span>
+              )}
+
+              <div className="p-6">
+                <h2 className="text-lg leading-6 font-medium text-gray-900">{plan.name}</h2>
+                <p className="mt-4">
+                  <span className="text-4xl font-extrabold text-gray-900">
+                    ${yearlyBilling ? plan.priceYearly : plan.priceMonthly}
+                  </span>
+                  <span className="text-base font-medium text-gray-500">
+                    {yearlyBilling ? '/year' : '/month'}
+                  </span>
+                </p>
+                {yearlyBilling && (
+                  <p className="mt-1 text-sm text-teal-700">
+                    Save {calculateSavings(plan.priceMonthly, plan.priceYearly)}% with yearly billing
+                  </p>
+                )}
+                <p className="mt-4 text-gray-500">
+                  {plan.credits} image processing credits
+                </p>
+              </div>
+
+              <div className="pt-6 pb-8 px-6">
+                <ul className="space-y-4">
+                  {plan.features.map((feature, index) => (
+                    <li key={index} className="flex items-start">
+                      <div className="flex-shrink-0">
+                        <svg className="h-6 w-6 text-teal-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      <p className="ml-3 text-base text-gray-500">{feature}</p>
                     </li>
                   ))}
                 </ul>
-                
-                <Link 
-                  to={plan.name === 'Enterprise' ? '/contact' : '/auth'}
-                  className={`w-full text-center py-2 px-4 rounded-md font-medium transition-colors ${
-                    plan.highlighted
-                      ? 'bg-teal-500 text-white hover:bg-teal-600'
-                      : 'bg-white border border-teal-500 text-teal-500 hover:bg-teal-50'
-                  }`}
-                >
-                  {plan.buttonText}
-                </Link>
+
+                <div className="mt-8">
+                  <button
+                    onClick={() => handlePurchase(plan.id)}
+                    disabled={loading}
+                    className={`w-full bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 ${
+                      loading && selectedPlan === plan.id ? 'opacity-70 cursor-not-allowed' : ''
+                    }`}
+                  >
+                    {loading && selectedPlan === plan.id ? 'Processing...' : 'Get Started'}
+                  </button>
+                </div>
               </div>
             </div>
           ))}
         </div>
-        
-        {/* FAQ Section */}
-        <div className="mt-20 max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-8">Frequently Asked Questions</h2>
-          
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h3 className="text-lg font-semibold mb-2">What payment methods do you accept?</h3>
-              <p className="text-gray-600">
-                We accept all major credit cards, PayPal, and selected regional payment methods. All payments are securely processed.
-              </p>
-            </div>
-            
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h3 className="text-lg font-semibold mb-2">Can I upgrade or downgrade my plan?</h3>
-              <p className="text-gray-600">
-                Yes, you can change your plan at any time. When upgrading, you'll be charged the prorated difference. When downgrading, the new rate will apply to your next billing cycle.
-              </p>
-            </div>
-            
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h3 className="text-lg font-semibold mb-2">Do unused credits roll over?</h3>
-              <p className="text-gray-600">
-                No, the monthly credits reset at the beginning of each billing cycle. However, yearly plan subscribers receive 20% bonus credits as a loyalty benefit.
-              </p>
-            </div>
-            
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h3 className="text-lg font-semibold mb-2">Is there a refund policy?</h3>
-              <p className="text-gray-600">
-                We offer a 7-day money-back guarantee for new subscriptions. If you're not satisfied with our service, contact support within 7 days of your purchase for a full refund.
-              </p>
-            </div>
-          </div>
+
+        <div className="mt-16 text-center">
+          <h3 className="text-lg font-medium text-gray-900">Need more credits?</h3>
+          <p className="mt-2 text-gray-500">
+            Contact us for custom enterprise plans with higher volumes and additional features.
+          </p>
+          <a
+            href="mailto:enterprise@imagenwiz.com"
+            className="mt-4 inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-teal-600 bg-white hover:bg-teal-50"
+          >
+            Contact Sales
+          </a>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
+
+export default Pricing;

@@ -1,40 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --primary-color: #47b1cd; /* Light blue-green shade */
-  --primary-hover: #339cb8;
-  --text-primary: #333333;
-  --text-secondary: #6b7280;
-  --bg-light: #f9fafb;
+  --primary-color: #14b8a6;
+  --primary-dark: #0f766e;
+  --primary-light: #99f6e4;
+  --text-color: #1f2937;
+  --background-color: #ffffff;
+  --secondary-background: #f3f4f6;
 }
 
+/* Base Styles */
 body {
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  color: var(--text-primary);
-  line-height: 1.5;
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--text-color);
+  background-color: var(--secondary-background);
 }
 
-.bg-primary {
-  background-color: var(--primary-color);
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
 }
 
-.text-primary {
-  color: var(--primary-color);
-}
-
-.hover\:bg-primary-hover:hover {
-  background-color: var(--primary-hover);
-}
-
-/* Custom checkered background for transparent images */
-.bg-checkered {
-  background-color: #ffffff;
-  background-image: linear-gradient(45deg, #f0f0f0 25%, transparent 25%),
-    linear-gradient(-45deg, #f0f0f0 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #f0f0f0 75%),
-    linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
-  background-size: 20px 20px;
-  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+/* Custom Classes */
+@layer components {
+  .btn-primary {
+    @apply bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded;
+  }
+  
+  .btn-secondary {
+    @apply bg-white hover:bg-gray-100 text-teal-600 font-bold py-2 px-4 rounded border border-teal-500;
+  }
+  
+  .card {
+    @apply bg-white rounded-lg shadow-md p-6;
+  }
+  
+  .form-input {
+    @apply mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring focus:ring-teal-500 focus:ring-opacity-50;
+  }
+  
+  .form-label {
+    @apply block text-sm font-medium text-gray-700;
+  }
 }
