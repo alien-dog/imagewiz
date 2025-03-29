@@ -1,49 +1,102 @@
-from flask import Flask
-from flask_cors import CORS
+import os
+from flask import Flask, send_from_directory, jsonify
+from datetime import timedelta
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
-import os
-from dotenv import load_dotenv
-
-# Load environment variables from .env file
-load_dotenv()
+from werkzeug.exceptions import HTTPException
+import stripe
 
 # Initialize extensions
 db = SQLAlchemy()
 jwt = JWTManager()
 bcrypt = Bcrypt()
 
+# Initialize Stripe API key
+stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
+
 def create_app():
+    """Initialize the core application."""
     app = Flask(__name__, static_folder='static')
     
-    # Configure the app
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'mysql+pymysql://root:Ir%86241992@8.130.113.102/mat_db')
+    # Configure the application
+    from urllib.parse import quote_plus
+    password = quote_plus(os.environ.get('DB_PASSWORD', ''))
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{os.environ.get('DB_USER')}:{password}@{os.environ.get('DB_HOST')}/{os.environ.get('DB_NAME')}"
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'your-secret-key-for-jwt')
-    app.config['UPLOAD_FOLDER'] = os.path.join(app.static_folder, 'uploads')
+    app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(
+        seconds=int(os.environ.get('JWT_ACCESS_TOKEN_EXPIRES', 86400))
+    )
+    
+    # Set up upload folders
+    app.config['UPLOAD_FOLDER'] = os.environ.get('UPLOAD_FOLDER', 'app/static/uploads')
+    app.config['PROCESSED_FOLDER'] = os.environ.get('PROCESSED_FOLDER', 'app/static/processed')
+    
+    # Check for upload directories and create if they don't exist
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    os.makedirs(app.config['PROCESSED_FOLDER'], exist_ok=True)
     
     # Initialize extensions with app
-    CORS(app)
     db.init_app(app)
     jwt.init_app(app)
     bcrypt.init_app(app)
     
-    # Ensure upload directory exists
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    
-    # Register blueprints
-    from app.auth.routes import auth_bp
-    from app.matting.routes import matting_bp
-    from app.payment.routes import payment_bp
-    
-    app.register_blueprint(auth_bp, url_prefix='/api/auth')
-    app.register_blueprint(matting_bp, url_prefix='/api/matting')
-    app.register_blueprint(payment_bp, url_prefix='/api/payment')
-    
-    # Simple route for testing
-    @app.route('/')
-    def index():
-        return {'message': 'Welcome to iMagenWiz API!'}
-    
-    return app
+    with app.app_context():
+        # Import models
+        from .models.models import User, RechargeHistory, MattingHistory
+        
+        # Create tables
+        db.create_all()
+        
+        # Register blueprints
+        from .auth import bp as auth_bp
+        app.register_blueprint(auth_bp)
+        
+        from .matting import bp as matting_bp
+        app.register_blueprint(matting_bp)
+        
+        from .payment import bp as payment_bp
+        app.register_blueprint(payment_bp)
+        
+        # Static file routes
+        @app.route('/uploads/<filename>')
+        def serve_upload(filename):
+            """Serve uploaded files"""
+            return send_from_directory(os.path.abspath(app.config['UPLOAD_FOLDER']), filename)
+            
+        @app.route('/processed/<filename>')
+        def serve_processed(filename):
+            """Serve processed files"""
+            return send_from_directory(os.path.abspath(app.config['PROCESSED_FOLDER']), filename)
+            
+        # Health check route
+        @app.route('/health')
+        def health_check():
+            """Return a simple health check response"""
+            return jsonify({"status": "ok", "message": "iMagenWiz API is running"})
+            
+        # Error handler for all exceptions
+        @app.errorhandler(Exception)
+        def handle_exception(e):
+            """Return JSON instead of HTML for HTTP errors."""
+            if isinstance(e, HTTPException):
+                response = {
+                    "code": e.code,
+                    "name": e.name,
+                    "description": e.description,
+                }
+                status_code = e.code
+            else:
+                # Handle non-HTTP exceptions
+                response = {
+                    "code": 500,
+                    "name": "Internal Server Error",
+                    "description": str(e),
+                }
+                status_code = 500
+                
+            app.logger.error(f"Error: {e}")
+            return jsonify(response), status_code
+            
+        return app

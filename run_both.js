@@ -1,53 +1,68 @@
-import { spawn } from 'child_process';
-import path from 'path';
-import { fileURLToPath } from 'url';
+const { spawn } = require('child_process');
+const path = require('path');
+const os = require('os');
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+/**
+ * Spawn a process with given arguments and handle output
+ * @param {string} command - The command to execute
+ * @param {string[]} args - Arguments for the command
+ * @param {string} cwd - Current working directory
+ * @param {string} name - Display name for the process
+ */
+function spawnProcess(command, args, cwd, name) {
+  console.log(`Starting ${name}...`);
+  
+  const proc = spawn(command, args, {
+    cwd,
+    stdio: 'pipe',
+    shell: true
+  });
+  
+  proc.stdout.on('data', (data) => {
+    console.log(`[${name}] ${data.toString().trim()}`);
+  });
+  
+  proc.stderr.on('data', (data) => {
+    console.error(`[${name}] ${data.toString().trim()}`);
+  });
+  
+  proc.on('error', (err) => {
+    console.error(`[${name}] Failed to start: ${err.message}`);
+  });
+  
+  proc.on('close', (code) => {
+    console.log(`[${name}] Process exited with code ${code}`);
+  });
+  
+  return proc;
+}
 
-console.log('Starting both backend and frontend servers...');
+// Get the current directory
+const rootDir = process.cwd();
 
-// Start the backend Flask server
-const backendProcess = spawn('python', ['run.py'], { 
-  cwd: path.join(__dirname, 'backend'),
-  stdio: 'inherit',
-  shell: true 
-});
+// Start Flask backend
+const flaskProc = spawnProcess(
+  'python', 
+  ['run.py'], 
+  path.join(rootDir, 'backend'),
+  'Flask'
+);
 
-backendProcess.on('error', (error) => {
-  console.error(`Backend Error: ${error.message}`);
-});
-
-// Wait for backend to initialize before starting frontend
+// Allow Flask to start up first
 setTimeout(() => {
-  // Start the frontend Vite server
-  const frontendProcess = spawn('npm', ['run', 'dev'], { 
-    cwd: path.join(__dirname, 'frontend'),
-    stdio: 'inherit',
-    shell: true 
+  // Start the Node.js server
+  const nodeProc = spawnProcess(
+    'node',
+    ['index.js'],
+    path.join(rootDir, 'server'),
+    'Node.js'
+  );
+  
+  // Handle process termination
+  process.on('SIGINT', () => {
+    console.log('Shutting down...');
+    flaskProc.kill();
+    nodeProc.kill();
+    process.exit(0);
   });
-
-  frontendProcess.on('error', (error) => {
-    console.error(`Frontend Error: ${error.message}`);
-  });
-
-  // Handle frontend process exit
-  frontendProcess.on('exit', (code) => {
-    console.log(`Frontend process exited with code ${code}`);
-    // Kill backend when frontend exits
-    backendProcess.kill();
-    process.exit(code);
-  });
-}, 3000);
-
-// Handle backend process exit
-backendProcess.on('exit', (code) => {
-  console.log(`Backend process exited with code ${code}`);
-  process.exit(code);
-});
-
-// Handle SIGINT (Ctrl+C)
-process.on('SIGINT', () => {
-  console.log('Received SIGINT. Shutting down...');
-  backendProcess.kill();
-  process.exit(0);
-});
+}, 3000); // Wait 3 seconds before starting Node

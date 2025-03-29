@@ -1,68 +1,69 @@
 from flask import request, jsonify
-from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from app.models.models import User
 from app import db
-from app.auth import auth_bp
+from . import bp
 
-@auth_bp.route('/register', methods=['POST'])
+@bp.route('/register', methods=['POST'])
 def register():
     """Register a new user"""
     data = request.get_json()
     
+    # Check if required fields are provided
     if not data or not data.get('username') or not data.get('password'):
-        return jsonify({'error': 'Username and password are required'}), 400
+        return jsonify({"error": "Missing username or password"}), 400
     
-    # Check if username exists
+    # Check if username already exists
     existing_user = User.query.filter_by(username=data['username']).first()
     if existing_user:
-        return jsonify({'error': 'Username already exists'}), 400
+        return jsonify({"error": "Username already exists"}), 400
     
     # Create new user
-    user = User(username=data['username'])
-    user.set_password(data['password'])
+    new_user = User(
+        username=data['username'],
+        credit_balance=0  # New users start with 0 credits
+    )
+    new_user.set_password(data['password'])
     
-    # Give 5 free credits to new users
-    user.credit_balance = 5
-    
-    db.session.add(user)
+    # Save user to database
+    db.session.add(new_user)
     db.session.commit()
     
-    # Create token
-    access_token = create_access_token(identity=user.id)
+    # Generate access token
+    access_token = create_access_token(identity=new_user.id)
     
     return jsonify({
-        'message': 'User registered successfully',
-        'access_token': access_token,
-        'user': user.to_dict()
+        "message": "User registered successfully",
+        "user": new_user.to_dict(),
+        "access_token": access_token
     }), 201
 
-
-@auth_bp.route('/login', methods=['POST'])
+@bp.route('/login', methods=['POST'])
 def login():
     """Login a user"""
     data = request.get_json()
     
+    # Check if required fields are provided
     if not data or not data.get('username') or not data.get('password'):
-        return jsonify({'error': 'Username and password are required'}), 400
+        return jsonify({"error": "Missing username or password"}), 400
     
-    # Find the user
+    # Find user
     user = User.query.filter_by(username=data['username']).first()
     
-    # Check password
+    # Check if user exists and password is correct
     if not user or not user.check_password(data['password']):
-        return jsonify({'error': 'Invalid username or password'}), 401
+        return jsonify({"error": "Invalid username or password"}), 401
     
-    # Create token
+    # Generate access token
     access_token = create_access_token(identity=user.id)
     
     return jsonify({
-        'message': 'Login successful',
-        'access_token': access_token,
-        'user': user.to_dict()
+        "message": "Login successful",
+        "user": user.to_dict(),
+        "access_token": access_token
     }), 200
 
-
-@auth_bp.route('/user', methods=['GET'])
+@bp.route('/user', methods=['GET'])
 @jwt_required()
 def get_current_user():
     """Get current user details"""
@@ -70,12 +71,11 @@ def get_current_user():
     user = User.query.get(user_id)
     
     if not user:
-        return jsonify({'error': 'User not found'}), 404
+        return jsonify({"error": "User not found"}), 404
     
-    return jsonify({'user': user.to_dict()}), 200
+    return jsonify(user.to_dict()), 200
 
-
-@auth_bp.route('/user', methods=['PUT'])
+@bp.route('/user', methods=['PATCH'])
 @jwt_required()
 def update_user():
     """Update user details"""
@@ -83,17 +83,17 @@ def update_user():
     user = User.query.get(user_id)
     
     if not user:
-        return jsonify({'error': 'User not found'}), 404
+        return jsonify({"error": "User not found"}), 404
     
     data = request.get_json()
     
-    # Update password if provided
+    # Only allow updating certain fields
     if data.get('password'):
         user.set_password(data['password'])
     
     db.session.commit()
     
     return jsonify({
-        'message': 'User updated successfully',
-        'user': user.to_dict()
+        "message": "User updated successfully",
+        "user": user.to_dict()
     }), 200

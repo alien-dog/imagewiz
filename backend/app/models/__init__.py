@@ -1,3 +1,1 @@
-from app.models.models import User, RechargeHistory, MattingHistory
-
-__all__ = ['User', 'RechargeHistory', 'MattingHistory']
+# This file is intentionally left empty to mark the directory as a Python package.

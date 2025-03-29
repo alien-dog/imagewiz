@@ -1,5 +1,5 @@
 from flask import Blueprint
 
-payment_bp = Blueprint('payment', __name__)
+bp = Blueprint('payment', __name__, url_prefix='/payment')
 
-from app.payment import routes
+from . import routes

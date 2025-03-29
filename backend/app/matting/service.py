@@ -1,6 +1,7 @@
-from PIL import Image
 import os
 import uuid
+from PIL import Image
+import time
 
 def process_image(input_path, output_path):
     """
@@ -19,41 +20,52 @@ def process_image(input_path, output_path):
     """
     try:
         # Open the input image
-        img = Image.open(input_path)
+        image = Image.open(input_path)
         
-        # For the prototype, we'll create a simple transparent background
-        # In a real implementation, this would use ML for segmentation
+        # Simulate processing time
+        time.sleep(1)  # Pretend we're doing complex processing
         
-        # Create a new image with RGBA mode (supports transparency)
-        if img.mode != 'RGBA':
-            img = img.convert('RGBA')
+        # For this prototype, we'll just create a simple transparency effect
+        # In a real implementation, this would be replaced with actual ML-based matting
         
-        # Get the size of the image
-        width, height = img.size
+        # Create a transparent version (with white background)
+        # Convert to RGBA if it isn't already
+        if image.mode != 'RGBA':
+            image = image.convert('RGBA')
         
-        # Create a simple circular mask for demonstration
-        # In a real implementation, this would be replaced with actual segmentation
+        # Create a new image with transparency
+        width, height = image.size
+        new_image = Image.new('RGBA', (width, height), (0, 0, 0, 0))
+        
+        # Process the image - this is a simple placeholder effect
+        # A real implementation would use ML for precise segmentation
+        pixels = image.load()
+        new_pixels = new_image.load()
+        
+        # Simple processing - make bright pixels more transparent
+        # This is just a placeholder, not real background removal
         for y in range(height):
             for x in range(width):
-                # Get pixel value
-                pixel = img.getpixel((x, y))
-                
-                # Simple circular mask: make pixels outside circle transparent
-                distance_from_center = ((x - width/2)**2 + (y - height/2)**2)**0.5
-                if distance_from_center > min(width, height)/2:
-                    # Make pixel transparent
-                    img.putpixel((x, y), (pixel[0], pixel[1], pixel[2], 0))
+                r, g, b, a = pixels[x, y]
+                # Simple adjustment - in a real app, this would be ML-based
+                if r > 200 and g > 200 and b > 200:  # If pixel is whitish
+                    a = 0  # Make it transparent
+                new_pixels[x, y] = (r, g, b, a)
         
         # Save the processed image
-        img.save(output_path, 'PNG')
-        
+        new_image.save(output_path, format='PNG')
         return True
+        
     except Exception as e:
         print(f"Error processing image: {e}")
         return False
 
-
 def generate_unique_filename(filename):
     """Generate a unique filename to avoid conflicts"""
-    ext = os.path.splitext(filename)[1]
-    return f"{uuid.uuid4().hex}{ext}"
+    # Extract file extension
+    _, ext = os.path.splitext(filename)
+    
+    # Generate a unique name using UUID
+    unique_name = f"{uuid.uuid4()}{ext}"
+    
+    return unique_name

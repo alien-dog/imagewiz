@@ -7,13 +7,10 @@ def admin_required(fn):
     """Decorator to require admin access for a route"""
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        user_id = get_jwt_identity()
-        user = User.query.get(user_id)
+        current_user_id = get_jwt_identity()
+        user = User.query.get(current_user_id)
         
-        # In this example, we don't have an admin flag in the User model
-        # For a real application, you might want to add an is_admin field
-        # For now, we'll just use a simple check (e.g., admin is user with ID 1)
-        if not user or user.id != 1:
+        if not user or not user.is_admin:
             return jsonify({'error': 'Admin access required'}), 403
         
         return fn(*args, **kwargs)

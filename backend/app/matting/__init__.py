@@ -1,5 +1,5 @@
 from flask import Blueprint
 
-matting_bp = Blueprint('matting', __name__)
+bp = Blueprint('matting', __name__, url_prefix='/matting')
 
-from app.matting import routes
+from . import routes
