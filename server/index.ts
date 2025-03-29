@@ -14,6 +14,9 @@ const FLASK_PORT = 5000;
 // Enable CORS
 app.use(cors());
 
+// Parse JSON request bodies
+app.use(express.json());
+
 // Proxy API requests to Flask backend
 app.use('/api', createProxyMiddleware({
   target: `http://localhost:${FLASK_PORT}`,
@@ -69,6 +72,10 @@ app.get('/test-login.html', (req, res) => {
 
 app.get('/proxy-test.html', (req, res) => {
   res.sendFile(path.join(__dirname, '../proxy-test.html'));
+});
+
+app.get('/simple-form.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../simple-form.html'));
 });
 
 // Catch-all route for SPA

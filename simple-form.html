@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iMagenWiz Simple Login Form</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1, h2 {
+      color: #2A9D8F;
+    }
+    .container {
+      background: #f9f9f9;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    button {
+      background: #2A9D8F;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background: #238B7E;
+    }
+    .info {
+      background-color: #e0f7fa;
+      border-left: 4px solid #00bcd4;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    .success {
+      background-color: #e8f5e9;
+      border-left: 4px solid #4caf50;
+      padding: 15px;
+      margin-top: 20px;
+      display: none;
+    }
+    .error {
+      background-color: #ffebee;
+      border-left: 4px solid #f44336;
+      padding: 15px;
+      margin-top: 20px;
+      display: none;
+    }
+    pre {
+      background: #f0f0f0;
+      padding: 15px;
+      border-radius: 4px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+    .quick-login {
+      display: inline-block;
+      margin-bottom: 20px;
+      background: #264653;
+    }
+  </style>
+</head>
+<body>
+  <h1>iMagenWiz Simple Login</h1>
+  
+  <div class="info">
+    <p><strong>Simple HTML Form Login</strong></p>
+    <p>This page submits a standard HTML form to test the API. This approach should be more compatible with Replit's environment.</p>
+  </div>
+
+  <div class="container">
+    <h2>Quick Login</h2>
+    <p>Click to pre-fill credentials:</p>
+    <button class="quick-login" id="testuser2">Login as testuser2</button>
+    <button class="quick-login" id="testuser3">Login as testuser3</button>
+  </div>
+  
+  <div class="container">
+    <h2>Login Form</h2>
+    <form id="loginForm" action="/api/auth/login" method="POST">
+      <div>
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+      </div>
+      <div>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+      </div>
+      <button type="submit">Login</button>
+    </form>
+    
+    <div id="successMessage" class="success">
+      <h3>Login Successful!</h3>
+      <p>Your access token has been saved.</p>
+      <div>
+        <strong>Response:</strong>
+        <pre id="responseData"></pre>
+      </div>
+    </div>
+    
+    <div id="errorMessage" class="error">
+      <h3>Login Failed</h3>
+      <p id="errorText"></p>
+    </div>
+  </div>
+  
+  <script>
+    // Quick login options
+    document.getElementById('testuser2').addEventListener('click', function() {
+      document.getElementById('username').value = 'testuser2';
+      document.getElementById('password').value = 'password123';
+    });
+    
+    document.getElementById('testuser3').addEventListener('click', function() {
+      document.getElementById('username').value = 'testuser3';
+      document.getElementById('password').value = 'password123';
+    });
+    
+    // Handle form submission
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      
+      // Create form data - this will be converted to JSON
+      const formData = {
+        username: username,
+        password: password
+      };
+      
+      // Make a fetch request
+      fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      })
+      .then(response => {
+        if (!response.ok) {
+          return response.json().then(data => {
+            throw new Error(data.error || `HTTP error ${response.status}`);
+          });
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Show success message
+        document.getElementById('successMessage').style.display = 'block';
+        document.getElementById('errorMessage').style.display = 'none';
+        document.getElementById('responseData').textContent = JSON.stringify(data, null, 2);
+        
+        // Save token to localStorage if available
+        if (data.access_token) {
+          localStorage.setItem('token', data.access_token);
+        }
+      })
+      .catch(error => {
+        // Show error message
+        document.getElementById('errorMessage').style.display = 'block';
+        document.getElementById('successMessage').style.display = 'none';
+        document.getElementById('errorText').textContent = error.message;
+      });
+    });
+  </script>
+</body>
+</html>
