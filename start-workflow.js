@@ -1,24 +1,23 @@
-const { spawn } = require('child_process');
-const path = require('path');
-const os = require('os');
+const { exec } = require('child_process');
 
-// Get the Replit workspace directory
-const workspaceDir = process.cwd();
-
-// Function to start the Flask backend
+// Start the Flask backend and Node.js server
 function startFlaskBackend() {
   console.log('Starting Flask backend...');
   
-  const flaskProcess = spawn('python', ['backend/run.py'], {
-    cwd: workspaceDir,
-    stdio: 'inherit',
-    shell: true
+  // Execute the run_both.js script
+  const childProcess = exec('node run_both.js', (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      return;
+    }
+    console.log(`stdout: ${stdout}`);
+    console.error(`stderr: ${stderr}`);
   });
   
-  flaskProcess.on('error', (err) => {
-    console.error('Failed to start Flask backend:', err);
-  });
+  // Pipe the output to the console
+  childProcess.stdout.pipe(process.stdout);
+  childProcess.stderr.pipe(process.stderr);
 }
 
-// Start the Flask backend
+// Start the application
 startFlaskBackend();

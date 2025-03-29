@@ -20,9 +20,7 @@ def create_app():
     app = Flask(__name__, static_folder='static')
     
     # Configure the application
-    from urllib.parse import quote_plus
-    password = quote_plus(os.environ.get('DB_PASSWORD', ''))
-    app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{os.environ.get('DB_USER')}:{password}@{os.environ.get('DB_HOST')}/{os.environ.get('DB_NAME')}"
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(
@@ -69,6 +67,12 @@ def create_app():
         def serve_processed(filename):
             """Serve processed files"""
             return send_from_directory(os.path.abspath(app.config['PROCESSED_FOLDER']), filename)
+            
+        # Root route
+        @app.route('/')
+        def index():
+            """Return root route response"""
+            return jsonify({"status": "ok", "message": "iMagenWiz API is running"})
             
         # Health check route
         @app.route('/health')

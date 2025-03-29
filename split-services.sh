@@ -1,28 +1,29 @@
 #!/bin/bash
 
-# This script helps set up folder structure and copy necessary files
+# Terminal 1: Start Flask backend
+cd backend && python run.py &
+FLASK_PID=$!
+echo "Flask backend started with PID: $FLASK_PID"
 
-# Create folders if they don't exist
-mkdir -p frontend/src/components/ui
-mkdir -p frontend/src/components/layout
-mkdir -p frontend/src/contexts
-mkdir -p frontend/src/pages
-mkdir -p frontend/src/lib
-mkdir -p frontend/src/hooks
-mkdir -p frontend/src/utils
-mkdir -p frontend/public
+# Wait for Flask to start up
+sleep 3
 
-mkdir -p backend/app/static/uploads
-mkdir -p backend/app/static/processed
+# Terminal 2: Start frontend dev server
+cd frontend && npm run dev &
+FRONTEND_PID=$!
+echo "Frontend dev server started with PID: $FRONTEND_PID"
 
-# Create sample .env files 
-cat > frontend/.env <<EOL
-VITE_API_URL=http://localhost:5000
-VITE_STRIPE_PUBLISHABLE_KEY=$STRIPE_PUBLISHABLE_KEY
-EOL
+# Function to kill both processes on exit
+cleanup() {
+    echo "Shutting down servers..."
+    kill $FLASK_PID
+    kill $FRONTEND_PID
+    exit 0
+}
 
-# Confirm completion
-echo "Folder structure has been set up!"
-echo "Backend in /backend"
-echo "Frontend in /frontend"
-echo "Node.js proxy in /server"
+# Register the cleanup function for when the script is terminated
+trap cleanup INT TERM
+
+# Keep the script running
+echo "Both servers are now running. Press Ctrl+C to stop both."
+wait

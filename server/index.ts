@@ -23,6 +23,18 @@ app.use('/api', createProxyMiddleware({
   }
 }));
 
+// Proxy uploads requests to Flask backend
+app.use('/uploads', createProxyMiddleware({
+  target: `http://localhost:${FLASK_PORT}`,
+  changeOrigin: true
+}));
+
+// Proxy processed requests to Flask backend
+app.use('/processed', createProxyMiddleware({
+  target: `http://localhost:${FLASK_PORT}`,
+  changeOrigin: true
+}));
+
 // Start Flask backend
 console.log('Starting Flask backend...');
 const backendProcess = spawn('python', ['run.py'], { 
@@ -52,7 +64,12 @@ app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
 // Catch-all route for SPA
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+  try {
+    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+  } catch (error) {
+    console.error('Error serving index.html:', error);
+    res.status(500).send('Error serving application');
+  }
 });
 
 // Start the server

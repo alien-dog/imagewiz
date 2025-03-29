@@ -1,6 +1,5 @@
 const { spawn } = require('child_process');
 const path = require('path');
-const os = require('os');
 
 /**
  * Spawn a process with given arguments and handle output
@@ -13,7 +12,7 @@ function spawnProcess(command, args, cwd, name) {
   console.log(`Starting ${name}...`);
   
   const proc = spawn(command, args, {
-    cwd,
+    cwd: path.resolve(__dirname, cwd),
     stdio: 'pipe',
     shell: true
   });
@@ -23,11 +22,7 @@ function spawnProcess(command, args, cwd, name) {
   });
   
   proc.stderr.on('data', (data) => {
-    console.error(`[${name}] ${data.toString().trim()}`);
-  });
-  
-  proc.on('error', (err) => {
-    console.error(`[${name}] Failed to start: ${err.message}`);
+    console.error(`[${name} ERROR] ${data.toString().trim()}`);
   });
   
   proc.on('close', (code) => {
@@ -37,32 +32,31 @@ function spawnProcess(command, args, cwd, name) {
   return proc;
 }
 
-// Get the current directory
-const rootDir = process.cwd();
-
-// Start Flask backend
-const flaskProc = spawnProcess(
+// Start the Flask backend server
+const backendProc = spawnProcess(
   'python', 
   ['run.py'], 
-  path.join(rootDir, 'backend'),
-  'Flask'
+  './backend',
+  'FLASK BACKEND'
 );
 
-// Allow Flask to start up first
+// Wait a bit for Flask to initialize
 setTimeout(() => {
-  // Start the Node.js server
-  const nodeProc = spawnProcess(
-    'node',
-    ['index.js'],
-    path.join(rootDir, 'server'),
-    'Node.js'
+  // Start the frontend development server
+  const frontendProc = spawnProcess(
+    'npm', 
+    ['run', 'dev'], 
+    './frontend',
+    'FRONTEND DEV SERVER'
   );
   
-  // Handle process termination
+  // Handle graceful shutdown
   process.on('SIGINT', () => {
-    console.log('Shutting down...');
-    flaskProc.kill();
-    nodeProc.kill();
+    console.log('Shutting down all processes...');
+    backendProc.kill('SIGINT');
+    frontendProc.kill('SIGINT');
     process.exit(0);
   });
-}, 3000); // Wait 3 seconds before starting Node
+}, 3000); // 3 second delay before starting frontend
+
+console.log('Starting both services. Press Ctrl+C to stop.');

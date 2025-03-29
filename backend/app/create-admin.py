@@ -9,31 +9,25 @@ python -m app.create-admin
 import os
 import sys
 import getpass
+from datetime import datetime
+
 from flask import Flask
 from dotenv import load_dotenv
 from app import db, bcrypt
 from app.models.models import User
 
-# Load environment variables
-load_dotenv()
-
 def create_admin_user():
     """Create an admin user if it doesn't already exist"""
-    
-    # Check if admin user already exists
+    # Check if an admin already exists
     admin = User.query.filter_by(is_admin=True).first()
+    
     if admin:
         print(f"Admin user already exists: {admin.username}")
-        while True:
-            response = input("Do you want to create another admin user? (y/n): ").lower()
-            if response in ["y", "yes"]:
-                break
-            elif response in ["n", "no"]:
-                return
-            else:
-                print("Please enter 'y' or 'n'")
+        create_another = input("Do you want to create another admin user? (y/n): ").lower()
+        if create_another != 'y':
+            return
     
-    # Get admin username
+    # Get admin details
     username = input("Enter admin username: ")
     
     # Check if username already exists
@@ -42,32 +36,48 @@ def create_admin_user():
         print(f"User '{username}' already exists.")
         return
     
-    # Get password (hidden input)
+    # Get password securely (not echoed to terminal)
     password = getpass.getpass("Enter admin password: ")
-    password_confirm = getpass.getpass("Confirm admin password: ")
+    confirm_password = getpass.getpass("Confirm password: ")
     
-    if password != password_confirm:
+    if password != confirm_password:
         print("Passwords do not match.")
         return
     
-    # Create the admin user
-    admin_user = User(username=username, is_admin=True, credit_balance=999)
-    admin_user.set_password(password)
+    if len(password) < 8:
+        print("Password must be at least 8 characters long.")
+        return
     
-    db.session.add(admin_user)
-    db.session.commit()
-    
-    print(f"Admin user '{username}' created successfully!")
+    # Create admin user
+    try:
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        admin = User(
+            username=username,
+            password=hashed_password,
+            is_admin=True,
+            credit_balance=1000,  # Give admin a starting balance
+            created_at=datetime.utcnow()
+        )
+        
+        db.session.add(admin)
+        db.session.commit()
+        
+        print(f"Admin user '{username}' created successfully!")
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error creating admin user: {str(e)}")
 
 if __name__ == "__main__":
-    # Create a minimal Flask app
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
-    # Initialize database
-    db.init_app(app)
-    bcrypt.init_app(app)
+    # Load environment variables
+    load_dotenv()
+    
+    # Configure the application
+    from urllib.parse import quote_plus
+    password = quote_plus(os.environ.get('DB_PASSWORD', ''))
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{os.environ.get('DB_USER')}:{password}@{os.environ.get('DB_HOST')}/{os.environ.get('DB_NAME')}"
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
     with app.app_context():
         create_admin_user()
