@@ -12,17 +12,23 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Set up axios defaults - don't include /api as Vite proxy handles this
+  // Set up axios defaults - make sure the Vite proxy correctly handles all requests
   axios.defaults.baseURL = '';
+  
+  // Debug our environment
+  console.log("React environment:", import.meta.env);
+  console.log("Current axios baseURL:", axios.defaults.baseURL);
 
   // Set token in axios headers and localStorage
   const setAuthToken = (token) => {
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       localStorage.setItem('token', token);
+      console.log("Set auth token:", token.substring(0, 15) + "...");
     } else {
       delete axios.defaults.headers.common['Authorization'];
       localStorage.removeItem('token');
+      console.log("Cleared auth token");
     }
   };
 
@@ -30,53 +36,66 @@ export const AuthProvider = ({ children }) => {
   const register = async (username, password) => {
     try {
       setError(null);
+      console.log("Attempting registration for:", username);
+      
       const res = await axios.post('/api/auth/register', { username, password });
+      console.log("Registration response:", res.data);
+      
       setToken(res.data.access_token);
       setUser(res.data.user);
       setAuthToken(res.data.access_token);
       return res.data;
     } catch (err) {
-      setError(err.response?.data?.error || 'Registration failed');
-      throw err;
+      console.error("Registration error:", err);
+      const errorMessage = err.response?.data?.error || 'Registration failed';
+      setError(errorMessage);
+      throw new Error(errorMessage);
     }
   };
 
-  // Login user
+  // Login user with better error handling and debugging
   const login = async (username, password) => {
     try {
       setError(null);
       console.log("Login attempt for:", username);
-      console.log("Using axios baseURL:", axios.defaults.baseURL);
-      console.log("Login URL:", axios.defaults.baseURL + '/api/auth/login');
       
-      const res = await axios.post('/api/auth/login', { username, password });
-      console.log("Login response:", res.data);
-      console.log("Response structure:", JSON.stringify(res.data, null, 2));
+      // Force setting baseURL to empty string in case it was changed
+      axios.defaults.baseURL = '';
       
-      if (!res.data.access_token) {
-        console.error("Missing access_token in response");
-        setError('Login failed: Invalid response from server');
+      // Direct fetch instead of axios as a fallback approach
+      console.log("Making fetch request to: /api/auth/login");
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log("Login response:", data);
+      
+      if (!data.access_token) {
         throw new Error('Missing access_token in login response');
       }
       
-      if (!res.data.user) {
-        console.error("Missing user data in response");
-        setError('Login failed: Invalid response from server');
+      if (!data.user) {
         throw new Error('Missing user data in login response');
       }
       
-      setToken(res.data.access_token);
-      setUser(res.data.user);
-      setAuthToken(res.data.access_token);
-      return res.data;
+      // Set auth state with response data
+      setToken(data.access_token);
+      setUser(data.user);
+      setAuthToken(data.access_token);
+      return data;
     } catch (err) {
-      console.error("Login error details:", err);
-      console.error("Error response:", err.response?.data);
-      console.error("Error status:", err.response?.status);
-      console.error("Error config:", err.config);
-      console.error("Full error object:", JSON.stringify(err, Object.getOwnPropertyNames(err)));
-      
-      setError(err.response?.data?.error || 'Login failed. Check your credentials.');
+      console.error("Login error:", err.message);
+      setError(err.message || 'Login failed. Check your credentials.');
       throw err;
     }
   };
@@ -97,8 +116,18 @@ export const AuthProvider = ({ children }) => {
           setAuthToken(token);
           
           // Check if token is expired
-          const decoded = jwtDecode(token);
-          if (decoded.exp * 1000 < Date.now()) {
+          try {
+            const decoded = jwtDecode(token);
+            if (decoded.exp * 1000 < Date.now()) {
+              console.log("Token expired, logging out");
+              setToken(null);
+              setUser(null);
+              setAuthToken(null);
+              setLoading(false);
+              return;
+            }
+          } catch (jwtError) {
+            console.error("JWT decode error:", jwtError);
             setToken(null);
             setUser(null);
             setAuthToken(null);
@@ -106,21 +135,30 @@ export const AuthProvider = ({ children }) => {
             return;
           }
           
-          // Get user data
-          const res = await axios.get('/api/auth/user');
-          console.log("User data response:", res.data);
+          // Get user data using fetch instead of axios
+          const response = await fetch('/api/auth/user', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error ${response.status}`);
+          }
+          
+          const data = await response.json();
+          console.log("User data response:", data);
           
           // Handle different response formats
-          if (res.data.user) {
-            setUser(res.data.user);
-          } else if (res.data && res.data.id) {
-            // If the response is the user object directly
-            setUser(res.data);
+          if (data.user) {
+            setUser(data.user);
+          } else if (data && data.id) {
+            setUser(data);
           } else {
-            console.error("Unexpected user data format:", res.data);
             throw new Error('Invalid user data format');
           }
         } catch (err) {
+          console.error("Error loading user:", err);
           setToken(null);
           setUser(null);
           setAuthToken(null);

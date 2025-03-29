@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, Navigate } from 'react-router-dom'
+import { Link, useLocation } from 'wouter'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function AuthPage() {
@@ -12,8 +12,10 @@ export default function AuthPage() {
   const { user, login, register } = useAuth()
   
   // Redirect if user is already logged in
+  const [, setLocation] = useLocation();
   if (user) {
-    return <Navigate to="/dashboard" replace />
+    setLocation("/dashboard"); 
+    return null;
   }
   
   const toggleForm = () => {

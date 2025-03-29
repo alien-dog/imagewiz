@@ -1,43 +1,292 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Test Login</title>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iMagenWiz Test Login</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      color: #2A9D8F;
+      margin-top: 0;
+    }
+    .card {
+      background: #f9f9f9;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    button {
+      background: #2A9D8F;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-right: 10px;
+    }
+    button:hover {
+      background: #238B7E;
+    }
+    #response {
+      white-space: pre-wrap;
+      background: #f0f0f0;
+      padding: 15px;
+      border-radius: 4px;
+      margin-top: 20px;
+      max-height: 300px;
+      overflow: auto;
+    }
+    .error {
+      color: #d62828;
+      background: #ffeeee;
+      padding: 10px;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+    .success {
+      color: #2a9d8f;
+      background: #e8f5f5;
+      padding: 10px;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .quick-login {
+      background: #264653;
+    }
+  </style>
 </head>
 <body>
-    <h1>Test Login</h1>
-    <button id="loginButton">Login with testuser3</button>
-    <div id="result" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc;"></div>
-
-    <script>
-        document.getElementById('loginButton').addEventListener('click', async () => {
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = 'Sending login request...';
-            
-            try {
-                // Direct request to the backend
-                const response = await axios.post('/api/auth/login', {
-                    username: 'testuser3',
-                    password: 'password123'
-                });
-                
-                resultDiv.innerHTML = `
-                    <h3>Success!</h3>
-                    <pre>${JSON.stringify(response.data, null, 2)}</pre>
-                `;
-                
-                console.log('Login response:', response.data);
-            } catch (error) {
-                resultDiv.innerHTML = `
-                    <h3>Error</h3>
-                    <p>${error.message}</p>
-                    <pre>${JSON.stringify(error.response?.data || {}, null, 2)}</pre>
-                `;
-                
-                console.error('Login error:', error);
-                console.error('Error response:', error.response?.data);
+  <h1>iMagenWiz Test Login</h1>
+  
+  <div class="card">
+    <h2>Quick Login Options</h2>
+    <p>Use these buttons to quickly test login with predefined credentials:</p>
+    
+    <div class="buttons">
+      <button class="quick-login" id="testuser2">Login as testuser2</button>
+      <button class="quick-login" id="testuser3">Login as testuser3</button>
+    </div>
+  </div>
+  
+  <div class="card">
+    <h2>Custom Login</h2>
+    
+    <div class="form-group">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" value="" placeholder="Enter username">
+    </div>
+    
+    <div class="form-group">
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" value="" placeholder="Enter password">
+    </div>
+    
+    <div class="buttons">
+      <button id="login">Login</button>
+      <button id="fetch-xhr">Test Fetch (XHR)</button>
+      <button id="fetch-direct">Test Direct Fetch</button>
+      <button id="clear">Clear Response</button>
+    </div>
+    
+    <div id="status"></div>
+    <pre id="response">Response will appear here...</pre>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Quick login buttons
+      document.getElementById('testuser2').addEventListener('click', function() {
+        document.getElementById('username').value = 'testuser2';
+        document.getElementById('password').value = 'password123';
+        document.getElementById('login').click();
+      });
+      
+      document.getElementById('testuser3').addEventListener('click', function() {
+        document.getElementById('username').value = 'testuser3';
+        document.getElementById('password').value = 'password123';
+        document.getElementById('login').click();
+      });
+      
+      // Login with custom credentials
+      document.getElementById('login').addEventListener('click', function() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        
+        if (!username || !password) {
+          showError('Please enter both username and password');
+          return;
+        }
+        
+        try {
+          fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, password }),
+          })
+          .then(response => {
+            if (!response.ok) {
+              return response.json().then(errorData => {
+                throw new Error(errorData.error || `HTTP error ${response.status}`);
+              });
             }
-        });
-    </script>
+            return response.json();
+          })
+          .then(data => {
+            showSuccess('Login successful!');
+            displayResponse(data);
+            
+            // Save token to local storage
+            if (data.access_token) {
+              localStorage.setItem('token', data.access_token);
+            }
+          })
+          .catch(error => {
+            showError(`Login failed: ${error.message}`);
+            displayResponse({ error: error.message });
+          });
+        } catch (error) {
+          showError(`Error: ${error.message}`);
+          displayResponse({ error: error.message });
+        }
+      });
+      
+      // Test fetch with XHR
+      document.getElementById('fetch-xhr').addEventListener('click', function() {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/api/auth/login', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        
+        xhr.onload = function() {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              const data = JSON.parse(xhr.responseText);
+              showSuccess('XHR request successful!');
+              displayResponse(data);
+            } catch (e) {
+              showError('Error parsing response');
+              displayResponse({ error: 'Parse error', response: xhr.responseText });
+            }
+          } else {
+            try {
+              const errorData = JSON.parse(xhr.responseText);
+              showError(`XHR request failed: ${errorData.error || xhr.statusText}`);
+              displayResponse(errorData);
+            } catch (e) {
+              showError(`XHR request failed: ${xhr.status} ${xhr.statusText}`);
+              displayResponse({ error: xhr.statusText, status: xhr.status });
+            }
+          }
+        };
+        
+        xhr.onerror = function() {
+          showError('Network error occurred');
+          displayResponse({ error: 'Network error' });
+        };
+        
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        
+        xhr.send(JSON.stringify({ username, password }));
+      });
+      
+      // Test direct fetch (with full URL)
+      document.getElementById('fetch-direct').addEventListener('click', function() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        
+        // Get the current hostname and port
+        const host = window.location.origin;
+        const url = `${host}/api/auth/login`;
+        
+        displayResponse({ attempting_fetch: url, credentials: { username, password: '******' } });
+        
+        try {
+          fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, password }),
+          })
+          .then(response => {
+            if (!response.ok) {
+              return response.json().then(errorData => {
+                throw new Error(errorData.error || `HTTP error ${response.status}`);
+              });
+            }
+            return response.json();
+          })
+          .then(data => {
+            showSuccess('Direct fetch successful!');
+            displayResponse(data);
+          })
+          .catch(error => {
+            showError(`Direct fetch failed: ${error.message}`);
+            displayResponse({ error: error.message });
+          });
+        } catch (error) {
+          showError(`Error: ${error.message}`);
+          displayResponse({ error: error.message });
+        }
+      });
+      
+      // Clear response
+      document.getElementById('clear').addEventListener('click', function() {
+        document.getElementById('response').textContent = 'Response cleared...';
+        document.getElementById('status').innerHTML = '';
+      });
+      
+      // Helper functions
+      function showError(message) {
+        const statusEl = document.getElementById('status');
+        statusEl.className = 'error';
+        statusEl.textContent = message;
+      }
+      
+      function showSuccess(message) {
+        const statusEl = document.getElementById('status');
+        statusEl.className = 'success';
+        statusEl.textContent = message;
+      }
+      
+      function displayResponse(data) {
+        const responseEl = document.getElementById('response');
+        responseEl.textContent = JSON.stringify(data, null, 2);
+      }
+    });
+  </script>
 </body>
 </html>

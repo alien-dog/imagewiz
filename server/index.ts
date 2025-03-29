@@ -62,6 +62,11 @@ process.on('SIGINT', () => {
 // Serve frontend files from dist directory
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
+// Serve test HTML file
+app.get('/test-login.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../test-login.html'));
+});
+
 // Catch-all route for SPA
 app.get('*', (req, res) => {
   try {
