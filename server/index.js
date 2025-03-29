@@ -6,12 +6,14 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const FLASK_PORT = 5000;
+const FLASK_URL = 'https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev'
 // Enable CORS
 app.use(cors());
 
 // Proxy API requests to Flask backend
 app.use('/api', createProxyMiddleware({
-  target: 'http://localhost:5000',
+  target: 'https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:5000',
   changeOrigin: true,
   pathRewrite: {
     '^/api': '' // Remove /api prefix when forwarding
@@ -20,7 +22,7 @@ app.use('/api', createProxyMiddleware({
 
 // Proxy static file requests to Flask for uploaded/processed images
 app.use('/static', createProxyMiddleware({
-  target: 'http://localhost:5000',
+  target: 'https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:5000',
   changeOrigin: true
 }));
 

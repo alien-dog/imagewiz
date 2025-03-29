@@ -21,7 +21,9 @@ app.use(express.json());
 app.use('/api', createProxyMiddleware({
   target: `http://localhost:${FLASK_PORT}`,
   changeOrigin: true,
-  // Don't rewrite the path - Flask also uses /api prefix
+  pathRewrite: {
+    '^/api': '' // Remove the /api prefix when forwarding to Flask
+  },
   // @ts-ignore - logLevel is a valid option but TypeScript doesn't recognize it
   logLevel: 'debug'
 }));

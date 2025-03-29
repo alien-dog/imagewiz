@@ -1,5 +1,7 @@
 {pkgs}: {
   deps = [
+    pkgs.lsof
+    pkgs.psmisc
     pkgs.mysql-client
     pkgs.mysql
     pkgs.pkg-config

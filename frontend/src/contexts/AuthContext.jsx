@@ -1,6 +1,6 @@
-import { createContext, useState, useEffect, useContext } from 'react';
-import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';
+import { createContext, useState, useEffect, useContext } from "react";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 // Create context
 export const AuthContext = createContext();
@@ -8,26 +8,26 @@ export const AuthContext = createContext();
 // Provider component
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [token, setToken] = useState(localStorage.getItem("token"));
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // Set up axios defaults - make sure the Vite proxy correctly handles all requests
-  axios.defaults.baseURL = '';
-  
+  axios.defaults.baseURL = `https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:5000`;
+
   // Debug our environment
   console.log("React environment:", import.meta.env);
-  console.log("Current axios baseURL:", axios.defaults.baseURL);
+  console.log("Current axios baseURL1:", axios.defaults.baseURL);
 
   // Set token in axios headers and localStorage
   const setAuthToken = (token) => {
     if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      localStorage.setItem('token', token);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      localStorage.setItem("token", token);
       console.log("Set auth token:", token.substring(0, 15) + "...");
     } else {
-      delete axios.defaults.headers.common['Authorization'];
-      localStorage.removeItem('token');
+      delete axios.defaults.headers.common["Authorization"];
+      localStorage.removeItem("token");
       console.log("Cleared auth token");
     }
   };
@@ -37,17 +37,20 @@ export const AuthProvider = ({ children }) => {
     try {
       setError(null);
       console.log("Attempting registration for:", username);
-      
-      const res = await axios.post('/api/auth/register', { username, password });
+
+      const res = await axios.post("/api/auth/register", {
+        username,
+        password,
+      });
       console.log("Registration response:", res.data);
-      
+
       setToken(res.data.access_token);
       setUser(res.data.user);
       setAuthToken(res.data.access_token);
       return res.data;
     } catch (err) {
       console.error("Registration error:", err);
-      const errorMessage = err.response?.data?.error || 'Registration failed';
+      const errorMessage = err.response?.data?.error || "Registration failed";
       setError(errorMessage);
       throw new Error(errorMessage);
     }
@@ -58,36 +61,38 @@ export const AuthProvider = ({ children }) => {
     try {
       setError(null);
       console.log("Login attempt for:", username);
-      
+
       // Force setting baseURL to empty string in case it was changed
-      axios.defaults.baseURL = '';
-      
+      // axios.defaults.baseURL = "";
+      axios.defaults.baseURL =
+        "https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:5000";
+
       // Direct fetch instead of axios as a fallback approach
       console.log("Making fetch request to: /api/auth/login");
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ username, password }),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || `HTTP error ${response.status}`);
       }
-      
+
       const data = await response.json();
       console.log("Login response:", data);
-      
+
       if (!data.access_token) {
-        throw new Error('Missing access_token in login response');
+        throw new Error("Missing access_token in login response");
       }
-      
+
       if (!data.user) {
-        throw new Error('Missing user data in login response');
+        throw new Error("Missing user data in login response");
       }
-      
+
       // Set auth state with response data
       setToken(data.access_token);
       setUser(data.user);
@@ -95,7 +100,7 @@ export const AuthProvider = ({ children }) => {
       return data;
     } catch (err) {
       console.error("Login error:", err.message);
-      setError(err.message || 'Login failed. Check your credentials.');
+      setError(err.message || "Login failed. Check your credentials.");
       throw err;
     }
   };
@@ -114,7 +119,7 @@ export const AuthProvider = ({ children }) => {
         try {
           // Set auth token in headers
           setAuthToken(token);
-          
+
           // Check if token is expired
           try {
             const decoded = jwtDecode(token);
@@ -134,28 +139,28 @@ export const AuthProvider = ({ children }) => {
             setLoading(false);
             return;
           }
-          
+
           // Get user data using fetch instead of axios
-          const response = await fetch('/api/auth/user', {
+          const response = await fetch("/api/auth/user", {
             headers: {
-              'Authorization': `Bearer ${token}`
-            }
+              Authorization: `Bearer ${token}`,
+            },
           });
-          
+
           if (!response.ok) {
             throw new Error(`HTTP error ${response.status}`);
           }
-          
+
           const data = await response.json();
           console.log("User data response:", data);
-          
+
           // Handle different response formats
           if (data.user) {
             setUser(data.user);
           } else if (data && data.id) {
             setUser(data);
           } else {
-            throw new Error('Invalid user data format');
+            throw new Error("Invalid user data format");
           }
         } catch (err) {
           console.error("Error loading user:", err);
@@ -166,21 +171,23 @@ export const AuthProvider = ({ children }) => {
       }
       setLoading(false);
     };
-    
+
     loadUser();
   }, [token]);
 
   return (
-    <AuthContext.Provider value={{
-      token,
-      user,
-      loading,
-      error,
-      register,
-      login,
-      logout,
-      isAuthenticated: !!user
-    }}>
+    <AuthContext.Provider
+      value={{
+        token,
+        user,
+        loading,
+        error,
+        register,
+        login,
+        logout,
+        isAuthenticated: !!user,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -190,7 +197,7 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
