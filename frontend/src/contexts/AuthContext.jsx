@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
 
   // Debug our environment
   console.log("React environment:", import.meta.env);
-  console.log("Current axios baseURL1:", axios.defaults.baseURL);
+  console.log("Current axios baseURL:", axios.defaults.baseURL);
 
   // Set token in axios headers and localStorage
   const setAuthToken = (token) => {
@@ -62,10 +62,8 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       console.log("Login attempt for:", username);
 
-      // Force setting baseURL to empty string in case it was changed
-      // axios.defaults.baseURL = "";
-      axios.defaults.baseURL =
-        "https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:5000";
+      // Set baseURL to ensure it's correct for this request
+      axios.defaults.baseURL = `https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:5000`;
 
       // Direct fetch instead of axios as a fallback approach
       console.log("Making fetch request to: /api/auth/login");
