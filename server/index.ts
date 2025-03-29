@@ -26,22 +26,6 @@ app.use('/api', createProxyMiddleware({
   logLevel: 'debug'
 }));
 
-// Proxy auth requests to Flask backend
-app.use('/auth', createProxyMiddleware({
-  target: `http://localhost:${FLASK_PORT}`,
-  changeOrigin: true,
-  // @ts-ignore - logLevel is a valid option but TypeScript doesn't recognize it
-  logLevel: 'debug'
-}));
-
-// Proxy login requests to Flask backend
-app.use('/login', createProxyMiddleware({
-  target: `http://localhost:${FLASK_PORT}`,
-  changeOrigin: true,
-  // @ts-ignore - logLevel is a valid option but TypeScript doesn't recognize it
-  logLevel: 'debug'
-}));
-
 // Proxy uploads requests to Flask backend
 app.use('/uploads', createProxyMiddleware({
   target: `http://localhost:${FLASK_PORT}`,
