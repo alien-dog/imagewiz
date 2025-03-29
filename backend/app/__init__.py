@@ -20,8 +20,13 @@ def create_app():
     app = Flask(__name__, static_folder='static')
     
     # Configure the application
-    # Use SQLite database (in-memory for development)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///imagenwiz.db'
+    # Use MySQL database with credentials from .env using quote_plus for password
+    from urllib.parse import quote_plus
+    mysql_user = os.environ.get('DB_USER')
+    mysql_password = quote_plus(os.environ.get('DB_PASSWORD', ''))
+    mysql_host = os.environ.get('DB_HOST')
+    mysql_db = os.environ.get('DB_NAME')
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{mysql_user}:{mysql_password}@{mysql_host}/{mysql_db}'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(
