@@ -13,11 +13,11 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   // Set up axios defaults - make sure the Vite proxy correctly handles all requests
-  axios.defaults.baseURL = `https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:5000`;
+  axios.defaults.baseURL = `http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:80`;
 
   // Debug our environment
   console.log("React environment:", import.meta.env);
-  console.log("Current axios baseURL1:", axios.defaults.baseURL);
+  console.log("Current axios baseURL:", axios.defaults.baseURL);
 
   // Set token in axios headers and localStorage
   const setAuthToken = (token) => {
@@ -37,8 +37,14 @@ export const AuthProvider = ({ children }) => {
     try {
       setError(null);
       console.log("Attempting registration for:", username);
-
-      const res = await axios.post("/api/auth/register", {
+      
+      // Make sure baseURL is set correctly
+      axios.defaults.baseURL = "http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:80";
+      
+      const registerUrl = "http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:80/api/auth/register";
+      console.log("Making registration request to:", registerUrl);
+      
+      const res = await axios.post(registerUrl, {
         username,
         password,
       });
@@ -62,14 +68,14 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       console.log("Login attempt for:", username);
 
-      // Force setting baseURL to empty string in case it was changed
-      // axios.defaults.baseURL = "";
-      axios.defaults.baseURL =
-        "https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:5000";
+      // Make sure baseURL is set correctly
+      axios.defaults.baseURL = 
+        "http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:80";
 
       // Direct fetch instead of axios as a fallback approach
-      console.log("Making fetch request to: /api/auth/login");
-      const response = await fetch("/api/auth/login", {
+      const loginUrl = "http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:80/api/auth/login";
+      console.log("Making fetch request to:", loginUrl);
+      const response = await fetch(loginUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -141,7 +147,9 @@ export const AuthProvider = ({ children }) => {
           }
 
           // Get user data using fetch instead of axios
-          const response = await fetch("/api/auth/user", {
+          const userUrl = "http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:80/api/auth/user";
+          console.log("Making user fetch request to:", userUrl);
+          const response = await fetch(userUrl, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
