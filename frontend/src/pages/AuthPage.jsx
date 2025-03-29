@@ -1,270 +1,231 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
-const AuthPage = () => {
-  const [activeTab, setActiveTab] = useState('login')
-  const [loginUsername, setLoginUsername] = useState('')
-  const [loginPassword, setLoginPassword] = useState('')
-  const [registerUsername, setRegisterUsername] = useState('')
-  const [registerPassword, setRegisterPassword] = useState('')
-  const [registerConfirmPassword, setRegisterConfirmPassword] = useState('')
-  const [loading, setLoading] = useState(false)
+export default function AuthPage() {
+  const [isLogin, setIsLogin] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const { currentUser, login, register } = useAuth()
   
-  const { login, register, currentUser } = useAuth()
-  const navigate = useNavigate()
-  
-  // Redirect if already logged in
+  // Redirect if user is already logged in
   if (currentUser) {
-    navigate('/dashboard')
-    return null
+    return <Navigate to="/dashboard" replace />
   }
   
-  const handleLogin = async (e) => {
+  const toggleForm = () => {
+    setIsLogin(!isLogin)
+    setError('')
+  }
+  
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
-    setLoading(true)
     
-    try {
-      await login(loginUsername, loginPassword)
-      navigate('/dashboard')
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
+    // Form validation
+    if (!username || !password) {
+      setError('All fields are required')
+      return
     }
-  }
-  
-  const handleRegister = async (e) => {
-    e.preventDefault()
-    setError('')
     
-    // Validate passwords match
-    if (registerPassword !== registerConfirmPassword) {
+    if (!isLogin && password !== confirmPassword) {
       setError('Passwords do not match')
       return
     }
     
-    // Validate password length
-    if (registerPassword.length < 6) {
-      setError('Password must be at least 6 characters')
-      return
-    }
-    
-    setLoading(true)
+    setIsLoading(true)
     
     try {
-      await register(registerUsername, registerPassword)
-      navigate('/dashboard')
-    } catch (err) {
-      setError(err.message)
+      if (isLogin) {
+        await login(username, password)
+      } else {
+        await register(username, password)
+      }
+    } catch (error) {
+      setError(error.message)
     } finally {
-      setLoading(false)
+      setIsLoading(false)
     }
   }
   
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl w-full flex flex-col md:flex-row shadow-lg rounded-lg overflow-hidden">
-        {/* Left Side - Form */}
-        <div className="bg-white p-8 lg:p-12 w-full md:w-1/2">
-          <div className="mb-6">
-            <h2 className="text-3xl font-extrabold text-gray-900">
-              {activeTab === 'login' ? 'Sign in to your account' : 'Create your account'}
+    <div className="min-h-screen flex flex-col lg:flex-row">
+      {/* Form Section */}
+      <div className="lg:w-1/2 flex flex-col justify-center px-4 py-12 sm:px-6 lg:px-20 xl:px-24">
+        <div className="mx-auto w-full max-w-sm lg:w-96">
+          <div className="text-center mb-8">
+            <h2 className="mt-6 text-3xl font-bold tracking-tight text-gray-900">
+              {isLogin ? 'Sign in to your account' : 'Create a new account'}
             </h2>
             <p className="mt-2 text-sm text-gray-600">
-              {activeTab === 'login' ? (
-                <>
-                  Or{' '}
-                  <button 
-                    className="text-blue-500 hover:text-blue-700 font-medium"
-                    onClick={() => setActiveTab('register')}
-                  >
-                    create a new account
-                  </button>
-                </>
-              ) : (
-                <>
-                  Already have an account?{' '}
-                  <button 
-                    className="text-blue-500 hover:text-blue-700 font-medium"
-                    onClick={() => setActiveTab('login')}
-                  >
-                    Sign in
-                  </button>
-                </>
-              )}
+              {isLogin ? "Don't have an account? " : "Already have an account? "}
+              <button 
+                onClick={toggleForm}
+                className="font-medium text-blue-500 hover:text-blue-600"
+              >
+                {isLogin ? 'Sign up now' : 'Sign in'}
+              </button>
             </p>
           </div>
           
           {error && (
-            <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-red-700">{error}</p>
-                </div>
-              </div>
+            <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-md border border-red-200">
+              {error}
             </div>
           )}
           
-          {activeTab === 'login' ? (
-            <form className="space-y-6" onSubmit={handleLogin}>
-              <div>
-                <label htmlFor="login-username" className="block text-sm font-medium text-gray-700">
-                  Username
-                </label>
-                <div className="mt-1">
-                  <input
-                    id="login-username"
-                    name="username"
-                    type="text"
-                    required
-                    value={loginUsername}
-                    onChange={(e) => setLoginUsername(e.target.value)}
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                Username
+              </label>
+              <div className="mt-1">
+                <input
+                  id="username"
+                  name="username"
+                  type="text"
+                  autoComplete="username"
+                  required
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                />
               </div>
-
-              <div>
-                <label htmlFor="login-password" className="block text-sm font-medium text-gray-700">
-                  Password
-                </label>
-                <div className="mt-1">
-                  <input
-                    id="login-password"
-                    name="password"
-                    type="password"
-                    required
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
+            </div>
+            
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                Password
+              </label>
+              <div className="mt-1">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete={isLogin ? "current-password" : "new-password"}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                />
               </div>
-
+            </div>
+            
+            {!isLogin && (
               <div>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
-                >
-                  {loading ? 'Signing in...' : 'Sign in'}
-                </button>
-              </div>
-            </form>
-          ) : (
-            <form className="space-y-6" onSubmit={handleRegister}>
-              <div>
-                <label htmlFor="register-username" className="block text-sm font-medium text-gray-700">
-                  Username
-                </label>
-                <div className="mt-1">
-                  <input
-                    id="register-username"
-                    name="username"
-                    type="text"
-                    required
-                    value={registerUsername}
-                    onChange={(e) => setRegisterUsername(e.target.value)}
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="register-password" className="block text-sm font-medium text-gray-700">
-                  Password
-                </label>
-                <div className="mt-1">
-                  <input
-                    id="register-password"
-                    name="password"
-                    type="password"
-                    required
-                    value={registerPassword}
-                    onChange={(e) => setRegisterPassword(e.target.value)}
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="register-confirm-password" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
                   Confirm Password
                 </label>
                 <div className="mt-1">
                   <input
-                    id="register-confirm-password"
+                    id="confirmPassword"
                     name="confirmPassword"
                     type="password"
+                    autoComplete="new-password"
                     required
-                    value={registerConfirmPassword}
-                    onChange={(e) => setRegisterConfirmPassword(e.target.value)}
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
                   />
                 </div>
               </div>
-
-              <div>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
-                >
-                  {loading ? 'Creating account...' : 'Create account'}
-                </button>
+            )}
+            
+            <div>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={`flex w-full justify-center rounded-md border border-transparent bg-blue-500 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                  isLoading ? 'opacity-70 cursor-not-allowed' : ''
+                }`}
+              >
+                {isLoading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    {isLogin ? 'Signing in...' : 'Creating account...'}
+                  </>
+                ) : (
+                  <>{isLogin ? 'Sign in' : 'Create account'}</>
+                )}
+              </button>
+            </div>
+          </form>
+          
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300" />
               </div>
-            </form>
-          )}
+              <div className="relative flex justify-center text-sm">
+                <span className="bg-white px-2 text-gray-500">Or continue with</span>
+              </div>
+            </div>
+            
+            <div className="mt-6 grid grid-cols-1 gap-3">
+              <button
+                className="flex w-full items-center justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+              >
+                <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M23.766 12.2764C23.766 11.4607 23.6999 10.6406 23.5588 9.83807H12.24V14.4591H18.7217C18.4528 15.9494 17.5885 17.2678 16.323 18.1056V21.1039H20.19C22.4608 19.0139 23.766 15.9274 23.766 12.2764Z" fill="#4285F4"/>
+                  <path d="M12.2401 24.0008C15.4766 24.0008 18.2059 22.9382 20.1945 21.1039L16.3276 18.1055C15.2517 18.8375 13.8627 19.252 12.2445 19.252C9.11388 19.252 6.45946 17.1399 5.50705 14.3003H1.5166V17.3912C3.55371 21.4434 7.7029 24.0008 12.2401 24.0008Z" fill="#34A853"/>
+                  <path d="M5.50253 14.3003C4.99987 12.8099 4.99987 11.1961 5.50253 9.70575V6.61481H1.51649C-0.18551 10.0056 -0.18551 14.0004 1.51649 17.3912L5.50253 14.3003Z" fill="#FBBC04"/>
+                  <path d="M12.2401 4.74966C13.9509 4.7232 15.6044 5.36697 16.8434 6.54867L20.2695 3.12262C18.1001 1.0855 15.2208 -0.034466 12.2401 0.000808666C7.7029 0.000808666 3.55371 2.55822 1.5166 6.61481L5.50264 9.70575C6.45064 6.86173 9.10947 4.74966 12.2401 4.74966Z" fill="#EA4335"/>
+                </svg>
+                Sign in with Google
+              </button>
+            </div>
+          </div>
         </div>
-        
-        {/* Right Side - Hero */}
-        <div className="hidden md:block w-1/2 bg-blue-600 p-12 text-white">
-          <div className="h-full flex flex-col justify-center">
-            <h2 className="text-3xl font-bold mb-6">
-              Instantly Remove Image Backgrounds with AI
-            </h2>
-            <p className="text-blue-100 mb-8 text-lg">
-              Join iMagenWiz and access our powerful image processing tools. Perfect for designers, marketers, and businesses.
-            </p>
-            <ul className="space-y-4">
-              <li className="flex items-center">
-                <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+      </div>
+      
+      {/* Hero Section */}
+      <div className="hidden lg:block lg:w-1/2 bg-blue-600">
+        <div className="flex h-full items-center justify-center p-12">
+          <div className="max-w-xl">
+            <div className="mb-8">
+              <h1 className="text-4xl font-bold text-white mb-4">
+                Background Removal Made Simple
+              </h1>
+              <p className="text-blue-100 text-xl">
+                Join thousands of professionals using iMagenWiz for fast, accurate background removal. Our AI-powered technology gives you perfect results every time.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-6 text-blue-100">
+              <div className="flex items-start">
+                <svg className="h-6 w-6 mr-2 text-blue-200 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span>Fast AI-powered background removal</span>
-              </li>
-              <li className="flex items-center">
-                <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                <span>Process up to 50 images with our free plan</span>
+              </div>
+              <div className="flex items-start">
+                <svg className="h-6 w-6 mr-2 text-blue-200 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span>Professional-quality results in seconds</span>
-              </li>
-              <li className="flex items-center">
-                <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                <span>Lightning-fast AI processing</span>
+              </div>
+              <div className="flex items-start">
+                <svg className="h-6 w-6 mr-2 text-blue-200 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span>Free credits for new users</span>
-              </li>
-              <li className="flex items-center">
-                <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                <span>High-quality transparent backgrounds</span>
+              </div>
+              <div className="flex items-start">
+                <svg className="h-6 w-6 mr-2 text-blue-200 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span>Flexible pricing plans for all needs</span>
-              </li>
-            </ul>
+                <span>Secure image storage and management</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   )
 }
-
-export default AuthPage
