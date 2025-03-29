@@ -19,6 +19,7 @@ app.use('/api', createProxyMiddleware({
   target: `http://localhost:${FLASK_PORT}`,
   changeOrigin: true,
   // Don't rewrite the path - Flask also uses /api prefix
+  // @ts-ignore - logLevel is a valid option but TypeScript doesn't recognize it
   logLevel: 'debug'
 }));
 
@@ -61,9 +62,13 @@ process.on('SIGINT', () => {
 // Serve frontend files from dist directory
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
-// Serve test HTML file
+// Serve test HTML files
 app.get('/test-login.html', (req, res) => {
   res.sendFile(path.join(__dirname, '../test-login.html'));
+});
+
+app.get('/proxy-test.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../proxy-test.html'));
 });
 
 // Catch-all route for SPA
