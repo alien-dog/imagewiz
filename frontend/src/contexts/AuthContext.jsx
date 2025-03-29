@@ -12,8 +12,8 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Set up axios defaults - direct connection to Flask backend
-  axios.defaults.baseURL = 'https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev';
+  // Set up axios defaults - make sure the Vite proxy correctly handles all requests
+  axios.defaults.baseURL = '';
   
   // Debug our environment
   console.log("React environment:", import.meta.env);
@@ -38,10 +38,6 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       console.log("Attempting registration for:", username);
       
-      // Make sure baseURL is set to the Flask backend with port 5001
-      axios.defaults.baseURL = 'https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:5001';
-      
-      console.log("Making registration request to:", axios.defaults.baseURL + '/api/auth/register');
       const res = await axios.post('/api/auth/register', { username, password });
       console.log("Registration response:", res.data);
       
@@ -63,19 +59,25 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       console.log("Login attempt for:", username);
       
-      // Make sure baseURL is set to the Flask backend with port 5001
-      axios.defaults.baseURL = 'https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:5001';
+      // Force setting baseURL to empty string in case it was changed
+      axios.defaults.baseURL = '';
       
-      // Use axios for a cleaner request
-      console.log("Making axios request to:", axios.defaults.baseURL + '/api/auth/login');
-      const response = await axios.post('/api/auth/login', { 
-        username, 
-        password 
+      // Direct fetch instead of axios as a fallback approach
+      console.log("Making fetch request to: /api/auth/login");
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
       });
       
-      // Axios automatically throws errors for non-2xx responses
-      // and parses JSON, so we can use response.data directly
-      const data = response.data;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error ${response.status}`);
+      }
+      
+      const data = await response.json();
       console.log("Login response:", data);
       
       if (!data.access_token) {
@@ -133,19 +135,18 @@ export const AuthProvider = ({ children }) => {
             return;
           }
           
-          // Make sure baseURL is set to the Flask backend with port 5001
-          axios.defaults.baseURL = 'https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:5001';
-          
-          // Get user data using axios with the full URL
-          console.log("Getting user data from:", axios.defaults.baseURL + '/api/auth/user');
-          const response = await axios.get('/api/auth/user', {
+          // Get user data using fetch instead of axios
+          const response = await fetch('/api/auth/user', {
             headers: {
               'Authorization': `Bearer ${token}`
             }
           });
           
-          // Axios data is already parsed
-          const data = response.data;
+          if (!response.ok) {
+            throw new Error(`HTTP error ${response.status}`);
+          }
+          
+          const data = await response.json();
           console.log("User data response:", data);
           
           // Handle different response formats

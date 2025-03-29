@@ -88,12 +88,6 @@
   <div class="info">
     <p><strong>Simple HTML Form Login</strong></p>
     <p>This page submits a standard HTML form to test the API. This approach should be more compatible with Replit's environment.</p>
-    <p><strong>Current Setup:</strong></p>
-    <ul>
-      <li>Frontend server: Running on port 3000</li>
-      <li>Backend server: External Flask API on e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev</li>
-      <li>API Requests: Proxied through Node.js to Flask backend</li>
-    </ul>
   </div>
 
   <div class="container">
@@ -105,7 +99,7 @@
   
   <div class="container">
     <h2>Login Form</h2>
-    <form id="loginForm" action="/api/auth/login" method="POST">
+    <form id="loginForm" action="/login" method="POST">
       <div>
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required>
@@ -116,14 +110,6 @@
       </div>
       <button type="submit">Login</button>
     </form>
-    
-    <div id="requestInfo" style="background-color: #f0f8ff; padding: 15px; margin: 15px 0; border-left: 4px solid #1e90ff;">
-      <h3>Request Information</h3>
-      <div><strong>Request URL:</strong> <span id="requestURL"></span></div>
-      <div><strong>Request Method:</strong> <span id="requestMethod"></span></div>
-      <div><strong>Request Headers:</strong> <pre id="requestHeaders"></pre></div>
-      <div><strong>Request Body:</strong> <pre id="requestBody"></pre></div>
-    </div>
     
     <div id="successMessage" class="success">
       <h3>Login Successful!</h3>
@@ -137,8 +123,6 @@
     <div id="errorMessage" class="error">
       <h3>Login Failed</h3>
       <p id="errorText"></p>
-      <div><strong>Response Status:</strong> <span id="errorStatus"></span></div>
-      <div><strong>Response Details:</strong> <pre id="errorDetails"></pre></div>
     </div>
   </div>
   
@@ -167,57 +151,21 @@
         password: password
       };
       
-      // Display request details
-      const requestURL = '/api/auth/login';
-      const requestMethod = 'POST';
-      const headers = {'Content-Type': 'application/json'};
-      const requestBody = JSON.stringify(formData, null, 2);
-      
-      document.getElementById('requestURL').textContent = requestURL;
-      document.getElementById('requestMethod').textContent = requestMethod;
-      document.getElementById('requestHeaders').textContent = JSON.stringify(headers, null, 2);
-      document.getElementById('requestBody').textContent = requestBody;
-      
-      console.log('Sending request to:', requestURL);
-      console.log('Request body:', requestBody);
-      
-      // Make a fetch request via Node.js proxy to Flask backend
-      fetch(requestURL, {
-        method: requestMethod,
-        headers: headers,
-        body: requestBody
+      // Make a fetch request
+      fetch('/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
       })
       .then(response => {
-        console.log('Response status:', response.status);
-        console.log('Response headers:', response.headers);
-        
-        // Store status for error display
-        const status = response.status;
-        const statusText = response.statusText;
-        
-        // Try to parse JSON response
-        return response.text().then(text => {
-          let jsonData;
-          try {
-            // Attempt to parse as JSON
-            jsonData = JSON.parse(text);
-            console.log('Response JSON:', jsonData);
-          } catch (e) {
-            console.log('Response is not JSON:', text);
-            jsonData = { rawText: text };
-          }
-          
-          if (!response.ok) {
-            throw {
-              status: status,
-              statusText: statusText,
-              message: jsonData.error || `HTTP error ${status}`,
-              details: jsonData
-            };
-          }
-          
-          return jsonData;
-        });
+        if (!response.ok) {
+          return response.json().then(data => {
+            throw new Error(data.error || `HTTP error ${response.status}`);
+          });
+        }
+        return response.json();
       })
       .then(data => {
         // Show success message
@@ -231,14 +179,10 @@
         }
       })
       .catch(error => {
-        console.error('Error details:', error);
-        
         // Show error message
         document.getElementById('errorMessage').style.display = 'block';
         document.getElementById('successMessage').style.display = 'none';
-        document.getElementById('errorText').textContent = error.message || 'Unknown error';
-        document.getElementById('errorStatus').textContent = error.status ? `${error.status} ${error.statusText}` : 'Unknown';
-        document.getElementById('errorDetails').textContent = JSON.stringify(error.details || error, null, 2);
+        document.getElementById('errorText').textContent = error.message;
       });
     });
   </script>

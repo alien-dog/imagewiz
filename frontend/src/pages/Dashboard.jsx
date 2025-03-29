@@ -5,7 +5,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
@@ -36,19 +36,14 @@ const Dashboard = () => {
 
     // Create form data for upload
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('image', file);
 
     setProcessing(true);
 
     try {
-      // Make sure baseURL is set to the Flask backend with port 5000
-      axios.defaults.baseURL = 'https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:5000';
-      
-      console.log("Sending image processing request to:", axios.defaults.baseURL + '/api/matting/process');
-      const response = await axios.post('/api/matting/process', formData, {
+      const response = await axios.post('/matting/process', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}`
         },
       });
       
@@ -58,7 +53,7 @@ const Dashboard = () => {
     } finally {
       setProcessing(false);
     }
-  }, [token]);
+  }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
