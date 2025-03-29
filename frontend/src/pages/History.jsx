@@ -10,7 +10,15 @@ const History = () => {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const response = await axios.get('/matting/history');
+        // Make sure baseURL is set to the Flask backend with port 5000
+        axios.defaults.baseURL = 'https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:5000';
+        
+        console.log("Fetching history from:", axios.defaults.baseURL + '/api/matting/history');
+        const response = await axios.get('/api/matting/history', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
         setHistory(response.data.history || []);
       } catch (err) {
         setError('Failed to load processing history. Please try again later.');

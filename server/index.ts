@@ -8,60 +8,142 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
-const PORT = process.env.PORT || 3000;
-const FLASK_PORT = 5000;
+// Use port 5000 for compatibility with Replit workflow runner
+const PORT = 5000;
+const FLASK_PORT = 5001;
 const FLASK_HOST = 'e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev';
 
-// Enable CORS
-app.use(cors());
+// Enable CORS with specific options
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+  credentials: true
+}));
+
+// Handle preflight requests
+app.options('*', cors());
 
 // Parse JSON request bodies
 app.use(express.json());
 
+// Add direct API endpoint for testing
+app.post('/test-api/login', (req, res) => {
+  console.log('[Test API] Login request received:', req.body);
+  
+  // Send success response
+  if (req.body.username === 'testuser2' && req.body.password === 'password123') {
+    res.status(200).json({
+      id: 1,
+      username: req.body.username,
+      access_token: 'test-token-12345',
+      credit_balance: 100,
+      is_admin: false,
+      message: 'Login successful (test API)'
+    });
+  } else {
+    res.status(401).json({
+      error: 'Invalid username or password (test API)'
+    });
+  }
+});
+
 // Proxy API requests to Flask backend
 app.use('/api', createProxyMiddleware({
-  target: `https://${FLASK_HOST}`,
+  target: `https://${FLASK_HOST}:${FLASK_PORT}`,
   changeOrigin: true,
   // Don't rewrite the path - Flask routes expect /api prefix
   // @ts-ignore - logLevel is a valid option but TypeScript doesn't recognize it
   logLevel: 'debug',
-  secure: false // Allow insecure SSL connections
+  secure: false, // Allow insecure SSL connections
+  ws: true, // Enable WebSocket proxying
+  pathRewrite: { '^/api': '/api' }, // No path rewriting needed but explicitly stated for clarity
+  onProxyReq: (proxyReq, req, res) => {
+    console.log(`[PROXY] Proxying request to: ${req.method} ${req.url}`);
+    
+    // Log request body for debugging if it's a POST request
+    if (req.method === 'POST' && req.body) {
+      console.log('[PROXY] Request body:', JSON.stringify(req.body));
+    }
+  },
+  onProxyRes: (proxyRes, req, res) => {
+    // Add CORS headers to the proxied response
+    proxyRes.headers['Access-Control-Allow-Origin'] = '*';
+    proxyRes.headers['Access-Control-Allow-Headers'] = 'X-Requested-With, Content-Type, Accept, Authorization';
+    proxyRes.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS';
+    console.log(`[PROXY] Received response for: ${req.method} ${req.url} with status: ${proxyRes.statusCode}`);
+  },
+  onError: (err, req, res) => {
+    console.error('[PROXY] Proxy error:', err);
+    res.writeHead(500, {
+      'Content-Type': 'text/plain'
+    });
+    res.end(`Proxy Error: ${err.message}`);
+  }
 }));
 
 // Proxy auth requests to Flask backend
 app.use('/auth', createProxyMiddleware({
-  target: `https://${FLASK_HOST}`,
+  target: `https://${FLASK_HOST}:${FLASK_PORT}`,
   changeOrigin: true,
   // @ts-ignore - logLevel is a valid option but TypeScript doesn't recognize it
   logLevel: 'debug',
-  secure: false // Allow insecure SSL connections
+  secure: false, // Allow insecure SSL connections
+  ws: true, // Enable WebSocket proxying
+  onProxyRes: (proxyRes, req, res) => {
+    // Add CORS headers to the proxied response
+    proxyRes.headers['Access-Control-Allow-Origin'] = '*';
+    proxyRes.headers['Access-Control-Allow-Headers'] = 'X-Requested-With, Content-Type, Accept, Authorization';
+    proxyRes.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS';
+  }
 }));
 
 // Proxy login requests to Flask backend
 app.use('/login', createProxyMiddleware({
-  target: `https://${FLASK_HOST}`,
+  target: `https://${FLASK_HOST}:${FLASK_PORT}`,
   changeOrigin: true,
   // @ts-ignore - logLevel is a valid option but TypeScript doesn't recognize it
   logLevel: 'debug',
-  secure: false // Allow insecure SSL connections
+  secure: false, // Allow insecure SSL connections
+  ws: true, // Enable WebSocket proxying
+  onProxyRes: (proxyRes, req, res) => {
+    // Add CORS headers to the proxied response
+    proxyRes.headers['Access-Control-Allow-Origin'] = '*';
+    proxyRes.headers['Access-Control-Allow-Headers'] = 'X-Requested-With, Content-Type, Accept, Authorization';
+    proxyRes.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS';
+  }
 }));
 
 // Proxy uploads requests to Flask backend
 app.use('/uploads', createProxyMiddleware({
-  target: `https://${FLASK_HOST}`,
+  target: `https://${FLASK_HOST}:${FLASK_PORT}`,
   changeOrigin: true,
-  secure: false // Allow insecure SSL connections
+  secure: false, // Allow insecure SSL connections
+  ws: true, // Enable WebSocket proxying
+  onProxyRes: (proxyRes, req, res) => {
+    // Add CORS headers to the proxied response
+    proxyRes.headers['Access-Control-Allow-Origin'] = '*';
+    proxyRes.headers['Access-Control-Allow-Headers'] = 'X-Requested-With, Content-Type, Accept, Authorization';
+    proxyRes.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS';
+  }
 }));
 
 // Proxy processed requests to Flask backend
 app.use('/processed', createProxyMiddleware({
-  target: `https://${FLASK_HOST}`,
+  target: `https://${FLASK_HOST}:${FLASK_PORT}`,
   changeOrigin: true,
-  secure: false // Allow insecure SSL connections
+  secure: false, // Allow insecure SSL connections
+  ws: true, // Enable WebSocket proxying
+  onProxyRes: (proxyRes, req, res) => {
+    // Add CORS headers to the proxied response
+    proxyRes.headers['Access-Control-Allow-Origin'] = '*';
+    proxyRes.headers['Access-Control-Allow-Headers'] = 'X-Requested-With, Content-Type, Accept, Authorization';
+    proxyRes.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS';
+  }
 }));
 
-// Using external Flask backend
-console.log(`Using external Flask backend at: https://${FLASK_HOST}`);
+// Using Vite to proxy to the external Flask backend
+console.log(`The frontend will proxy API requests directly to the Flask backend`);
 
 // Create a dummy process for compatibility
 const backendProcess = {
@@ -99,6 +181,10 @@ app.get('/direct-test.html', (req, res) => {
   res.sendFile(path.join(__dirname, '../direct-test.html'));
 });
 
+app.get('/test-direct-api.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../test-direct-api.html'));
+});
+
 // Catch-all route for SPA
 app.get('*', (req, res) => {
   try {
@@ -110,6 +196,6 @@ app.get('*', (req, res) => {
 });
 
 // Start the server
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running at http://0.0.0.0:${PORT}`);
 });

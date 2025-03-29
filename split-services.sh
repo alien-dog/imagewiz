@@ -1,23 +1,17 @@
 #!/bin/bash
 
-# Terminal 1: Start Flask backend
-cd backend && python run.py &
-FLASK_PID=$!
-echo "Flask backend started with PID: $FLASK_PID"
+# We're using a remote Flask backend, so no need to start it here
+echo "Using remote Flask backend"
 
-# Wait for Flask to start up
-sleep 3
+# Terminal: Start Node.js server which proxies to remote Flask
+npx tsx server/index.ts &
+SERVER_PID=$!
+echo "Express server started with PID: $SERVER_PID"
 
-# Terminal 2: Start frontend dev server
-cd frontend && npm run dev &
-FRONTEND_PID=$!
-echo "Frontend dev server started with PID: $FRONTEND_PID"
-
-# Function to kill both processes on exit
+# Function to kill the server process on exit
 cleanup() {
-    echo "Shutting down servers..."
-    kill $FLASK_PID
-    kill $FRONTEND_PID
+    echo "Shutting down server..."
+    kill $SERVER_PID
     exit 0
 }
 
