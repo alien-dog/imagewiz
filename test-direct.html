@@ -64,7 +64,7 @@
 
     <script>
         // Explicitly set the baseURL to the Flask API
-        axios.defaults.baseURL = 'https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:5000';
+        axios.defaults.baseURL = 'http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:80';
         console.log('Set axios.defaults.baseURL to:', axios.defaults.baseURL);
         
         document.getElementById('testButton').addEventListener('click', async () => {
@@ -72,8 +72,39 @@
             resultDiv.innerHTML = 'Testing direct connection to API...';
             
             try {
-                // Try to get a response from the root API endpoint
-                const response = await axios.get('/');
+                // Try multiple endpoints to test direct API access
+                const endpoints = [
+                    { url: '/', method: 'get', name: 'Root API' },
+                    { url: '/auth/login', method: 'post', name: 'Login API', data: { username: 'testuser3', password: 'password123' } }
+                ];
+                
+                const results = [];
+                
+                for (const endpoint of endpoints) {
+                    try {
+                        console.log(`Testing ${endpoint.name} at ${endpoint.url}`);
+                        const resp = await axios({
+                            method: endpoint.method,
+                            url: endpoint.url,
+                            data: endpoint.data
+                        });
+                        results.push({
+                            endpoint: endpoint.name,
+                            status: 'Success',
+                            data: resp.data
+                        });
+                    } catch (err) {
+                        results.push({
+                            endpoint: endpoint.name,
+                            status: 'Error',
+                            error: err.message,
+                            details: err.response?.data || {}
+                        });
+                    }
+                }
+                
+                // Use a fake response object to continue the flow
+                const response = { data: results };
                 
                 resultDiv.innerHTML = `
                     <h3>Success!</h3>
