@@ -8,8 +8,10 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
-// Use port 5000 for compatibility with Replit workflow runner
-const PORT = 5000;
+// Try port 5000 first, but fall back to 5001 if it's already in use
+const PRIMARY_PORT = 5000;
+const FALLBACK_PORT = 5001;
+let PORT = PRIMARY_PORT;
 const FLASK_PORT = 5001;
 const FLASK_HOST = 'e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev';
 
@@ -195,7 +197,17 @@ app.get('*', (req, res) => {
   }
 });
 
-// Start the server
-app.listen(PORT, '0.0.0.0', () => {
+// Start the server with fallback
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running at http://0.0.0.0:${PORT}`);
+}).on('error', (e: any) => {
+  if (e.code === 'EADDRINUSE') {
+    console.log(`Port ${PORT} is already in use, trying fallback port ${FALLBACK_PORT}`);
+    PORT = FALLBACK_PORT;
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`Server running at http://0.0.0.0:${PORT}`);
+    });
+  } else {
+    console.error(`Failed to start server: ${e.message}`);
+  }
 });

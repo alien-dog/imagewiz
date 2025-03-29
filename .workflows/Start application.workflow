@@ -1,5 +1,5 @@
-run = "npx tsx server/index.ts"
+run = "npm run dev"
 entrypoint = "server/index.ts"
 onBoot = "true"
 language = "nodejs"
-port = 5000
+port = 5001
