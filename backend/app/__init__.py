@@ -64,12 +64,12 @@ def create_app():
         app.register_blueprint(payment_bp)
         
         # Static file routes
-        @app.route('/uploads/<filename>')
+        @app.route('/api/uploads/<filename>')
         def serve_upload(filename):
             """Serve uploaded files"""
             return send_from_directory(os.path.abspath(app.config['UPLOAD_FOLDER']), filename)
             
-        @app.route('/processed/<filename>')
+        @app.route('/api/processed/<filename>')
         def serve_processed(filename):
             """Serve processed files"""
             return send_from_directory(os.path.abspath(app.config['PROCESSED_FOLDER']), filename)
@@ -80,8 +80,14 @@ def create_app():
             """Return root route response"""
             return jsonify({"status": "ok", "message": "iMagenWiz API is running"})
             
+        # API root route
+        @app.route('/api')
+        def api_index():
+            """Return API root route response"""
+            return jsonify({"status": "ok", "message": "iMagenWiz API is running"})
+            
         # Health check route
-        @app.route('/health')
+        @app.route('/api/health')
         def health_check():
             """Return a simple health check response"""
             return jsonify({"status": "ok", "message": "iMagenWiz API is running"})
