@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
   const register = async (username, password) => {
     try {
       setError(null);
-      const res = await axios.post('/api/auth/register', { username, password });
+      const res = await axios.post('/auth/register', { username, password });
       setToken(res.data.access_token);
       setUser(res.data.user);
       setAuthToken(res.data.access_token);
@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (username, password) => {
     try {
       setError(null);
-      const res = await axios.post('/api/auth/login', { username, password });
+      const res = await axios.post('/auth/login', { username, password });
       setToken(res.data.access_token);
       setUser(res.data.user);
       setAuthToken(res.data.access_token);
@@ -82,7 +82,7 @@ export const AuthProvider = ({ children }) => {
           }
           
           // Get user data
-          const res = await axios.get('/api/auth/user');
+          const res = await axios.get('/auth/user');
           setUser(res.data.user);
         } catch (err) {
           setToken(null);
