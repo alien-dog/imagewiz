@@ -1,27 +1,14 @@
 #!/bin/bash
 
-# Start the Flask backend
+# Start the Flask backend in the background
 cd backend && python run.py &
-
-# Remember backend PID
 BACKEND_PID=$!
 
-# Wait a moment to ensure backend starts up
-sleep 2
+# Wait a bit for the backend to start
+sleep 3
 
-# Start the React frontend
-cd frontend && npm run dev &
+# Start the frontend
+cd ../frontend && npm run dev
 
-# Remember frontend PID
-FRONTEND_PID=$!
-
-# Wait for either process to exit
-wait $BACKEND_PID $FRONTEND_PID
-
-# If we get here, one of the processes has exited
-# Kill the other one
-kill $BACKEND_PID 2>/dev/null
-kill $FRONTEND_PID 2>/dev/null
-
-# Exit with the same status as the process that exited
-exit 0
+# If the frontend exits, kill the backend too
+kill $BACKEND_PID

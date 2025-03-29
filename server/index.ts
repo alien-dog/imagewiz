@@ -1,35 +1,61 @@
-import express from "express";
-import cors from "cors";
-import { execSync } from "child_process";
-import { registerRoutes } from "./routes.js";
-import { registerVite } from "./vite.js";
+// This is a proxy server that forwards requests to the Flask backend
+import express from 'express';
+import { spawn } from 'child_process';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import cors from 'cors';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 
-console.log("Starting server...");
-
-// Start the Flask backend
-console.log("Starting Flask backend...");
-try {
-  const backend = execSync("cd backend && python3 run.py &", { stdio: 'inherit' });
-} catch (error) {
-  console.error("Error starting Flask backend:", error);
-}
-
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
+const PORT = process.env.PORT || 3000;
+const FLASK_PORT = 5000;
 
-// CORS setup
+// Enable CORS
 app.use(cors());
 
-// Body parser middleware
-app.use(express.json());
+// Proxy API requests to Flask backend
+app.use('/api', createProxyMiddleware({
+  target: `http://localhost:${FLASK_PORT}`,
+  changeOrigin: true,
+  pathRewrite: {
+    '^/api': '/api'
+  }
+}));
 
-// Register API routes
-const httpServer = registerRoutes(app);
+// Start Flask backend
+console.log('Starting Flask backend...');
+const backendProcess = spawn('python', ['run.py'], { 
+  cwd: path.join(__dirname, '../backend'),
+  stdio: 'inherit',
+  shell: true 
+});
 
-// Register Vite middleware in development
-registerVite(app);
+backendProcess.on('error', (error) => {
+  console.error(`Backend Error: ${error.message}`);
+});
+
+backendProcess.on('exit', (code) => {
+  console.log(`Backend process exited with code ${code}`);
+  process.exit(code);
+});
+
+// Handle shutdown
+process.on('SIGINT', () => {
+  console.log('Received SIGINT. Shutting down...');
+  backendProcess.kill();
+  process.exit(0);
+});
+
+// Serve frontend files from dist directory
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+// Catch-all route for SPA
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+});
 
 // Start the server
-const PORT = process.env.PORT || 3000;
-httpServer.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
 });
