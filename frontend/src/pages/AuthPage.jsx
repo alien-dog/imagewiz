@@ -9,10 +9,10 @@ export default function AuthPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const { currentUser, login, register } = useAuth()
+  const { user, login, register } = useAuth()
   
   // Redirect if user is already logged in
-  if (currentUser) {
+  if (user) {
     return <Navigate to="/dashboard" replace />
   }
   
@@ -45,7 +45,8 @@ export default function AuthPage() {
         await register(username, password)
       }
     } catch (error) {
-      setError(error.message)
+      console.error("Login error:", error);
+      setError(error.response?.data?.error || error.message || "Login failed. Please check your credentials.")
     } finally {
       setIsLoading(false)
     }
