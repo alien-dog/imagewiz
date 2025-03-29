@@ -99,7 +99,7 @@
   
   <div class="container">
     <h2>Login Form</h2>
-    <form id="loginForm" action="/login" method="POST">
+    <form id="loginForm" action="/api/auth/login" method="POST">
       <div>
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required>
@@ -152,7 +152,7 @@
       };
       
       // Make a fetch request
-      fetch('/login', {
+      fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
