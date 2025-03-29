@@ -12,8 +12,8 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Set up axios defaults
-  axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+  // Set up axios defaults - don't include /api as Vite proxy handles this
+  axios.defaults.baseURL = '';
 
   // Set token in axios headers and localStorage
   const setAuthToken = (token) => {
@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
   const register = async (username, password) => {
     try {
       setError(null);
-      const res = await axios.post('/auth/register', { username, password });
+      const res = await axios.post('/api/auth/register', { username, password });
       setToken(res.data.access_token);
       setUser(res.data.user);
       setAuthToken(res.data.access_token);
@@ -45,13 +45,22 @@ export const AuthProvider = ({ children }) => {
   const login = async (username, password) => {
     try {
       setError(null);
-      const res = await axios.post('/auth/login', { username, password });
+      console.log("Login attempt for:", username);
+      console.log("Using axios baseURL:", axios.defaults.baseURL);
+      console.log("Login URL:", axios.defaults.baseURL + '/api/auth/login');
+      
+      const res = await axios.post('/api/auth/login', { username, password });
+      console.log("Login response:", res.data);
+      
       setToken(res.data.access_token);
       setUser(res.data.user);
       setAuthToken(res.data.access_token);
       return res.data;
     } catch (err) {
-      setError(err.response?.data?.error || 'Login failed');
+      console.error("Login error details:", err);
+      console.error("Error response:", err.response?.data);
+      console.error("Error status:", err.response?.status);
+      setError(err.response?.data?.error || 'Login failed. Check your credentials.');
       throw err;
     }
   };
@@ -82,7 +91,7 @@ export const AuthProvider = ({ children }) => {
           }
           
           // Get user data
-          const res = await axios.get('/auth/user');
+          const res = await axios.get('/api/auth/user');
           setUser(res.data.user);
         } catch (err) {
           setToken(null);
