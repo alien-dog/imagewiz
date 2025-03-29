@@ -51,6 +51,19 @@ export const AuthProvider = ({ children }) => {
       
       const res = await axios.post('/api/auth/login', { username, password });
       console.log("Login response:", res.data);
+      console.log("Response structure:", JSON.stringify(res.data, null, 2));
+      
+      if (!res.data.access_token) {
+        console.error("Missing access_token in response");
+        setError('Login failed: Invalid response from server');
+        throw new Error('Missing access_token in login response');
+      }
+      
+      if (!res.data.user) {
+        console.error("Missing user data in response");
+        setError('Login failed: Invalid response from server');
+        throw new Error('Missing user data in login response');
+      }
       
       setToken(res.data.access_token);
       setUser(res.data.user);
@@ -60,6 +73,9 @@ export const AuthProvider = ({ children }) => {
       console.error("Login error details:", err);
       console.error("Error response:", err.response?.data);
       console.error("Error status:", err.response?.status);
+      console.error("Error config:", err.config);
+      console.error("Full error object:", JSON.stringify(err, Object.getOwnPropertyNames(err)));
+      
       setError(err.response?.data?.error || 'Login failed. Check your credentials.');
       throw err;
     }
@@ -92,7 +108,18 @@ export const AuthProvider = ({ children }) => {
           
           // Get user data
           const res = await axios.get('/api/auth/user');
-          setUser(res.data.user);
+          console.log("User data response:", res.data);
+          
+          // Handle different response formats
+          if (res.data.user) {
+            setUser(res.data.user);
+          } else if (res.data && res.data.id) {
+            // If the response is the user object directly
+            setUser(res.data);
+          } else {
+            console.error("Unexpected user data format:", res.data);
+            throw new Error('Invalid user data format');
+          }
         } catch (err) {
           setToken(null);
           setUser(null);
