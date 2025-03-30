@@ -7,9 +7,11 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-import History from './pages/History';
-import Pricing from './pages/Pricing';
+import DashboardPage from './pages/DashboardPage';
+import HistoryPage from './pages/HistoryPage';
+import HistoryDetailPage from './pages/HistoryDetailPage';
+import PricingPage from './pages/PricingPage';
+import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import Profile from './pages/Profile';
 import NotFound from './pages/NotFound';
 
@@ -39,14 +41,22 @@ const AppContent = () => {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route
+              path="/payment-success"
+              element={
+                <ProtectedRoute>
+                  <PaymentSuccessPage />
+                </ProtectedRoute>
+              }
+            />
             
             {/* Protected routes */}
             <Route
               path="/dashboard"
               element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <DashboardPage />
                 </ProtectedRoute>
               }
             />
@@ -54,7 +64,15 @@ const AppContent = () => {
               path="/history"
               element={
                 <ProtectedRoute>
-                  <History />
+                  <HistoryPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/history/:id"
+              element={
+                <ProtectedRoute>
+                  <HistoryDetailPage />
                 </ProtectedRoute>
               }
             />

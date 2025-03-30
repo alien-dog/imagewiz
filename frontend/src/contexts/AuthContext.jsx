@@ -123,6 +123,42 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setAuthToken(null);
   };
+  
+  // Refresh user data from backend
+  const refreshUser = async () => {
+    if (!token) return;
+    try {
+      const userTimestamp = new Date().getTime();
+      const userUrl = `/api/auth/user?t=${userTimestamp}`;
+      console.log("Refreshing user data from:", userUrl);
+      const response = await fetch(userUrl, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Refreshed user data:", data);
+
+      // Handle different response formats
+      if (data.user) {
+        setUser(data.user);
+      } else if (data && data.id) {
+        setUser(data);
+      } else {
+        throw new Error("Invalid user data format");
+      }
+      
+      return data;
+    } catch (err) {
+      console.error("Error refreshing user:", err);
+      return null;
+    }
+  };
 
   // Check if user is authenticated on load
   useEffect(() => {
@@ -201,6 +237,7 @@ export const AuthProvider = ({ children }) => {
         register,
         login,
         logout,
+        refreshUser,
         isAuthenticated: !!user,
       }}
     >
