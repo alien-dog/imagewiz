@@ -10,10 +10,17 @@ axios.defaults.baseURL = '';
 // Add request interceptor to catch any direct backend access attempts
 axios.interceptors.request.use(
   (config) => {
+    console.log(`📡 DEBUG: Axios sending request to: ${config.url}`);
+    
     // Catch direct attempts to use backend endpoints without /api prefix
     if (config.url) {
+      // Important fix: Make sure /api/payment/create-checkout-session stays as is
+      // This is the correct URL format and shouldn't be modified
+      if (config.url === '/api/payment/create-checkout-session') {
+        console.log(`✅ CORRECT URL: Using proper endpoint ${config.url}`);
+      }
       // Handle direct /payment/create-checkout endpoint (without -session)
-      if (config.url === '/payment/create-checkout') {
+      else if (config.url === '/payment/create-checkout') {
         console.error(`⚠️ INTERCEPTED: Incorrect checkout endpoint ${config.url}`);
         // Fix the URL to use the proper endpoint name and API prefix
         config.url = `/api/payment/create-checkout-session`;
