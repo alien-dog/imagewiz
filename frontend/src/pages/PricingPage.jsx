@@ -15,11 +15,15 @@ const PricingPage = () => {
   useEffect(() => {
     const fetchPackages = async () => {
       try {
+        console.log('Fetching packages from /api/payment/packages');
         const response = await axios.get('/api/payment/packages');
+        console.log('Packages response:', response.data);
         setPackages(response.data.packages);
       } catch (err) {
         console.error('Error fetching packages:', err);
-        setError('Failed to load pricing packages. Please try again later.');
+        console.error('Error response:', err.response?.data);
+        // Fall back to default packages defined below if the API call fails
+        setError('Using default packages. API error: ' + (err.response?.data?.message || err.message));
       } finally {
         setLoading(false);
       }

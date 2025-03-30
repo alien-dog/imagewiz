@@ -80,33 +80,47 @@ app.post('/api/payment/create-checkout-session', async (req, res) => {
     console.log('Request body:', JSON.stringify(req.body));
     
     // This is the correct URL to forward to the Flask backend
+    // Make sure to use /payment/create-checkout-session (no /api prefix)
     const url = `http://localhost:${FLASK_PORT}/payment/create-checkout-session`;
     console.log('Forwarding to:', url);
     
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Authorization': authHeader,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(req.body),
-    });
-    
-    if (!response.ok) {
-      console.error(`Manual proxy: Flask server returned ${response.status} ${response.statusText}`);
-      const errorText = await response.text();
-      console.error('Error response:', errorText);
-      return res.status(response.status).json({ 
-        error: 'Backend server error',
-        status: response.status,
-        details: errorText
+    // Make the request to the Flask backend
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': authHeader,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(req.body),
       });
+      
+      // Log the raw response status
+      console.log('Response status:', response.status, response.statusText);
+      
+      if (!response.ok) {
+        console.error(`Manual proxy: Flask server returned ${response.status} ${response.statusText}`);
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        return res.status(response.status).json({ 
+          error: 'Backend server error',
+          status: response.status,
+          details: errorText
+        });
+      }
+      
+      const data = await response.json();
+      console.log('Manual proxy: Checkout response received:', data);
+      res.status(response.status).json(data);
+    } catch (fetchError: any) {
+      // Specific error handling for the fetch request
+      console.error('Manual proxy: Fetch error:', fetchError.message);
+      if (fetchError.cause) {
+        console.error('Cause:', fetchError.cause.code, fetchError.cause.message);
+      }
+      throw fetchError;
     }
-    
-    const data = await response.json();
-    console.log('Manual proxy: Checkout response received:', data);
-    res.status(response.status).json(data);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Manual proxy: Error forwarding checkout request', error);
     res.status(500).json({ 
       error: 'Internal server error', 
@@ -116,7 +130,7 @@ app.post('/api/payment/create-checkout-session', async (req, res) => {
   }
 });
 
-// Proxy API requests to Flask backend (except login which we handle manually)
+// Proxy API requests to Flask backend (except login and payment/create-checkout-session which we handle manually)
 app.use('/api', createProxyMiddleware({
   target: `http://localhost:${FLASK_PORT}`,
   changeOrigin: true,
