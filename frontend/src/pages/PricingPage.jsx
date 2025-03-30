@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const PricingPage = () => {
   const [packages, setPackages] = useState([]);
@@ -7,6 +9,160 @@ const PricingPage = () => {
   const [error, setError] = useState('');
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [processingPayment, setProcessingPayment] = useState(false);
+  const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  // Debug environment for troubleshooting
+  useEffect(() => {
+    console.log("React environment:", import.meta.env);
+    console.log("Current axios baseURL:", axios.defaults.baseURL);
+  }, []);
+
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        console.log('Fetching packages from /api/payment/packages');
+        const response = await axios.get('/api/payment/packages');
+        console.log('Packages response:', response.data);
+        setPackages(response.data.packages);
+      } catch (err) {
+        console.error('Error fetching packages:', err);
+        console.error('Error response:', err.response?.data);
+        // Fall back to default packages defined below if the API call fails
+        setError('Using default packages. API error: ' + (err.response?.data?.message || err.message));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPackages();
+  }, []);
+
+  const handlePurchase = async (packageId) => {
+    if (!isAuthenticated) {
+      navigate('/login?redirect=/pricing');
+      return;
+    }
+
+    if (processingPayment) return;
+
+    setProcessingPayment(true);
+    try {
+      // Generate a base URL for success and cancel redirects
+      // Get the full current URL including protocol and host
+      const baseUrl = window.location.origin;
+      
+      // Construct explicit absolute URLs for success and cancel
+      const successUrl = `${baseUrl}/payment-success`;
+      const cancelUrl = `${baseUrl}/pricing`;
+      
+      console.log(`Creating checkout session for package ${packageId}`, {
+        packageId,
+        successUrl,
+        cancelUrl
+      });
+      
+      const token = localStorage.getItem('token');
+      console.log('Using authorization token:', token ? 'Token exists' : 'No token');
+      
+      // IMPORTANT FIX: Use the direct endpoint that works consistently
+      // The issue was that we're not correctly routed to /api/payment/... 
+      // Using /payment/... directly is properly proxied by the server
+      const endpoint = '/payment/create-checkout-session';
+      console.log('Making payment request to endpoint:', endpoint);
+      
+      // Get package details for better debugging
+      const selectedPackage = packages.find(p => p.id === packageId) || 
+                              defaultPackages.find(p => p.id === packageId);
+                              
+      console.log('Selected package details:', selectedPackage);
+      
+      // Include detailed package info in the request to help with debugging
+      const requestData = { 
+        package_id: packageId,
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+        price: selectedPackage?.price || 0,
+        credits: selectedPackage?.credits || 0,
+        is_yearly: false
+      };
+      console.log('With payload:', requestData);
+      
+      const response = await axios.post(
+        endpoint,
+        requestData,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+
+      console.log('Checkout session created:', response.data);
+      
+      // Redirect to Stripe Checkout
+      if (response.data.url) {
+        const checkoutUrl = response.data.url;
+        console.log('Redirecting to Stripe checkout URL:', checkoutUrl);
+        
+        // Store the URL in localStorage in case we need to retry
+        localStorage.setItem('stripeCheckoutUrl', checkoutUrl);
+        
+        // MOST DIRECT METHOD: Redirect to Stripe directly with window.location
+        console.log('DIRECT REDIRECT: Using window.location.href to go to checkout URL');
+        window.location.href = checkoutUrl;
+        
+        /* 
+        // Fallback method - create floating button 
+        // This code is now commented out as we're using direct redirect
+        const checkoutButton = document.createElement('div');
+        checkoutButton.className = 'fixed top-4 right-4 z-50 bg-white shadow-lg rounded-lg p-4 max-w-md';
+        checkoutButton.innerHTML = `
+          <h3 class="text-lg font-bold mb-2">Ready to checkout</h3>
+          <p class="mb-3">Click the button below to open the payment page:</p>
+          <a 
+            href="${checkoutUrl}" 
+            target="_blank"
+            class="inline-block bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded">
+            Open Checkout
+          </a>
+          <button class="ml-2 text-gray-500 hover:text-gray-700" id="close-checkout-prompt">
+            Close
+          </button>
+        `;
+        
+        document.body.appendChild(checkoutButton);
+        
+        // Add event listener to close button
+        document.getElementById('close-checkout-prompt').addEventListener('click', () => {
+          checkoutButton.remove();
+        });
+        
+        // Also try to open the window right away
+        const newWindow = window.open(checkoutUrl, '_blank');
+        */
+        
+        // Show a helpful message
+        setError("Redirecting to payment page...");
+        // We don't reset processing state as we're redirecting away
+      } else {
+        throw new Error('No checkout URL returned from server');
+      }
+    } catch (err) {
+      console.error('Error creating checkout session:', err.response?.data || err.message);
+      const errorDetails = err.response?.data ? JSON.stringify(err.response.data) : err.message;
+      setError(`Payment failed: ${errorDetails}`);
+      setProcessingPayment(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[70vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
+      </div>
+    );
+  }
 
   // Default packages if API fails
   const defaultPackages = [
@@ -36,129 +192,6 @@ const PricingPage = () => {
     }
   ];
 
-  useEffect(() => {
-    const fetchPackages = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get('/payment/packages', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        setPackages(response.data.packages);
-        setLoading(false);
-      } catch (err) {
-        console.error('Error loading packages:', err);
-        setError('Failed to load packages. Please refresh the page to try again.');
-        setLoading(false);
-      }
-    };
-
-    fetchPackages();
-  }, []);
-
-  const handlePurchase = async (packageId) => {
-    // Prevent multiple purchase attempts
-    if (processingPayment) return;
-    
-    setSelectedPackage(packageId);
-    setProcessingPayment(true);
-    setError(''); // Clear any previous errors
-    
-    try {
-      // Get the full current URL including protocol and host
-      const baseUrl = window.location.origin;
-      
-      // Construct explicit absolute URLs for success and cancel
-      const successUrl = `${baseUrl}/payment-success`;
-      const cancelUrl = `${baseUrl}/pricing`;
-      
-      console.log(`Creating checkout session for package ${packageId}`, {
-        packageId,
-        successUrl,
-        cancelUrl
-      });
-      
-      const token = localStorage.getItem('token');
-      console.log('Using authorization token:', token ? 'Token exists' : 'No token');
-      
-      // IMPORTANT FIX: Use the direct endpoint that works consistently
-      // The issue was that we're not correctly routed to /api/payment/... 
-      // Using /payment/... directly is properly proxied by the server
-      const endpoint = '/payment/create-checkout-session';
-      console.log('Making payment request to endpoint:', endpoint);
-      
-      // Get package details for better debugging
-      const selectedPackage = packages.find(p => p.id === packageId) || 
-                              defaultPackages.find(p => p.id === packageId);
-                              
-      console.log('Selected package details:', selectedPackage);
-      
-      // Include only minimal required fields - the server will handle success/cancel URLs
-      const requestData = { 
-        package_id: packageId,
-        price: selectedPackage?.price || 0,
-        credits: selectedPackage?.credits || 0,
-        is_yearly: false
-      };
-      console.log('With payload:', requestData);
-      
-      const response = await axios.post(
-        endpoint,
-        requestData,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
-
-      console.log('Checkout session created:', response.data);
-      
-      // Redirect to Stripe Checkout
-      if (response.data && response.data.url) {
-        const checkoutUrl = response.data.url;
-        console.log('Redirecting to Stripe checkout URL:', checkoutUrl);
-        
-        // Store the URL in localStorage for debugging/retry
-        localStorage.setItem('stripeCheckoutUrl', checkoutUrl);
-        
-        // Set a message to inform the user
-        setError("Redirecting to payment page...");
-        
-        // SIMPLEST APPROACH: Direct page redirect
-        // This is the most reliable approach and avoids issues with popup blockers
-        console.log('USING DIRECT WINDOW.LOCATION REDIRECT');
-        
-        // Show a message briefly before redirecting
-        setError("Redirecting to Stripe checkout...");
-        
-        // Use a very short timeout to ensure the message is seen
-        setTimeout(() => {
-          // This is the key change - direct redirect without any complex logic
-          window.location.href = checkoutUrl;
-        }, 100);
-        
-        // No further code needed - the page will redirect immediately
-      } else {
-        throw new Error('No checkout URL returned from server');
-      }
-    } catch (err) {
-      console.error('Error creating checkout session:', err.response?.data || err.message);
-      const errorDetails = err.response?.data ? JSON.stringify(err.response.data) : err.message;
-      setError(`Payment failed: ${errorDetails}`);
-      setProcessingPayment(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[70vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
-      </div>
-    );
-  }
-
   const displayPackages = packages.length > 0 ? packages : defaultPackages;
 
   return (
@@ -168,11 +201,6 @@ const PricingPage = () => {
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
           Choose the plan that works for you. All plans provide access to our AI-powered background removal tool.
         </p>
-        <div className="mt-4">
-          <a href="/test-stripe-open.html" target="_blank" className="text-sm text-blue-500 hover:underline">
-            Test Stripe Checkout Directly
-          </a>
-        </div>
       </div>
 
       {error && (

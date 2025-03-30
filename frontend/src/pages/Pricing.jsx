@@ -83,7 +83,6 @@ const Pricing = () => {
       // Generate a base URL for success and cancel redirects
       const baseUrl = window.location.origin;
       // Make sure we use absolute URLs with the full domain
-      // Include front slash to ensure we don't get redirected to /undefined
       const successUrl = `${baseUrl}/payment-success`;
       const cancelUrl = `${baseUrl}/pricing`;
       
@@ -95,13 +94,9 @@ const Pricing = () => {
         cancelUrl
       });
       
-      // Use the direct payment endpoint without /api prefix
-      // This matches the backend route which is /payment/create-checkout-session
-      const response = await axios.post('/payment/create-checkout-session', {
+      // FIXED: Use the correct API endpoint with /api prefix
+      const response = await axios.post('/api/payment/create-checkout-session', {
         package_id: planId,
-        price: price,
-        credits: selectedPlan.credits,
-        is_yearly: yearlyBilling,
         success_url: successUrl,
         cancel_url: cancelUrl
       }, {
@@ -115,15 +110,9 @@ const Pricing = () => {
         const checkoutUrl = response.data.url;
         console.log('Redirecting to Stripe checkout URL:', checkoutUrl);
         
-        // Store the URL in localStorage for later use if needed
+        // Store the URL in localStorage in case we need to retry
         localStorage.setItem('stripeCheckoutUrl', checkoutUrl);
         
-        // SIMPLIFY: Immediately redirect the user to Stripe checkout
-        // This is the most reliable approach and avoids popup blockers
-        window.location.href = checkoutUrl;
-        return; // Stop execution here as we're redirecting
-        
-        /* The following code is commented out because we're taking the direct redirect approach
         // Create elements to display the URL and a retry button in case window.open fails
         const stripeUrlMessage = document.createElement('div');
         stripeUrlMessage.innerHTML = `
@@ -140,35 +129,11 @@ const Pricing = () => {
           </div>
         `;
         
-        // First try to open in a new window
+        // Try to open immediately in a new window
         const newWindow = window.open(checkoutUrl, '_blank');
         
-        // If opening a new window fails (popup blockers), we can offer a direct redirect
-        if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-          console.log('Popup blocked, showing manual redirect options');
-          
-          // Show a message with options
-          setError("Popup window was blocked. Please click the 'Open Checkout Page' button below, or we can redirect you directly.");
-          
-          // Create a direct redirect button in addition to the 'Open Checkout Page' button
-          const redirectButton = document.createElement('button');
-          redirectButton.innerHTML = 'Redirect to Checkout';
-          redirectButton.style.cssText = 'display: block; width: 100%; background-color: #6366f1; color: white; padding: 10px 15px; text-decoration: none; border-radius: 4px; margin-top: 10px; border: none; cursor: pointer;';
-          redirectButton.onclick = () => {
-            window.location.href = checkoutUrl;
-          };
-          
-          // Add the direct redirect button to the message
-          setTimeout(() => {
-            const messageContainer = document.querySelector('.bg-red-50.border-l-4');
-            if (messageContainer) {
-              messageContainer.appendChild(redirectButton);
-            }
-          }, 100);
-        } else {
-          // If window opened successfully
-          setError("Stripe checkout page has been opened in a new tab. If you don't see it, please check your popup blocker or use the 'Open Checkout Page' button below.");
-        }
+        // Either way, set a helpful message
+        setError("Stripe checkout page has been opened in a new tab. If you don't see it, please check your popup blocker or use the 'Open Checkout Page' button below.");
         setLoading(false);
         
         // Add the checkout button to the page after the "Get Started" button
@@ -179,7 +144,6 @@ const Pricing = () => {
             targetCard.appendChild(stripeUrlMessage);
           }
         }, 100);
-        */
         
       } else {
         throw new Error('No checkout URL returned from server');

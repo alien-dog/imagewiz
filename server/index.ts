@@ -75,59 +75,13 @@ app.all('/payment/*', (req, res) => {
   
   // For POST to /payment/create-checkout-session, we'll proxy it properly
   if (req.method === 'POST' && (req.url === '/payment/create-checkout-session' || req.url === '/payment/create-checkout')) {
-    console.log('⚠️ WARNING: Direct access to create-checkout endpoint - will forward to Flask backend directly');
-    
-    // Extract the token from the Authorization header
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-      return res.status(401).json({ error: 'No authorization header provided' });
-    }
-    
-    // Get request body
-    const requestBody = req.body;
-    console.log('Request body:', JSON.stringify(requestBody));
-    
-    // Forward to the Flask backend directly
-    fetch(`http://localhost:${FLASK_PORT}/payment/create-checkout-session`, {
-      method: 'POST',
-      headers: {
-        'Authorization': authHeader,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody),
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log('Direct response from Flask backend:', data);
-      
-      // Check if the URL is present and valid
-      if (data && data.url) {
-        try {
-          console.log('Received checkout URL from Flask:', data.url);
-          
-          // SPECIAL HANDLING FOR STRIPE - Direct browser redirect
-          // Simply return the Stripe URL directly to the frontend
-          return res.status(200).json(data);
-        } catch (urlError) {
-          console.error('Error processing checkout URL:', urlError);
-          return res.status(500).json({ error: 'Invalid checkout URL format' });
-        }
-      } else {
-        console.error('No URL in response data from Flask backend');
-        return res.status(500).json({ error: 'No checkout URL in response' });
-      }
-    })
-    .catch(error => {
-      console.error('Error forwarding request to Flask backend:', error);
-      return res.status(500).json({ error: 'Error forwarding request to backend' });
-    });
-    
-    return; // Don't continue with the request
+    console.log('⚠️ WARNING: Direct access to create-checkout-session endpoint - will forward anyway');
+    // Forward to the /api/payment/create-checkout-session endpoint handler
+    return app._router.handle(Object.assign({}, req, {
+      url: '/api/payment/create-checkout-session',
+      originalUrl: '/api/payment/create-checkout-session',
+      baseUrl: '/api'
+    }), res, () => {});
   }
   
   // Return a helpful error message for other endpoints
@@ -283,10 +237,6 @@ app.get('/simple-form.html', (req, res) => {
 
 app.get('/test-stripe-redirect.html', (req, res) => {
   res.sendFile(path.join(__dirname, '../test-stripe-redirect.html'));
-});
-
-app.get('/test-stripe-open.html', (req, res) => {
-  res.sendFile(path.join(__dirname, '../test-stripe-open.html'));
 });
 
 // Catch-all route for SPA - handle all frontend routes
