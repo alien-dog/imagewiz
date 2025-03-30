@@ -1,4 +1,5 @@
-// This is a proxy server that forwards requests to the Flask backend
+// This is a proxy server that forwards API requests to the Flask backend
+// and serves the React frontend for all other routes
 import express from 'express';
 import { spawn } from 'child_process';
 import path from 'path';
@@ -10,6 +11,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3000;
 const FLASK_PORT = 5000;
+
+// Define the frontend dist path
+const FRONTEND_DIST_PATH = path.join(__dirname, '../frontend/dist');
 
 // Enable CORS
 app.use(cors());
@@ -157,78 +161,12 @@ app.post('/api/payment/create-checkout-session', async (req, res) => {
   }
 });
 
-// Make sure to serve frontend routes first before API proxying
+//==========================================================================
+// SERVER CONFIGURATION - ROUTE ORDER IS IMPORTANT
+//==========================================================================
 
-// Root route explicit handler - This ensures the React app loads properly at the root URL
-app.get('/', (req, res) => {
-  console.log('Serving React app root route');
-  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
-});
-
-// Serve static files from the frontend build
-app.use(express.static(path.join(__dirname, '../frontend/dist')));
-
-// Serve test HTML files
-app.get('/test-login.html', (req, res) => {
-  res.sendFile(path.join(__dirname, '../test-login.html'));
-});
-
-app.get('/proxy-test.html', (req, res) => {
-  res.sendFile(path.join(__dirname, '../proxy-test.html'));
-});
-
-app.get('/simple-form.html', (req, res) => {
-  res.sendFile(path.join(__dirname, '../simple-form.html'));
-});
-
-app.get('/test-stripe-redirect.html', (req, res) => {
-  res.sendFile(path.join(__dirname, '../test-stripe-redirect.html'));
-});
-
-app.get('/test-stripe-open.html', (req, res) => {
-  res.sendFile(path.join(__dirname, '../test-stripe-open.html'));
-});
-
-// Now set up the API proxy after frontend routes
-// Proxy API requests to Flask backend (except login and payment/create-checkout-session which we handle manually)
-app.use('/api', createProxyMiddleware({
-  target: `http://localhost:${FLASK_PORT}`,
-  changeOrigin: true,
-  pathRewrite: {
-    '^/api': ''  // Remove '/api' prefix when forwarding
-  },
-  // @ts-ignore - logLevel is a valid option but TypeScript doesn't recognize it
-  logLevel: 'debug',
-  // Handle each request before it's sent to give more debug info
-  onProxyReq: (proxyReq: any, req: any, res: any) => {
-    console.log(`Proxying request: ${req.method} ${req.url} to Flask backend`);
-    console.log(`Target URL: ${proxyReq.path}`);
-    
-    // For debugging authorization headers
-    const authHeader = req.headers.authorization;
-    if (authHeader) {
-      console.log('Authorization header found:', authHeader.substring(0, 20) + '...');
-      // Add authorization header to proxy request
-      proxyReq.setHeader('Authorization', authHeader);
-    } else {
-      console.log('No authorization header found');
-    }
-  }
-}));
-
-// Proxy uploads requests to Flask backend
-app.use('/uploads', createProxyMiddleware({
-  target: `http://localhost:${FLASK_PORT}`,
-  changeOrigin: true
-}));
-
-// Proxy processed requests to Flask backend
-app.use('/processed', createProxyMiddleware({
-  target: `http://localhost:${FLASK_PORT}`,
-  changeOrigin: true
-}));
-
-// Start Flask backend
+// STEP 1: START FLASK BACKEND (before setting up routes so it's available when needed)
+//==========================================================================
 console.log('Starting Flask backend...');
 const backendProcess = spawn('python', ['run.py'], { 
   cwd: path.join(__dirname, '../backend'),
@@ -252,36 +190,96 @@ process.on('SIGINT', () => {
   process.exit(0);
 });
 
-// No duplicate needed - already defined above
+// STEP 2: FRONTEND ROUTES - Must come BEFORE API routes
+//==========================================================================
 
-// Catch-all route for SPA - handle all frontend routes
-app.get('*', (req, res) => {
-  try {
-    console.log(`Serving SPA route: ${req.path}`);
+// EXPLICITLY handle root route to ensure it's ALWAYS served by Express, not forwarded to Flask
+app.get('/', (req, res) => {
+  console.log('🌟 Serving React app root route');
+  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+});
+
+// Serve static files from the frontend build directory
+app.use(express.static(FRONTEND_DIST_PATH));
+
+// Serve test HTML files
+app.get('/test-login.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../test-login.html'));
+});
+
+app.get('/proxy-test.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../proxy-test.html'));
+});
+
+app.get('/simple-form.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../simple-form.html'));
+});
+
+app.get('/test-stripe-redirect.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../test-stripe-redirect.html'));
+});
+
+app.get('/test-stripe-open.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../test-stripe-open.html'));
+});
+
+// STEP 3: BACKEND API PROXYING - Must come AFTER frontend routes
+//==========================================================================
+
+// Proxy API requests (except manually handled ones) to Flask backend
+app.use('/api', createProxyMiddleware({
+  target: `http://localhost:${FLASK_PORT}`,
+  changeOrigin: true,
+  pathRewrite: {
+    '^/api': ''  // Remove '/api' prefix when forwarding
+  },
+  // @ts-ignore - logLevel is a valid option but TypeScript doesn't recognize it
+  logLevel: 'debug',
+  onProxyReq: (proxyReq: any, req: any, res: any) => {
+    console.log(`🔄 Proxying API request: ${req.method} ${req.url} to Flask backend`);
+    console.log(`Target URL: ${proxyReq.path}`);
     
-    // Special handling for payment success/failure routes to ensure they don't get confused
-    // with backend routes
-    if (req.path === '/payment-success' || req.path === '/payment-failure' || 
-        req.path === '/undefined' || req.path.startsWith('/payment')) {
-      console.log(`Handling special frontend route: ${req.path} -> serving index.html`);
-      
-      // For /undefined, also log a detailed warning to help debug
-      if (req.path === '/undefined') {
-        console.warn(`
+    // Forward authorization headers
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+      console.log('Authorization header found:', authHeader.substring(0, 20) + '...');
+      proxyReq.setHeader('Authorization', authHeader);
+    }
+  }
+}));
+
+// Proxy uploads requests to Flask backend
+app.use('/uploads', createProxyMiddleware({
+  target: `http://localhost:${FLASK_PORT}`,
+  changeOrigin: true
+}));
+
+// Proxy processed requests to Flask backend
+app.use('/processed', createProxyMiddleware({
+  target: `http://localhost:${FLASK_PORT}`,
+  changeOrigin: true
+}));
+
+// STEP 4: CATCH-ALL ROUTE - Must be LAST route defined
+//==========================================================================
+app.get('*', (req, res) => {
+  console.log(`🌐 Serving SPA route: ${req.path}`);
+  
+  // Special handling for payment routes
+  if (req.path === '/payment-success' || req.path === '/payment-failure' || 
+      req.path === '/undefined' || req.path.startsWith('/payment')) {
+    console.log(`⚠️ Handling special frontend route: ${req.path} → serving index.html`);
+    
+    if (req.path === '/undefined') {
+      console.warn(`
 !!! IMPORTANT: Redirect to /undefined detected !!!
 This usually happens when a URL parameter is not properly defined in a redirect.
 Check that your success_url and cancel_url parameters in Stripe checkout are correct.
-The current request will be handled by returning index.html to avoid a 404,
-but you should fix the underlying issue.
-        `);
-      }
+      `);
     }
-    
-    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
-  } catch (error) {
-    console.error('Error serving index.html:', error);
-    res.status(500).send('Error serving application');
   }
+  
+  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
 });
 
 // Start the server
