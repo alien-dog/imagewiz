@@ -147,9 +147,17 @@ def create_checkout_session():
         if success_url and '?' not in success_url:
             success_url = f"{success_url}?session_id={{CHECKOUT_SESSION_ID}}"
             
-        # For debugging, print the URLs
-        print(f"Success URL: {success_url}")
-        print(f"Cancel URL: {cancel_url}")
+        # Final sanity check - FORCE replace localhost with Replit URL if detected
+        if 'localhost' in success_url:
+            # Hardcode the app URL to be 100% sure it works
+            replit_url = "https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev"
+            success_url = success_url.replace('http://localhost:5000', replit_url)
+            cancel_url = cancel_url.replace('http://localhost:5000', replit_url)
+            print(f"REPLACED localhost URLs with Replit URL")
+            
+        # For debugging, print the FINAL URLs
+        print(f"FINAL Success URL: {success_url}")
+        print(f"FINAL Cancel URL: {cancel_url}")
         
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
