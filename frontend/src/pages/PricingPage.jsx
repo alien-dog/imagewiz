@@ -38,175 +38,6 @@ const PricingPage = () => {
     fetchPackages();
   }, []);
 
-  const handlePurchase = async (packageId) => {
-    if (!isAuthenticated) {
-      navigate('/login?redirect=/pricing');
-      return;
-    }
-
-    if (processingPayment) return;
-
-    setProcessingPayment(true);
-    try {
-      // Generate a base URL for success and cancel redirects
-      // Get the full current URL including protocol and host
-      const baseUrl = window.location.origin;
-      
-      // Construct explicit absolute URLs for success and cancel
-      const successUrl = `${baseUrl}/payment-success`;
-      const cancelUrl = `${baseUrl}/pricing`;
-      
-      console.log(`Creating checkout session for package ${packageId}`, {
-        packageId,
-        successUrl,
-        cancelUrl
-      });
-      
-      const token = localStorage.getItem('token');
-      console.log('Using authorization token:', token ? 'Token exists' : 'No token');
-      
-      // IMPORTANT FIX: Use the direct endpoint that works consistently
-      // The issue was that we're not correctly routed to /api/payment/... 
-      // Using /payment/... directly is properly proxied by the server
-      const endpoint = '/payment/create-checkout-session';
-      console.log('Making payment request to endpoint:', endpoint);
-      
-      // Get package details for better debugging
-      const selectedPackage = packages.find(p => p.id === packageId) || 
-                              defaultPackages.find(p => p.id === packageId);
-                              
-      console.log('Selected package details:', selectedPackage);
-      
-      // Include detailed package info in the request to help with debugging
-      const requestData = { 
-        package_id: packageId,
-        success_url: successUrl,
-        cancel_url: cancelUrl,
-        price: selectedPackage?.price || 0,
-        credits: selectedPackage?.credits || 0,
-        is_yearly: false
-      };
-      console.log('With payload:', requestData);
-      
-      const response = await axios.post(
-        endpoint,
-        requestData,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
-
-      console.log('Checkout session created:', response.data);
-      
-      // Redirect to Stripe Checkout
-      if (response.data.url) {
-        const checkoutUrl = response.data.url;
-        console.log('Redirecting to Stripe checkout URL:', checkoutUrl);
-        
-        // Store the URL in localStorage for debugging/retry
-        localStorage.setItem('stripeCheckoutUrl', checkoutUrl);
-        
-        // MOST DIRECT METHOD: Open Stripe checkout in a new tab
-        console.log('DIRECT REDIRECT: Using window.open to go to checkout URL');
-        
-        // First try: window.open
-        const newTab = window.open(checkoutUrl, '_blank');
-        
-        // If window.open fails (e.g., due to popup blockers), try a manual approach
-        if (!newTab || newTab.closed || typeof newTab.closed === 'undefined') {
-          console.log('Popup blocked - trying a fallback approach');
-          
-          // Create a message for the user with a link
-          setError("Opening checkout failed. Please click the button below to open the payment page:");
-          
-          // Create a clickable button in the UI
-          const checkoutButton = document.createElement('div');
-          checkoutButton.className = 'fixed top-4 right-4 z-50 bg-white shadow-lg rounded-lg p-4 max-w-md';
-          checkoutButton.innerHTML = `
-            <h3 class="text-lg font-bold mb-2">Ready to checkout</h3>
-            <p class="mb-3">Click the button below to open the payment page:</p>
-            <a 
-              href="${checkoutUrl}" 
-              target="_blank"
-              class="inline-block bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded">
-              Open Checkout
-            </a>
-            <button class="ml-2 text-gray-500 hover:text-gray-700" id="close-checkout-prompt">
-              Close
-            </button>
-          `;
-          
-          document.body.appendChild(checkoutButton);
-          
-          // Add event listener to close button
-          document.getElementById('close-checkout-prompt').addEventListener('click', () => {
-            checkoutButton.remove();
-          });
-          
-          // Also provide a message for the test helper
-          console.log('IMPORTANT: Use test-stripe-open.html to manually open the checkout URL');
-          
-          // Set error state to guide user
-          setProcessingPayment(false);
-        } else {
-          // Success with window.open
-          setError("Opening checkout in a new tab. If you don't see it, check for popup blockers.");
-        }
-        
-        /* 
-        // Fallback method - create floating button 
-        // This code is now commented out as we're using direct redirect
-        const checkoutButton = document.createElement('div');
-        checkoutButton.className = 'fixed top-4 right-4 z-50 bg-white shadow-lg rounded-lg p-4 max-w-md';
-        checkoutButton.innerHTML = `
-          <h3 class="text-lg font-bold mb-2">Ready to checkout</h3>
-          <p class="mb-3">Click the button below to open the payment page:</p>
-          <a 
-            href="${checkoutUrl}" 
-            target="_blank"
-            class="inline-block bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded">
-            Open Checkout
-          </a>
-          <button class="ml-2 text-gray-500 hover:text-gray-700" id="close-checkout-prompt">
-            Close
-          </button>
-        `;
-        
-        document.body.appendChild(checkoutButton);
-        
-        // Add event listener to close button
-        document.getElementById('close-checkout-prompt').addEventListener('click', () => {
-          checkoutButton.remove();
-        });
-        
-        // Also try to open the window right away
-        const newWindow = window.open(checkoutUrl, '_blank');
-        */
-        
-        // Show a helpful message
-        setError("Redirecting to payment page...");
-        // We don't reset processing state as we're redirecting away
-      } else {
-        throw new Error('No checkout URL returned from server');
-      }
-    } catch (err) {
-      console.error('Error creating checkout session:', err.response?.data || err.message);
-      const errorDetails = err.response?.data ? JSON.stringify(err.response.data) : err.message;
-      setError(`Payment failed: ${errorDetails}`);
-      setProcessingPayment(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[70vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
-      </div>
-    );
-  }
-
   // Default packages if API fails
   const defaultPackages = [
     { 
@@ -234,6 +65,97 @@ const PricingPage = () => {
       features: ["500 image processes", "Valid for 365 days", "Premium quality", "Priority support", "Bulk processing"] 
     }
   ];
+
+  const handlePurchase = async (packageId) => {
+    if (!isAuthenticated) {
+      navigate('/login?redirect=/pricing');
+      return;
+    }
+
+    if (processingPayment) return;
+
+    setProcessingPayment(true);
+    try {
+      // Generate a base URL for success and cancel redirects
+      const baseUrl = window.location.origin;
+      
+      // Construct explicit absolute URLs for success and cancel
+      const successUrl = `${baseUrl}/payment-success`;
+      const cancelUrl = `${baseUrl}/pricing`;
+      
+      console.log(`Creating checkout session for package ${packageId}`, {
+        packageId,
+        successUrl,
+        cancelUrl
+      });
+      
+      const token = localStorage.getItem('token');
+      console.log('Using authorization token:', token ? 'Token exists' : 'No token');
+      
+      // Use /api prefix for the endpoint
+      const endpoint = '/api/payment/create-checkout-session';
+      
+      // Get package details for better debugging
+      const selectedPackage = packages.find(p => p.id === packageId) || 
+                             defaultPackages.find(p => p.id === packageId);
+                              
+      console.log('Selected package details:', selectedPackage);
+      
+      // Include package info in the request
+      const requestData = { 
+        package_id: packageId,
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+        price: selectedPackage?.price || 0,
+        credits: selectedPackage?.credits || 0,
+        is_yearly: false
+      };
+      
+      console.log('Making checkout request to:', endpoint);
+      console.log('Request data:', requestData);
+      
+      const response = await axios.post(
+        endpoint,
+        requestData,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      
+      console.log('Checkout response received:', response);
+      
+      if (response.data && response.data.url) {
+        // Success - we have a checkout URL
+        const checkoutUrl = response.data.url;
+        console.log('Redirecting to Stripe checkout URL:', checkoutUrl);
+        
+        // Store the URL in localStorage for debugging
+        localStorage.setItem('stripeCheckoutUrl', checkoutUrl);
+        
+        // DIRECT REDIRECT to Stripe
+        window.location.href = checkoutUrl;
+      } else {
+        console.error('No checkout URL in response:', response.data);
+        setError('Payment failed: No checkout URL returned from server');
+        setProcessingPayment(false);
+      }
+    } catch (err) {
+      console.error('Error creating checkout session:', err);
+      const errorDetails = err.response?.data ? JSON.stringify(err.response.data) : err.message;
+      setError(`Payment failed: ${errorDetails}`);
+      setProcessingPayment(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[70vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
+      </div>
+    );
+  }
 
   const displayPackages = packages.length > 0 ? packages : defaultPackages;
 

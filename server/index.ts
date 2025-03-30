@@ -191,9 +191,29 @@ app.post('/api/payment/create-checkout-session', async (req, res) => {
         });
       }
       
-      const data = await response.json();
-      console.log('✅ Manual proxy: Checkout response received:', data);
-      res.status(response.status).json(data);
+      try {
+        const data = await response.json();
+        console.log('✅ Manual proxy: Checkout response received:', JSON.stringify(data, null, 2));
+        
+        // CRITICAL FIX: Ensure we have the URL in the response
+        if (!data.url) {
+          console.error('❌ ERROR: Stripe checkout session created but no URL returned');
+          return res.status(500).json({
+            error: 'Stripe checkout URL missing',
+            message: 'The payment session was created but no URL was returned',
+            data: data 
+          });
+        }
+        
+        // Success! Return the response with URL to the client
+        console.log('✅ SUCCESS: Returning Stripe checkout URL to client:', data.url);
+        return res.status(response.status).json(data);
+      } catch (jsonError: any) {
+        console.error('❌ Manual proxy: Error parsing JSON response:', jsonError.message);
+        const rawText = await response.text();
+        console.error('Raw response text:', rawText.substring(0, 500) + (rawText.length > 500 ? '...' : ''));
+        throw new Error(`Failed to parse JSON response: ${jsonError.message}`);
+      }
     } catch (fetchError: any) {
       // Specific error handling for the fetch request
       console.error('❌ Manual proxy: Fetch error:', fetchError.message);
