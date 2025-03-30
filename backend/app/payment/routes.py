@@ -101,9 +101,10 @@ def create_checkout_session():
                 forwarded_proto = request.headers.get('X-Forwarded-Proto', 'https')
                 success_url = f"{forwarded_proto}://{forwarded_host}/payment-success"
             else:
-                # Absolute last resort - just build a URL from the host/port
-                # Not ideal but better than localhost
-                success_url = f"https://{host}/payment-success"
+                # Absolute last resort - use the request url itself
+                # Get the current domain from the request
+                current_domain = request.url_root.rstrip('/')
+                success_url = f"{current_domain}/payment-success"
             
         print(f"No success_url provided, using default: {success_url}")
     
@@ -130,9 +131,10 @@ def create_checkout_session():
                 forwarded_proto = request.headers.get('X-Forwarded-Proto', 'https')
                 cancel_url = f"{forwarded_proto}://{forwarded_host}/pricing"
             else:
-                # Absolute last resort - just build a URL from the host/port
-                # Not ideal but better than localhost
-                cancel_url = f"https://{host}/pricing"
+                # Absolute last resort - use the request url itself
+                # Get the current domain from the request
+                current_domain = request.url_root.rstrip('/')
+                cancel_url = f"{current_domain}/pricing"
             
         print(f"No cancel_url provided, using default: {cancel_url}")
     

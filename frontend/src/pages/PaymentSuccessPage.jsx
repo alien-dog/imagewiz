@@ -39,7 +39,7 @@ const PaymentSuccessPage = () => {
 
         console.log(`Verifying payment for session ${sessionId}`);
         const response = await axios.get(
-          `/api/payment/verify?session_id=${sessionId}`,
+          `/payment/verify?session_id=${sessionId}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`
