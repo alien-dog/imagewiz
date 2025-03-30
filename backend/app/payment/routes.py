@@ -82,28 +82,14 @@ def create_checkout_session():
         # We need to ensure we're using the frontend URL, not the backend URL
         host = request.headers.get('Host', 'localhost')
         origin = request.headers.get('Origin')
-        referer = request.headers.get('Referer')
         
         # Use origin if available (which should include the protocol)
         if origin:
             success_url = f"{origin}/payment-success"
-        elif referer:
-            # Extract origin from referer
-            from urllib.parse import urlparse
-            parsed_referer = urlparse(referer)
-            base_url = f"{parsed_referer.scheme}://{parsed_referer.netloc}"
-            success_url = f"{base_url}/payment-success"
         else:
-            # Fallback to determine the actual frontend URL
-            # Check X-Forwarded headers which should be set by the proxy
-            if 'X-Forwarded-Host' in request.headers:
-                forwarded_host = request.headers.get('X-Forwarded-Host')
-                forwarded_proto = request.headers.get('X-Forwarded-Proto', 'https')
-                success_url = f"{forwarded_proto}://{forwarded_host}/payment-success"
-            else:
-                # Absolute last resort - just build a URL from the host/port
-                # Not ideal but better than localhost
-                success_url = f"https://{host}/payment-success"
+            # Fallback to host with https
+            forwarded_proto = request.headers.get('X-Forwarded-Proto', 'https')
+            success_url = f"{forwarded_proto}://{host}/payment-success"
             
         print(f"No success_url provided, using default: {success_url}")
     
@@ -111,28 +97,14 @@ def create_checkout_session():
         # Get the origin from request headers or use the host directly
         host = request.headers.get('Host', 'localhost')
         origin = request.headers.get('Origin')
-        referer = request.headers.get('Referer')
         
         # Use origin if available (which should include the protocol)
         if origin:
             cancel_url = f"{origin}/pricing"
-        elif referer:
-            # Extract origin from referer
-            from urllib.parse import urlparse
-            parsed_referer = urlparse(referer)
-            base_url = f"{parsed_referer.scheme}://{parsed_referer.netloc}"
-            cancel_url = f"{base_url}/pricing"
         else:
-            # Fallback to determine the actual frontend URL
-            # Check X-Forwarded headers which should be set by the proxy
-            if 'X-Forwarded-Host' in request.headers:
-                forwarded_host = request.headers.get('X-Forwarded-Host')
-                forwarded_proto = request.headers.get('X-Forwarded-Proto', 'https')
-                cancel_url = f"{forwarded_proto}://{forwarded_host}/pricing"
-            else:
-                # Absolute last resort - just build a URL from the host/port
-                # Not ideal but better than localhost
-                cancel_url = f"https://{host}/pricing"
+            # Fallback to host with https
+            forwarded_proto = request.headers.get('X-Forwarded-Proto', 'https')
+            cancel_url = f"{forwarded_proto}://{host}/pricing"
             
         print(f"No cancel_url provided, using default: {cancel_url}")
     
