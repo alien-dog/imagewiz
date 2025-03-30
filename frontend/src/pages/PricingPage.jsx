@@ -49,7 +49,10 @@ const PricingPage = () => {
     setProcessingPayment(true);
     try {
       // Generate a base URL for success and cancel redirects
+      // Get the full current URL including protocol and host
       const baseUrl = window.location.origin;
+      
+      // Construct explicit absolute URLs for success and cancel
       const successUrl = `${baseUrl}/payment-success`;
       const cancelUrl = `${baseUrl}/pricing`;
       
@@ -66,10 +69,20 @@ const PricingPage = () => {
       const endpoint = '/api/payment/create-checkout-session';
       console.log('Making payment request to endpoint:', endpoint);
       
+      // Get package details for better debugging
+      const selectedPackage = packages.find(p => p.id === packageId) || 
+                              defaultPackages.find(p => p.id === packageId);
+                              
+      console.log('Selected package details:', selectedPackage);
+      
+      // Include detailed package info in the request to help with debugging
       const requestData = { 
         package_id: packageId,
         success_url: successUrl,
-        cancel_url: cancelUrl
+        cancel_url: cancelUrl,
+        price: selectedPackage?.price || 0,
+        credits: selectedPackage?.credits || 0,
+        is_yearly: false
       };
       console.log('With payload:', requestData);
       

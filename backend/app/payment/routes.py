@@ -76,6 +76,19 @@ def create_checkout_session():
     print(f"Creating checkout session for user {user.id}, package {package_id}")
     print(f"Success URL: {success_url}, Cancel URL: {cancel_url}")
     
+    # If success_url or cancel_url are not provided, use default URLs based on request origin
+    if not success_url:
+        # Get the origin from request headers or use the host directly
+        origin = request.headers.get('Origin', f"https://{request.host}")
+        success_url = f"{origin}/payment-success"
+        print(f"No success_url provided, using default: {success_url}")
+    
+    if not cancel_url:
+        # Get the origin from request headers or use the host directly
+        origin = request.headers.get('Origin', f"https://{request.host}")
+        cancel_url = f"{origin}/pricing"
+        print(f"No cancel_url provided, using default: {cancel_url}")
+    
     # Find the selected package
     package = next((p for p in CREDIT_PACKAGES if p['id'] == package_id), None)
     if not package:

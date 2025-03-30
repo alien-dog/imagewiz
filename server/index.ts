@@ -239,9 +239,18 @@ app.get('/test-stripe-redirect.html', (req, res) => {
   res.sendFile(path.join(__dirname, '../test-stripe-redirect.html'));
 });
 
-// Catch-all route for SPA
+// Catch-all route for SPA - handle all frontend routes
 app.get('*', (req, res) => {
   try {
+    console.log(`Serving SPA route: ${req.path}`);
+    
+    // Special handling for payment success/failure routes to ensure they don't get confused
+    // with backend routes
+    if (req.path === '/payment-success' || req.path === '/payment-failure' || 
+        req.path === '/undefined' || req.path.startsWith('/payment')) {
+      console.log(`Handling special frontend route: ${req.path} -> serving index.html`);
+    }
+    
     res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
   } catch (error) {
     console.error('Error serving index.html:', error);
