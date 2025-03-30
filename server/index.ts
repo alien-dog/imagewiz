@@ -157,6 +157,32 @@ app.post('/api/payment/create-checkout-session', async (req, res) => {
   }
 });
 
+// Make sure frontend routes are served first before we set up API proxying
+// Serve static files from the frontend build
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+// Serve test HTML files
+app.get('/test-login.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../test-login.html'));
+});
+
+app.get('/proxy-test.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../proxy-test.html'));
+});
+
+app.get('/simple-form.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../simple-form.html'));
+});
+
+app.get('/test-stripe-redirect.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../test-stripe-redirect.html'));
+});
+
+app.get('/test-stripe-open.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../test-stripe-open.html'));
+});
+
+// Now set up the API proxy after frontend routes
 // Proxy API requests to Flask backend (except login and payment/create-checkout-session which we handle manually)
 app.use('/api', createProxyMiddleware({
   target: `http://localhost:${FLASK_PORT}`,
@@ -219,29 +245,7 @@ process.on('SIGINT', () => {
   process.exit(0);
 });
 
-// Serve frontend files from dist directory
-app.use(express.static(path.join(__dirname, '../frontend/dist')));
-
-// Serve test HTML files
-app.get('/test-login.html', (req, res) => {
-  res.sendFile(path.join(__dirname, '../test-login.html'));
-});
-
-app.get('/proxy-test.html', (req, res) => {
-  res.sendFile(path.join(__dirname, '../proxy-test.html'));
-});
-
-app.get('/simple-form.html', (req, res) => {
-  res.sendFile(path.join(__dirname, '../simple-form.html'));
-});
-
-app.get('/test-stripe-redirect.html', (req, res) => {
-  res.sendFile(path.join(__dirname, '../test-stripe-redirect.html'));
-});
-
-app.get('/test-stripe-open.html', (req, res) => {
-  res.sendFile(path.join(__dirname, '../test-stripe-open.html'));
-});
+// No duplicate needed - already defined above
 
 // Catch-all route for SPA - handle all frontend routes
 app.get('*', (req, res) => {
