@@ -1,0 +1,15 @@
+{
+  "id": "evt_test_1234567890",
+  "type": "checkout.session.completed",
+  "data": {
+    "object": {
+      "id": "cs_test_a18XH5OUSlaNjfb9UlHwTgErD9CCFWO5J0xuMEyK0OPY5agKMAlpKzf4FZ",
+      "metadata": {
+        "user_id": "2",
+        "package_id": "basic",
+        "credits": "50",
+        "price": "5.99"
+      }
+    }
+  }
+}
