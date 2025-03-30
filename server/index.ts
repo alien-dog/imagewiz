@@ -17,7 +17,28 @@ app.use(cors());
 // Parse JSON request bodies
 app.use(express.json());
 
-// Proxy API requests to Flask backend
+// Add a manual proxy endpoint for auth
+app.post('/api/auth/login', async (req, res) => {
+  console.log('Manual proxy: Received login request');
+  try {
+    const response = await fetch(`http://localhost:${FLASK_PORT}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(req.body),
+    });
+    
+    const data = await response.json();
+    console.log('Manual proxy: Login response received');
+    res.status(response.status).json(data);
+  } catch (error) {
+    console.error('Manual proxy: Error forwarding login request', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Proxy API requests to Flask backend (except login which we handle manually)
 app.use('/api', createProxyMiddleware({
   target: `http://localhost:${FLASK_PORT}`,
   changeOrigin: true,
