@@ -76,67 +76,65 @@ def create_checkout_session():
     print(f"Creating checkout session for user {user.id}, package {package_id}")
     print(f"Success URL: {success_url}, Cancel URL: {cancel_url}")
     
-    # If success_url or cancel_url are not provided, use default URLs based on request origin
-    if not success_url:
-        # Get the origin from request headers or use the host directly
-        # We need to ensure we're using the frontend URL, not the backend URL
-        host = request.headers.get('Host', 'localhost')
-        origin = request.headers.get('Origin')
-        referer = request.headers.get('Referer')
+    # ROBUST URL DETECTION: Get the base URL from different sources
+    base_url = None
+    
+    # Get from X-Forwarded-* headers (best for proxied environments like Replit)
+    if 'X-Forwarded-Host' in request.headers:
+        forwarded_host = request.headers.get('X-Forwarded-Host')
+        forwarded_proto = request.headers.get('X-Forwarded-Proto', 'https')
+        base_url = f"{forwarded_proto}://{forwarded_host}"
+        print(f"Using base URL from X-Forwarded headers: {base_url}")
         
-        # Use origin if available (which should include the protocol)
-        if origin:
-            success_url = f"{origin}/payment-success"
-        elif referer:
-            # Extract origin from referer
-            from urllib.parse import urlparse
-            parsed_referer = urlparse(referer)
-            base_url = f"{parsed_referer.scheme}://{parsed_referer.netloc}"
-            success_url = f"{base_url}/payment-success"
+    # Get from Origin header
+    if not base_url and request.headers.get('Origin'):
+        base_url = request.headers.get('Origin')
+        print(f"Using base URL from Origin header: {base_url}")
+        
+    # Get from Referer header 
+    if not base_url and request.headers.get('Referer'):
+        from urllib.parse import urlparse
+        parsed_referer = urlparse(request.headers.get('Referer'))
+        base_url = f"{parsed_referer.scheme}://{parsed_referer.netloc}"
+        print(f"Using base URL from Referer header: {base_url}")
+    
+    # Get from Host header (not reliable with proxies)
+    if not base_url and request.headers.get('Host'):
+        host = request.headers.get('Host')
+        # Make educated guess about protocol
+        proto = 'https' if 'replit' in host else 'http'
+        base_url = f"{proto}://{host}"
+        print(f"Using base URL from Host header: {base_url}")
+    
+    # Absolute last resort
+    if not base_url:
+        # In Replit, try to construct a URL from the request
+        # Use the actual URL that called this endpoint
+        actual_host = request.host_url.rstrip('/')
+        if 'localhost' not in actual_host:
+            base_url = actual_host
         else:
-            # Fallback to determine the actual frontend URL
-            # Check X-Forwarded headers which should be set by the proxy
-            if 'X-Forwarded-Host' in request.headers:
-                forwarded_host = request.headers.get('X-Forwarded-Host')
-                forwarded_proto = request.headers.get('X-Forwarded-Proto', 'https')
-                success_url = f"{forwarded_proto}://{forwarded_host}/payment-success"
+            # Hardcode the Replit URL format as a last resort
+            # This is better than using localhost:5000 which will never work for the browser
+            replit_domain = os.environ.get('REPL_SLUG')
+            replit_owner = os.environ.get('REPL_OWNER')
+            if replit_domain and replit_owner:
+                base_url = f"https://{replit_domain}.{replit_owner}.repl.co"
             else:
-                # Absolute last resort - use the request url itself
-                # Get the current domain from the request
-                current_domain = request.url_root.rstrip('/')
-                success_url = f"{current_domain}/payment-success"
-            
-        print(f"No success_url provided, using default: {success_url}")
+                # Use a default external URL if we can't detect anything else
+                # This is the Replit URL for this project
+                base_url = "https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev"
+        
+        print(f"Using fallback base URL: {base_url}")
+    
+    # Now set the success and cancel URLs based on the detected base URL
+    if not success_url:
+        success_url = f"{base_url}/payment-success"
+        print(f"No success_url provided, using: {success_url}")
     
     if not cancel_url:
-        # Get the origin from request headers or use the host directly
-        host = request.headers.get('Host', 'localhost')
-        origin = request.headers.get('Origin')
-        referer = request.headers.get('Referer')
-        
-        # Use origin if available (which should include the protocol)
-        if origin:
-            cancel_url = f"{origin}/pricing"
-        elif referer:
-            # Extract origin from referer
-            from urllib.parse import urlparse
-            parsed_referer = urlparse(referer)
-            base_url = f"{parsed_referer.scheme}://{parsed_referer.netloc}"
-            cancel_url = f"{base_url}/pricing"
-        else:
-            # Fallback to determine the actual frontend URL
-            # Check X-Forwarded headers which should be set by the proxy
-            if 'X-Forwarded-Host' in request.headers:
-                forwarded_host = request.headers.get('X-Forwarded-Host')
-                forwarded_proto = request.headers.get('X-Forwarded-Proto', 'https')
-                cancel_url = f"{forwarded_proto}://{forwarded_host}/pricing"
-            else:
-                # Absolute last resort - use the request url itself
-                # Get the current domain from the request
-                current_domain = request.url_root.rstrip('/')
-                cancel_url = f"{current_domain}/pricing"
-            
-        print(f"No cancel_url provided, using default: {cancel_url}")
+        cancel_url = f"{base_url}/pricing"
+        print(f"No cancel_url provided, using: {cancel_url}")
     
     # Find the selected package
     package = next((p for p in CREDIT_PACKAGES if p['id'] == package_id), None)

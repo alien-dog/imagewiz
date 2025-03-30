@@ -126,86 +126,20 @@ const PricingPage = () => {
         // Set a message to inform the user
         setError("Redirecting to payment page...");
         
-        // APPROACH 1: Try window.open in a new tab first (this is more reliable)
-        try {
-          console.log('1. TRYING WINDOW.OPEN IN NEW TAB');
-          const newTab = window.open(checkoutUrl, '_blank');
-          
-          if (newTab && !newTab.closed) {
-            console.log('Window.open success!');
-            setError("Payment page opened in a new tab. If you don't see it, please check your popup blocker.");
-            setProcessingPayment(false);
-            return; // Exit on success
-          } else {
-            console.log('Window may have been blocked by popup blocker');
-          }
-        } catch (e) {
-          console.error('window.open failed:', e);
-        }
+        // SIMPLEST APPROACH: Direct page redirect
+        // This is the most reliable approach and avoids issues with popup blockers
+        console.log('USING DIRECT WINDOW.LOCATION REDIRECT');
         
-        // APPROACH 2: If new tab didn't work, try direct navigation
-        try {
-          console.log('2. TRYING DIRECT WINDOW.LOCATION REDIRECT');
-          // Use setTimeout to ensure the user sees the message briefly
-          setError("Redirecting to Stripe checkout...");
-          setTimeout(() => {
-            window.location.href = checkoutUrl;
-          }, 500);
-          return; // Exit and let the redirect happen
-        } catch (e) {
-          console.error('window.location.href redirect failed:', e);
-        }
+        // Show a message briefly before redirecting
+        setError("Redirecting to Stripe checkout...");
         
-        // APPROACH 3: Create a visible button for the user
-        console.log('3. CREATING MANUAL CHECKOUT BUTTON');
+        // Use a very short timeout to ensure the message is seen
+        setTimeout(() => {
+          // This is the key change - direct redirect without any complex logic
+          window.location.href = checkoutUrl;
+        }, 100);
         
-        // Show clear message to user
-        setError("Please click the button below to open the payment page:");
-        
-        // Create a prominent checkout button in the center of the screen
-        const checkoutButton = document.createElement('div');
-        checkoutButton.className = 'fixed top-0 left-0 w-full h-full flex items-center justify-center z-50 bg-black bg-opacity-50';
-        
-        // Create the modal content
-        const modalContent = document.createElement('div');
-        modalContent.className = 'bg-white shadow-2xl rounded-lg p-8 max-w-md text-center relative';
-        
-        modalContent.innerHTML = `
-          <h3 class="text-2xl font-bold mb-4">Your Payment is Ready</h3>
-          <p class="mb-6 text-gray-600">Click the button below to proceed to Stripe's secure checkout page:</p>
-          <div class="mb-6">
-            <a 
-              href="${checkoutUrl}" 
-              target="_blank"
-              class="block w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-4 px-6 rounded-lg text-lg transition-colors">
-              Proceed to Checkout
-            </a>
-          </div>
-          <div class="text-sm text-gray-600 mb-3 mt-6 pt-4 border-t border-gray-200">
-            If the button doesn't work, copy this link and paste it into your browser:
-          </div>
-          <div class="bg-gray-100 p-3 rounded mb-6 break-all text-left">
-            <code class="text-xs select-all">${checkoutUrl}</code>
-          </div>
-          <button class="absolute top-3 right-3 text-gray-400 hover:text-gray-600" id="close-checkout-prompt">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-        `;
-        
-        checkoutButton.appendChild(modalContent);
-        
-        document.body.appendChild(checkoutButton);
-        
-        // Add event listener to close button
-        document.getElementById('close-checkout-prompt').addEventListener('click', () => {
-          checkoutButton.remove();
-        });
-        
-        // Reset the processing state so user can try again if needed
-        setProcessingPayment(false);
+        // No further code needed - the page will redirect immediately
       } else {
         throw new Error('No checkout URL returned from server');
       }
