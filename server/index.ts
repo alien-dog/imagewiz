@@ -157,7 +157,14 @@ app.post('/api/payment/create-checkout-session', async (req, res) => {
   }
 });
 
-// Make sure frontend routes are served first before we set up API proxying
+// Make sure to serve frontend routes first before API proxying
+
+// Root route explicit handler - This ensures the React app loads properly at the root URL
+app.get('/', (req, res) => {
+  console.log('Serving React app root route');
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+});
+
 // Serve static files from the frontend build
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
