@@ -90,8 +90,16 @@ const PricingPage = () => {
         const checkoutUrl = response.data.url;
         console.log('Redirecting to Stripe checkout URL:', checkoutUrl);
         
-        // Use window.location.assign for better browser compatibility
-        window.location.assign(checkoutUrl);
+        // Add a small delay before redirecting to ensure the browser has time to process
+        setTimeout(() => {
+          // Force redirect to the Stripe checkout page in a new tab
+          window.open(checkoutUrl, '_blank');
+          
+          // Fallback in case popup is blocked
+          setTimeout(() => {
+            window.location.href = checkoutUrl;
+          }, 500);
+        }, 100);
       } else {
         throw new Error('No checkout URL returned from server');
       }
