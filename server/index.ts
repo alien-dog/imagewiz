@@ -66,6 +66,36 @@ app.get('/api/auth/user', async (req, res) => {
   }
 });
 
+// Add a manual proxy endpoint for payment checkout
+app.post('/api/payment/create-checkout-session', async (req, res) => {
+  console.log('Manual proxy: Received create-checkout-session request');
+  try {
+    // Extract the token from the Authorization header
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ error: 'No authorization header provided' });
+    }
+    
+    console.log('Manual proxy: Forwarding checkout request with auth header:', authHeader.substring(0, 20) + '...');
+    
+    const response = await fetch(`http://localhost:${FLASK_PORT}/payment/create-checkout-session`, {
+      method: 'POST',
+      headers: {
+        'Authorization': authHeader,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(req.body),
+    });
+    
+    const data = await response.json();
+    console.log('Manual proxy: Checkout response received:', data);
+    res.status(response.status).json(data);
+  } catch (error) {
+    console.error('Manual proxy: Error forwarding checkout request', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Proxy API requests to Flask backend (except login which we handle manually)
 app.use('/api', createProxyMiddleware({
   target: `http://localhost:${FLASK_PORT}`,
@@ -79,6 +109,16 @@ app.use('/api', createProxyMiddleware({
   onProxyReq: (proxyReq: any, req: any, res: any) => {
     console.log(`Proxying request: ${req.method} ${req.url} to Flask backend`);
     console.log(`Target URL: ${proxyReq.path}`);
+    
+    // For debugging authorization headers
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+      console.log('Authorization header found:', authHeader.substring(0, 20) + '...');
+      // Add authorization header to proxy request
+      proxyReq.setHeader('Authorization', authHeader);
+    } else {
+      console.log('No authorization header found');
+    }
   }
 }));
 

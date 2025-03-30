@@ -99,10 +99,10 @@ const PaymentSuccessPage = () => {
                 Go to Dashboard
               </button>
               <button 
-                onClick={() => navigate('/history')} 
+                onClick={() => navigate('/payment-history')} 
                 className="bg-gray-200 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-300"
               >
-                View History
+                View Payment History
               </button>
             </div>
           </div>

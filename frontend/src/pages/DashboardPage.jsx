@@ -79,9 +79,15 @@ const DashboardPage = () => {
             </Link>
             <Link 
               to="/history" 
-              className="ml-4 text-white border border-white px-4 py-2 rounded font-medium hover:bg-teal-600 transition-colors inline-block"
+              className="ml-2 text-white border border-white px-4 py-2 rounded font-medium hover:bg-teal-600 transition-colors inline-block"
             >
-              View History
+              Processing History
+            </Link>
+            <Link 
+              to="/payment-history" 
+              className="ml-2 text-white border border-white px-4 py-2 rounded font-medium hover:bg-teal-600 transition-colors inline-block"
+            >
+              Payment History
             </Link>
           </div>
         </div>

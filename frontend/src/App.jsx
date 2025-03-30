@@ -12,6 +12,7 @@ import HistoryPage from './pages/HistoryPage';
 import HistoryDetailPage from './pages/HistoryDetailPage';
 import PricingPage from './pages/PricingPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
+import PaymentHistoryPage from './pages/PaymentHistoryPage';
 import Profile from './pages/Profile';
 import NotFound from './pages/NotFound';
 
@@ -81,6 +82,14 @@ const AppContent = () => {
               element={
                 <ProtectedRoute>
                   <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/payment-history"
+              element={
+                <ProtectedRoute>
+                  <PaymentHistoryPage />
                 </ProtectedRoute>
               }
             />
