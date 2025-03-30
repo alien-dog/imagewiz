@@ -7,6 +7,9 @@ from app.models.models import User, RechargeHistory
 from app import db
 from . import bp
 
+# Initialize Stripe with the API key
+stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
+
 # Credit package options
 CREDIT_PACKAGES = [
     {
