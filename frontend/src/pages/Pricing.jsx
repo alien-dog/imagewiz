@@ -115,9 +115,15 @@ const Pricing = () => {
         const checkoutUrl = response.data.url;
         console.log('Redirecting to Stripe checkout URL:', checkoutUrl);
         
-        // Store the URL in localStorage in case we need to retry
+        // Store the URL in localStorage for later use if needed
         localStorage.setItem('stripeCheckoutUrl', checkoutUrl);
         
+        // SIMPLIFY: Immediately redirect the user to Stripe checkout
+        // This is the most reliable approach and avoids popup blockers
+        window.location.href = checkoutUrl;
+        return; // Stop execution here as we're redirecting
+        
+        /* The following code is commented out because we're taking the direct redirect approach
         // Create elements to display the URL and a retry button in case window.open fails
         const stripeUrlMessage = document.createElement('div');
         stripeUrlMessage.innerHTML = `
@@ -173,6 +179,7 @@ const Pricing = () => {
             targetCard.appendChild(stripeUrlMessage);
           }
         }, 100);
+        */
         
       } else {
         throw new Error('No checkout URL returned from server');

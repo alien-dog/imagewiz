@@ -75,13 +75,44 @@ app.all('/payment/*', (req, res) => {
   
   // For POST to /payment/create-checkout-session, we'll proxy it properly
   if (req.method === 'POST' && (req.url === '/payment/create-checkout-session' || req.url === '/payment/create-checkout')) {
-    console.log('⚠️ WARNING: Direct access to create-checkout-session endpoint - will forward anyway');
-    // Forward to the /api/payment/create-checkout-session endpoint handler
-    return app._router.handle(Object.assign({}, req, {
-      url: '/api/payment/create-checkout-session',
-      originalUrl: '/api/payment/create-checkout-session',
-      baseUrl: '/api'
-    }), res, () => {});
+    console.log('⚠️ WARNING: Direct access to create-checkout endpoint - will forward to Flask backend directly');
+    
+    // Extract the token from the Authorization header
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ error: 'No authorization header provided' });
+    }
+    
+    // Get request body
+    const requestBody = req.body;
+    console.log('Request body:', JSON.stringify(requestBody));
+    
+    // Forward to the Flask backend directly
+    fetch(`http://localhost:${FLASK_PORT}/payment/create-checkout-session`, {
+      method: 'POST',
+      headers: {
+        'Authorization': authHeader,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Direct response from Flask backend:', data);
+      // Return the response directly to the client
+      return res.status(200).json(data);
+    })
+    .catch(error => {
+      console.error('Error forwarding request to Flask backend:', error);
+      return res.status(500).json({ error: 'Error forwarding request to backend' });
+    });
+    
+    return; // Don't continue with the request
   }
   
   // Return a helpful error message for other endpoints
