@@ -66,13 +66,29 @@ app.get('/api/auth/user', async (req, res) => {
   }
 });
 
+// Capture any direct requests to payment endpoints (which should go through the proxy)
+app.all('/payment/*', (req, res) => {
+  console.log('⚠️ DIRECT ACCESS ATTEMPT: Client tried to access backend directly at:', req.url);
+  console.log('Method:', req.method);
+  console.log('Headers:', JSON.stringify(req.headers));
+  console.log('This request should go through the /api proxy instead');
+  
+  // Return a helpful error message
+  return res.status(404).json({
+    error: 'Incorrect URL path',
+    message: 'Please use the /api prefix for all API requests',
+    correctPath: `/api${req.url}`
+  });
+});
+
 // Add a manual proxy endpoint for payment checkout
 app.post('/api/payment/create-checkout-session', async (req, res) => {
-  console.log('Manual proxy: Received create-checkout-session request');
+  console.log('✅ Manual proxy: Received create-checkout-session request');
   try {
     // Extract the token from the Authorization header
     const authHeader = req.headers.authorization;
     if (!authHeader) {
+      console.log('❌ Error: No authorization header provided');
       return res.status(401).json({ error: 'No authorization header provided' });
     }
     
@@ -99,7 +115,7 @@ app.post('/api/payment/create-checkout-session', async (req, res) => {
       console.log('Response status:', response.status, response.statusText);
       
       if (!response.ok) {
-        console.error(`Manual proxy: Flask server returned ${response.status} ${response.statusText}`);
+        console.error(`❌ Manual proxy: Flask server returned ${response.status} ${response.statusText}`);
         const errorText = await response.text();
         console.error('Error response:', errorText);
         return res.status(response.status).json({ 
@@ -110,18 +126,18 @@ app.post('/api/payment/create-checkout-session', async (req, res) => {
       }
       
       const data = await response.json();
-      console.log('Manual proxy: Checkout response received:', data);
+      console.log('✅ Manual proxy: Checkout response received:', data);
       res.status(response.status).json(data);
     } catch (fetchError: any) {
       // Specific error handling for the fetch request
-      console.error('Manual proxy: Fetch error:', fetchError.message);
+      console.error('❌ Manual proxy: Fetch error:', fetchError.message);
       if (fetchError.cause) {
         console.error('Cause:', fetchError.cause.code, fetchError.cause.message);
       }
       throw fetchError;
     }
   } catch (error: any) {
-    console.error('Manual proxy: Error forwarding checkout request', error);
+    console.error('❌ Manual proxy: Error forwarding checkout request', error);
     res.status(500).json({ 
       error: 'Internal server error', 
       message: error.message,

@@ -56,13 +56,20 @@ const PricingPage = () => {
       const token = localStorage.getItem('token');
       console.log('Using authorization token:', token ? 'Token exists' : 'No token');
       
+      // Important: Make sure we're using the correct API endpoint path
+      const endpoint = '/api/payment/create-checkout-session';
+      console.log('Making payment request to endpoint:', endpoint);
+      
+      const requestData = { 
+        package_id: packageId,
+        success_url: successUrl,
+        cancel_url: cancelUrl
+      };
+      console.log('With payload:', requestData);
+      
       const response = await axios.post(
-        '/api/payment/create-checkout-session',  // Keep this path the same
-        { 
-          package_id: packageId,
-          success_url: successUrl,
-          cancel_url: cancelUrl
-        },
+        endpoint,
+        requestData,
         {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -74,14 +81,18 @@ const PricingPage = () => {
       
       // Redirect to Stripe Checkout
       if (response.data.url) {
-        console.log('Redirecting to Stripe checkout:', response.data.url);
-        window.location.href = response.data.url;
+        const checkoutUrl = response.data.url;
+        console.log('Redirecting to Stripe checkout URL:', checkoutUrl);
+        
+        // Use window.location.assign for better browser compatibility
+        window.location.assign(checkoutUrl);
       } else {
         throw new Error('No checkout URL returned from server');
       }
     } catch (err) {
       console.error('Error creating checkout session:', err.response?.data || err.message);
-      setError('Failed to initiate payment. Please try again later.');
+      const errorDetails = err.response?.data ? JSON.stringify(err.response.data) : err.message;
+      setError(`Payment failed: ${errorDetails}`);
       setProcessingPayment(false);
     }
   };
