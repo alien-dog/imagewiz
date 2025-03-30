@@ -79,14 +79,33 @@ def create_checkout_session():
     # If success_url or cancel_url are not provided, use default URLs based on request origin
     if not success_url:
         # Get the origin from request headers or use the host directly
-        origin = request.headers.get('Origin', f"https://{request.host}")
-        success_url = f"{origin}/payment-success"
+        # We need to ensure we're using the frontend URL, not the backend URL
+        host = request.headers.get('Host', 'localhost')
+        origin = request.headers.get('Origin')
+        
+        # Use origin if available (which should include the protocol)
+        if origin:
+            success_url = f"{origin}/payment-success"
+        else:
+            # Fallback to host with https
+            forwarded_proto = request.headers.get('X-Forwarded-Proto', 'https')
+            success_url = f"{forwarded_proto}://{host}/payment-success"
+            
         print(f"No success_url provided, using default: {success_url}")
     
     if not cancel_url:
         # Get the origin from request headers or use the host directly
-        origin = request.headers.get('Origin', f"https://{request.host}")
-        cancel_url = f"{origin}/pricing"
+        host = request.headers.get('Host', 'localhost')
+        origin = request.headers.get('Origin')
+        
+        # Use origin if available (which should include the protocol)
+        if origin:
+            cancel_url = f"{origin}/pricing"
+        else:
+            # Fallback to host with https
+            forwarded_proto = request.headers.get('X-Forwarded-Proto', 'https')
+            cancel_url = f"{forwarded_proto}://{host}/pricing"
+            
         print(f"No cancel_url provided, using default: {cancel_url}")
     
     # Find the selected package

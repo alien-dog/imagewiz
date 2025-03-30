@@ -106,7 +106,13 @@ const PricingPage = () => {
         // Store the URL in localStorage in case we need to retry
         localStorage.setItem('stripeCheckoutUrl', checkoutUrl);
         
-        // Create a button that will open the checkout in a new tab
+        // MOST DIRECT METHOD: Redirect to Stripe directly with window.location
+        console.log('DIRECT REDIRECT: Using window.location.href to go to checkout URL');
+        window.location.href = checkoutUrl;
+        
+        /* 
+        // Fallback method - create floating button 
+        // This code is now commented out as we're using direct redirect
         const checkoutButton = document.createElement('div');
         checkoutButton.className = 'fixed top-4 right-4 z-50 bg-white shadow-lg rounded-lg p-4 max-w-md';
         checkoutButton.innerHTML = `
@@ -132,10 +138,11 @@ const PricingPage = () => {
         
         // Also try to open the window right away
         const newWindow = window.open(checkoutUrl, '_blank');
+        */
         
-        // Show a helpful message either way
-        setError("Payment page opened in a new tab. If you don't see it, use the 'Open Checkout' button in the top right.");
-        setProcessingPayment(false);
+        // Show a helpful message
+        setError("Redirecting to payment page...");
+        // We don't reset processing state as we're redirecting away
       } else {
         throw new Error('No checkout URL returned from server');
       }
