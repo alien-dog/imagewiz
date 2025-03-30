@@ -90,20 +90,39 @@ const PricingPage = () => {
         const checkoutUrl = response.data.url;
         console.log('Redirecting to Stripe checkout URL:', checkoutUrl);
         
-        // Store the current URL so we can come back after payment
-        sessionStorage.setItem('paymentReturnPath', window.location.pathname);
+        // Store the URL in localStorage in case we need to retry
+        localStorage.setItem('stripeCheckoutUrl', checkoutUrl);
         
-        // Add a small delay before redirecting to ensure the browser has time to process
-        setTimeout(() => {
-          // Force redirect to the Stripe checkout page in a new tab
-          window.open(checkoutUrl, '_blank');
-          
-          // Display a message that the checkout page has been opened in a new tab
-          setError("Checkout page opened in a new tab. If you don't see it, please check your popup blocker.");
-          setProcessingPayment(false);
-          
-          // Don't automatically redirect in this tab, stay on pricing page
-        }, 100);
+        // Create a button that will open the checkout in a new tab
+        const checkoutButton = document.createElement('div');
+        checkoutButton.className = 'fixed top-4 right-4 z-50 bg-white shadow-lg rounded-lg p-4 max-w-md';
+        checkoutButton.innerHTML = `
+          <h3 class="text-lg font-bold mb-2">Ready to checkout</h3>
+          <p class="mb-3">Click the button below to open the payment page:</p>
+          <a 
+            href="${checkoutUrl}" 
+            target="_blank"
+            class="inline-block bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded">
+            Open Checkout
+          </a>
+          <button class="ml-2 text-gray-500 hover:text-gray-700" id="close-checkout-prompt">
+            Close
+          </button>
+        `;
+        
+        document.body.appendChild(checkoutButton);
+        
+        // Add event listener to close button
+        document.getElementById('close-checkout-prompt').addEventListener('click', () => {
+          checkoutButton.remove();
+        });
+        
+        // Also try to open the window right away
+        const newWindow = window.open(checkoutUrl, '_blank');
+        
+        // Show a helpful message either way
+        setError("Payment page opened in a new tab. If you don't see it, use the 'Open Checkout' button in the top right.");
+        setProcessingPayment(false);
       } else {
         throw new Error('No checkout URL returned from server');
       }

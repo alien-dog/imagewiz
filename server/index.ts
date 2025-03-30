@@ -235,6 +235,10 @@ app.get('/simple-form.html', (req, res) => {
   res.sendFile(path.join(__dirname, '../simple-form.html'));
 });
 
+app.get('/test-stripe-redirect.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../test-stripe-redirect.html'));
+});
+
 // Catch-all route for SPA
 app.get('*', (req, res) => {
   try {

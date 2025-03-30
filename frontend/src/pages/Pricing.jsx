@@ -110,20 +110,41 @@ const Pricing = () => {
         const checkoutUrl = response.data.url;
         console.log('Redirecting to Stripe checkout URL:', checkoutUrl);
         
-        // Store the current URL so we can come back after payment
-        sessionStorage.setItem('paymentReturnPath', window.location.pathname);
+        // Store the URL in localStorage in case we need to retry
+        localStorage.setItem('stripeCheckoutUrl', checkoutUrl);
         
-        // Add a small delay before redirecting to ensure the browser has time to process
+        // Create elements to display the URL and a retry button in case window.open fails
+        const stripeUrlMessage = document.createElement('div');
+        stripeUrlMessage.innerHTML = `
+          <div style="margin-top: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+            <p>Click the button below to open the Stripe checkout page:</p>
+            <a 
+              href="${checkoutUrl}" 
+              target="_blank"
+              style="display: inline-block; background-color: #4CAF50; color: white; 
+                    padding: 10px 15px; text-decoration: none; border-radius: 4px; 
+                    margin-top: 10px;">
+              Open Checkout Page
+            </a>
+          </div>
+        `;
+        
+        // Try to open immediately in a new window
+        const newWindow = window.open(checkoutUrl, '_blank');
+        
+        // Either way, set a helpful message
+        setError("Stripe checkout page has been opened in a new tab. If you don't see it, please check your popup blocker or use the 'Open Checkout Page' button below.");
+        setLoading(false);
+        
+        // Add the checkout button to the page after the "Get Started" button
         setTimeout(() => {
-          // Force redirect to the Stripe checkout page in a new tab
-          window.open(checkoutUrl, '_blank');
-          
-          // Display a message that the checkout page has been opened in a new tab
-          setError("Checkout page opened in a new tab. If you don't see it, please check your popup blocker.");
-          setLoading(false);
-          
-          // Don't automatically redirect in this tab, stay on pricing page
+          const pricingCards = document.querySelectorAll('.bg-white.rounded-lg.shadow-lg');
+          if (pricingCards.length > 0) {
+            const targetCard = pricingCards[0];
+            targetCard.appendChild(stripeUrlMessage);
+          }
         }, 100);
+        
       } else {
         throw new Error('No checkout URL returned from server');
       }

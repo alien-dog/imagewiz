@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stripe Redirect Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Stripe Redirect</h1>
+    
+    <h2>1. Direct URL Redirect Test</h2>
+    <p>This will test redirecting directly to a Stripe checkout URL:</p>
+    <input type="text" id="stripeUrl" style="width: 100%;" placeholder="Paste Stripe URL here">
+    <button id="redirectButton">Test Redirect</button>
+    
+    <h2>2. API Call Test</h2>
+    <p>This will test the full API call and redirect flow:</p>
+    <div>
+        <label for="token">JWT Token:</label>
+        <input type="text" id="token" style="width: 100%;" placeholder="Your JWT token">
+    </div>
+    <div>
+        <label for="packageId">Package ID:</label>
+        <select id="packageId">
+            <option value="basic">Basic</option>
+            <option value="pro">Pro</option>
+            <option value="premium">Premium</option>
+        </select>
+    </div>
+    <button id="apiCallButton">Make API Call</button>
+    
+    <div class="result" id="resultContainer">
+        <h3>Results:</h3>
+        <pre id="resultOutput">No results yet</pre>
+    </div>
+    
+    <script>
+        // Function to display results
+        function showResult(message) {
+            document.getElementById('resultOutput').textContent = message;
+        }
+        
+        // Direct URL redirect test
+        document.getElementById('redirectButton').addEventListener('click', () => {
+            const url = document.getElementById('stripeUrl').value.trim();
+            
+            if (!url) {
+                showResult('Please enter a Stripe URL');
+                return;
+            }
+            
+            showResult(`Attempting to open: ${url}`);
+            
+            // Test opening in a new tab
+            const newTab = window.open(url, '_blank');
+            
+            if (!newTab || newTab.closed || typeof newTab.closed === 'undefined') {
+                showResult(`Popup blocked! Trying direct redirect instead.\nURL: ${url}`);
+                // If popup blocked, try direct redirect
+                window.location.href = url;
+            } else {
+                showResult(`New tab opened successfully with URL: ${url}`);
+            }
+        });
+        
+        // API call test
+        document.getElementById('apiCallButton').addEventListener('click', async () => {
+            const token = document.getElementById('token').value.trim();
+            const packageId = document.getElementById('packageId').value;
+            
+            if (!token) {
+                showResult('Please enter your JWT token');
+                return;
+            }
+            
+            try {
+                showResult(`Making API call for package: ${packageId}...`);
+                
+                // Generate success and cancel URLs
+                const baseUrl = window.location.origin;
+                const successUrl = `${baseUrl}/payment-success`;
+                const cancelUrl = `${baseUrl}/pricing`;
+                
+                // Make the API call
+                const response = await fetch('/api/payment/create-checkout-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        package_id: packageId,
+                        success_url: successUrl,
+                        cancel_url: cancelUrl
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.url) {
+                    showResult(`API call successful!\nCheckout URL: ${data.url}\n\nTrying to open URL in new tab...`);
+                    
+                    // Try to open in new tab
+                    const newTab = window.open(data.url, '_blank');
+                    
+                    if (!newTab || newTab.closed || typeof newTab.closed === 'undefined') {
+                        showResult(`Popup blocked! URL was:\n${data.url}\n\nClick the button below to try again:`);
+                        
+                        // Create a button to try again
+                        const retryButton = document.createElement('button');
+                        retryButton.textContent = 'Try Opening URL Again';
+                        retryButton.onclick = () => {
+                            window.open(data.url, '_blank');
+                        };
+                        
+                        document.getElementById('resultContainer').appendChild(retryButton);
+                    } else {
+                        showResult(`New tab opened successfully with URL: ${data.url}`);
+                    }
+                } else {
+                    showResult(`API call returned no URL:\n${JSON.stringify(data, null, 2)}`);
+                }
+            } catch (error) {
+                showResult(`Error: ${error.message}`);
+            }
+        });
+    </script>
+</body>
+</html>
