@@ -9,23 +9,60 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
-const PORT = process.env.PORT || 3000;
-const FLASK_PORT = 5000;
+const PORT: number = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+const FLASK_PORT: number = 5000;
 
-// Define the frontend dist path - check both potential locations
+// Define the frontend dist path - check all potential locations
 import fs from 'fs';
 
-let FRONTEND_DIST_PATH = path.join(__dirname, '../frontend/dist');
-// If frontend/dist doesn't exist, try client/dist as a fallback
-if (!fs.existsSync(FRONTEND_DIST_PATH)) {
-  const alternatePath = path.join(__dirname, '../client/dist');
-  if (fs.existsSync(alternatePath)) {
-    console.log('Using alternate frontend path:', alternatePath);
-    FRONTEND_DIST_PATH = alternatePath;
+console.log('Starting Express server with frontend static files');
+console.log('Current directory:', process.cwd());
+console.log('__dirname:', __dirname);
+
+// Try multiple possible frontend dist paths
+const possiblePaths = [
+  path.join(__dirname, '../frontend/dist'),
+  path.join(__dirname, '../client/dist'),
+  path.join(process.cwd(), 'frontend/dist'),
+  path.join(process.cwd(), 'client/dist')
+];
+
+console.log('Checking for frontend build directories:');
+let FRONTEND_DIST_PATH = possiblePaths[0]; // Default
+let foundValidPath = false;
+
+for (const pathToCheck of possiblePaths) {
+  console.log(`- Checking: ${pathToCheck}`);
+  if (fs.existsSync(pathToCheck)) {
+    try {
+      // Also verify index.html exists in this folder
+      if (fs.existsSync(path.join(pathToCheck, 'index.html'))) {
+        console.log(`✅ Found valid frontend path with index.html: ${pathToCheck}`);
+        FRONTEND_DIST_PATH = pathToCheck;
+        foundValidPath = true;
+        break;
+      } else {
+        console.log(`❌ Directory exists but no index.html found in: ${pathToCheck}`);
+      }
+    } catch (err) {
+      console.error(`Error checking path ${pathToCheck}:`, err);
+    }
   } else {
-    console.warn('⚠️ Frontend build directory not found! Checked:');
-    console.warn('- ' + FRONTEND_DIST_PATH);
-    console.warn('- ' + alternatePath);
+    console.log(`❌ Directory not found: ${pathToCheck}`);
+  }
+}
+
+if (!foundValidPath) {
+  console.error('⚠️ WARNING: No valid frontend build directory found!');
+  console.error('The frontend will not be served correctly.');
+} else {
+  console.log(`Using frontend path: ${FRONTEND_DIST_PATH}`);
+  // List files in the chosen directory
+  try {
+    const files = fs.readdirSync(FRONTEND_DIST_PATH);
+    console.log(`Files in ${FRONTEND_DIST_PATH}:`, files);
+  } catch (err) {
+    console.error(`Error listing files in ${FRONTEND_DIST_PATH}:`, err);
   }
 }
 
@@ -296,7 +333,8 @@ Check that your success_url and cancel_url parameters in Stripe checkout are cor
   res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
 });
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+// Start the server and bind to all interfaces (0.0.0.0) to make it accessible externally
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running at http://0.0.0.0:${PORT}`);
+  console.log(`Access your app at: ${process.env.REPLIT_DOMAINS || `localhost:${PORT}`}`);
 });
