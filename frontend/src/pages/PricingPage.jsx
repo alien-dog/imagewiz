@@ -53,7 +53,7 @@ const PricingPage = () => {
       console.log('Using authorization token:', token ? 'Token exists' : 'No token');
       
       const response = await axios.post(
-        '/api/payment/create-checkout-session',
+        '/api/payment/create-checkout-session',  // Keep this path the same
         { 
           package_id: packageId,
           success_url: successUrl,
