@@ -1,0 +1,11 @@
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MzMwMDYyMSwianRpIjoiMzM1MzVlOGMtNjk4Mi00YzA1LTllNTUtMzZmYjVjZjMzMjZkIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjIiLCJuYmYiOjE3NDMzMDA2MjEsImNzcmYiOiJhZjNiMjkzNS01Zjc2LTQ1N2QtOGRiYi1lMGE4MGZkNzE1OTUiLCJleHAiOjE3NDMzODcwMjF9.Q4tKuBlT9aMhgf-5ZFeUXwXOtVfY8L09dYyU5irzMh4",
+  "message": "Login successful",
+  "user": {
+    "created_at": "2025-03-29T13:35:49",
+    "credit_balance": 0,
+    "id": 2,
+    "is_admin": false,
+    "username": "testuser2"
+  }
+}

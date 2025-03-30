@@ -29,8 +29,9 @@ def register():
     db.session.add(new_user)
     db.session.commit()
     
-    # Generate access token
-    access_token = create_access_token(identity=new_user.id)
+    # Generate access token - ensure identity is a string
+    # Converting new_user.id to string to fix the "Subject must be a string" error
+    access_token = create_access_token(identity=str(new_user.id))
     
     return jsonify({
         "message": "User registered successfully",
@@ -54,8 +55,9 @@ def login():
     if not user or not user.check_password(data['password']):
         return jsonify({"error": "Invalid username or password"}), 401
     
-    # Generate access token
-    access_token = create_access_token(identity=user.id)
+    # Generate access token - ensure identity is a string
+    # Converting user.id to string to fix the "Subject must be a string" error
+    access_token = create_access_token(identity=str(user.id))
     
     return jsonify({
         "message": "Login successful",
@@ -68,6 +70,12 @@ def login():
 def get_current_user():
     """Get current user details"""
     user_id = get_jwt_identity()
+    # Convert back to int since we stored it as a string in the token
+    try:
+        user_id = int(user_id)
+    except (ValueError, TypeError):
+        return jsonify({"error": "Invalid user ID"}), 400
+        
     user = User.query.get(user_id)
     
     if not user:
@@ -80,6 +88,12 @@ def get_current_user():
 def update_user():
     """Update user details"""
     user_id = get_jwt_identity()
+    # Convert back to int since we stored it as a string in the token
+    try:
+        user_id = int(user_id)
+    except (ValueError, TypeError):
+        return jsonify({"error": "Invalid user ID"}), 400
+        
     user = User.query.get(user_id)
     
     if not user:
