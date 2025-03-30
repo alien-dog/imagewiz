@@ -68,14 +68,17 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       console.log("Login attempt for:", username);
 
-      // Make sure baseURL is set correctly
-      axios.defaults.baseURL = 
-        'http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev';
+      // Print current URL for debugging
+      console.log("Current window location:", window.location.origin);
+      
+      // Set baseURL to current window location
+      axios.defaults.baseURL = window.location.origin;
+      console.log("Setting axios baseURL to:", axios.defaults.baseURL);
 
       // Direct fetch instead of axios as a fallback approach
       // Add timestamp to prevent caching
       const timestamp = new Date().getTime();
-      const loginUrl = `http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev/api/auth/login?t=${timestamp}`;
+      const loginUrl = `/api/auth/login?t=${timestamp}`;
       console.log("Making fetch request to:", loginUrl);
       const response = await fetch(loginUrl, {
         method: "POST",
@@ -151,7 +154,7 @@ export const AuthProvider = ({ children }) => {
           // Get user data using fetch instead of axios
           // Add timestamp to prevent caching
           const userTimestamp = new Date().getTime();
-          const userUrl = `http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev/api/auth/user?t=${userTimestamp}`;
+          const userUrl = `/api/auth/user?t=${userTimestamp}`;
           console.log("Making user fetch request to:", userUrl);
           const response = await fetch(userUrl, {
             headers: {
