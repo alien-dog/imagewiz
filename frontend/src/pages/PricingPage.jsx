@@ -43,9 +43,15 @@ const PricingPage = () => {
       const successUrl = `${baseUrl}/payment-success`;
       const cancelUrl = `${baseUrl}/pricing`;
       
-      console.log(`Creating checkout session for package ${packageId}`);
+      console.log(`Creating checkout session for package ${packageId}`, {
+        packageId,
+        successUrl,
+        cancelUrl
+      });
       
       const token = localStorage.getItem('token');
+      console.log('Using authorization token:', token ? 'Token exists' : 'No token');
+      
       const response = await axios.post(
         '/api/payment/create-checkout-session',
         { 
@@ -87,7 +93,7 @@ const PricingPage = () => {
   // Default packages if API fails
   const defaultPackages = [
     { 
-      id: 1, 
+      id: "basic", 
       name: "Starter", 
       price: 5.99, 
       credits: 50, 
@@ -95,7 +101,7 @@ const PricingPage = () => {
       features: ["50 image processes", "Valid for 90 days", "Standard quality"] 
     },
     { 
-      id: 2, 
+      id: "standard", 
       name: "Pro", 
       price: 14.99, 
       credits: 200, 
@@ -103,7 +109,7 @@ const PricingPage = () => {
       features: ["200 image processes", "Valid for 180 days", "High quality", "Priority support"] 
     },
     { 
-      id: 3, 
+      id: "premium", 
       name: "Business", 
       price: 39.99, 
       credits: 500, 
