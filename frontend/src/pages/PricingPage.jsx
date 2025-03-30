@@ -82,10 +82,9 @@ const PricingPage = () => {
       const token = localStorage.getItem('token');
       console.log('Using authorization token:', token ? 'Token exists' : 'No token');
       
-      // IMPORTANT FIX: Use the direct endpoint that works consistently
-      // The issue was that we're not correctly routed to /api/payment/... 
-      // Using /payment/... directly is properly proxied by the server
-      const endpoint = '/payment/create-checkout-session';
+      // UPDATED FIX: Make sure we go through the /api proxy
+      // We're explicitly using /api to ensure the request is properly routed
+      const endpoint = '/api/payment/create-checkout-session';
       console.log('Making payment request to endpoint:', endpoint);
       
       // Get package details for better debugging
@@ -126,8 +125,9 @@ const PricingPage = () => {
         // Set a message to inform the user
         setError("Redirecting to payment page...");
         
-        // CHALLENGE: Stripe might be using the original URL for redirects causing /undefined
-        console.log('Processing Stripe URL before redirect');
+        // SIMPLIFIED APPROACH: Direct redirection to Stripe URL
+        // Our backend now correctly handles the redirect URLs, so we can just redirect directly
+        console.log('Using direct redirection to Stripe URL');
         
         // Verify URL - check if it's from Stripe checkout first
         if (!checkoutUrl.includes('checkout.stripe.com')) {
@@ -136,49 +136,15 @@ const PricingPage = () => {
           return;
         }
         
-        // CRUCIAL FIX: Let's create our own return URL and pass it directly to Stripe
-        try {
-          // Create a new URL object to parse the Stripe URL
-          const stripeUrl = new URL(checkoutUrl);
-          
-          // Get the current base URL directly from window.location
-          const siteBaseUrl = window.location.origin;
-          console.log('Using site base URL for redirects:', siteBaseUrl);
-          
-          // Create our success URL with the session ID parameter
-          const successUrl = `${siteBaseUrl}/payment-success?session_id={CHECKOUT_SESSION_ID}`;
-          const cancelUrl = `${siteBaseUrl}/pricing`;
-          
-          // Log the URLs for debugging
-          console.log('Generated success URL:', successUrl);
-          console.log('Generated cancel URL:', cancelUrl);
-          
-          // Create a modified URL by directly appending the return_url parameter
-          // This is a more reliable approach than trying to modify Stripe's URL structure
-          const finalUrl = `${checkoutUrl}&redirect_on_completion=always&success_url=${encodeURIComponent(successUrl)}&cancel_url=${encodeURIComponent(cancelUrl)}`;
-          
-          console.log('FINAL MODIFIED STRIPE URL:', finalUrl);
-          localStorage.setItem('modifiedStripeUrl', finalUrl);
-          
-          // Show a message briefly before redirecting
-          setError("Redirecting to secure payment page...");
-          
-          // Direct page redirect after a brief delay to show the message
-          setTimeout(() => {
-            window.location.href = finalUrl;
-          }, 100);
-          
-        } catch (urlError) {
-          console.error('Error modifying Stripe URL:', urlError);
-          
-          // Fallback to direct redirect with original URL if our enhancement fails
-          console.log('FALLBACK: Using original URL for redirect');
-          setError("Redirecting to Stripe checkout...");
-          
-          setTimeout(() => {
-            window.location.href = checkoutUrl;
-          }, 100);
-        }
+        // Show a message briefly before redirecting
+        setError("Redirecting to secure payment page...");
+        
+        // DIRECT APPROACH: Immediate redirect to the Stripe checkout URL
+        // This is the most reliable approach as our backend now handles setting the correct URLs
+        console.log('REDIRECTING DIRECTLY TO STRIPE URL');
+        
+        // Direct page redirect
+        window.location.href = checkoutUrl;
         
         // No further code needed - the page will redirect immediately
       } else {
