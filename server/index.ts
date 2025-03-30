@@ -17,7 +17,7 @@ app.use(cors());
 // Parse JSON request bodies
 app.use(express.json());
 
-// Add a manual proxy endpoint for auth
+// Add a manual proxy endpoint for auth login
 app.post('/api/auth/login', async (req, res) => {
   console.log('Manual proxy: Received login request');
   try {
@@ -34,6 +34,34 @@ app.post('/api/auth/login', async (req, res) => {
     res.status(response.status).json(data);
   } catch (error) {
     console.error('Manual proxy: Error forwarding login request', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Add a manual proxy endpoint for auth user
+app.get('/api/auth/user', async (req, res) => {
+  console.log('Manual proxy: Received user request');
+  try {
+    // Extract the token from the Authorization header
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ error: 'No authorization header provided' });
+    }
+    
+    console.log('Manual proxy: Forwarding user request with auth header:', authHeader);
+    
+    const response = await fetch(`http://localhost:${FLASK_PORT}/auth/user`, {
+      method: 'GET',
+      headers: {
+        'Authorization': authHeader,
+      },
+    });
+    
+    const data = await response.json();
+    console.log('Manual proxy: User response received');
+    res.status(response.status).json(data);
+  } catch (error) {
+    console.error('Manual proxy: Error forwarding user request', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
