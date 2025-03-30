@@ -113,12 +113,16 @@ def create_checkout_session():
     if not package:
         return jsonify({"error": "Invalid package selected"}), 400
     
-    # Add query params to success URL
-    if success_url and '?' not in success_url:
-        success_url = f"{success_url}?session_id={{CHECKOUT_SESSION_ID}}"
-    
     # Create Stripe session
     try:
+        # Ensure success_url has the checkout session ID parameter
+        if success_url and '?' not in success_url:
+            success_url = f"{success_url}?session_id={{CHECKOUT_SESSION_ID}}"
+            
+        # For debugging, print the URLs
+        print(f"Success URL: {success_url}")
+        print(f"Cancel URL: {cancel_url}")
+        
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=[
@@ -135,8 +139,8 @@ def create_checkout_session():
                 },
             ],
             mode='payment',
-            success_url=success_url or request.host_url,
-            cancel_url=cancel_url or request.host_url,
+            success_url=success_url,
+            cancel_url=cancel_url,
             metadata={
                 'user_id': user.id,
                 'package_id': package_id,

@@ -249,6 +249,17 @@ app.get('*', (req, res) => {
     if (req.path === '/payment-success' || req.path === '/payment-failure' || 
         req.path === '/undefined' || req.path.startsWith('/payment')) {
       console.log(`Handling special frontend route: ${req.path} -> serving index.html`);
+      
+      // For /undefined, also log a detailed warning to help debug
+      if (req.path === '/undefined') {
+        console.warn(`
+!!! IMPORTANT: Redirect to /undefined detected !!!
+This usually happens when a URL parameter is not properly defined in a redirect.
+Check that your success_url and cancel_url parameters in Stripe checkout are correct.
+The current request will be handled by returning index.html to avoid a 404,
+but you should fix the underlying issue.
+        `);
+      }
     }
     
     res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
