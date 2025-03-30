@@ -104,8 +104,23 @@ app.all('/payment/*', (req, res) => {
     })
     .then(data => {
       console.log('Direct response from Flask backend:', data);
-      // Return the response directly to the client
-      return res.status(200).json(data);
+      
+      // Check if the URL is present and valid
+      if (data && data.url) {
+        try {
+          console.log('Received checkout URL from Flask:', data.url);
+          
+          // SPECIAL HANDLING FOR STRIPE - Direct browser redirect
+          // Simply return the Stripe URL directly to the frontend
+          return res.status(200).json(data);
+        } catch (urlError) {
+          console.error('Error processing checkout URL:', urlError);
+          return res.status(500).json({ error: 'Invalid checkout URL format' });
+        }
+      } else {
+        console.error('No URL in response data from Flask backend');
+        return res.status(500).json({ error: 'No checkout URL in response' });
+      }
     })
     .catch(error => {
       console.error('Error forwarding request to Flask backend:', error);

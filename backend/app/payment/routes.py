@@ -76,6 +76,13 @@ def create_checkout_session():
     print(f"Creating checkout session for user {user.id}, package {package_id}")
     print(f"Success URL: {success_url}, Cancel URL: {cancel_url}")
     
+    # SIMPLEST SOLUTION: Always use the hardcoded Replit URL
+    # This avoids all complexities of URL detection through headers
+    base_url = "https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev"
+    print(f"Using direct Replit URL: {base_url}")
+    
+    # Commented out all the complex URL detection logic, which wasn't working reliably
+    """
     # ROBUST URL DETECTION: Get the base URL from different sources
     base_url = None
     
@@ -126,6 +133,7 @@ def create_checkout_session():
                 base_url = "https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev"
         
         print(f"Using fallback base URL: {base_url}")
+    """
     
     # Now set the success and cancel URLs based on the detected base URL
     if not success_url:
