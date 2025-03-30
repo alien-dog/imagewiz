@@ -239,6 +239,10 @@ app.get('/test-stripe-redirect.html', (req, res) => {
   res.sendFile(path.join(__dirname, '../test-stripe-redirect.html'));
 });
 
+app.get('/test-stripe-open.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../test-stripe-open.html'));
+});
+
 // Catch-all route for SPA - handle all frontend routes
 app.get('*', (req, res) => {
   try {
