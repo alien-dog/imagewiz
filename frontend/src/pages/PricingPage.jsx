@@ -94,11 +94,9 @@ const PricingPage = () => {
                               
       console.log('Selected package details:', selectedPackage);
       
-      // Include detailed package info in the request to help with debugging
+      // Include only minimal required fields - the server will handle success/cancel URLs
       const requestData = { 
         package_id: packageId,
-        success_url: successUrl,
-        cancel_url: cancelUrl,
         price: selectedPackage?.price || 0,
         credits: selectedPackage?.credits || 0,
         is_yearly: false
@@ -128,28 +126,34 @@ const PricingPage = () => {
         // Set a message to inform the user
         setError("Redirecting to payment page...");
         
-        // DIRECT APPROACH 1: Try immediate window.location redirect
+        // APPROACH 1: Try window.open in a new tab first (this is more reliable)
         try {
-          console.log('1. TRYING DIRECT WINDOW.LOCATION REDIRECT');
-          window.location.href = checkoutUrl;
-          return; // Exit and let the redirect happen
-        } catch (e) {
-          console.error('window.location.href redirect failed:', e);
-        }
-        
-        // If we're still here, the direct redirect didn't work
-        // APPROACH 2: Try window.open in a new tab
-        try {
-          console.log('2. TRYING WINDOW.OPEN IN NEW TAB');
+          console.log('1. TRYING WINDOW.OPEN IN NEW TAB');
           const newTab = window.open(checkoutUrl, '_blank');
           
           if (newTab && !newTab.closed) {
             console.log('Window.open success!');
             setError("Payment page opened in a new tab. If you don't see it, please check your popup blocker.");
+            setProcessingPayment(false);
             return; // Exit on success
+          } else {
+            console.log('Window may have been blocked by popup blocker');
           }
         } catch (e) {
           console.error('window.open failed:', e);
+        }
+        
+        // APPROACH 2: If new tab didn't work, try direct navigation
+        try {
+          console.log('2. TRYING DIRECT WINDOW.LOCATION REDIRECT');
+          // Use setTimeout to ensure the user sees the message briefly
+          setError("Redirecting to Stripe checkout...");
+          setTimeout(() => {
+            window.location.href = checkoutUrl;
+          }, 500);
+          return; // Exit and let the redirect happen
+        } catch (e) {
+          console.error('window.location.href redirect failed:', e);
         }
         
         // APPROACH 3: Create a visible button for the user
@@ -160,28 +164,38 @@ const PricingPage = () => {
         
         // Create a prominent checkout button in the center of the screen
         const checkoutButton = document.createElement('div');
-        checkoutButton.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white shadow-2xl rounded-lg p-6 max-w-md text-center';
-        checkoutButton.innerHTML = `
-          <h3 class="text-xl font-bold mb-4">Ready to Checkout</h3>
-          <p class="mb-4">Your payment page is ready. Click the button below to open it:</p>
-          <div class="mb-4">
+        checkoutButton.className = 'fixed top-0 left-0 w-full h-full flex items-center justify-center z-50 bg-black bg-opacity-50';
+        
+        // Create the modal content
+        const modalContent = document.createElement('div');
+        modalContent.className = 'bg-white shadow-2xl rounded-lg p-8 max-w-md text-center relative';
+        
+        modalContent.innerHTML = `
+          <h3 class="text-2xl font-bold mb-4">Your Payment is Ready</h3>
+          <p class="mb-6 text-gray-600">Click the button below to proceed to Stripe's secure checkout page:</p>
+          <div class="mb-6">
             <a 
               href="${checkoutUrl}" 
               target="_blank"
-              class="inline-block bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors">
-              Open Checkout
+              class="block w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-4 px-6 rounded-lg text-lg transition-colors">
+              Proceed to Checkout
             </a>
           </div>
-          <div class="text-sm text-gray-600 mb-3">
-            If nothing happens when you click, copy the link below and paste it into your browser:
+          <div class="text-sm text-gray-600 mb-3 mt-6 pt-4 border-t border-gray-200">
+            If the button doesn't work, copy this link and paste it into your browser:
           </div>
-          <div class="bg-gray-100 p-3 rounded mb-4 break-all">
-            <code class="text-xs">${checkoutUrl}</code>
+          <div class="bg-gray-100 p-3 rounded mb-6 break-all text-left">
+            <code class="text-xs select-all">${checkoutUrl}</code>
           </div>
-          <button class="text-gray-500 hover:text-gray-700 underline" id="close-checkout-prompt">
-            Close this message
+          <button class="absolute top-3 right-3 text-gray-400 hover:text-gray-600" id="close-checkout-prompt">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
           </button>
         `;
+        
+        checkoutButton.appendChild(modalContent);
         
         document.body.appendChild(checkoutButton);
         
