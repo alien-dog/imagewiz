@@ -73,7 +73,18 @@ app.all('/payment/*', (req, res) => {
   console.log('Headers:', JSON.stringify(req.headers));
   console.log('This request should go through the /api proxy instead');
   
-  // Return a helpful error message
+  // For POST to /payment/create-checkout-session, we'll proxy it properly
+  if (req.method === 'POST' && (req.url === '/payment/create-checkout-session' || req.url === '/payment/create-checkout')) {
+    console.log('⚠️ WARNING: Direct access to create-checkout-session endpoint - will forward anyway');
+    // Forward to the /api/payment/create-checkout-session endpoint handler
+    return app._router.handle(Object.assign({}, req, {
+      url: '/api/payment/create-checkout-session',
+      originalUrl: '/api/payment/create-checkout-session',
+      baseUrl: '/api'
+    }), res, () => {});
+  }
+  
+  // Return a helpful error message for other endpoints
   return res.status(404).json({
     error: 'Incorrect URL path',
     message: 'Please use the /api prefix for all API requests',
