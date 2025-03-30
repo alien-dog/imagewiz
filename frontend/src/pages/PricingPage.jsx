@@ -12,6 +12,12 @@ const PricingPage = () => {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
+  // Debug environment for troubleshooting
+  useEffect(() => {
+    console.log("React environment:", import.meta.env);
+    console.log("Current axios baseURL:", axios.defaults.baseURL);
+  }, []);
+
   useEffect(() => {
     const fetchPackages = async () => {
       try {

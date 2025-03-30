@@ -80,16 +80,40 @@ const Pricing = () => {
       const selectedPlan = pricingPlans.find((plan) => plan.id === planId);
       const price = yearlyBilling ? selectedPlan.priceYearly : selectedPlan.priceMonthly;
       
-      const response = await axios.post('/payment/create-checkout', {
-        package_id: planId,
-        price: price,
+      // Generate a base URL for success and cancel redirects
+      const baseUrl = window.location.origin;
+      const successUrl = `${baseUrl}/payment-success`;
+      const cancelUrl = `${baseUrl}/pricing`;
+      
+      console.log(`Creating checkout session for package ${planId}`, {
+        planId,
+        price,
         credits: selectedPlan.credits,
-        is_yearly: yearlyBilling,
+        successUrl,
+        cancelUrl
+      });
+      
+      // FIXED: Use the correct API endpoint with /api prefix
+      const response = await axios.post('/api/payment/create-checkout-session', {
+        package_id: planId,
+        success_url: successUrl,
+        cancel_url: cancelUrl
+      }, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
       });
 
       // Redirect to Stripe checkout
-      window.location.href = response.data.checkout_url;
+      if (response.data.url) {
+        const checkoutUrl = response.data.url;
+        console.log('Redirecting to Stripe checkout URL:', checkoutUrl);
+        window.location.assign(checkoutUrl);
+      } else {
+        throw new Error('No checkout URL returned from server');
+      }
     } catch (err) {
+      console.error('Error creating checkout session:', err.response?.data || err.message);
       setError(err.response?.data?.error || 'Failed to process your request. Please try again.');
     } finally {
       setLoading(false);
