@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   // Set up axios defaults - make sure the Vite proxy correctly handles all requests
-  axios.defaults.baseURL = `http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:80`;
+  axios.defaults.baseURL = 'http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev';
 
   // Debug our environment
   console.log("React environment:", import.meta.env);
@@ -39,9 +39,9 @@ export const AuthProvider = ({ children }) => {
       console.log("Attempting registration for:", username);
       
       // Make sure baseURL is set correctly
-      axios.defaults.baseURL = "http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:80";
+      axios.defaults.baseURL = 'http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev';
       
-      const registerUrl = "http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:80/api/auth/register";
+      const registerUrl = "http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev/api/auth/register";
       console.log("Making registration request to:", registerUrl);
       
       const res = await axios.post(registerUrl, {
@@ -70,10 +70,12 @@ export const AuthProvider = ({ children }) => {
 
       // Make sure baseURL is set correctly
       axios.defaults.baseURL = 
-        "http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:80";
+        'http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev';
 
       // Direct fetch instead of axios as a fallback approach
-      const loginUrl = "http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:80/api/auth/login";
+      // Add timestamp to prevent caching
+      const timestamp = new Date().getTime();
+      const loginUrl = `http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev/api/auth/login?t=${timestamp}`;
       console.log("Making fetch request to:", loginUrl);
       const response = await fetch(loginUrl, {
         method: "POST",
@@ -147,7 +149,9 @@ export const AuthProvider = ({ children }) => {
           }
 
           // Get user data using fetch instead of axios
-          const userUrl = "http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:80/api/auth/user";
+          // Add timestamp to prevent caching
+          const userTimestamp = new Date().getTime();
+          const userUrl = `http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev/api/auth/user?t=${userTimestamp}`;
           console.log("Making user fetch request to:", userUrl);
           const response = await fetch(userUrl, {
             headers: {
