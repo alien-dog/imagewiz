@@ -147,13 +147,43 @@ def create_checkout_session():
         if success_url and '?' not in success_url:
             success_url = f"{success_url}?session_id={{CHECKOUT_SESSION_ID}}"
             
-        # Final sanity check - FORCE replace localhost with Replit URL if detected
-        if 'localhost' in success_url:
-            # Hardcode the app URL to be 100% sure it works
+        # ENHANCED URL HANDLING: Make absolutely sure the URLs are correct for Replit
+        # This is critical for Stripe redirect to work properly
+        
+        # Get the current request's host - this is the most reliable source of the actual URL
+        request_host = request.headers.get('Host', '')
+        print(f"Request Host header: {request_host}")
+        
+        # Build URLs using host header if available
+        if request_host:
+            # Check if using secure connection
+            is_secure = request.headers.get('X-Forwarded-Proto') == 'https'
+            protocol = 'https' if is_secure else 'http'
+            
+            # Create the base URL from host header
+            host_base_url = f"{protocol}://{request_host}"
+            print(f"Using host header base URL: {host_base_url}")
+            
+            # Replace any localhost URLs with the host-derived URL
+            # Also replace any other URLs with this one to ensure consistency
+            hardcoded_replit_url = "https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev"
+            
+            # Try different variations of localhost to catch all cases
+            for localhost_url in ['http://localhost:5000', 'http://localhost:3000', 'https://localhost:5000', 'https://localhost:3000', 'http://localhost', 'https://localhost']:
+                success_url = success_url.replace(localhost_url, host_base_url)
+                cancel_url = cancel_url.replace(localhost_url, host_base_url)
+            
+            # Also replace any hardcoded Replit URL with the current one
+            success_url = success_url.replace(hardcoded_replit_url, host_base_url)
+            cancel_url = cancel_url.replace(hardcoded_replit_url, host_base_url)
+            
+            print(f"URLs updated based on host header")
+        else:
+            # Fallback to hardcoded Replit URL as last resort
             replit_url = "https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev"
             success_url = success_url.replace('http://localhost:5000', replit_url)
             cancel_url = cancel_url.replace('http://localhost:5000', replit_url)
-            print(f"REPLACED localhost URLs with Replit URL")
+            print(f"REPLACED localhost URLs with hardcoded Replit URL")
             
         # For debugging, print the FINAL URLs
         print(f"FINAL Success URL: {success_url}")

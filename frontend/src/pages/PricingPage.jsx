@@ -126,18 +126,59 @@ const PricingPage = () => {
         // Set a message to inform the user
         setError("Redirecting to payment page...");
         
-        // SIMPLEST APPROACH: Direct page redirect
-        // This is the most reliable approach and avoids issues with popup blockers
-        console.log('USING DIRECT WINDOW.LOCATION REDIRECT');
+        // CHALLENGE: Stripe might be using the original URL for redirects causing /undefined
+        console.log('Processing Stripe URL before redirect');
         
-        // Show a message briefly before redirecting
-        setError("Redirecting to Stripe checkout...");
+        // Verify URL - check if it's from Stripe checkout first
+        if (!checkoutUrl.includes('checkout.stripe.com')) {
+          setError("Invalid checkout URL received from server. Please try again.");
+          setProcessingPayment(false);
+          return;
+        }
         
-        // Use a very short timeout to ensure the message is seen
-        setTimeout(() => {
-          // This is the key change - direct redirect without any complex logic
-          window.location.href = checkoutUrl;
-        }, 100);
+        // CRUCIAL FIX: Let's create our own return URL and pass it directly to Stripe
+        try {
+          // Create a new URL object to parse the Stripe URL
+          const stripeUrl = new URL(checkoutUrl);
+          
+          // Get the current base URL directly from window.location
+          const siteBaseUrl = window.location.origin;
+          console.log('Using site base URL for redirects:', siteBaseUrl);
+          
+          // Create our success URL with the session ID parameter
+          const successUrl = `${siteBaseUrl}/payment-success?session_id={CHECKOUT_SESSION_ID}`;
+          const cancelUrl = `${siteBaseUrl}/pricing`;
+          
+          // Log the URLs for debugging
+          console.log('Generated success URL:', successUrl);
+          console.log('Generated cancel URL:', cancelUrl);
+          
+          // Create a modified URL by directly appending the return_url parameter
+          // This is a more reliable approach than trying to modify Stripe's URL structure
+          const finalUrl = `${checkoutUrl}&redirect_on_completion=always&success_url=${encodeURIComponent(successUrl)}&cancel_url=${encodeURIComponent(cancelUrl)}`;
+          
+          console.log('FINAL MODIFIED STRIPE URL:', finalUrl);
+          localStorage.setItem('modifiedStripeUrl', finalUrl);
+          
+          // Show a message briefly before redirecting
+          setError("Redirecting to secure payment page...");
+          
+          // Direct page redirect after a brief delay to show the message
+          setTimeout(() => {
+            window.location.href = finalUrl;
+          }, 100);
+          
+        } catch (urlError) {
+          console.error('Error modifying Stripe URL:', urlError);
+          
+          // Fallback to direct redirect with original URL if our enhancement fails
+          console.log('FALLBACK: Using original URL for redirect');
+          setError("Redirecting to Stripe checkout...");
+          
+          setTimeout(() => {
+            window.location.href = checkoutUrl;
+          }, 100);
+        }
         
         // No further code needed - the page will redirect immediately
       } else {
