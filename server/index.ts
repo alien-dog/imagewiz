@@ -21,7 +21,9 @@ app.use(express.json());
 app.use('/api', createProxyMiddleware({
   target: `http://localhost:${FLASK_PORT}`,
   changeOrigin: true,
-  // No pathRewrite specified, so original path is preserved
+  pathRewrite: {
+    '^/api': ''  // Remove '/api' prefix when forwarding
+  },
   // @ts-ignore - logLevel is a valid option but TypeScript doesn't recognize it
   logLevel: 'debug',
   // Handle each request before it's sent to give more debug info

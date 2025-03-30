@@ -12,8 +12,8 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Set up axios defaults - make sure the Vite proxy correctly handles all requests
-  axios.defaults.baseURL = 'http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev';
+  // Set up axios defaults - use relative URLs to ensure proxy works correctly
+  axios.defaults.baseURL = '';  // Empty baseURL to use relative URLs
 
   // Debug our environment
   console.log("React environment:", import.meta.env);
@@ -38,27 +38,35 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       console.log("Attempting registration for:", username);
       
-      // Make sure baseURL is set correctly
-      axios.defaults.baseURL = 'http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev';
-      
-      const registerUrl = "http://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev/api/auth/register";
+      // Use relative URLs
+      const registerUrl = "/api/auth/register";
       console.log("Making registration request to:", registerUrl);
       
-      const res = await axios.post(registerUrl, {
-        username,
-        password,
+      const res = await fetch(registerUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
       });
-      console.log("Registration response:", res.data);
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || `HTTP error ${res.status}`);
+      }
+      
+      const data = await res.json();
+      console.log("Registration response:", data);
 
-      setToken(res.data.access_token);
-      setUser(res.data.user);
-      setAuthToken(res.data.access_token);
-      return res.data;
+      setToken(data.access_token);
+      setUser(data.user);
+      setAuthToken(data.access_token);
+      return data;
     } catch (err) {
       console.error("Registration error:", err);
-      const errorMessage = err.response?.data?.error || "Registration failed";
+      const errorMessage = err.message || "Registration failed";
       setError(errorMessage);
-      throw new Error(errorMessage);
+      throw err;
     }
   };
 
@@ -68,14 +76,7 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       console.log("Login attempt for:", username);
 
-      // Print current URL for debugging
-      console.log("Current window location:", window.location.origin);
-      
-      // Set baseURL to current window location
-      axios.defaults.baseURL = window.location.origin;
-      console.log("Setting axios baseURL to:", axios.defaults.baseURL);
-
-      // Direct fetch instead of axios as a fallback approach
+      // Direct fetch approach
       // Add timestamp to prevent caching
       const timestamp = new Date().getTime();
       const loginUrl = `/api/auth/login?t=${timestamp}`;
