@@ -147,18 +147,9 @@ def create_checkout_session():
         if success_url and '?' not in success_url:
             success_url = f"{success_url}?session_id={{CHECKOUT_SESSION_ID}}"
             
-        # CRITICAL BUG FIX: Use hardcoded Replit URL
-        # Instead of trying to detect the URL, always use the known working URL
-        fixed_replit_url = "https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev"
-        print(f"Using 100% reliable hardcoded Replit URL: {fixed_replit_url}")
-        
-        # Always make sure session_id parameter is included
-        success_url = f"{fixed_replit_url}/payment-success?session_id={{CHECKOUT_SESSION_ID}}"
-        cancel_url = f"{fixed_replit_url}/pricing"
-        
-        # Final URL check
-        print(f"FINAL Success URL: {success_url}")
-        print(f"FINAL Cancel URL: {cancel_url}")
+        # For debugging, print the URLs
+        print(f"Success URL: {success_url}")
+        print(f"Cancel URL: {cancel_url}")
         
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=['card'],

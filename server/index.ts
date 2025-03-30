@@ -103,15 +103,6 @@ app.all('/payment/*', (req, res) => {
       return response.json();
     })
     .then(data => {
-      // Sanity check for data.url - make sure it doesn't contain localhost
-      if (data.url && typeof data.url === 'string' && data.url.includes('localhost')) {
-        console.log('⚠️ CRITICAL: Detected localhost in Stripe checkout URL - fixing...');
-        // Replace localhost with Replit URL
-        const replitUrl = "https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev";
-        data.url = data.url.replace(/http:\/\/localhost:[0-9]+/g, replitUrl);
-        console.log('✅ FIXED URL:', data.url);
-      }
-      
       console.log('Direct response from Flask backend:', data);
       // Return the response directly to the client
       return res.status(200).json(data);
@@ -177,16 +168,6 @@ app.post('/api/payment/create-checkout-session', async (req, res) => {
       }
       
       const data = await response.json();
-      
-      // Sanity check for data.url - make sure it doesn't contain localhost
-      if (data.url && typeof data.url === 'string' && data.url.includes('localhost')) {
-        console.log('⚠️ CRITICAL: Detected localhost in Stripe checkout URL - fixing...');
-        // Replace localhost with Replit URL
-        const replitUrl = "https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev";
-        data.url = data.url.replace(/http:\/\/localhost:[0-9]+/g, replitUrl);
-        console.log('✅ FIXED URL:', data.url);
-      }
-      
       console.log('✅ Manual proxy: Checkout response received:', data);
       res.status(response.status).json(data);
     } catch (fetchError: any) {

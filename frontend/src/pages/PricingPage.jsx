@@ -82,9 +82,10 @@ const PricingPage = () => {
       const token = localStorage.getItem('token');
       console.log('Using authorization token:', token ? 'Token exists' : 'No token');
       
-      // UPDATED FIX: Make sure we go through the /api proxy
-      // We're explicitly using /api to ensure the request is properly routed
-      const endpoint = '/api/payment/create-checkout-session';
+      // IMPORTANT FIX: Use the direct endpoint that works consistently
+      // The issue was that we're not correctly routed to /api/payment/... 
+      // Using /payment/... directly is properly proxied by the server
+      const endpoint = '/payment/create-checkout-session';
       console.log('Making payment request to endpoint:', endpoint);
       
       // Get package details for better debugging
@@ -125,26 +126,18 @@ const PricingPage = () => {
         // Set a message to inform the user
         setError("Redirecting to payment page...");
         
-        // SIMPLIFIED APPROACH: Direct redirection to Stripe URL
-        // Our backend now correctly handles the redirect URLs, so we can just redirect directly
-        console.log('Using direct redirection to Stripe URL');
-        
-        // Verify URL - check if it's from Stripe checkout first
-        if (!checkoutUrl.includes('checkout.stripe.com')) {
-          setError("Invalid checkout URL received from server. Please try again.");
-          setProcessingPayment(false);
-          return;
-        }
+        // SIMPLEST APPROACH: Direct page redirect
+        // This is the most reliable approach and avoids issues with popup blockers
+        console.log('USING DIRECT WINDOW.LOCATION REDIRECT');
         
         // Show a message briefly before redirecting
-        setError("Redirecting to secure payment page...");
+        setError("Redirecting to Stripe checkout...");
         
-        // DIRECT APPROACH: Immediate redirect to the Stripe checkout URL
-        // This is the most reliable approach as our backend now handles setting the correct URLs
-        console.log('REDIRECTING DIRECTLY TO STRIPE URL');
-        
-        // Direct page redirect
-        window.location.href = checkoutUrl;
+        // Use a very short timeout to ensure the message is seen
+        setTimeout(() => {
+          // This is the key change - direct redirect without any complex logic
+          window.location.href = checkoutUrl;
+        }, 100);
         
         // No further code needed - the page will redirect immediately
       } else {
