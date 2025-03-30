@@ -105,12 +105,55 @@ const PricingPage = () => {
         const checkoutUrl = response.data.url;
         console.log('Redirecting to Stripe checkout URL:', checkoutUrl);
         
-        // Store the URL in localStorage in case we need to retry
+        // Store the URL in localStorage for debugging/retry
         localStorage.setItem('stripeCheckoutUrl', checkoutUrl);
         
-        // MOST DIRECT METHOD: Redirect to Stripe directly with window.location
-        console.log('DIRECT REDIRECT: Using window.location.href to go to checkout URL');
-        window.location.href = checkoutUrl;
+        // MOST DIRECT METHOD: Open Stripe checkout in a new tab
+        console.log('DIRECT REDIRECT: Using window.open to go to checkout URL');
+        
+        // First try: window.open
+        const newTab = window.open(checkoutUrl, '_blank');
+        
+        // If window.open fails (e.g., due to popup blockers), try a manual approach
+        if (!newTab || newTab.closed || typeof newTab.closed === 'undefined') {
+          console.log('Popup blocked - trying a fallback approach');
+          
+          // Create a message for the user with a link
+          setError("Opening checkout failed. Please click the button below to open the payment page:");
+          
+          // Create a clickable button in the UI
+          const checkoutButton = document.createElement('div');
+          checkoutButton.className = 'fixed top-4 right-4 z-50 bg-white shadow-lg rounded-lg p-4 max-w-md';
+          checkoutButton.innerHTML = `
+            <h3 class="text-lg font-bold mb-2">Ready to checkout</h3>
+            <p class="mb-3">Click the button below to open the payment page:</p>
+            <a 
+              href="${checkoutUrl}" 
+              target="_blank"
+              class="inline-block bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded">
+              Open Checkout
+            </a>
+            <button class="ml-2 text-gray-500 hover:text-gray-700" id="close-checkout-prompt">
+              Close
+            </button>
+          `;
+          
+          document.body.appendChild(checkoutButton);
+          
+          // Add event listener to close button
+          document.getElementById('close-checkout-prompt').addEventListener('click', () => {
+            checkoutButton.remove();
+          });
+          
+          // Also provide a message for the test helper
+          console.log('IMPORTANT: Use test-stripe-open.html to manually open the checkout URL');
+          
+          // Set error state to guide user
+          setProcessingPayment(false);
+        } else {
+          // Success with window.open
+          setError("Opening checkout in a new tab. If you don't see it, check for popup blockers.");
+        }
         
         /* 
         // Fallback method - create floating button 
@@ -201,6 +244,11 @@ const PricingPage = () => {
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
           Choose the plan that works for you. All plans provide access to our AI-powered background removal tool.
         </p>
+        <div className="mt-4">
+          <a href="/test-stripe-open.html" target="_blank" className="text-sm text-blue-500 hover:underline">
+            Test Stripe Checkout Directly
+          </a>
+        </div>
       </div>
 
       {error && (
