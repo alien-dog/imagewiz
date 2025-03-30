@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
 
 const PricingPage = () => {
   const [packages, setPackages] = useState([]);
@@ -9,28 +7,49 @@ const PricingPage = () => {
   const [error, setError] = useState('');
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [processingPayment, setProcessingPayment] = useState(false);
-  const { user, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
 
-  // Debug environment for troubleshooting
-  useEffect(() => {
-    console.log("React environment:", import.meta.env);
-    console.log("Current axios baseURL:", axios.defaults.baseURL);
-  }, []);
+  // Default packages if API fails
+  const defaultPackages = [
+    { 
+      id: "basic", 
+      name: "Starter", 
+      price: 5.99, 
+      credits: 50, 
+      description: "Perfect for occasional use", 
+      features: ["50 image processes", "Valid for 90 days", "Standard quality"] 
+    },
+    { 
+      id: "standard", 
+      name: "Pro", 
+      price: 14.99, 
+      credits: 200, 
+      description: "Best value for regular users", 
+      features: ["200 image processes", "Valid for 180 days", "High quality", "Priority support"] 
+    },
+    { 
+      id: "premium", 
+      name: "Business", 
+      price: 39.99, 
+      credits: 500, 
+      description: "Ideal for professional use", 
+      features: ["500 image processes", "Valid for 365 days", "Premium quality", "Priority support", "Bulk processing"] 
+    }
+  ];
 
   useEffect(() => {
     const fetchPackages = async () => {
       try {
-        console.log('Fetching packages from /api/payment/packages');
-        const response = await axios.get('/api/payment/packages');
-        console.log('Packages response:', response.data);
+        const token = localStorage.getItem('token');
+        const response = await axios.get('/payment/packages', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         setPackages(response.data.packages);
+        setLoading(false);
       } catch (err) {
-        console.error('Error fetching packages:', err);
-        console.error('Error response:', err.response?.data);
-        // Fall back to default packages defined below if the API call fails
-        setError('Using default packages. API error: ' + (err.response?.data?.message || err.message));
-      } finally {
+        console.error('Error loading packages:', err);
+        setError('Failed to load packages. Please refresh the page to try again.');
         setLoading(false);
       }
     };
@@ -39,16 +58,14 @@ const PricingPage = () => {
   }, []);
 
   const handlePurchase = async (packageId) => {
-    if (!isAuthenticated) {
-      navigate('/login?redirect=/pricing');
-      return;
-    }
-
+    // Prevent multiple purchase attempts
     if (processingPayment) return;
-
+    
+    setSelectedPackage(packageId);
     setProcessingPayment(true);
+    setError(''); // Clear any previous errors
+    
     try {
-      // Generate a base URL for success and cancel redirects
       // Get the full current URL including protocol and host
       const baseUrl = window.location.origin;
       
@@ -101,76 +118,68 @@ const PricingPage = () => {
       console.log('Checkout session created:', response.data);
       
       // Redirect to Stripe Checkout
-      if (response.data.url) {
+      if (response.data && response.data.url) {
         const checkoutUrl = response.data.url;
         console.log('Redirecting to Stripe checkout URL:', checkoutUrl);
         
         // Store the URL in localStorage for debugging/retry
         localStorage.setItem('stripeCheckoutUrl', checkoutUrl);
         
-        // MOST DIRECT METHOD: Open Stripe checkout in a new tab
-        console.log('DIRECT REDIRECT: Using window.open to go to checkout URL');
+        // Set a message to inform the user
+        setError("Redirecting to payment page...");
         
-        // First try: window.open
-        const newTab = window.open(checkoutUrl, '_blank');
+        // DIRECT APPROACH 1: Try immediate window.location redirect
+        try {
+          console.log('1. TRYING DIRECT WINDOW.LOCATION REDIRECT');
+          window.location.href = checkoutUrl;
+          return; // Exit and let the redirect happen
+        } catch (e) {
+          console.error('window.location.href redirect failed:', e);
+        }
         
-        // If window.open fails (e.g., due to popup blockers), try a manual approach
-        if (!newTab || newTab.closed || typeof newTab.closed === 'undefined') {
-          console.log('Popup blocked - trying a fallback approach');
+        // If we're still here, the direct redirect didn't work
+        // APPROACH 2: Try window.open in a new tab
+        try {
+          console.log('2. TRYING WINDOW.OPEN IN NEW TAB');
+          const newTab = window.open(checkoutUrl, '_blank');
           
-          // Create a message for the user with a link
-          setError("Opening checkout failed. Please click the button below to open the payment page:");
-          
-          // Create a clickable button in the UI
-          const checkoutButton = document.createElement('div');
-          checkoutButton.className = 'fixed top-4 right-4 z-50 bg-white shadow-lg rounded-lg p-4 max-w-md';
-          checkoutButton.innerHTML = `
-            <h3 class="text-lg font-bold mb-2">Ready to checkout</h3>
-            <p class="mb-3">Click the button below to open the payment page:</p>
+          if (newTab && !newTab.closed) {
+            console.log('Window.open success!');
+            setError("Payment page opened in a new tab. If you don't see it, please check your popup blocker.");
+            return; // Exit on success
+          }
+        } catch (e) {
+          console.error('window.open failed:', e);
+        }
+        
+        // APPROACH 3: Create a visible button for the user
+        console.log('3. CREATING MANUAL CHECKOUT BUTTON');
+        
+        // Show clear message to user
+        setError("Please click the button below to open the payment page:");
+        
+        // Create a prominent checkout button in the center of the screen
+        const checkoutButton = document.createElement('div');
+        checkoutButton.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white shadow-2xl rounded-lg p-6 max-w-md text-center';
+        checkoutButton.innerHTML = `
+          <h3 class="text-xl font-bold mb-4">Ready to Checkout</h3>
+          <p class="mb-4">Your payment page is ready. Click the button below to open it:</p>
+          <div class="mb-4">
             <a 
               href="${checkoutUrl}" 
               target="_blank"
-              class="inline-block bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded">
+              class="inline-block bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors">
               Open Checkout
             </a>
-            <button class="ml-2 text-gray-500 hover:text-gray-700" id="close-checkout-prompt">
-              Close
-            </button>
-          `;
-          
-          document.body.appendChild(checkoutButton);
-          
-          // Add event listener to close button
-          document.getElementById('close-checkout-prompt').addEventListener('click', () => {
-            checkoutButton.remove();
-          });
-          
-          // Also provide a message for the test helper
-          console.log('IMPORTANT: Use test-stripe-open.html to manually open the checkout URL');
-          
-          // Set error state to guide user
-          setProcessingPayment(false);
-        } else {
-          // Success with window.open
-          setError("Opening checkout in a new tab. If you don't see it, check for popup blockers.");
-        }
-        
-        /* 
-        // Fallback method - create floating button 
-        // This code is now commented out as we're using direct redirect
-        const checkoutButton = document.createElement('div');
-        checkoutButton.className = 'fixed top-4 right-4 z-50 bg-white shadow-lg rounded-lg p-4 max-w-md';
-        checkoutButton.innerHTML = `
-          <h3 class="text-lg font-bold mb-2">Ready to checkout</h3>
-          <p class="mb-3">Click the button below to open the payment page:</p>
-          <a 
-            href="${checkoutUrl}" 
-            target="_blank"
-            class="inline-block bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded">
-            Open Checkout
-          </a>
-          <button class="ml-2 text-gray-500 hover:text-gray-700" id="close-checkout-prompt">
-            Close
+          </div>
+          <div class="text-sm text-gray-600 mb-3">
+            If nothing happens when you click, copy the link below and paste it into your browser:
+          </div>
+          <div class="bg-gray-100 p-3 rounded mb-4 break-all">
+            <code class="text-xs">${checkoutUrl}</code>
+          </div>
+          <button class="text-gray-500 hover:text-gray-700 underline" id="close-checkout-prompt">
+            Close this message
           </button>
         `;
         
@@ -181,13 +190,8 @@ const PricingPage = () => {
           checkoutButton.remove();
         });
         
-        // Also try to open the window right away
-        const newWindow = window.open(checkoutUrl, '_blank');
-        */
-        
-        // Show a helpful message
-        setError("Redirecting to payment page...");
-        // We don't reset processing state as we're redirecting away
+        // Reset the processing state so user can try again if needed
+        setProcessingPayment(false);
       } else {
         throw new Error('No checkout URL returned from server');
       }
@@ -206,34 +210,6 @@ const PricingPage = () => {
       </div>
     );
   }
-
-  // Default packages if API fails
-  const defaultPackages = [
-    { 
-      id: "basic", 
-      name: "Starter", 
-      price: 5.99, 
-      credits: 50, 
-      description: "Perfect for occasional use", 
-      features: ["50 image processes", "Valid for 90 days", "Standard quality"] 
-    },
-    { 
-      id: "standard", 
-      name: "Pro", 
-      price: 14.99, 
-      credits: 200, 
-      description: "Best value for regular users", 
-      features: ["200 image processes", "Valid for 180 days", "High quality", "Priority support"] 
-    },
-    { 
-      id: "premium", 
-      name: "Business", 
-      price: 39.99, 
-      credits: 500, 
-      description: "Ideal for professional use", 
-      features: ["500 image processes", "Valid for 365 days", "Premium quality", "Priority support", "Bulk processing"] 
-    }
-  ];
 
   const displayPackages = packages.length > 0 ? packages : defaultPackages;
 
