@@ -12,8 +12,22 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const FLASK_PORT = 5000;
 
-// Define the frontend dist path
-const FRONTEND_DIST_PATH = path.join(__dirname, '../frontend/dist');
+// Define the frontend dist path - check both potential locations
+import fs from 'fs';
+
+let FRONTEND_DIST_PATH = path.join(__dirname, '../frontend/dist');
+// If frontend/dist doesn't exist, try client/dist as a fallback
+if (!fs.existsSync(FRONTEND_DIST_PATH)) {
+  const alternatePath = path.join(__dirname, '../client/dist');
+  if (fs.existsSync(alternatePath)) {
+    console.log('Using alternate frontend path:', alternatePath);
+    FRONTEND_DIST_PATH = alternatePath;
+  } else {
+    console.warn('⚠️ Frontend build directory not found! Checked:');
+    console.warn('- ' + FRONTEND_DIST_PATH);
+    console.warn('- ' + alternatePath);
+  }
+}
 
 // Enable CORS
 app.use(cors());

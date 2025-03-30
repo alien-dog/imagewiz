@@ -78,17 +78,29 @@ def create_app():
             """Serve processed files"""
             return send_from_directory(os.path.abspath(app.config['PROCESSED_FOLDER']), filename)
             
-        # Root route
-        @app.route('/')
-        def index():
-            """Return root route response"""
-            return jsonify({"status": "ok", "message": "iMagenWiz API is running"})
-            
-        # API root route
+        # API root route only - no more root route in Flask
         @app.route('/api')
         def api_index():
             """Return API root route response"""
             return jsonify({"status": "ok", "message": "iMagenWiz API is running"})
+            
+        # Just serve API info on root route instead of redirecting
+        @app.route('/')
+        def root_route():
+            """Return API info at root"""
+            return jsonify({
+                "status": "ok", 
+                "message": "iMagenWiz API is running. Please use the web interface at port 3000 to access the application.",
+                "api_version": "1.0",
+                "endpoints": [
+                    "/api/auth/login", 
+                    "/api/auth/register",
+                    "/api/auth/user",
+                    "/api/payment/packages",
+                    "/api/matting/process",
+                    "/api/matting/history"
+                ]
+            })
             
         # Health check route
         @app.route('/api/health')
