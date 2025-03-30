@@ -65,8 +65,10 @@ const PricingPage = () => {
       const token = localStorage.getItem('token');
       console.log('Using authorization token:', token ? 'Token exists' : 'No token');
       
-      // Important: Make sure we're using the correct API endpoint path
-      const endpoint = '/api/payment/create-checkout-session';
+      // IMPORTANT FIX: Use the direct endpoint that works consistently
+      // The issue was that we're not correctly routed to /api/payment/... 
+      // Using /payment/... directly is properly proxied by the server
+      const endpoint = '/payment/create-checkout-session';
       console.log('Making payment request to endpoint:', endpoint);
       
       // Get package details for better debugging
