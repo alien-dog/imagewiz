@@ -36,7 +36,12 @@ const PaymentSuccessPage = () => {
         }
         
         // Verify payment with backend
-        const response = await axios.get(`/api/payment/verify-intent/${paymentIntentId}`);
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`/api/payment/verify-intent/${paymentIntentId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         
         if (response.data.status === 'success') {
           setPaymentVerified(true);

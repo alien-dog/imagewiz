@@ -33,10 +33,15 @@ const CheckoutPage = () => {
         setLoading(true);
         setError(null);
         
+        const token = localStorage.getItem('token');
         const response = await axios.post('/api/payment/create-payment-intent', {
           priceId: location.state.packageDetails.priceId,
           packageName: location.state.packageDetails.packageName,
           isYearly: location.state.packageDetails.isYearly
+        }, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
         });
         
         setClientSecret(response.data.clientSecret);

@@ -27,6 +27,14 @@ const StripeCheckoutForm = ({ clientSecret, packageDetails }) => {
 
     setProcessing(true);
     setMessage(null);
+    
+    // Ensure we have the auth token for JWT authentication
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setMessage("You must be logged in to complete this transaction.");
+      setProcessing(false);
+      return;
+    }
 
     // Trigger form validation and wallet collection
     const { error: submitError } = await elements.submit();
