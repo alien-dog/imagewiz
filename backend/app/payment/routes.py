@@ -13,55 +13,36 @@ stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
 # Credit package options
 CREDIT_PACKAGES = [
     {
-        "id": "free",
-        "name": "Free",
-        "credits": 3,
-        "price": 0,
-        "currency": "usd",
-        "description": "3 credits for removing background from images",
-        "is_subscription": False
-    },
-    {
-        "id": "lite_monthly",
-        "name": "Lite (Monthly)",
+        "id": "basic",
+        "name": "Basic",
         "credits": 50,
-        "price": 9.90,
+        "price": 5.99,
         "currency": "usd",
-        "description": "50 credits per month for removing background from images",
-        "is_subscription": True,
-        "interval": "month"
+        "description": "50 credits for removing background from images"
     },
     {
-        "id": "lite_yearly",
-        "name": "Lite (Yearly)",
-        "credits": 600,
-        "price": 106.80,
+        "id": "standard",
+        "name": "Standard",
+        "credits": 125,
+        "price": 12.99,
         "currency": "usd",
-        "description": "600 credits per year for removing background from images",
-        "is_subscription": True,
-        "interval": "year"
+        "description": "125 credits for removing background from images"
     },
     {
-        "id": "pro_monthly",
-        "name": "Pro (Monthly)",
-        "credits": 250,
-        "price": 24.90,
+        "id": "premium",
+        "name": "Premium",
+        "credits": 300,
+        "price": 24.99,
         "currency": "usd",
-        "description": "250 credits per month for removing background from images",
-        "is_subscription": True,
-        "interval": "month",
-        "popular": True
+        "description": "300 credits for removing background from images"
     },
     {
-        "id": "pro_yearly",
-        "name": "Pro (Yearly)",
-        "credits": 3000,
-        "price": 262.80,
+        "id": "professional",
+        "name": "Professional",
+        "credits": 700,
+        "price": 49.99,
         "currency": "usd",
-        "description": "3000 credits per year for removing background from images",
-        "is_subscription": True,
-        "interval": "year",
-        "popular": True
+        "description": "700 credits for removing background from images"
     }
 ]
 
@@ -142,39 +123,29 @@ def create_checkout_session():
         print(f"Success URL: {success_url}")
         print(f"Cancel URL: {cancel_url}")
         
-        # Set up payment details
-        line_items = [
-            {
-                'price_data': {
-                    'currency': package['currency'],
-                    'product_data': {
-                        'name': package['name'],
-                        'description': package['description'],
-                    },
-                    'unit_amount': int(package['price'] * 100),  # Convert to cents
-                    # Add recurring price data if it's a subscription
-                    **({"recurring": {"interval": package["interval"]}} if package.get("is_subscription", False) else {})
-                },
-                'quantity': 1,
-            }
-        ]
-        
-        # Determine payment mode based on package type
-        payment_mode = 'subscription' if package.get('is_subscription', False) else 'payment'
-        
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
-            line_items=line_items,
-            mode=payment_mode,
+            line_items=[
+                {
+                    'price_data': {
+                        'currency': package['currency'],
+                        'product_data': {
+                            'name': package['name'],
+                            'description': package['description'],
+                        },
+                        'unit_amount': int(package['price'] * 100),  # Convert to cents
+                    },
+                    'quantity': 1,
+                },
+            ],
+            mode='payment',
             success_url=success_url,
             cancel_url=cancel_url,
             metadata={
                 'user_id': user.id,
                 'package_id': package_id,
                 'credits': package['credits'],
-                'price': package['price'],
-                'is_subscription': "true" if package.get('is_subscription', False) else "false",
-                'interval': package.get('interval', '')
+                'price': package['price']
             }
         )
         

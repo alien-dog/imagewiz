@@ -10,7 +10,7 @@ import Register from './pages/Register';
 import DashboardPage from './pages/DashboardPage';
 import HistoryPage from './pages/HistoryPage';
 import HistoryDetailPage from './pages/HistoryDetailPage';
-import ModernPricing from './pages/ModernPricing';
+import Pricing from './pages/Pricing';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import PaymentHistoryPage from './pages/PaymentHistoryPage';
 import Profile from './pages/Profile';
@@ -42,7 +42,7 @@ const AppContent = () => {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/pricing" element={<ModernPricing />} />
+            <Route path="/pricing" element={<Pricing />} />
             <Route
               path="/payment-success"
               element={
