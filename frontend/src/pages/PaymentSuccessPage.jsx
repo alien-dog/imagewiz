@@ -128,15 +128,25 @@ const PaymentSuccessPage = () => {
               
               {paymentDetails ? (
                 <div className="bg-gray-50 rounded p-4 mb-6">
-                  <h3 className="font-semibold text-lg mb-2">{paymentDetails.package_name} Package</h3>
+                  <h3 className="font-semibold text-lg mb-2">
+                    {/* Display either the package_name if it already includes the billing period or format it */}
+                    {paymentDetails.package_name.includes('Monthly') || paymentDetails.package_name.includes('Yearly') 
+                      ? paymentDetails.package_name
+                      : `${paymentDetails.package_name} ${paymentDetails.is_yearly ? '(Yearly)' : '(Monthly)'} Plan`}
+                  </h3>
                   <p className="text-gray-700 mb-1">
                     <span className="font-medium">Amount Paid:</span> ${paymentDetails.amount_paid.toFixed(2)}
                   </p>
                   <p className="text-gray-700 mb-1">
-                    <span className="font-medium">Credits Added:</span> {paymentDetails.credits_added}
+                    <span className="font-medium">Credits Added:</span> {paymentDetails.credits_added.toLocaleString()}
+                    {paymentDetails.is_yearly && (
+                      <span className="text-gray-500 text-sm ml-1">
+                        ({Math.round(paymentDetails.credits_added/12).toLocaleString()} per month)
+                      </span>
+                    )}
                   </p>
                   <p className="text-gray-700 font-medium text-lg mt-2">
-                    New Balance: <span className="text-teal-600">{paymentDetails.new_balance} credits</span>
+                    New Balance: <span className="text-teal-600">{paymentDetails.new_balance.toLocaleString()} credits</span>
                   </p>
                 </div>
               ) : (

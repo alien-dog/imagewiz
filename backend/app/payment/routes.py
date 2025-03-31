@@ -13,36 +13,48 @@ stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
 # Credit package options
 CREDIT_PACKAGES = [
     {
-        "id": "basic",
-        "name": "Basic",
+        "id": "free",
+        "name": "Free",
+        "credits": 3,
+        "price": 0,
+        "currency": "usd",
+        "description": "3 credits for removing background from images"
+    },
+    {
+        "id": "lite_monthly",
+        "name": "Lite Monthly",
         "credits": 50,
-        "price": 5.99,
+        "price": 9.9,
         "currency": "usd",
-        "description": "50 credits for removing background from images"
+        "description": "50 credits for removing background from images",
+        "is_yearly": False
     },
     {
-        "id": "standard",
-        "name": "Standard",
-        "credits": 125,
-        "price": 12.99,
+        "id": "lite_yearly",
+        "name": "Lite Yearly",
+        "credits": 600,
+        "price": 106.8,
         "currency": "usd",
-        "description": "125 credits for removing background from images"
+        "description": "600 credits for removing background from images (50 per month)",
+        "is_yearly": True
     },
     {
-        "id": "premium",
-        "name": "Premium",
-        "credits": 300,
-        "price": 24.99,
+        "id": "pro_monthly",
+        "name": "Pro Monthly",
+        "credits": 250,
+        "price": 24.9,
         "currency": "usd",
-        "description": "300 credits for removing background from images"
+        "description": "250 credits for removing background from images",
+        "is_yearly": False
     },
     {
-        "id": "professional",
-        "name": "Professional",
-        "credits": 700,
-        "price": 49.99,
+        "id": "pro_yearly",
+        "name": "Pro Yearly",
+        "credits": 3000,
+        "price": 262.8,
         "currency": "usd",
-        "description": "700 credits for removing background from images"
+        "description": "3000 credits for removing background from images (250 per month)",
+        "is_yearly": True
     }
 ]
 
@@ -73,7 +85,13 @@ def create_checkout_session():
     success_url = data.get('success_url')
     cancel_url = data.get('cancel_url')
     
+    # Get optional parameters
+    custom_price = data.get('price')
+    custom_credits = data.get('credits')
+    is_yearly = data.get('is_yearly', False)
+    
     print(f"Creating checkout session for user {user.id}, package {package_id}")
+    print(f"Is yearly: {is_yearly}, Credits: {custom_credits}, Price: {custom_price}")
     print(f"Success URL: {success_url}, Cancel URL: {cancel_url}")
     
     # If success_url or cancel_url are not provided, use default URLs based on request origin
@@ -109,9 +127,22 @@ def create_checkout_session():
         print(f"No cancel_url provided, using default: {cancel_url}")
     
     # Find the selected package
-    package = next((p for p in CREDIT_PACKAGES if p['id'] == package_id), None)
+    package = None
+    
+    # Handle packages with yearly/monthly options
+    if is_yearly is not None:
+        package = next((p for p in CREDIT_PACKAGES if p['id'] == package_id and p.get('is_yearly', False) == is_yearly), None)
+    
+    # If not found or no is_yearly provided, try the default
+    if not package:
+        package = next((p for p in CREDIT_PACKAGES if p['id'] == package_id), None)
+    
     if not package:
         return jsonify({"error": "Invalid package selected"}), 400
+        
+    # Override package properties with custom values if provided
+    price = custom_price if custom_price is not None else package['price']
+    credits = custom_credits if custom_credits is not None else package['credits']
     
     # Create Stripe session
     try:
@@ -123,6 +154,20 @@ def create_checkout_session():
         print(f"Success URL: {success_url}")
         print(f"Cancel URL: {cancel_url}")
         
+        # Create a customized description if we're using custom values
+        product_name = package['name']
+        product_description = package['description']
+        
+        # If custom values were provided, update the description
+        if custom_credits is not None or custom_price is not None:
+            # Extract the base package name (before _monthly or _yearly)
+            base_name = package_id.split('_')[0].capitalize()
+            billing_period = "Yearly" if is_yearly else "Monthly"
+            product_name = f"{base_name} Plan ({billing_period})"
+            product_description = f"{credits} credits for removing background from images"
+            if is_yearly:
+                product_description += f" ({int(credits/12)} per month)"
+        
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=[
@@ -130,10 +175,10 @@ def create_checkout_session():
                     'price_data': {
                         'currency': package['currency'],
                         'product_data': {
-                            'name': package['name'],
-                            'description': package['description'],
+                            'name': product_name,
+                            'description': product_description,
                         },
-                        'unit_amount': int(package['price'] * 100),  # Convert to cents
+                        'unit_amount': int(price * 100),  # Convert to cents
                     },
                     'quantity': 1,
                 },
@@ -144,8 +189,9 @@ def create_checkout_session():
             metadata={
                 'user_id': user.id,
                 'package_id': package_id,
-                'credits': package['credits'],
-                'price': package['price']
+                'credits': credits,
+                'price': price,
+                'is_yearly': 'true' if is_yearly else 'false'
             }
         )
         
@@ -199,6 +245,7 @@ def handle_successful_payment(session):
             package_id = metadata.get('package_id')
             credits = int(metadata.get('credits', 0))
             price = float(metadata.get('price', 0))
+            is_yearly = metadata.get('is_yearly', 'false').lower() == 'true'
             session_id = session.id
         else:
             # If session is a dict
@@ -207,6 +254,7 @@ def handle_successful_payment(session):
             package_id = metadata.get('package_id')
             credits = int(metadata.get('credits', 0))
             price = float(metadata.get('price', 0))
+            is_yearly = metadata.get('is_yearly', 'false').lower() == 'true'
             session_id = session.get('id')
         
         print(f"Processing payment for user_id: {user_id}, credits: {credits}, price: {price}")
@@ -247,7 +295,9 @@ def handle_successful_payment(session):
             credit_gained=credits,
             payment_status='completed',
             payment_method='stripe',
-            stripe_payment_id=session_id
+            stripe_payment_id=session_id,
+            is_yearly=is_yearly,
+            package_id=package_id
         )
         
         db.session.add(recharge)
@@ -298,6 +348,7 @@ def verify_payment_query():
                 package_id = session.metadata.get('package_id')
                 package = next((p for p in CREDIT_PACKAGES if p['id'] == package_id), None)
                 
+                is_yearly = session.metadata.get('is_yearly', 'false').lower() == 'true'
                 return jsonify({
                     "status": "success", 
                     "message": "Payment verified and credits added",
@@ -305,6 +356,7 @@ def verify_payment_query():
                     "package_name": package['name'] if package else "Credit Package",
                     "amount_paid": float(session.metadata.get('price', 0)),
                     "credits_added": int(session.metadata.get('credits', 0)),
+                    "is_yearly": is_yearly,
                     "new_balance": user.credit_balance
                 }), 200
             else:
@@ -329,6 +381,7 @@ def verify_payment_query():
         "package_name": package_name,
         "amount_paid": float(recharge.amount),
         "credits_added": recharge.credit_gained,
+        "is_yearly": recharge.is_yearly,
         "new_balance": user.credit_balance
     }), 200
 

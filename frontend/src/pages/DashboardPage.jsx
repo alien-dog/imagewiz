@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ImageUploader from '../components/ImageUploader';
 import { useAuth } from '../contexts/AuthContext';
+import CreditUsageCard from '../components/CreditUsageCard';
 
 const DashboardPage = () => {
   const { user, refreshUser } = useAuth();
@@ -93,8 +94,13 @@ const DashboardPage = () => {
         </div>
       </div>
 
-      <div className="mb-8">
-        <ImageUploader />
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="md:col-span-3">
+          <ImageUploader />
+        </div>
+        <div className="md:col-span-1">
+          <CreditUsageCard />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

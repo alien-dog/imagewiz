@@ -43,6 +43,8 @@ class RechargeHistory(db.Model):
     payment_status = db.Column(db.String(20), nullable=False)
     payment_method = db.Column(db.String(50), nullable=False)
     stripe_payment_id = db.Column(db.String(100))
+    is_yearly = db.Column(db.Boolean, default=False)
+    package_id = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     def to_dict(self):
@@ -55,6 +57,8 @@ class RechargeHistory(db.Model):
             'payment_status': self.payment_status,
             'payment_method': self.payment_method,
             'stripe_payment_id': self.stripe_payment_id,
+            'is_yearly': self.is_yearly,
+            'package_id': self.package_id,
             'created_at': self.created_at.isoformat()
         }
         
