@@ -12,6 +12,7 @@ import HistoryPage from './pages/HistoryPage';
 import HistoryDetailPage from './pages/HistoryDetailPage';
 import Pricing from './pages/Pricing';
 import PricingNew from './pages/PricingNew';
+import CheckoutPage from './pages/CheckoutPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import PaymentHistoryPage from './pages/PaymentHistoryPage';
 import Profile from './pages/Profile';
@@ -45,6 +46,14 @@ const AppContent = () => {
             <Route path="/register" element={<Register />} />
             <Route path="/pricing" element={<PricingNew />} />
             <Route path="/pricing-old" element={<Pricing />} />
+            <Route
+              path="/checkout"
+              element={
+                <ProtectedRoute>
+                  <CheckoutPage />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/payment-success"
               element={

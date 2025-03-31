@@ -230,6 +230,11 @@ def webhook():
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
         handle_successful_payment(session)
+    # Handle the payment_intent.succeeded event for direct payments
+    elif event['type'] == 'payment_intent.succeeded':
+        payment_intent = event['data']['object']
+        # Process the payment intent
+        handle_payment_intent_success(payment_intent)
     
     return jsonify({"status": "success"}), 200
 
@@ -428,6 +433,226 @@ def verify_payment(session_id):
         "status": "success",
         "message": "Payment already verified",
         "user": user.to_dict()
+    }), 200
+
+@bp.route('/checkout-intent', methods=['POST'])
+@jwt_required()
+def create_payment_intent():
+    """Create a Stripe PaymentIntent for embedded checkout"""
+    user_id = get_jwt_identity()
+    try:
+        user_id = int(user_id)
+    except (ValueError, TypeError):
+        return jsonify({"error": "Invalid user ID"}), 400
+        
+    user = User.query.get(user_id)
+    
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    data = request.get_json()
+    priceId = data.get("priceId")
+    packageName = data.get("packageName") 
+    isYearly = data.get("isYearly", False)
+    
+    if not packageName or not priceId:
+        return jsonify({"error": "Package name and price ID are required"}), 400
+    
+    # Get the price from Stripe to determine the amount
+    try:
+        price = stripe.Price.retrieve(priceId)
+        amount = price.unit_amount  # Amount in cents
+        
+        # Create a PaymentIntent
+        intent = stripe.PaymentIntent.create(
+            amount=amount,
+            currency="usd",
+            metadata={
+                "user_id": user.id,
+                "package_name": packageName,
+                "is_yearly": "true" if isYearly else "false",
+                "price_id": priceId
+            }
+        )
+        
+        return jsonify({
+            "clientSecret": intent.client_secret,
+            "amount": amount / 100  # Convert cents to dollars for display
+        })
+    except Exception as e:
+        print(f"Error creating payment intent: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+def handle_payment_intent_success(payment_intent):
+    """Process a successful payment intent and add credits to user"""
+    try:
+        metadata = payment_intent.metadata
+        user_id = metadata.get('user_id')
+        package_name = metadata.get('package_name')
+        price_id = metadata.get('price_id')
+        is_yearly = metadata.get('is_yearly', 'false').lower() == 'true'
+        payment_id = payment_intent.id
+        
+        print(f"Processing payment intent for user_id: {user_id}, package: {package_name}, price_id: {price_id}")
+        
+        if not user_id:
+            print("Error: No user_id in payment metadata")
+            return
+            
+        # Convert user_id to integer if it's a string
+        try:
+            user_id = int(user_id)
+        except (ValueError, TypeError) as e:
+            print(f"Error converting user_id to integer: {str(e)}")
+            return
+        
+        # Find the user
+        user = User.query.get(user_id)
+        if not user:
+            print(f"Error: User {user_id} not found for payment {payment_id}")
+            return
+        
+        # Check if this payment has already been processed
+        existing_recharge = RechargeHistory.query.filter_by(
+            stripe_payment_id=payment_id
+        ).first()
+        
+        if existing_recharge:
+            print(f"Payment intent {payment_id} already processed, skipping")
+            return
+        
+        # Get price information from Stripe
+        try:
+            price = stripe.Price.retrieve(price_id)
+            amount = price.unit_amount / 100  # Convert cents to dollars
+            
+            # Determine credits based on price
+            credit_amount = 0
+            package_id = ''
+            
+            # Find matching package by price and yearly status
+            for pkg in CREDIT_PACKAGES:
+                # Match by price and yearly status
+                if pkg.get('price') == amount and pkg.get('is_yearly', False) == is_yearly:
+                    credit_amount = pkg.get('credits', 0)
+                    package_id = pkg.get('id', '')
+                    break
+            
+            # If no exact match found, use a fallback calculation based on plan name
+            if credit_amount == 0:
+                if 'lite' in package_name.lower():
+                    credit_amount = 50 if not is_yearly else 600
+                    package_id = 'lite_monthly' if not is_yearly else 'lite_yearly'
+                elif 'pro' in package_name.lower():
+                    credit_amount = 250 if not is_yearly else 3000
+                    package_id = 'pro_monthly' if not is_yearly else 'pro_yearly'
+                else:
+                    # Default credits if still no match
+                    credit_amount = round(amount * 5)  # $1 = 5 credits as a fallback
+                    package_id = 'custom'
+            
+            # Add credits to user's balance
+            user.credit_balance += credit_amount
+            
+            # Record the recharge history
+            recharge = RechargeHistory(
+                user_id=user.id,
+                amount=amount,
+                credit_gained=credit_amount,
+                payment_status='completed',
+                payment_method='stripe',
+                stripe_payment_id=payment_id,
+                is_yearly=is_yearly,
+                package_id=package_id
+            )
+            
+            db.session.add(recharge)
+            db.session.commit()
+            
+            print(f"User {user.username} recharged {credit_amount} credits for ${amount}")
+            return user
+            
+        except Exception as e:
+            print(f"Error retrieving price info: {str(e)}")
+            return None
+            
+    except Exception as e:
+        print(f"Error in handle_payment_intent_success: {str(e)}")
+        # Don't raise exception, just log it
+        return None
+
+@bp.route('/verify-intent/<payment_intent_id>', methods=['GET'])
+@jwt_required()
+def verify_payment_intent(payment_intent_id):
+    """Verify a payment intent status and return updated user data"""
+    user_id = get_jwt_identity()
+    try:
+        user_id = int(user_id)
+    except (ValueError, TypeError):
+        return jsonify({"error": "Invalid user ID"}), 400
+        
+    user = User.query.get(user_id)
+    
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    
+    # Check if payment exists in user's history
+    recharge = RechargeHistory.query.filter_by(
+        user_id=user.id,
+        stripe_payment_id=payment_intent_id
+    ).first()
+    
+    if not recharge:
+        # Try to retrieve payment intent from Stripe
+        try:
+            payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+            if payment_intent.status == 'succeeded' and str(payment_intent.metadata.get('user_id')) == str(user.id):
+                # Payment successful but not recorded yet, process it
+                handle_payment_intent_success(payment_intent)
+                
+                # Get price info to determine credits and package details
+                price = stripe.Price.retrieve(payment_intent.metadata.get('price_id'))
+                amount = price.unit_amount / 100  # Convert cents to dollars
+                
+                # Determine credits based on package name
+                package_name = payment_intent.metadata.get('package_name', '')
+                is_yearly = payment_intent.metadata.get('is_yearly', 'false').lower() == 'true'
+                
+                credits = 0
+                if 'lite' in package_name.lower():
+                    credits = 50 if not is_yearly else 600
+                elif 'pro' in package_name.lower():
+                    credits = 250 if not is_yearly else 3000
+                else:
+                    # Default credits if no match
+                    credits = round(amount * 5)  # $1 = 5 credits as a fallback
+                
+                return jsonify({
+                    "status": "success", 
+                    "message": "Payment verified and credits added",
+                    "user": user.to_dict(),
+                    "package_name": package_name,
+                    "amount_paid": amount,
+                    "credits_added": credits,
+                    "is_yearly": is_yearly,
+                    "new_balance": user.credit_balance
+                }), 200
+            else:
+                return jsonify({"error": "Payment not completed or unauthorized"}), 400
+        except Exception as e:
+            print(f"Error verifying payment intent: {str(e)}")
+            return jsonify({"error": str(e)}), 500
+    
+    # If payment was already verified, get package info from the recharge record
+    return jsonify({
+        "status": "success",
+        "message": "Payment already verified",
+        "user": user.to_dict(),
+        "package_name": recharge.package_id,
+        "amount_paid": float(recharge.amount),
+        "credits_added": recharge.credit_gained,
+        "is_yearly": recharge.is_yearly,
+        "new_balance": user.credit_balance
     }), 200
 
 @bp.route('/history', methods=['GET'])

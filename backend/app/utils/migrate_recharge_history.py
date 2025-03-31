@@ -4,51 +4,73 @@ Migration script to add the is_yearly and package_id columns to the recharge_his
 
 import os
 import sys
-from sqlalchemy import inspect, text
+from sqlalchemy import create_engine, text
+from urllib.parse import quote_plus
 
-# Add the parent directory to the sys.path
-script_dir = os.path.dirname(os.path.abspath(__file__))
-app_dir = os.path.abspath(os.path.join(script_dir, '..'))
-sys.path.insert(0, app_dir)
+# Get database connection from environment variables
+DB_HOST = os.environ.get('MYSQL_HOST', '8.130.113.102')
+DB_USER = os.environ.get('MYSQL_USER', 'root')
+DB_PASSWORD = os.environ.get('MYSQL_PASSWORD', 'Ir%86241992')
+DB_NAME = os.environ.get('MYSQL_DB', 'mat_db')
 
-# Import after path setup
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from app import create_app, db
+# Create database URI with proper escaping
+DB_URI = f"mysql+pymysql://{DB_USER}:{quote_plus(DB_PASSWORD)}@{DB_HOST}/{DB_NAME}"
 
 def column_exists(table_name, column_name):
     """Check if a column exists in a table"""
-    with db.engine.connect() as conn:
-        inspector = inspect(db.engine)
-        columns = [col['name'] for col in inspector.get_columns(table_name)]
-        return column_name in columns
+    try:
+        engine = create_engine(DB_URI)
+        with engine.connect() as connection:
+            query = text(f"""
+                SELECT 1 
+                FROM information_schema.COLUMNS 
+                WHERE TABLE_SCHEMA = '{DB_NAME}' 
+                AND TABLE_NAME = '{table_name}' 
+                AND COLUMN_NAME = '{column_name}'
+            """)
+            result = connection.execute(query)
+            return bool(result.scalar())
+    except Exception as e:
+        print(f"Error checking if column exists: {e}")
+        return False
 
 def alter_table_add_is_yearly():
     """Add is_yearly column to recharge_history table if it doesn't exist"""
-    if not column_exists('recharge_history', 'is_yearly'):
-        print("Adding 'is_yearly' column to recharge_history table...")
-        with db.engine.connect() as conn:
-            conn.execute(text("ALTER TABLE recharge_history ADD COLUMN is_yearly BOOLEAN DEFAULT FALSE"))
-            conn.commit()
-        print("Added 'is_yearly' column to recharge_history table.")
-    else:
-        print("Column 'is_yearly' already exists in recharge_history table.")
-
+    try:
+        if not column_exists("recharge_history", "is_yearly"):
+            engine = create_engine(DB_URI)
+            with engine.connect() as connection:
+                query = text("""
+                    ALTER TABLE recharge_history
+                    ADD COLUMN is_yearly BOOLEAN DEFAULT FALSE
+                """)
+                connection.execute(query)
+                connection.commit()
+                print("Added is_yearly column to recharge_history table")
+        else:
+            print("is_yearly column already exists in recharge_history table")
+    except Exception as e:
+        print(f"Error adding is_yearly column: {e}")
+        
 def alter_table_add_package_id():
     """Add package_id column to recharge_history table if it doesn't exist"""
-    if not column_exists('recharge_history', 'package_id'):
-        print("Adding 'package_id' column to recharge_history table...")
-        with db.engine.connect() as conn:
-            conn.execute(text("ALTER TABLE recharge_history ADD COLUMN package_id VARCHAR(50)"))
-            conn.commit()
-        print("Added 'package_id' column to recharge_history table.")
-    else:
-        print("Column 'package_id' already exists in recharge_history table.")
+    try:
+        if not column_exists("recharge_history", "package_id"):
+            engine = create_engine(DB_URI)
+            with engine.connect() as connection:
+                query = text("""
+                    ALTER TABLE recharge_history
+                    ADD COLUMN package_id VARCHAR(50) DEFAULT NULL
+                """)
+                connection.execute(query)
+                connection.commit()
+                print("Added package_id column to recharge_history table")
+        else:
+            print("package_id column already exists in recharge_history table")
+    except Exception as e:
+        print(f"Error adding package_id column: {e}")
 
-if __name__ == '__main__':
-    app = create_app()
-    with app.app_context():
-        print("Starting database migration...")
-        alter_table_add_is_yearly()
-        alter_table_add_package_id()
-        print("Database migration completed successfully!")
+if __name__ == "__main__":
+    alter_table_add_is_yearly()
+    alter_table_add_package_id()
+    print("Migration completed")

@@ -4,6 +4,8 @@ import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import { CheckIcon, XIcon } from 'lucide-react';
 
+import { PRICE_IDS } from '../lib/stripe';
+
 // Plans configuration
 const pricingPlans = [
   {
@@ -38,6 +40,8 @@ const pricingPlans = [
     yearlyPrice: 106.8,
     monthlyCredits: 50,
     yearlyCredits: 600,
+    monthlyPriceId: PRICE_IDS.LITE_MONTHLY,
+    yearlyPriceId: PRICE_IDS.LITE_YEARLY,
     features: [
       '50 monthly/600 yearly image processes',
       'High quality processing',
@@ -61,6 +65,8 @@ const pricingPlans = [
     yearlyPrice: 262.8,
     monthlyCredits: 250,
     yearlyCredits: 3000,
+    monthlyPriceId: PRICE_IDS.PRO_MONTHLY,
+    yearlyPriceId: PRICE_IDS.PRO_YEARLY,
     features: [
       '250 monthly/3000 yearly image processes',
       'Premium quality processing',
@@ -118,51 +124,31 @@ const PricingNew = () => {
         throw new Error(`Plan ${planId} not found`);
       }
       
-      // Determine the right plan ID based on billing period
-      const effectivePlanId = yearlyBilling 
-        ? (selectedPlan.idYearly || planId) 
-        : planId;
+      // Determine price ID based on selection
+      let priceId = '';
+      let packageName = '';
       
-      // Generate a base URL for success and cancel redirects
-      const baseUrl = window.location.origin;
-      const successUrl = `${baseUrl}/payment-success`;
-      const cancelUrl = `${baseUrl}/pricing`;
-      
-      console.log(`Creating checkout session for package ${effectivePlanId}`, {
-        packageId: effectivePlanId,
-        price: yearlyBilling ? selectedPlan.yearlyPrice : selectedPlan.monthlyPrice,
-        credits: yearlyBilling ? selectedPlan.yearlyCredits : selectedPlan.monthlyCredits,
-        isYearly: yearlyBilling,
-        successUrl,
-        cancelUrl
-      });
-      
-      // Use the correct API endpoint with /api prefix
-      const response = await axios.post('/api/payment/create-checkout-session', {
-        package_id: effectivePlanId,
-        price: yearlyBilling ? selectedPlan.yearlyPrice : selectedPlan.monthlyPrice,
-        credits: yearlyBilling ? selectedPlan.yearlyCredits : selectedPlan.monthlyCredits,
-        is_yearly: yearlyBilling,
-        success_url: successUrl,
-        cancel_url: cancelUrl
-      }, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-
-      // Redirect to Stripe checkout
-      if (response.data.url) {
-        const checkoutUrl = response.data.url;
-        console.log('Redirecting to Stripe checkout URL:', checkoutUrl);
-        window.location.href = checkoutUrl;
-      } else {
-        throw new Error('No checkout URL returned from server');
+      if (selectedPlan === 'lite') {
+        priceId = yearlyBilling ? PRICE_IDS.LITE_YEARLY : PRICE_IDS.LITE_MONTHLY;
+        packageName = yearlyBilling ? 'Lite Yearly' : 'Lite Monthly';
+      } else if (selectedPlan === 'pro') {
+        priceId = yearlyBilling ? PRICE_IDS.PRO_YEARLY : PRICE_IDS.PRO_MONTHLY;
+        packageName = yearlyBilling ? 'Pro Yearly' : 'Pro Monthly';
       }
+      
+      // Navigate to checkout page with the plan data
+      navigate('/checkout', { 
+        state: { 
+          packageDetails: {
+            priceId,
+            packageName,
+            isYearly: yearlyBilling
+          }
+        } 
+      });
     } catch (err) {
-      console.error('Error creating checkout session:', err.response?.data || err.message);
-      setError(err.response?.data?.error || 'Failed to process your request. Please try again.');
-    } finally {
+      console.error('Error processing plan selection:', err.message);
+      setError('Failed to process your selection. Please try again.');
       setLoading(false);
     }
   };
