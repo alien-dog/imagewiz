@@ -532,6 +532,7 @@ def verify_payment(session_id):
     }), 200
 
 @bp.route('/checkout-intent', methods=['POST'])
+@bp.route('/create-payment-intent', methods=['POST'])  # Add additional route with the same handler
 @jwt_required()
 def create_payment_intent():
     """Create a Stripe PaymentIntent for embedded checkout"""
