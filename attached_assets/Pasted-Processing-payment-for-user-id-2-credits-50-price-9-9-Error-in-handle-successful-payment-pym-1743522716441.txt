@@ -1,0 +1,10 @@
+Processing payment for user_id: 2, credits: 50, price: 9.9
+Error in handle_successful_payment: (pymysql.err.OperationalError) (1054, "Unknown column 'is_yearly' in 'field list'")
+[SQL: INSERT INTO recharge_history (user_id, amount, credit_gained, payment_status, payment_method, stripe_payment_id, is_yearly, package_id, created_at) VALUES (%(user_id)s, %(amount)s, %(credit_gained)s, %(payment_status)s, %(payment_method)s, %(stripe_payment_id)s, %(is_yearly)s, %(package_id)s, %(created_at)s)]
+[parameters: {'user_id': 2, 'amount': 9.9, 'credit_gained': 50, 'payment_status': 'completed', 'payment_method': 'stripe', 'stripe_payment_id': 'cs_test_a1yjs0gKxxCkJuPsnDSwIXNaL611ZgcYYosFKtbm8IV6aGdCRI3Sk9wyXN', 'is_yearly': 0, 'package_id': 'lite_monthly', 'created_at': datetime.datetime(2025, 4, 1, 15, 50, 54, 844430)}]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+Error verifying payment: This Session's transaction has been rolled back due to a previous exception during flush. To begin a new transaction with this Session, first issue Session.rollback(). Original exception was: (pymysql.err.OperationalError) (1054, "Unknown column 'is_yearly' in 'field list'")
+[SQL: INSERT INTO recharge_history (user_id, amount, credit_gained, payment_status, payment_method, stripe_payment_id, is_yearly, package_id, created_at) VALUES (%(user_id)s, %(amount)s, %(credit_gained)s, %(payment_status)s, %(payment_method)s, %(stripe_payment_id)s, %(is_yearly)s, %(package_id)s, %(created_at)s)]
+[parameters: {'user_id': 2, 'amount': 9.9, 'credit_gained': 50, 'payment_status': 'completed', 'payment_method': 'stripe', 'stripe_payment_id': 'cs_test_a1yjs0gKxxCkJuPsnDSwIXNaL611ZgcYYosFKtbm8IV6aGdCRI3Sk9wyXN', 'is_yearly': 0, 'package_id': 'lite_monthly', 'created_at': datetime.datetime(2025, 4, 1, 15, 50, 54, 844430)}]
+(Background on this error at: https://sqlalche.me/e/20/e3q8) (Background on this error at: https://sqlalche.me/e/20/7s2a)
+127.0.0.1 - - [01/Apr/2025 15:50:55] "GET /payment/verify?session_id=cs_test_a1yjs0gKxxCkJuPsnDSwIXNaL611ZgcYYosFKtbm8IV6aGdCRI3Sk9wyXN HTTP/1.1" 500 -

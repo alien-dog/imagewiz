@@ -306,32 +306,46 @@ def handle_successful_payment(session):
         # Add credits to user's balance
         user.credit_balance += credits
         
-        # Record the recharge history - handle columns that might be missing
-        recharge_data = {
-            'user_id': user.id,
-            'amount': price,
-            'credit_gained': credits,
-            'payment_status': 'completed',
-            'payment_method': 'stripe',
-            'stripe_payment_id': session_id
-        }
+        # Instead of using the ORM, let's directly execute SQL to insert only the columns we know exist
+        from sqlalchemy import text
         
-        # Try to add is_yearly and package_id only if they exist in the model
         try:
-            # Create a dummy instance to test if the column exists
-            test_recharge = RechargeHistory()
-            if hasattr(test_recharge, 'is_yearly'):
-                recharge_data['is_yearly'] = is_yearly
-            if hasattr(test_recharge, 'package_id'):
-                recharge_data['package_id'] = package_id
-        except Exception as schema_error:
-            print(f"Warning: Error checking schema: {schema_error}")
-            # Continue without the potentially missing columns
-        
-        recharge = RechargeHistory(**recharge_data)
-        
-        db.session.add(recharge)
-        db.session.commit()
+            # Use raw SQL with only the basic columns we know exist
+            sql = text("""
+            INSERT INTO recharge_history 
+            (user_id, amount, credit_gained, payment_status, payment_method, stripe_payment_id, created_at)
+            VALUES (:user_id, :amount, :credit_gained, :payment_status, :payment_method, :stripe_payment_id, NOW())
+            """)
+            
+            # Execute the insert
+            db.session.execute(sql, {
+                'user_id': user.id,
+                'amount': price,
+                'credit_gained': credits,
+                'payment_status': 'completed',
+                'payment_method': 'stripe',
+                'stripe_payment_id': session_id
+            })
+            
+            # Update user's credit balance
+            user.credit_balance += credits
+            
+            # Commit all changes
+            db.session.commit()
+            
+            print(f"Successfully inserted payment record for user {user.username}")
+        except Exception as insert_error:
+            db.session.rollback()
+            print(f"Error inserting payment record: {insert_error}")
+            # Even if the insert fails, try to at least update the user's credit balance
+            try:
+                user.credit_balance += credits
+                db.session.commit()
+                print(f"Updated user's credit balance to {user.credit_balance}")
+            except Exception as balance_error:
+                db.session.rollback()
+                print(f"Error updating user's credit balance: {balance_error}")
+                raise
         
         print(f"User {user.username} recharged {credits} credits for ${price}")
         return user
@@ -649,32 +663,43 @@ def handle_payment_intent_success(payment_intent):
             # Add credits to user's balance
             user.credit_balance += credit_amount
             
-            # Record the recharge history - handle columns that might be missing
-            recharge_data = {
-                'user_id': user.id,
-                'amount': amount,
-                'credit_gained': credit_amount,
-                'payment_status': 'completed',
-                'payment_method': 'stripe',
-                'stripe_payment_id': payment_id
-            }
+            # Instead of using the ORM, directly execute SQL to insert only the columns we know exist
+            from sqlalchemy import text
             
-            # Try to add is_yearly and package_id only if they exist in the model
             try:
-                # Create a dummy instance to test if the column exists
-                test_recharge = RechargeHistory()
-                if hasattr(test_recharge, 'is_yearly'):
-                    recharge_data['is_yearly'] = is_yearly
-                if hasattr(test_recharge, 'package_id'):
-                    recharge_data['package_id'] = package_id
-            except Exception as schema_error:
-                print(f"Warning: Error checking schema: {schema_error}")
-                # Continue without the potentially missing columns
-            
-            recharge = RechargeHistory(**recharge_data)
-            
-            db.session.add(recharge)
-            db.session.commit()
+                # Use raw SQL with only the basic columns we know exist
+                sql = text("""
+                INSERT INTO recharge_history 
+                (user_id, amount, credit_gained, payment_status, payment_method, stripe_payment_id, created_at)
+                VALUES (:user_id, :amount, :credit_gained, :payment_status, :payment_method, :stripe_payment_id, NOW())
+                """)
+                
+                # Execute the insert
+                db.session.execute(sql, {
+                    'user_id': user.id,
+                    'amount': amount,
+                    'credit_gained': credit_amount,
+                    'payment_status': 'completed',
+                    'payment_method': 'stripe',
+                    'stripe_payment_id': payment_id
+                })
+                
+                # Commit all changes
+                db.session.commit()
+                
+                print(f"Successfully inserted payment record for user {user.username}")
+            except Exception as insert_error:
+                db.session.rollback()
+                print(f"Error inserting payment record: {insert_error}")
+                # Even if the insert fails, try to at least update the user's credit balance
+                try:
+                    user.credit_balance += credit_amount
+                    db.session.commit()
+                    print(f"Updated user's credit balance to {user.credit_balance}")
+                except Exception as balance_error:
+                    db.session.rollback()
+                    print(f"Error updating user's credit balance: {balance_error}")
+                    raise
             
             print(f"User {user.username} recharged {credit_amount} credits for ${amount}")
             return user
