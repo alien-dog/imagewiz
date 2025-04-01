@@ -8,7 +8,9 @@ from app import db
 from . import bp
 
 # Initialize Stripe with the API key
-stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
+stripe_api_key = os.environ.get('STRIPE_SECRET_KEY')
+print(f"DEBUG: Stripe API key is {'configured' if stripe_api_key else 'NOT configured'}")
+stripe.api_key = stripe_api_key
 
 # Credit package options
 CREDIT_PACKAGES = [
@@ -557,10 +559,13 @@ def create_payment_intent():
     
     # Get the price from Stripe to determine the amount
     try:
+        print(f"DEBUG: Attempting to retrieve Stripe price with ID: {priceId}")
         price = stripe.Price.retrieve(priceId)
         amount = price.unit_amount  # Amount in cents
+        print(f"DEBUG: Retrieved price with amount: {amount}")
         
         # Create a PaymentIntent
+        print(f"DEBUG: Creating payment intent for user id: {user.id}, package: {packageName}")
         intent = stripe.PaymentIntent.create(
             amount=amount,
             currency="usd",
@@ -571,6 +576,7 @@ def create_payment_intent():
                 "price_id": priceId
             }
         )
+        print(f"DEBUG: Created payment intent with client_secret: {intent.client_secret[:10]}...")
         
         return jsonify({
             "clientSecret": intent.client_secret,
@@ -827,6 +833,25 @@ def verify_payment_intent(payment_intent_id):
         "is_yearly": False,  # Default since column might not exist
         "new_balance": user.credit_balance
     }), 200
+
+@bp.route('/test-stripe-connection', methods=['GET'])
+def test_stripe_connection():
+    """Test the Stripe API connection"""
+    try:
+        print("Testing Stripe API connection...")
+        # Try to fetch a simple resource from Stripe
+        balance = stripe.Balance.retrieve()
+        print(f"Stripe connection successful, received balance response")
+        return jsonify({
+            "status": "success",
+            "message": "Stripe API connection is working"
+        }), 200
+    except Exception as e:
+        print(f"Stripe API connection test failed: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "message": f"Stripe API connection failed: {str(e)}"
+        }), 500
 
 @bp.route('/history', methods=['GET'])
 @jwt_required()

@@ -128,13 +128,20 @@ const PricingNew = () => {
       let priceId = '';
       let packageName = '';
       
-      if (selectedPlan === 'lite') {
-        priceId = yearlyBilling ? PRICE_IDS.LITE_YEARLY : PRICE_IDS.LITE_MONTHLY;
-        packageName = yearlyBilling ? 'Lite Yearly' : 'Lite Monthly';
-      } else if (selectedPlan === 'pro') {
-        priceId = yearlyBilling ? PRICE_IDS.PRO_YEARLY : PRICE_IDS.PRO_MONTHLY;
-        packageName = yearlyBilling ? 'Pro Yearly' : 'Pro Monthly';
+      // Use the price ID directly from the plan object
+      if (yearlyBilling) {
+        priceId = selectedPlan.yearlyPriceId;
+        packageName = `${selectedPlan.name} Yearly`;
+      } else {
+        priceId = selectedPlan.monthlyPriceId;
+        packageName = `${selectedPlan.name} Monthly`;
       }
+      
+      // Debug information
+      console.log('Selected plan:', selectedPlan);
+      console.log('Price ID being used:', priceId);
+      console.log('Package name:', packageName);
+      console.log('Is yearly billing:', yearlyBilling);
       
       // Navigate to checkout page with the plan data
       navigate('/checkout', { 
