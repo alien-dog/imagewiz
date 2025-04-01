@@ -117,10 +117,10 @@ const PaymentSuccessPage = () => {
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </button>
                   <button
-                    onClick={() => navigate('/upload')}
+                    onClick={() => navigate('/dashboard')}
                     className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-teal-600 bg-white border-teal-600 hover:bg-teal-50 transition-colors"
                   >
-                    Process Images Now
+                    Start Processing Images
                   </button>
                 </div>
               </div>
