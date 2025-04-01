@@ -728,9 +728,47 @@ def get_history():
     if not user:
         return jsonify({"error": "User not found"}), 404
     
-    # Get history entries for the user
-    history = RechargeHistory.query.filter_by(user_id=user.id).order_by(RechargeHistory.created_at.desc()).all()
-    
-    return jsonify({
-        "history": [entry.to_dict() for entry in history]
-    }), 200
+    try:
+        # Use a more targeted query to avoid selecting missing columns
+        # Instead of using the ORM directly, use a custom SQL query 
+        # that only selects the columns we know exist in the database
+        from sqlalchemy import text
+        from app import db
+        
+        # Query with just the basic columns that should always be present
+        sql = text("""
+        SELECT id, user_id, amount, credit_gained, payment_status, payment_method, stripe_payment_id, created_at
+        FROM recharge_history
+        WHERE user_id = :user_id
+        ORDER BY created_at DESC
+        """)
+        
+        result = db.session.execute(sql, {"user_id": user.id})
+        
+        # Convert the rows to dicts manually
+        history = []
+        for row in result:
+            entry = {
+                'id': row.id,
+                'user_id': row.user_id,
+                'amount': float(row.amount),
+                'credit_gained': row.credit_gained,
+                'payment_status': row.payment_status,
+                'payment_method': row.payment_method,
+                'stripe_payment_id': row.stripe_payment_id,
+                'created_at': row.created_at.isoformat(),
+                'is_yearly': False,  # Default value since column might not exist
+                'package_id': None   # Default value since column might not exist
+            }
+            history.append(entry)
+        
+        return jsonify({
+            "history": history
+        }), 200
+        
+    except Exception as e:
+        print(f"Error fetching payment history: {str(e)}")
+        return jsonify({
+            "error": "Failed to load payment history",
+            "details": str(e)
+        }), 500
