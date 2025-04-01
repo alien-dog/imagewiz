@@ -42,38 +42,16 @@ const CheckoutPage = () => {
         
         console.log('Creating payment intent with payload:', payload);
         
-        try {
-          // First try the real Stripe integration
-          console.log('Attempting to use real Stripe integration');
-          const response = await axios.post('/api/payment/create-payment-intent', payload, {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            },
-            timeout: 8000 // Set timeout to 8 seconds
-          });
-          
-          console.log('Real Stripe integration succeeded');
-          setClientSecret(response.data.clientSecret);
-        } catch (mainErr) {
-          console.error('Error with real Stripe integration:', mainErr);
-          
-          // If real Stripe fails, try the mock route as fallback
-          try {
-            console.log('Attempting to use mock Stripe integration');
-            const mockResponse = await axios.post('/api/payment/mock/mock-payment-intent', payload, {
-              headers: {
-                'Authorization': `Bearer ${token}`
-              }
-            });
-            
-            console.log('Mock integration succeeded');
-            setClientSecret(mockResponse.data.clientSecret);
-          } catch (mockErr) {
-            console.error('Error with mock integration too:', mockErr);
-            // Re-throw the original error if mock also fails
-            throw mainErr;
+        // Use the real Stripe integration directly
+        console.log('Calling Stripe payment intent API');
+        const response = await axios.post('/api/payment/create-payment-intent', payload, {
+          headers: {
+            'Authorization': `Bearer ${token}`
           }
-        }
+        });
+        
+        console.log('Stripe payment intent created successfully');
+        setClientSecret(response.data.clientSecret);
       } catch (err) {
         console.error('Error creating payment intent:', err);
         setError('Failed to initialize payment. Please try again or contact support.');
