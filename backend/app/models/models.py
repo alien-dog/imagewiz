@@ -49,7 +49,7 @@ class RechargeHistory(db.Model):
     
     def to_dict(self):
         """Convert recharge history to dictionary for API responses"""
-        return {
+        result = {
             'id': self.id,
             'user_id': self.user_id,
             'amount': float(self.amount),
@@ -57,10 +57,21 @@ class RechargeHistory(db.Model):
             'payment_status': self.payment_status,
             'payment_method': self.payment_method,
             'stripe_payment_id': self.stripe_payment_id,
-            'is_yearly': self.is_yearly,
-            'package_id': self.package_id,
             'created_at': self.created_at.isoformat()
         }
+        
+        # Only add these fields if they exist in the model
+        if hasattr(self, 'is_yearly'):
+            result['is_yearly'] = self.is_yearly
+        else:
+            result['is_yearly'] = False
+            
+        if hasattr(self, 'package_id'):
+            result['package_id'] = self.package_id
+        else:
+            result['package_id'] = None
+            
+        return result
         
 class MattingHistory(db.Model):
     __tablename__ = 'matting_history'
