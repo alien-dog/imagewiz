@@ -662,20 +662,20 @@ def handle_payment_intent_success(payment_intent):
         
         if not user_id:
             print("Error: No user_id in payment metadata")
-            return
+            return None
             
         # Convert user_id to integer if it's a string
         try:
             user_id = int(user_id)
         except (ValueError, TypeError) as e:
             print(f"Error converting user_id to integer: {str(e)}")
-            return
+            return None
         
         # Find the user
         user = User.query.get(user_id)
         if not user:
             print(f"Error: User {user_id} not found for payment {payment_id}")
-            return
+            return None
         
         # Check if this payment has already been processed - using raw SQL to avoid ORM issues
         from sqlalchemy import text
@@ -694,92 +694,67 @@ def handle_payment_intent_success(payment_intent):
             
             if row:
                 print(f"Payment intent {payment_id} already processed, skipping")
-                return
+                return None
         except Exception as db_error:
             print(f"Warning: Error checking for existing payment: {db_error}")
             # Continue with the payment processing
         
-        # Get price information from Stripe
+        # Get amount directly from the payment intent
+        amount = payment_intent.amount / 100  # Convert cents to dollars
+        
+        # Determine credits based on package name
+        credit_amount = 0
+        package_id = ''
+        
+        # Use package name to determine credits
+        if package_name and 'lite' in package_name.lower():
+            credit_amount = 50 if not is_yearly else 600
+            package_id = 'lite_monthly' if not is_yearly else 'lite_yearly'
+        elif package_name and 'pro' in package_name.lower():
+            credit_amount = 250 if not is_yearly else 3000
+            package_id = 'pro_monthly' if not is_yearly else 'pro_yearly'
+        else:
+            # Default credits if no match
+            credit_amount = round(amount * 5)  # $1 = 5 credits as a fallback
+            package_id = 'custom'
+        
+        # Add credits to user's balance
+        user.credit_balance += credit_amount
+        
         try:
-            price = stripe.Price.retrieve(price_id)
-            amount = price.unit_amount / 100  # Convert cents to dollars
+            # Use raw SQL to insert the payment record
+            sql = text("""
+            INSERT INTO recharge_history 
+            (user_id, amount, credit_gained, payment_status, payment_method, stripe_payment_id, created_at)
+            VALUES (:user_id, :amount, :credit_gained, :payment_status, :payment_method, :stripe_payment_id, NOW())
+            """)
             
-            # Determine credits based on price
-            credit_amount = 0
-            package_id = ''
+            db.session.execute(sql, {
+                'user_id': user.id,
+                'amount': amount,
+                'credit_gained': credit_amount,
+                'payment_status': 'completed',
+                'payment_method': 'stripe',
+                'stripe_payment_id': payment_id
+            })
             
-            # Find matching package by price and yearly status
-            for pkg in CREDIT_PACKAGES:
-                # Match by price and yearly status
-                if pkg.get('price') == amount and pkg.get('is_yearly', False) == is_yearly:
-                    credit_amount = pkg.get('credits', 0)
-                    package_id = pkg.get('id', '')
-                    break
-            
-            # If no exact match found, use a fallback calculation based on plan name
-            if credit_amount == 0:
-                if 'lite' in package_name.lower():
-                    credit_amount = 50 if not is_yearly else 600
-                    package_id = 'lite_monthly' if not is_yearly else 'lite_yearly'
-                elif 'pro' in package_name.lower():
-                    credit_amount = 250 if not is_yearly else 3000
-                    package_id = 'pro_monthly' if not is_yearly else 'pro_yearly'
-                else:
-                    # Default credits if still no match
-                    credit_amount = round(amount * 5)  # $1 = 5 credits as a fallback
-                    package_id = 'custom'
-            
-            # Add credits to user's balance
-            user.credit_balance += credit_amount
-            
-            # Instead of using the ORM, directly execute SQL to insert only the columns we know exist
-            from sqlalchemy import text
-            
+            db.session.commit()
+            print(f"Successfully inserted payment record for user {user.username}")
+        except Exception as insert_error:
+            db.session.rollback()
+            print(f"Error inserting payment record: {insert_error}")
+            # Try to update the credit balance even if the insert fails
             try:
-                # Use raw SQL with only the basic columns we know exist
-                sql = text("""
-                INSERT INTO recharge_history 
-                (user_id, amount, credit_gained, payment_status, payment_method, stripe_payment_id, created_at)
-                VALUES (:user_id, :amount, :credit_gained, :payment_status, :payment_method, :stripe_payment_id, NOW())
-                """)
-                
-                # Execute the insert
-                db.session.execute(sql, {
-                    'user_id': user.id,
-                    'amount': amount,
-                    'credit_gained': credit_amount,
-                    'payment_status': 'completed',
-                    'payment_method': 'stripe',
-                    'stripe_payment_id': payment_id
-                })
-                
-                # Commit all changes
                 db.session.commit()
-                
-                print(f"Successfully inserted payment record for user {user.username}")
-            except Exception as insert_error:
+                print(f"Updated user's credit balance to {user.credit_balance}")
+            except Exception as balance_error:
                 db.session.rollback()
-                print(f"Error inserting payment record: {insert_error}")
-                # Even if the insert fails, try to at least update the user's credit balance
-                try:
-                    user.credit_balance += credit_amount
-                    db.session.commit()
-                    print(f"Updated user's credit balance to {user.credit_balance}")
-                except Exception as balance_error:
-                    db.session.rollback()
-                    print(f"Error updating user's credit balance: {balance_error}")
-                    raise
-            
-            print(f"User {user.username} recharged {credit_amount} credits for ${amount}")
-            return user
-            
-        except Exception as e:
-            print(f"Error retrieving price info: {str(e)}")
-            return None
-            
+                print(f"Error updating user's credit balance: {balance_error}")
+        
+        print(f"User {user.username} recharged {credit_amount} credits for ${amount}")
+        return user
     except Exception as e:
         print(f"Error in handle_payment_intent_success: {str(e)}")
-        # Don't raise exception, just log it
         return None
 
 @bp.route('/verify-intent/<payment_intent_id>', methods=['GET'])
@@ -837,19 +812,15 @@ def verify_payment_intent(payment_intent_id):
                 # Payment successful but not recorded yet, process it
                 handle_payment_intent_success(payment_intent)
                 
-                # Get price info to determine credits and package details
-                try:
-                    price = stripe.Price.retrieve(payment_intent.metadata.get('price_id'))
-                    amount = price.unit_amount / 100  # Convert cents to dollars
-                except Exception as price_error:
-                    print(f"Error retrieving price: {price_error}")
-                    # Use a fallback amount if price retrieval fails
-                    amount = payment_intent.amount / 100  # Convert cents to dollars
-                
-                # Determine credits based on package name
+                # Don't try to retrieve price information from Stripe API
+                # Just determine credits directly from package name as it's more reliable
                 package_name = payment_intent.metadata.get('package_name', '')
                 is_yearly = payment_intent.metadata.get('is_yearly', 'false').lower() == 'true'
                 
+                # Get amount from payment intent directly
+                amount = payment_intent.amount / 100  # Convert cents to dollars
+                
+                # Determine credits based on package name
                 credits = 0
                 if 'lite' in package_name.lower():
                     credits = 50 if not is_yearly else 600
