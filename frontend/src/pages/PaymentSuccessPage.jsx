@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
@@ -15,8 +15,23 @@ const PaymentSuccessPage = () => {
   
   // Extract payment information from URL or location state
   useEffect(() => {
+    // Track if component is mounted to prevent state updates after unmount
+    let isMounted = true;
+    
+    // Only run once flag to prevent repeated verification
+    const alreadyRun = React.useRef(false);
+    
     const verifyPayment = async () => {
+      // Skip if already run
+      if (alreadyRun.current) {
+        return;
+      }
+      
+      // Mark as run immediately to prevent double execution
+      alreadyRun.current = true;
+      
       try {
+        if (!isMounted) return;
         setLoading(true);
         setError(null);
         
@@ -31,7 +46,7 @@ const PaymentSuccessPage = () => {
         }
         
         // Store package details from state if available
-        if (location.state?.packageDetails) {
+        if (location.state?.packageDetails && isMounted) {
           setPackageDetails(location.state.packageDetails);
         }
         
@@ -43,22 +58,31 @@ const PaymentSuccessPage = () => {
           }
         });
         
-        if (response.data.status === 'success') {
+        if (response.data.status === 'success' && isMounted) {
           setPaymentVerified(true);
           // Refresh user data to get updated credit balance
           await refreshUser();
-        } else {
+        } else if (isMounted) {
           throw new Error('Payment verification failed.');
         }
       } catch (err) {
-        console.error('Error verifying payment:', err);
-        setError('We could not verify your payment. Please contact support if your credits are not applied.');
+        if (isMounted) {
+          console.error('Error verifying payment:', err);
+          setError('We could not verify your payment. Please contact support if your credits are not applied.');
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
     
     verifyPayment();
+    
+    // Cleanup function to prevent memory leaks and state updates after unmount
+    return () => {
+      isMounted = false;
+    };
   }, [location, refreshUser]);
   
   if (loading) {
