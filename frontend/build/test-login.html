@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Login</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>Test Login</h1>
+    <div style="display: flex; gap: 10px;">
+        <button id="loginButton">Login with testuser3</button>
+        <button id="loginButton2">Login with testuser2</button>
+        <button id="clearButton">Clear Axios Defaults</button>
+    </div>
+    
+    <div style="margin-top: 10px;">
+        <input id="usernameInput" type="text" placeholder="Username" value="testuser3" />
+        <input id="passwordInput" type="password" placeholder="Password" value="password123" />
+        <button id="customLoginButton">Login with Custom Credentials</button>
+    </div>
+    
+    <div id="result" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc;"></div>
+
+    <script>
+        // Log axios defaults for debugging
+        console.log('Axios defaults:', axios.defaults);
+        
+        // Ensure baseURL is empty as in the React app
+        axios.defaults.baseURL = '';
+        console.log('Set axios.defaults.baseURL to empty string');
+        
+        document.getElementById('loginButton').addEventListener('click', async () => {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Sending login request for testuser3...';
+            
+            try {
+                // Log the request we're about to make
+                console.log('Sending login request to:', '/api/auth/login');
+                console.log('With payload:', {username: 'testuser3', password: 'password123'});
+                
+                // Direct request to the backend
+                const response = await axios.post('/api/auth/login', {
+                    username: 'testuser3',
+                    password: 'password123'
+                });
+                
+                resultDiv.innerHTML = `
+                    <h3>Success!</h3>
+                    <pre>${JSON.stringify(response.data, null, 2)}</pre>
+                `;
+                
+                console.log('Login response:', response.data);
+                
+                // Set token in localStorage like the React app does
+                if (response.data.access_token) {
+                    localStorage.setItem('token', response.data.access_token);
+                    console.log('Token saved to localStorage');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <h3>Error</h3>
+                    <p>${error.message}</p>
+                    <pre>${JSON.stringify(error.response?.data || {}, null, 2)}</pre>
+                `;
+                
+                console.error('Login error:', error);
+                console.error('Error response:', error.response?.data);
+                console.error('Error status:', error.response?.status);
+            }
+        });
+        
+        document.getElementById('loginButton2').addEventListener('click', async () => {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Sending login request for testuser2...';
+            
+            try {
+                const response = await axios.post('/api/auth/login', {
+                    username: 'testuser2',
+                    password: 'password123'
+                });
+                
+                resultDiv.innerHTML = `
+                    <h3>Success!</h3>
+                    <pre>${JSON.stringify(response.data, null, 2)}</pre>
+                `;
+                
+                console.log('Login response:', response.data);
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <h3>Error</h3>
+                    <p>${error.message}</p>
+                    <pre>${JSON.stringify(error.response?.data || {}, null, 2)}</pre>
+                `;
+                
+                console.error('Login error:', error);
+            }
+        });
+        
+        document.getElementById('customLoginButton').addEventListener('click', async () => {
+            const username = document.getElementById('usernameInput').value;
+            const password = document.getElementById('passwordInput').value;
+            
+            if (!username || !password) {
+                alert('Please enter both username and password');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `Sending login request for ${username}...`;
+            
+            try {
+                const response = await axios.post('/api/auth/login', {
+                    username,
+                    password
+                });
+                
+                resultDiv.innerHTML = `
+                    <h3>Success!</h3>
+                    <pre>${JSON.stringify(response.data, null, 2)}</pre>
+                `;
+                
+                console.log('Login response:', response.data);
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <h3>Error</h3>
+                    <p>${error.message}</p>
+                    <pre>${JSON.stringify(error.response?.data || {}, null, 2)}</pre>
+                `;
+                
+                console.error('Login error:', error);
+            }
+        });
+        
+        document.getElementById('clearButton').addEventListener('click', () => {
+            axios.defaults.baseURL = '';
+            delete axios.defaults.headers.common['Authorization'];
+            localStorage.removeItem('token');
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Cleared Axios defaults and localStorage token';
+            console.log('Cleared Axios defaults and localStorage token');
+        });
+    </script>
+</body>
+</html>
