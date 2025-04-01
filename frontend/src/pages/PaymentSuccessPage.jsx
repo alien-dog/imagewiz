@@ -108,19 +108,13 @@ const PaymentSuccessPage = () => {
                   </div>
                 )}
                 
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <div className="flex justify-center">
                   <button
                     onClick={() => navigate('/dashboard')}
-                    className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 transition-colors"
+                    className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 transition-colors"
                   >
                     Go to Dashboard
                     <ArrowRight className="ml-2 h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => navigate('/dashboard')}
-                    className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-teal-600 bg-white border-teal-600 hover:bg-teal-50 transition-colors"
-                  >
-                    Start Processing Images
                   </button>
                 </div>
               </div>
