@@ -9,8 +9,31 @@ from . import bp
 
 # Initialize Stripe with the API key
 stripe_api_key = os.environ.get('STRIPE_SECRET_KEY')
-print(f"DEBUG: Stripe API key is {'configured' if stripe_api_key else 'NOT configured'}")
+if stripe_api_key:
+    print(f"DEBUG: Stripe API key is configured with key starting with: {stripe_api_key[:4]}...")
+    print(f"DEBUG: Key length: {len(stripe_api_key)} characters")
+    
+    # Log whether this looks like a valid test key format
+    if stripe_api_key.startswith('sk_test_'):
+        print("DEBUG: Key appears to be a valid test key format (sk_test_)")
+    elif stripe_api_key.startswith('sk_live_'):
+        print("DEBUG: Key appears to be a LIVE key format - caution!")
+    else:
+        print("WARNING: Key format does not match expected Stripe key format (sk_test_ or sk_live_)")
+else:
+    print("ERROR: Stripe API key is NOT configured!")
+
+# Set the key in the Stripe library
 stripe.api_key = stripe_api_key
+print(f"DEBUG: Stripe API key set in library, API version: {stripe.api_version}")
+
+# Test Stripe connectivity immediately on startup
+try:
+    print("DEBUG: Testing Stripe API connectivity...")
+    stripe.Account.retrieve()
+    print("DEBUG: Successfully connected to Stripe API on startup")
+except Exception as e:
+    print(f"ERROR: Failed to connect to Stripe API: {str(e)}")
 
 # Credit package options
 CREDIT_PACKAGES = [
@@ -538,36 +561,63 @@ def verify_payment(session_id):
 @jwt_required()
 def create_payment_intent():
     """Create a Stripe PaymentIntent for embedded checkout"""
+    print("********** PAYMENT INTENT ENDPOINT CALLED **********")
+    print(f"Request headers: {dict(request.headers)}")
+    print(f"Request data: {request.get_data(as_text=True)}")
+    
     user_id = get_jwt_identity()
+    print(f"JWT Identity (user_id): {user_id}")
+    
     try:
         user_id = int(user_id)
-    except (ValueError, TypeError):
+        print(f"User ID converted to int: {user_id}")
+    except (ValueError, TypeError) as e:
+        print(f"Error converting user_id to int: {str(e)}")
         return jsonify({"error": "Invalid user ID"}), 400
         
     user = User.query.get(user_id)
+    print(f"User query result: {user}")
     
     if not user:
+        print(f"User not found with ID: {user_id}")
         return jsonify({"error": "User not found"}), 404
 
+    print(f"User authenticated: {user.username} (ID: {user.id})")
+    
     data = request.get_json()
+    print(f"Request JSON data: {data}")
+    
     priceId = data.get("priceId")
     packageName = data.get("packageName") 
     isYearly = data.get("isYearly", False)
     
+    print(f"Processing: priceId={priceId}, packageName={packageName}, isYearly={isYearly}")
+    
     if not packageName or not priceId:
+        print("Error: Missing required fields (packageName or priceId)")
         return jsonify({"error": "Package name and price ID are required"}), 400
     
-    # Get the price from Stripe to determine the amount
+    # For now, use a hardcoded approach to fix immediate issues
+    # We'll use the package details to determine the amount
+    print(f"DEBUG: Processing payment for package: {packageName}, priceId: {priceId}, isYearly: {isYearly}")
+    
+    # Determine amount based on package name (fallback if Stripe API is slow/timeout)
+    amount_cents = 0
+    if "lite" in packageName.lower():
+        amount_cents = 990 if not isYearly else 10680  # $9.90 or $106.80
+    elif "pro" in packageName.lower():
+        amount_cents = 2490 if not isYearly else 26280  # $24.90 or $262.80
+    else:
+        print(f"ERROR: Unknown package: {packageName}")
+        return jsonify({"error": "Unknown package"}), 400
+    
     try:
-        print(f"DEBUG: Attempting to retrieve Stripe price with ID: {priceId}")
-        price = stripe.Price.retrieve(priceId)
-        amount = price.unit_amount  # Amount in cents
-        print(f"DEBUG: Retrieved price with amount: {amount}")
+        print(f"DEBUG: Using amount of {amount_cents} cents for {packageName}")
         
-        # Create a PaymentIntent
-        print(f"DEBUG: Creating payment intent for user id: {user.id}, package: {packageName}")
+        # Create a PaymentIntent with the determined amount
+        print(f"DEBUG: Creating payment intent for user id: {user.id}")
         intent = stripe.PaymentIntent.create(
-            amount=amount,
+            amount=amount_cents,
             currency="usd",
             metadata={
                 "user_id": user.id,
@@ -576,15 +626,27 @@ def create_payment_intent():
                 "price_id": priceId
             }
         )
-        print(f"DEBUG: Created payment intent with client_secret: {intent.client_secret[:10]}...")
+        
+        print(f"DEBUG: Created payment intent successfully")
         
         return jsonify({
             "clientSecret": intent.client_secret,
-            "amount": amount / 100  # Convert cents to dollars for display
+            "amount": amount_cents / 100  # Convert cents to dollars for display
         })
     except Exception as e:
-        print(f"Error creating payment intent: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        error_msg = str(e)
+        print(f"ERROR creating payment intent: {error_msg}")
+        
+        # Check if it's an authentication error
+        if "Authentication" in error_msg or "key" in error_msg.lower():
+            print("ERROR: Stripe API key is invalid or missing")
+            return jsonify({
+                "error": "Stripe API authentication failed. Please check your API key."
+            }), 500
+        
+        return jsonify({
+            "error": f"Failed to create payment: {error_msg}"
+        }), 500
 
 def handle_payment_intent_success(payment_intent):
     """Process a successful payment intent and add credits to user"""

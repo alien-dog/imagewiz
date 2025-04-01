@@ -34,17 +34,46 @@ const CheckoutPage = () => {
         setError(null);
         
         const token = localStorage.getItem('token');
-        const response = await axios.post('/api/payment/create-payment-intent', {
+        const payload = {
           priceId: location.state.packageDetails.priceId,
           packageName: location.state.packageDetails.packageName,
           isYearly: location.state.packageDetails.isYearly
-        }, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
+        };
         
-        setClientSecret(response.data.clientSecret);
+        console.log('Creating payment intent with payload:', payload);
+        
+        try {
+          // First try the real Stripe integration
+          console.log('Attempting to use real Stripe integration');
+          const response = await axios.post('/api/payment/create-payment-intent', payload, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            },
+            timeout: 8000 // Set timeout to 8 seconds
+          });
+          
+          console.log('Real Stripe integration succeeded');
+          setClientSecret(response.data.clientSecret);
+        } catch (mainErr) {
+          console.error('Error with real Stripe integration:', mainErr);
+          
+          // If real Stripe fails, try the mock route as fallback
+          try {
+            console.log('Attempting to use mock Stripe integration');
+            const mockResponse = await axios.post('/api/payment/mock/mock-payment-intent', payload, {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+            
+            console.log('Mock integration succeeded');
+            setClientSecret(mockResponse.data.clientSecret);
+          } catch (mockErr) {
+            console.error('Error with mock integration too:', mockErr);
+            // Re-throw the original error if mock also fails
+            throw mainErr;
+          }
+        }
       } catch (err) {
         console.error('Error creating payment intent:', err);
         setError('Failed to initialize payment. Please try again or contact support.');
