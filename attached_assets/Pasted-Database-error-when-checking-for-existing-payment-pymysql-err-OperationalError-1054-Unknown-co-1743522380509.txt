@@ -1,0 +1,34 @@
+Database error when checking for existing payment: (pymysql.err.OperationalError) (1054, "Unknown column 'recharge_history.is_yearly' in 'field list'")
+[SQL: SELECT recharge_history.id AS recharge_history_id, recharge_history.user_id AS recharge_history_user_id, recharge_history.amount AS recharge_history_amount, recharge_history.credit_gained AS recharge_history_credit_gained, recharge_history.payment_status AS recharge_history_payment_status, recharge_history.payment_method AS recharge_history_payment_method, recharge_history.stripe_payment_id AS recharge_history_stripe_payment_id, recharge_history.is_yearly AS recharge_history_is_yearly, recharge_history.package_id AS recharge_history_package_id, recharge_history.created_at AS recharge_history_created_at 
+FROM recharge_history 
+WHERE recharge_history.user_id = %(user_id_1)s AND recharge_history.stripe_payment_id = %(stripe_payment_id_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'user_id_1': 2, 'stripe_payment_id_1': 'cs_test_a1bCW5mo3CD1gbhIt4zSVXEAWxGSYcwN2ROMzW67lfpxlJ8phVu3xc8V04', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+Processing payment for user_id: 2, credits: 50, price: 9.9
+Error in handle_successful_payment: (pymysql.err.OperationalError) (1054, "Unknown column 'recharge_history.is_yearly' in 'field list'")
+[SQL: SELECT recharge_history.id AS recharge_history_id, recharge_history.user_id AS recharge_history_user_id, recharge_history.amount AS recharge_history_amount, recharge_history.credit_gained AS recharge_history_credit_gained, recharge_history.payment_status AS recharge_history_payment_status, recharge_history.payment_method AS recharge_history_payment_method, recharge_history.stripe_payment_id AS recharge_history_stripe_payment_id, recharge_history.is_yearly AS recharge_history_is_yearly, recharge_history.package_id AS recharge_history_package_id, recharge_history.created_at AS recharge_history_created_at 
+FROM recharge_history 
+WHERE recharge_history.stripe_payment_id = %(stripe_payment_id_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'stripe_payment_id_1': 'cs_test_a1bCW5mo3CD1gbhIt4zSVXEAWxGSYcwN2ROMzW67lfpxlJ8phVu3xc8V04', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+127.0.0.1 - - [01/Apr/2025 15:44:47] "GET /payment/verify?session_id=cs_test_a1bCW5mo3CD1gbhIt4zSVXEAWxGSYcwN2ROMzW67lfpxlJ8phVu3xc8V04 HTTP/1.1" 200 -
+Manual proxy: Received user request
+Manual proxy: Forwarding user request with auth header: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MzUyMTU1NiwianRpIjoiYWRjZWNlNzUtNjExOC00YzM3LTlmYjYtYjI0ODE5NWIwOTI3IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjIiLCJuYmYiOjE3NDM1MjE1NTYsImNzcmYiOiI5YjAwNDcxMS0zMjZiLTQ5YTYtOTIxMi04MzAxNDA3NTZiMTkiLCJleHAiOjE3NDM2MDc5NTZ9.IEeCfpRKn29076I-MqqSENydUocWvRQ0HhPSdH8Tayo
+127.0.0.1 - - [01/Apr/2025 15:44:48] "GET /auth/user HTTP/1.1" 200 -
+Manual proxy: User response received
+Database error when checking for existing payment: (pymysql.err.OperationalError) (1054, "Unknown column 'recharge_history.is_yearly' in 'field list'")
+[SQL: SELECT recharge_history.id AS recharge_history_id, recharge_history.user_id AS recharge_history_user_id, recharge_history.amount AS recharge_history_amount, recharge_history.credit_gained AS recharge_history_credit_gained, recharge_history.payment_status AS recharge_history_payment_status, recharge_history.payment_method AS recharge_history_payment_method, recharge_history.stripe_payment_id AS recharge_history_stripe_payment_id, recharge_history.is_yearly AS recharge_history_is_yearly, recharge_history.package_id AS recharge_history_package_id, recharge_history.created_at AS recharge_history_created_at 
+FROM recharge_history 
+WHERE recharge_history.user_id = %(user_id_1)s AND recharge_history.stripe_payment_id = %(stripe_payment_id_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'user_id_1': 2, 'stripe_payment_id_1': 'cs_test_a1bCW5mo3CD1gbhIt4zSVXEAWxGSYcwN2ROMzW67lfpxlJ8phVu3xc8V04', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+Processing payment for user_id: 2, credits: 50, price: 9.9
+Error in handle_successful_payment: (pymysql.err.OperationalError) (1054, "Unknown column 'recharge_history.is_yearly' in 'field list'")
+[SQL: SELECT recharge_history.id AS recharge_history_id, recharge_history.user_id AS recharge_history_user_id, recharge_history.amount AS recharge_history_amount, recharge_history.credit_gained AS recharge_history_credit_gained, recharge_history.payment_status AS recharge_history_payment_status, recharge_history.payment_method AS recharge_history_payment_method, recharge_history.stripe_payment_id AS recharge_history_stripe_payment_id, recharge_history.is_yearly AS recharge_history_is_yearly, recharge_history.package_id AS recharge_history_package_id, recharge_history.created_at AS recharge_history_created_at 
+FROM recharge_history 
+WHERE recharge_history.stripe_payment_id = %(stripe_payment_id_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'stripe_payment_id_1': 'cs_test_a1bCW5mo3CD1gbhIt4zSVXEAWxGSYcwN2ROMzW67lfpxlJ8phVu3xc8V04', 'param_1': 1}]

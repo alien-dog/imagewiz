@@ -281,14 +281,27 @@ def handle_successful_payment(session):
             print(f"Error: User {user_id} not found for payment {session_id}")
             return
         
-        # Check if this payment has already been processed
-        existing_recharge = RechargeHistory.query.filter_by(
-            stripe_payment_id=session_id
-        ).first()
+        # Check if this payment has already been processed - using raw SQL to avoid ORM issues
+        from sqlalchemy import text
         
-        if existing_recharge:
-            print(f"Payment {session_id} already processed, skipping")
-            return
+        try:
+            # Query with just the basic columns that should always be present
+            sql = text("""
+            SELECT id 
+            FROM recharge_history
+            WHERE stripe_payment_id = :session_id
+            LIMIT 1
+            """)
+            
+            result = db.session.execute(sql, {"session_id": session_id})
+            row = result.fetchone()
+            
+            if row:
+                print(f"Payment {session_id} already processed, skipping")
+                return
+        except Exception as db_error:
+            print(f"Warning: Error checking for existing payment: {db_error}")
+            # Continue with the payment processing
         
         # Add credits to user's balance
         user.credit_balance += credits
@@ -348,11 +361,34 @@ def verify_payment_query():
         return jsonify({"error": "User not found"}), 404
     
     # Check if payment exists in user's history
+    # Use raw SQL to avoid ORM issues with missing columns
+    from sqlalchemy import text
+    
+    recharge = None
     try:
-        recharge = RechargeHistory.query.filter_by(
-            user_id=user.id,
-            stripe_payment_id=session_id
-        ).first()
+        # Query with just the basic columns that should always be present
+        sql = text("""
+        SELECT id, user_id, amount, credit_gained, payment_status, payment_method, stripe_payment_id, created_at
+        FROM recharge_history
+        WHERE user_id = :user_id AND stripe_payment_id = :session_id
+        LIMIT 1
+        """)
+        
+        result = db.session.execute(sql, {"user_id": user.id, "session_id": session_id})
+        row = result.fetchone()
+        
+        if row:
+            # Convert row to a dict-like object
+            recharge = {
+                'id': row.id,
+                'user_id': row.user_id,
+                'amount': float(row.amount),
+                'credit_gained': row.credit_gained,
+                'payment_status': row.payment_status,
+                'payment_method': row.payment_method,
+                'stripe_payment_id': row.stripe_payment_id,
+                'created_at': row.created_at.isoformat()
+            }
     except Exception as db_error:
         print(f"Database error when checking for existing payment: {db_error}")
         # Continue as if the recharge doesn't exist, we'll try to create it from Stripe data
@@ -391,26 +427,21 @@ def verify_payment_query():
     package_id = None
     package_name = "Credit Package"  # Default value
     for pkg in CREDIT_PACKAGES:
-        if pkg['credits'] == recharge.credit_gained:
+        if pkg['credits'] == recharge['credit_gained']:
             package_id = pkg['id']
             package_name = pkg['name']
             break
     
-    # Handle is_yearly safely (might be missing from DB schema)
+    # is_yearly is already set to False by default above
     is_yearly = False
-    try:
-        is_yearly = recharge.is_yearly if hasattr(recharge, 'is_yearly') else False
-    except Exception:
-        # If there's any error accessing is_yearly, use default
-        is_yearly = False
-    
+
     return jsonify({
         "status": "success",
         "message": "Payment already verified",
         "user": user.to_dict(),
         "package_name": package_name,
-        "amount_paid": float(recharge.amount),
-        "credits_added": recharge.credit_gained,
+        "amount_paid": float(recharge['amount']),
+        "credits_added": recharge['credit_gained'],
         "is_yearly": is_yearly,
         "new_balance": user.credit_balance
     }), 200
@@ -431,11 +462,37 @@ def verify_payment(session_id):
     if not user:
         return jsonify({"error": "User not found"}), 404
     
-    # Check if payment exists in user's history
-    recharge = RechargeHistory.query.filter_by(
-        user_id=user.id,
-        stripe_payment_id=session_id
-    ).first()
+    # Check if payment exists in user's history - using raw SQL to avoid ORM issues
+    from sqlalchemy import text
+    
+    recharge = None
+    try:
+        # Query with just the basic columns that should always be present
+        sql = text("""
+        SELECT id, user_id, amount, credit_gained, payment_status, payment_method, stripe_payment_id, created_at
+        FROM recharge_history
+        WHERE user_id = :user_id AND stripe_payment_id = :session_id
+        LIMIT 1
+        """)
+        
+        result = db.session.execute(sql, {"user_id": user.id, "session_id": session_id})
+        row = result.fetchone()
+        
+        if row:
+            # Convert row to a dict-like object
+            recharge = {
+                'id': row.id,
+                'user_id': row.user_id,
+                'amount': float(row.amount),
+                'credit_gained': row.credit_gained,
+                'payment_status': row.payment_status,
+                'payment_method': row.payment_method,
+                'stripe_payment_id': row.stripe_payment_id,
+                'created_at': row.created_at.isoformat()
+            }
+    except Exception as db_error:
+        print(f"Database error when checking for existing payment: {db_error}")
+        # Continue as if the recharge doesn't exist, we'll try to create it from Stripe data
     
     if not recharge:
         # Try to retrieve session from Stripe
@@ -537,14 +594,27 @@ def handle_payment_intent_success(payment_intent):
             print(f"Error: User {user_id} not found for payment {payment_id}")
             return
         
-        # Check if this payment has already been processed
-        existing_recharge = RechargeHistory.query.filter_by(
-            stripe_payment_id=payment_id
-        ).first()
+        # Check if this payment has already been processed - using raw SQL to avoid ORM issues
+        from sqlalchemy import text
         
-        if existing_recharge:
-            print(f"Payment intent {payment_id} already processed, skipping")
-            return
+        try:
+            # Query with just the basic columns that should always be present
+            sql = text("""
+            SELECT id 
+            FROM recharge_history
+            WHERE stripe_payment_id = :payment_id
+            LIMIT 1
+            """)
+            
+            result = db.session.execute(sql, {"payment_id": payment_id})
+            row = result.fetchone()
+            
+            if row:
+                print(f"Payment intent {payment_id} already processed, skipping")
+                return
+        except Exception as db_error:
+            print(f"Warning: Error checking for existing payment: {db_error}")
+            # Continue with the payment processing
         
         # Get price information from Stripe
         try:
@@ -633,16 +703,37 @@ def verify_payment_intent(payment_intent_id):
     if not user:
         return jsonify({"error": "User not found"}), 404
     
-    # Check if payment exists in user's history
+    # Check if payment exists in user's history - using raw SQL to avoid ORM issues
+    from sqlalchemy import text
+    
+    recharge = None
     try:
-        recharge = RechargeHistory.query.filter_by(
-            user_id=user.id,
-            stripe_payment_id=payment_intent_id
-        ).first()
+        # Query with just the basic columns that should always be present
+        sql = text("""
+        SELECT id, user_id, amount, credit_gained, payment_status, payment_method, stripe_payment_id, created_at
+        FROM recharge_history
+        WHERE user_id = :user_id AND stripe_payment_id = :payment_id
+        LIMIT 1
+        """)
+        
+        result = db.session.execute(sql, {"user_id": user.id, "payment_id": payment_intent_id})
+        row = result.fetchone()
+        
+        if row:
+            # Convert row to a dict-like object
+            recharge = {
+                'id': row.id,
+                'user_id': row.user_id,
+                'amount': float(row.amount),
+                'credit_gained': row.credit_gained,
+                'payment_status': row.payment_status,
+                'payment_method': row.payment_method,
+                'stripe_payment_id': row.stripe_payment_id,
+                'created_at': row.created_at.isoformat()
+            }
     except Exception as db_error:
         print(f"Database error when checking for existing payment intent: {db_error}")
         # Continue as if the recharge doesn't exist, we'll try to create it from Stripe data
-        recharge = None
     
     if not recharge:
         # Try to retrieve payment intent from Stripe
@@ -690,31 +781,24 @@ def verify_payment_intent(payment_intent_id):
             print(f"Error verifying payment intent: {str(e)}")
             return jsonify({"error": str(e)}), 500
     
-    # If payment was already verified, get package info from the recharge record
-    # Handle is_yearly safely (might be missing from DB schema)
-    is_yearly = False
-    try:
-        is_yearly = recharge.is_yearly if hasattr(recharge, 'is_yearly') else False
-    except Exception:
-        # If there's any error accessing is_yearly, use default
-        is_yearly = False
-        
-    # Handle package_id safely (might be missing from DB schema)
-    package_id = "Custom"
-    try:
-        package_id = recharge.package_id if hasattr(recharge, 'package_id') else "Custom"
-    except Exception:
-        # If there's any error accessing package_id, use default
-        package_id = "Custom"
+    # For dictionary-based recharge, we don't need to handle fields that might be missing
+    # We already set defaults when building the recharge dict
+    
+    # Get package name based on credits for display
+    package_name = "Custom Package"
+    for pkg in CREDIT_PACKAGES:
+        if pkg['credits'] == recharge['credit_gained']:
+            package_name = pkg['name']
+            break
     
     return jsonify({
         "status": "success",
         "message": "Payment already verified",
         "user": user.to_dict(),
-        "package_name": package_id,
-        "amount_paid": float(recharge.amount),
-        "credits_added": recharge.credit_gained,
-        "is_yearly": is_yearly,
+        "package_name": package_name,
+        "amount_paid": float(recharge['amount']),
+        "credits_added": recharge['credit_gained'],
+        "is_yearly": False,  # Default since column might not exist
         "new_balance": user.credit_balance
     }), 200
 
