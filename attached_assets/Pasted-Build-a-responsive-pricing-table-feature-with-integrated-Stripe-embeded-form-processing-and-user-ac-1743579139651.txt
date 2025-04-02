@@ -1,0 +1,32 @@
+Build a responsive pricing table feature with integrated Stripe embeded form, processing and user account credit updates. The pricing table should display three plans—Free, Lite, and Pro—with the following details:
+- Free Plan:
+  - Price: Free
+  - Credits: 3 credits
+  - CTA: “Sign Up”
+- Lite Plan:
+  - Monthly: $9.9/month for 50 credits
+  - Yearly: $106.8/year for 600 credits
+  - CTA: “Subscribe”
+- Pro Plan:
+  - Monthly: $24.9/month for 250 credits
+  - Yearly: $262.8/year for 3000 credits
+  - Mark this as “Most Popular” with a badge
+  - CTA: “Subscribe”
+Key Requirements:
+1. Layout & Design:
+  - Use a three-column layout that clearly compares plan names, pricing (with a toggle for monthly/yearly), and credits.
+  - Ensure the design is fully responsive and accessible across all devices (desktop, tablet, mobile).
+  - Include a monthly/yearly pricing toggle that updates pricing and credit information in real time.
+2. Stripe Integration:
+  - When a user selects a paid plan (Lite or Pro) and clicks the CTA, initiate a Stripe checkout session (embeded form).
+  - Set up a secure webhook endpoint to handle Stripe callbacks. On successful payment confirmation, verify the transaction and update the user’s account with the appropriate credits based on the selected plan and billing period.
+  - Implement error handling to display appropriate error messages if payment fails, with the option to retry.
+3. Business Logic:
+  - Do not allow credit rollover; unused credits expire at the end of the billing period.
+  - Maintain accurate records of subscription status and credit allocations per user.
+4. User Flow:
+  - User visits the pricing page, reviews the plan options, and toggles between monthly and yearly pricing.
+  - On selecting a plan, the user is taken through the Stripe checkout process.
+  - After successful payment (via webhook callback), the user's account is updated with the correct credit allocation.
+Implement this feature ensuring a smooth user experience, robust payment integration, and adherence to accessibility and responsive design best practices.
+I have provided the respective price IDs previously

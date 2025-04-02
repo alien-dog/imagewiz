@@ -12,6 +12,7 @@ const PaymentSuccessPage = () => {
   const [paymentVerified, setPaymentVerified] = useState(false);
   const [error, setError] = useState(null);
   const [paymentDetails, setPaymentDetails] = useState(null);
+  const [redirectCountdown, setRedirectCountdown] = useState(3);
   
   // Extract payment information from URL
   useEffect(() => {
@@ -66,6 +67,24 @@ const PaymentSuccessPage = () => {
           
           // Refresh user data to get updated credit balance
           await refreshUser();
+          
+          // Auto-redirect to dashboard after countdown
+          console.log('Payment successful, starting redirect countdown...');
+          // Start countdown timer
+          const countdownInterval = setInterval(() => {
+            if (isMounted) {
+              setRedirectCountdown(prev => {
+                if (prev <= 1) {
+                  clearInterval(countdownInterval);
+                  navigate('/dashboard');
+                  return 0;
+                }
+                return prev - 1;
+              });
+            } else {
+              clearInterval(countdownInterval);
+            }
+          }, 1000);
         } else if (isMounted) {
           throw new Error('Payment verification failed.');
         }
@@ -87,7 +106,7 @@ const PaymentSuccessPage = () => {
     return () => {
       isMounted = false;
     };
-  }, [location, refreshUser]);
+  }, [location, refreshUser, navigate]);
   
   if (loading) {
     return (
@@ -145,12 +164,15 @@ const PaymentSuccessPage = () => {
                   </div>
                 )}
                 
-                <div className="flex justify-center">
+                <div className="flex flex-col items-center justify-center">
+                  <p className="text-sm text-gray-500 mb-2">
+                    Redirecting to dashboard in {redirectCountdown} seconds...
+                  </p>
                   <button
                     onClick={() => navigate('/dashboard')}
                     className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 transition-colors"
                   >
-                    Go to Dashboard
+                    Go to Dashboard Now
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </button>
                 </div>
