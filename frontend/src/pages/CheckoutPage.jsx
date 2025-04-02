@@ -27,9 +27,11 @@ const CheckoutPage = () => {
         setError(null);
         
         const token = localStorage.getItem('token');
-        // Get the current domain to use for success and cancel URLs
-        const currentDomain = window.location.origin;
-        console.log('Current domain for checkout URLs:', currentDomain);
+        // Get the current domain to use for success and cancel URLs - remove port if present
+        const url = new URL(window.location.href);
+        // Use host without port for callback URLs to avoid port issues with redirects
+        const baseUrl = `${url.protocol}//${url.hostname}`;
+        console.log('Base URL for checkout callbacks (without port):', baseUrl);
         
         const payload = {
           package_id: location.state.packageDetails.isYearly 
@@ -40,9 +42,9 @@ const CheckoutPage = () => {
           price: location.state.packageDetails.packageName.includes('Lite') 
             ? (location.state.packageDetails.isYearly ? 106.8 : 9.9)
             : (location.state.packageDetails.isYearly ? 262.8 : 24.9),
-          // Explicitly provide success and cancel URLs with the correct domain
-          success_url: `${currentDomain}/payment-success`,
-          cancel_url: `${currentDomain}/pricing`
+          // Explicitly provide success and cancel URLs with domain but NO PORT
+          success_url: `${baseUrl}/payment-success`,
+          cancel_url: `${baseUrl}/pricing`
         };
         
         console.log('Checkout payload with success/cancel URLs:', payload);

@@ -171,16 +171,45 @@ def create_checkout_session():
     
     # Create Stripe session
     try:
-        # Ensure success_url has the checkout session ID parameter
+        # Process the success_url to handle any port issues and add session ID
         if success_url:
-            # Make sure we always append the session_id parameter correctly
-            if '?' not in success_url:
+            try:
+                # Parse the URL to ensure it's valid and remove port if present
+                parsed_url = success_url
+                
+                # Make sure port number is not in the URL as it can cause issues with redirects
+                if ":3000" in success_url:
+                    parsed_url = success_url.replace(":3000", "")
+                    print(f"Removed port 3000 from success URL: {parsed_url}")
+                elif ":5000" in success_url:
+                    parsed_url = success_url.replace(":5000", "")
+                    print(f"Removed port 5000 from success URL: {parsed_url}")
+                    
+                # Make sure we always append the session_id parameter correctly
+                if '?' not in parsed_url:
+                    success_url = f"{parsed_url}?session_id={{CHECKOUT_SESSION_ID}}"
+                else:
+                    # If URL already has query parameters, append with &
+                    success_url = f"{parsed_url}&session_id={{CHECKOUT_SESSION_ID}}"
+            except Exception as e:
+                print(f"Error processing success_url: {e}")
+                # Fallback to a basic URL if parsing fails
                 success_url = f"{success_url}?session_id={{CHECKOUT_SESSION_ID}}"
-            else:
-                # If URL already has query parameters, append with &
-                success_url = f"{success_url}&session_id={{CHECKOUT_SESSION_ID}}"
+        
+        # Process the cancel_url to handle any port issues
+        if cancel_url:
+            try:
+                # Remove port if present to avoid redirect issues
+                if ":3000" in cancel_url:
+                    cancel_url = cancel_url.replace(":3000", "")
+                    print(f"Removed port 3000 from cancel URL: {cancel_url}")
+                elif ":5000" in cancel_url:
+                    cancel_url = cancel_url.replace(":5000", "")
+                    print(f"Removed port 5000 from cancel URL: {cancel_url}")
+            except Exception as e:
+                print(f"Error processing cancel_url: {e}")
             
-        # For debugging, print the URLs
+        # For debugging, print the final URLs
         print(f"Success URL: {success_url}")
         print(f"Cancel URL: {cancel_url}")
         
