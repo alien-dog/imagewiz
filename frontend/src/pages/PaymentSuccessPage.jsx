@@ -69,14 +69,16 @@ const PaymentSuccessPage = () => {
           await refreshUser();
           
           // Auto-redirect to dashboard immediately
-          console.log('Payment successful, redirecting to dashboard...');
-          // Force immediate redirect instead of countdown
+          console.log('Payment successful, redirecting to dashboard NOW...');
+          
+          // Force immediate redirect - most reliable approach for SPA after payment returns
+          window.location.replace('/dashboard');
+          
+          // Fallback redirect in case the above doesn't work for some reason
           setTimeout(() => {
-            if (isMounted) {
-              // Direct navigation without React Router - more reliable for payment returns
-              window.location.href = '/dashboard';
-            }
-          }, 1500);
+            console.log('Fallback redirect executing...');
+            window.location.href = '/dashboard';
+          }, 500);
         } else if (isMounted) {
           throw new Error('Payment verification failed.');
         }
