@@ -27,6 +27,10 @@ const CheckoutPage = () => {
         setError(null);
         
         const token = localStorage.getItem('token');
+        // Get the current domain to use for success and cancel URLs
+        const currentDomain = window.location.origin;
+        console.log('Current domain for checkout URLs:', currentDomain);
+        
         const payload = {
           package_id: location.state.packageDetails.isYearly 
             ? location.state.packageDetails.packageName.includes('Lite') ? 'lite_yearly' : 'pro_yearly'
@@ -35,8 +39,13 @@ const CheckoutPage = () => {
           // Determine price based on the package name
           price: location.state.packageDetails.packageName.includes('Lite') 
             ? (location.state.packageDetails.isYearly ? 106.8 : 9.9)
-            : (location.state.packageDetails.isYearly ? 262.8 : 24.9)
+            : (location.state.packageDetails.isYearly ? 262.8 : 24.9),
+          // Explicitly provide success and cancel URLs with the correct domain
+          success_url: `${currentDomain}/payment-success`,
+          cancel_url: `${currentDomain}/pricing`
         };
+        
+        console.log('Checkout payload with success/cancel URLs:', payload);
         
         console.log('Creating checkout session with payload:', payload);
         

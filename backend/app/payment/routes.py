@@ -172,8 +172,13 @@ def create_checkout_session():
     # Create Stripe session
     try:
         # Ensure success_url has the checkout session ID parameter
-        if success_url and '?' not in success_url:
-            success_url = f"{success_url}?session_id={{CHECKOUT_SESSION_ID}}"
+        if success_url:
+            # Make sure we always append the session_id parameter correctly
+            if '?' not in success_url:
+                success_url = f"{success_url}?session_id={{CHECKOUT_SESSION_ID}}"
+            else:
+                # If URL already has query parameters, append with &
+                success_url = f"{success_url}&session_id={{CHECKOUT_SESSION_ID}}"
             
         # For debugging, print the URLs
         print(f"Success URL: {success_url}")
