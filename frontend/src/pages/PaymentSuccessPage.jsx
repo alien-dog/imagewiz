@@ -68,23 +68,15 @@ const PaymentSuccessPage = () => {
           // Refresh user data to get updated credit balance
           await refreshUser();
           
-          // Auto-redirect to dashboard after countdown
-          console.log('Payment successful, starting redirect countdown...');
-          // Start countdown timer
-          const countdownInterval = setInterval(() => {
+          // Auto-redirect to dashboard immediately
+          console.log('Payment successful, redirecting to dashboard...');
+          // Force immediate redirect instead of countdown
+          setTimeout(() => {
             if (isMounted) {
-              setRedirectCountdown(prev => {
-                if (prev <= 1) {
-                  clearInterval(countdownInterval);
-                  navigate('/dashboard');
-                  return 0;
-                }
-                return prev - 1;
-              });
-            } else {
-              clearInterval(countdownInterval);
+              // Direct navigation without React Router - more reliable for payment returns
+              window.location.href = '/dashboard';
             }
-          }, 1000);
+          }, 1500);
         } else if (isMounted) {
           throw new Error('Payment verification failed.');
         }
@@ -166,10 +158,10 @@ const PaymentSuccessPage = () => {
                 
                 <div className="flex flex-col items-center justify-center">
                   <p className="text-sm text-gray-500 mb-2">
-                    Redirecting to dashboard in {redirectCountdown} seconds...
+                    Redirecting to dashboard...
                   </p>
                   <button
-                    onClick={() => navigate('/dashboard')}
+                    onClick={() => window.location.href = '/dashboard'}
                     className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 transition-colors"
                   >
                     Go to Dashboard Now
@@ -184,7 +176,7 @@ const PaymentSuccessPage = () => {
                 </div>
                 
                 <button
-                  onClick={() => navigate('/dashboard')}
+                  onClick={() => window.location.href = '/dashboard'}
                   className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 transition-colors"
                 >
                   Return to Dashboard
