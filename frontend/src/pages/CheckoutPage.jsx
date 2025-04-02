@@ -1,20 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements } from '@stripe/react-stripe-js';
-import StripeCheckoutForm from '../components/StripeCheckoutForm';
 import axios from 'axios';
-import { ArrowLeft } from 'lucide-react';
-
-// Load Stripe outside of component render cycle
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+import { ArrowLeft, Loader2 } from 'lucide-react';
 
 const CheckoutPage = () => {
   const { isAuthenticated, user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const [clientSecret, setClientSecret] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [packageDetails, setPackageDetails] = useState(null);
@@ -27,41 +20,46 @@ const CheckoutPage = () => {
 
     setPackageDetails(location.state.packageDetails);
     
-    // Create PaymentIntent as soon as the page loads
-    const createPaymentIntent = async () => {
+    // Create Stripe checkout session and redirect
+    const createCheckoutSession = async () => {
       try {
         setLoading(true);
         setError(null);
         
         const token = localStorage.getItem('token');
         const payload = {
-          priceId: location.state.packageDetails.priceId,
-          packageName: location.state.packageDetails.packageName,
-          isYearly: location.state.packageDetails.isYearly
+          package_id: location.state.packageDetails.isYearly 
+            ? location.state.packageDetails.packageName.includes('Lite') ? 'lite_yearly' : 'pro_yearly'
+            : location.state.packageDetails.packageName.includes('Lite') ? 'lite_monthly' : 'pro_monthly',
+          is_yearly: location.state.packageDetails.isYearly,
+          // Determine price based on the package name
+          price: location.state.packageDetails.packageName.includes('Lite') 
+            ? (location.state.packageDetails.isYearly ? 106.8 : 9.9)
+            : (location.state.packageDetails.isYearly ? 262.8 : 24.9)
         };
         
-        console.log('Creating payment intent with payload:', payload);
+        console.log('Creating checkout session with payload:', payload);
         
-        // Use the real Stripe integration directly
-        console.log('Calling Stripe payment intent API');
-        const response = await axios.post('/api/payment/create-payment-intent', payload, {
+        // Use the traditional checkout session API
+        const response = await axios.post('/api/payment/create-checkout-session', payload, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
         
-        console.log('Stripe payment intent created successfully');
-        setClientSecret(response.data.clientSecret);
+        console.log('Stripe checkout session created:', response.data);
+        
+        // Redirect to Stripe's hosted checkout page
+        window.location.href = response.data.url;
       } catch (err) {
-        console.error('Error creating payment intent:', err);
+        console.error('Error creating checkout session:', err);
         setError('Failed to initialize payment. Please try again or contact support.');
-      } finally {
         setLoading(false);
       }
     };
 
     if (isAuthenticated) {
-      createPaymentIntent();
+      createCheckoutSession();
     } else {
       navigate('/login', { 
         state: { 
@@ -78,20 +76,12 @@ const CheckoutPage = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <Loader2 className="h-12 w-12 animate-spin text-teal-500 mb-4" />
+        <p className="text-gray-600">Redirecting to secure checkout...</p>
       </div>
     );
   }
-
-  const appearance = {
-    theme: 'stripe',
-    variables: {
-      colorPrimary: '#0d9488', // teal-600
-      fontFamily: 'Inter, system-ui, sans-serif',
-      borderRadius: '8px',
-    },
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16 pb-20">
@@ -116,37 +106,16 @@ const CheckoutPage = () => {
               </div>
             )}
             
-            <div className="mb-6">
-              <h2 className="text-lg font-medium text-gray-900 mb-2">Order Summary</h2>
-              {packageDetails && (
-                <div className="bg-gray-50 rounded-md p-4">
-                  <div className="flex justify-between mb-2">
-                    <span className="text-gray-600">Package:</span>
-                    <span className="font-medium">{packageDetails.packageName}</span>
-                  </div>
-                  <div className="flex justify-between mb-2">
-                    <span className="text-gray-600">Billing Period:</span>
-                    <span className="font-medium">{packageDetails.isYearly ? 'Yearly' : 'Monthly'}</span>
-                  </div>
-                  <div className="flex justify-between mb-2">
-                    <span className="text-gray-600">Account:</span>
-                    <span className="font-medium">{user?.username}</span>
-                  </div>
-                </div>
-              )}
-            </div>
-            
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Payment Details</h2>
-            {clientSecret && (
-              <Elements stripe={stripePromise} options={{ clientSecret, appearance }}>
-                <StripeCheckoutForm clientSecret={clientSecret} packageDetails={packageDetails} />
-              </Elements>
-            )}
-            
-            <div className="mt-8 text-sm text-gray-500">
-              <p>
-                Your payment is processed securely through Stripe. We do not store your credit card information.
-              </p>
+            <div className="text-center py-10">
+              <Loader2 className="h-12 w-12 animate-spin text-teal-500 mx-auto mb-4" />
+              <p className="text-gray-600 mb-2">Redirecting to Stripe for secure checkout...</p>
+              <p className="text-sm text-gray-500">If you are not redirected automatically, please click the button below.</p>
+              <button 
+                onClick={() => window.location.reload()}
+                className="mt-4 bg-teal-500 hover:bg-teal-600 text-white font-medium py-2 px-4 rounded transition-colors"
+              >
+                Go to Checkout
+              </button>
             </div>
           </div>
         </div>

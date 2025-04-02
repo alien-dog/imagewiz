@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
-import { CheckCircle, ArrowRight } from 'lucide-react';
+import { CheckCircle, ArrowRight, Loader2 } from 'lucide-react';
 
 const PaymentSuccessPage = () => {
   const { user, refreshUser } = useAuth();
@@ -11,9 +11,9 @@ const PaymentSuccessPage = () => {
   const [loading, setLoading] = useState(true);
   const [paymentVerified, setPaymentVerified] = useState(false);
   const [error, setError] = useState(null);
-  const [packageDetails, setPackageDetails] = useState(null);
+  const [paymentDetails, setPaymentDetails] = useState(null);
   
-  // Extract payment information from URL or location state
+  // Extract payment information from URL
   useEffect(() => {
     // Track if component is mounted to prevent state updates after unmount
     let isMounted = true;
@@ -35,31 +35,35 @@ const PaymentSuccessPage = () => {
         setLoading(true);
         setError(null);
         
-        // Check if we have payment intent from URL (redirect flow) or from state (direct flow)
+        // For Stripe hosted checkout, we get a session_id in the URL
         const params = new URLSearchParams(window.location.search);
-        const paymentIntentFromUrl = params.get('payment_intent');
-        const paymentIntentFromState = location.state?.paymentIntentId;
-        const paymentIntentId = paymentIntentFromUrl || paymentIntentFromState;
+        const sessionId = params.get('session_id');
         
-        if (!paymentIntentId) {
-          throw new Error('No payment information found.');
+        if (!sessionId) {
+          throw new Error('No payment session information found.');
         }
         
-        // Store package details from state if available
-        if (location.state?.packageDetails && isMounted) {
-          setPackageDetails(location.state.packageDetails);
-        }
+        console.log('Verifying payment with session ID:', sessionId);
         
         // Verify payment with backend
         const token = localStorage.getItem('token');
-        const response = await axios.get(`/api/payment/verify-intent/${paymentIntentId}`, {
+        const response = await axios.get(`/api/payment/verify/${sessionId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
         
+        console.log('Payment verification response:', response.data);
+        
         if (response.data.status === 'success' && isMounted) {
           setPaymentVerified(true);
+          setPaymentDetails({
+            packageName: response.data.package_name || 'Credit Package',
+            amountPaid: response.data.amount_paid || 0,
+            creditsAdded: response.data.credits_added || 0,
+            isYearly: response.data.is_yearly || false
+          });
+          
           // Refresh user data to get updated credit balance
           await refreshUser();
         } else if (isMounted) {
@@ -87,8 +91,9 @@ const PaymentSuccessPage = () => {
   
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <Loader2 className="h-12 w-12 animate-spin text-teal-500 mb-4" />
+        <p className="text-gray-600">Verifying your payment...</p>
       </div>
     );
   }
@@ -114,19 +119,27 @@ const PaymentSuccessPage = () => {
                   Your payment was successful and your credits have been added to your account.
                 </p>
                 
-                {packageDetails && (
+                {paymentDetails && (
                   <div className="bg-gray-50 rounded-md p-4 max-w-sm mx-auto mb-8 text-left">
                     <div className="font-medium text-lg text-gray-900 mb-2">Order Details</div>
                     <div className="flex justify-between mb-1">
                       <span className="text-gray-600">Package:</span>
-                      <span className="font-medium">{packageDetails.packageName}</span>
+                      <span className="font-medium">{paymentDetails.packageName}</span>
                     </div>
                     <div className="flex justify-between mb-1">
                       <span className="text-gray-600">Billing Period:</span>
-                      <span className="font-medium">{packageDetails.isYearly ? 'Yearly' : 'Monthly'}</span>
+                      <span className="font-medium">{paymentDetails.isYearly ? 'Yearly' : 'Monthly'}</span>
+                    </div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-gray-600">Amount Paid:</span>
+                      <span className="font-medium">${paymentDetails.amountPaid}</span>
+                    </div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-gray-600">Credits Added:</span>
+                      <span className="font-medium">{paymentDetails.creditsAdded}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Credit Balance:</span>
+                      <span className="text-gray-600">Current Balance:</span>
                       <span className="font-medium">{user?.credit_balance || 0} credits</span>
                     </div>
                   </div>
