@@ -185,18 +185,19 @@ def create_checkout_session():
                     parsed_url = success_url.replace(":5000", "")
                     print(f"Removed port 5000 from success URL: {parsed_url}")
                     
-                # Make sure we're using a 443 port redirect back to replit.dev domain
-                # This ensures it goes through the proper Express server which serves the frontend
-                if ".replit.dev" in parsed_url and not ":443" in parsed_url:
-                    # Parse the URL to get protocol, hostname, path
+                # Do NOT add port 443 explicitly - this was causing redirect issues
+                # For Replit hosted apps, use the default HTTPS port (implicit 443)
+                if ".replit.dev" in parsed_url and ":443" in parsed_url:
+                    # Remove explicit port 443 if it's there
                     try:
                         from urllib.parse import urlparse, urlunparse
                         parsed = urlparse(parsed_url)
-                        # Ensure we use SSL port 443 explicitly 
-                        parsed_url = parsed_url.replace(parsed.netloc, f"{parsed.netloc}:443")
-                        print(f"Added port 443 for redirect: {parsed_url}")
+                        # Remove the port specification entirely
+                        cleaned_netloc = parsed.netloc.replace(":443", "")
+                        parsed_url = parsed_url.replace(parsed.netloc, cleaned_netloc)
+                        print(f"Removed explicit port for cleaner redirect: {parsed_url}")
                     except Exception as e:
-                        print(f"Error adding port 443: {e}")
+                        print(f"Error cleaning URL: {e}")
                     
                 # Make sure we always append the session_id parameter correctly
                 if '?' not in parsed_url:
@@ -333,6 +334,36 @@ def handle_successful_payment(session):
             price = float(metadata.get('price', 0))
             is_yearly = metadata.get('is_yearly', 'false').lower() == 'true'
             session_id = session.get('id')
+            
+        # If credits are not explicitly provided in metadata, calculate based on package_id
+        if credits == 0 and package_id:
+            print(f"Calculating credits for package: {package_id}")
+            if package_id == 'lite_monthly':
+                credits = 50
+            elif package_id == 'lite_yearly':
+                credits = 600
+            elif package_id == 'pro_monthly':
+                credits = 250
+            elif package_id == 'pro_yearly':
+                credits = 3000
+            print(f"Calculated credits: {credits}")
+        
+        # Final sanity check - if we still have 0 credits, calculate based on price
+        if credits == 0 and price > 0:
+            # Fallback calculation: Lite = 9.90 for 50 credits, Pro = 24.90 for 250 credits
+            if abs(price - 9.90) < 0.1:  # ~= $9.90
+                credits = 50
+            elif abs(price - 106.80) < 0.1:  # ~= $106.80
+                credits = 600
+            elif abs(price - 24.90) < 0.1:  # ~= $24.90
+                credits = 250
+            elif abs(price - 262.80) < 0.1:  # ~= $262.80
+                credits = 3000
+            else:
+                # Absolute fallback: 5 credits per $1
+                credits = int(price * 5)
+                
+            print(f"Fallback credit calculation based on price ${price}: {credits} credits")
         
         print(f"Processing payment for user_id: {user_id}, credits: {credits}, price: {price}")
         
@@ -399,21 +430,29 @@ def handle_successful_payment(session):
                 'stripe_payment_id': session_id
             })
             
-            # Update user's credit balance
-            user.credit_balance += credits
+            # The credits have already been added to user.credit_balance earlier in this function
+            # DO NOT add the credits again to avoid doubling them
             
             # Commit all changes
             db.session.commit()
             
             print(f"Successfully inserted payment record for user {user.username}")
+            print(f"User {user.username} credit balance is now {user.credit_balance}")
         except Exception as insert_error:
             db.session.rollback()
             print(f"Error inserting payment record: {insert_error}")
             # Even if the insert fails, try to at least update the user's credit balance
             try:
-                user.credit_balance += credits
-                db.session.commit()
-                print(f"Updated user's credit balance to {user.credit_balance}")
+                # Make sure we don't double-add credits
+                # We need to query the user again to get the latest credit balance
+                fresh_user = User.query.get(user.id)
+                if fresh_user.credit_balance == user.credit_balance - credits:
+                    # Only add credits if they weren't added before
+                    fresh_user.credit_balance += credits
+                    db.session.commit()
+                    print(f"Updated user's credit balance to {fresh_user.credit_balance}")
+                else:
+                    print(f"Credits already added, current balance: {fresh_user.credit_balance}")
             except Exception as balance_error:
                 db.session.rollback()
                 print(f"Error updating user's credit balance: {balance_error}")

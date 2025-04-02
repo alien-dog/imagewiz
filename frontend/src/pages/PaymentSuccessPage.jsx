@@ -40,19 +40,51 @@ const PaymentSuccessPage = () => {
         const params = new URLSearchParams(window.location.search);
         const sessionId = params.get('session_id');
         
+        // Debug payment verification
+        console.log('Payment verification triggered with URL params:', window.location.search);
+        console.log('Session ID from URL:', sessionId);
+        
         if (!sessionId) {
-          throw new Error('No payment session information found.');
+          console.error('ERROR: No session_id found in URL parameters');
+          // Instead of throwing error, show a recovery UI
+          setError('No payment session information found. If you have completed a payment, please contact support.');
+          setLoading(false);
+          return; // Exit early instead of throwing
         }
         
         console.log('Verifying payment with session ID:', sessionId);
         
         // Verify payment with backend
         const token = localStorage.getItem('token');
-        const response = await axios.get(`/api/payment/verify?session_id=${sessionId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
+        
+        // Add more detailed logging for debugging
+        console.log('Sending payment verification request to API');
+        console.log('API base URL:', axios.defaults.baseURL);
+        console.log('Auth token present:', !!token);
+        
+        // Add timeout and retry logic for robustness
+        let retries = 2;
+        let response;
+        
+        while (retries >= 0) {
+          try {
+            response = await axios.get(`/api/payment/verify?session_id=${sessionId}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              },
+              timeout: 10000 // 10 second timeout
+            });
+            break; // Success, exit the retry loop
+          } catch (err) {
+            console.error(`Verification attempt failed (${retries} retries left):`, err);
+            if (retries === 0) {
+              throw err; // No more retries, propagate the error
+            }
+            retries--;
+            // Wait 1 second before retrying
+            await new Promise(resolve => setTimeout(resolve, 1000));
           }
-        });
+        }
         
         console.log('Payment verification response:', response.data);
         
@@ -65,22 +97,27 @@ const PaymentSuccessPage = () => {
             isYearly: response.data.is_yearly || false
           });
           
+          // Log payment details for debugging
+          console.log('Payment details from backend:', response.data);
+          console.log('Credits added:', response.data.credits_added);
+          console.log('New balance should be:', response.data.new_balance);
+          
           // Refresh user data to get updated credit balance
           await refreshUser();
           
-          // Auto-redirect to dashboard immediately
-          console.log('Payment successful, redirecting to dashboard NOW...');
+          // Show success UI first (don't redirect automatically) to allow user to see purchase details
+          console.log('Payment successful, showing success UI');
+          setLoading(false);
           
-          // Force immediate redirect - most reliable approach for SPA after payment returns
-          window.location.replace('/dashboard');
-          
-          // Fallback redirect in case the above doesn't work for some reason
+          // Delayed redirect to dashboard after 5 seconds to give user time to see confirmation
           setTimeout(() => {
-            console.log('Fallback redirect executing...');
+            console.log('Delayed redirect to dashboard executing...');
             window.location.href = '/dashboard';
-          }, 500);
+          }, 5000);
         } else if (isMounted) {
-          throw new Error('Payment verification failed.');
+          console.error('Payment verification failed with response:', response.data);
+          setError('Payment verification failed. Please contact support if your credits are not applied.');
+          setLoading(false);
         }
       } catch (err) {
         if (isMounted) {

@@ -30,18 +30,32 @@ const CheckoutPage = () => {
         // Get the current domain to use for success and cancel URLs
         const url = new URL(window.location.href);
         
-        // For Replit hosted apps, use the replit.dev domain WITHOUT port specification
-        // and explicitly use port 443 (HTTPS) for more reliable routing
+        // For Replit hosted apps, construct URLs carefully to ensure redirection works
         let baseUrl;
         if (url.hostname.includes('.replit.dev')) {
-          // For Replit domains, use https protocol with no port specified
+          // For Replit domains, use https protocol with NO port for most reliable routing
+          // (Stripe will redirect back to this URL and port numbers can cause issues)
           baseUrl = `https://${url.hostname}`;
-          console.log('Using Replit domain for callbacks (no port):', baseUrl);
-        } else {
-          // For other environments or localhost, use full origin including port
+          console.log('Using Replit domain for callbacks without port:', baseUrl);
+        } else if (url.hostname === 'localhost' || url.hostname === '0.0.0.0' || url.hostname === '127.0.0.1') {
+          // For local development, keep the port (needed for local testing)
           baseUrl = window.location.origin;
-          console.log('Using full origin with port for callbacks:', baseUrl);
+          console.log('Using localhost with port for callbacks:', baseUrl);
+        } else {
+          // For all other environments, use clean URLs without ports to avoid redirect issues
+          baseUrl = `${url.protocol}//${url.hostname}`;
+          console.log('Using clean URL without port for callbacks:', baseUrl);
         }
+        
+        // Log full URL information for debugging
+        console.log('URL details:', {
+          protocol: url.protocol,
+          hostname: url.hostname,
+          host: url.host,
+          port: url.port,
+          pathname: url.pathname,
+          baseUrl: baseUrl
+        });
         
         const payload = {
           package_id: location.state.packageDetails.isYearly 

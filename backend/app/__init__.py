@@ -125,8 +125,10 @@ def create_app():
             replit_match = re.match(r'(.*?)\.replit\.dev', host)
             
             if replit_match:
-                # For replit domain, redirect to port 443 (HTTPS)
-                redirect_url = f"https://{host}:443/payment-success"
+                # For replit domain, redirect without port specification 
+                # Using port 443 was causing issues, so just use default HTTPS port
+                redirect_url = f"https://{host}/payment-success"
+                print(f"Redirecting payment success to: {redirect_url}")
             else:
                 # For other environments, redirect to port 3000
                 redirect_url = f"http://{host}:3000/payment-success"
@@ -146,7 +148,8 @@ def create_app():
             replit_match = re.match(r'(.*?)\.replit\.dev', host)
             
             if replit_match:
-                redirect_url = f"https://{host}:443/dashboard"
+                redirect_url = f"https://{host}/dashboard"
+                print(f"Redirecting dashboard to: {redirect_url}")
             else:
                 redirect_url = f"http://{host}:3000/dashboard"
                 
@@ -160,7 +163,8 @@ def create_app():
             replit_match = re.match(r'(.*?)\.replit\.dev', host)
             
             if replit_match:
-                redirect_url = f"https://{host}:443/pricing"
+                redirect_url = f"https://{host}/pricing"
+                print(f"Redirecting pricing to: {redirect_url}")
             else:
                 redirect_url = f"http://{host}:3000/pricing"
                 
@@ -179,7 +183,8 @@ def create_app():
                     replit_match = re.match(r'(.*?)\.replit\.dev', host)
                     
                     if replit_match:
-                        redirect_url = f"https://{host}:443{path}"
+                        redirect_url = f"https://{host}{path}"
+                        print(f"404 handler redirecting to: {redirect_url}")
                     else:
                         redirect_url = f"http://{host}:3000{path}"
                         
