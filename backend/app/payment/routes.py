@@ -185,6 +185,19 @@ def create_checkout_session():
                     parsed_url = success_url.replace(":5000", "")
                     print(f"Removed port 5000 from success URL: {parsed_url}")
                     
+                # Make sure we're using a 443 port redirect back to replit.dev domain
+                # This ensures it goes through the proper Express server which serves the frontend
+                if ".replit.dev" in parsed_url and not ":443" in parsed_url:
+                    # Parse the URL to get protocol, hostname, path
+                    try:
+                        from urllib.parse import urlparse, urlunparse
+                        parsed = urlparse(parsed_url)
+                        # Ensure we use SSL port 443 explicitly 
+                        parsed_url = parsed_url.replace(parsed.netloc, f"{parsed.netloc}:443")
+                        print(f"Added port 443 for redirect: {parsed_url}")
+                    except Exception as e:
+                        print(f"Error adding port 443: {e}")
+                    
                 # Make sure we always append the session_id parameter correctly
                 if '?' not in parsed_url:
                     success_url = f"{parsed_url}?session_id={{CHECKOUT_SESSION_ID}}"

@@ -27,11 +27,21 @@ const CheckoutPage = () => {
         setError(null);
         
         const token = localStorage.getItem('token');
-        // Get the current domain to use for success and cancel URLs - remove port if present
+        // Get the current domain to use for success and cancel URLs
         const url = new URL(window.location.href);
-        // Use host without port for callback URLs to avoid port issues with redirects
-        const baseUrl = `${url.protocol}//${url.hostname}`;
-        console.log('Base URL for checkout callbacks (without port):', baseUrl);
+        
+        // For Replit hosted apps, use the replit.dev domain WITHOUT port specification
+        // and explicitly use port 443 (HTTPS) for more reliable routing
+        let baseUrl;
+        if (url.hostname.includes('.replit.dev')) {
+          // For Replit domains, use https protocol with no port specified
+          baseUrl = `https://${url.hostname}`;
+          console.log('Using Replit domain for callbacks (no port):', baseUrl);
+        } else {
+          // For other environments or localhost, use full origin including port
+          baseUrl = window.location.origin;
+          console.log('Using full origin with port for callbacks:', baseUrl);
+        }
         
         const payload = {
           package_id: location.state.packageDetails.isYearly 

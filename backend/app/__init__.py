@@ -1,5 +1,5 @@
 import os
-from flask import Flask, send_from_directory, jsonify
+from flask import Flask, send_from_directory, jsonify, redirect, request
 from datetime import timedelta
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
@@ -7,6 +7,7 @@ from flask_bcrypt import Bcrypt
 from werkzeug.exceptions import HTTPException
 from flask_cors import CORS
 import stripe
+import re
 
 # Initialize extensions
 db = SQLAlchemy()
@@ -109,9 +110,86 @@ def create_app():
             return jsonify({"status": "ok", "message": "iMagenWiz API is running"})
             
         # Error handler for all exceptions
+        # Special route to handle the payment-success redirect from Stripe
+        @app.route('/payment-success')
+        def handle_payment_success():
+            """Redirect payment success to the Express server"""
+            # Get the query parameters
+            session_id = request.args.get('session_id')
+            
+            # In production environments, determine the proper frontend host
+            host = request.headers.get('Host')
+            
+            # Extract the base domain - pattern matching for replit.dev domains
+            base_domain = host
+            replit_match = re.match(r'(.*?)\.replit\.dev', host)
+            
+            if replit_match:
+                # For replit domain, redirect to port 443 (HTTPS)
+                redirect_url = f"https://{host}:443/payment-success"
+            else:
+                # For other environments, redirect to port 3000
+                redirect_url = f"http://{host}:3000/payment-success"
+                
+            # Include any query parameters in the redirect
+            if session_id:
+                redirect_url += f"?session_id={session_id}"
+                
+            app.logger.info(f"Redirecting payment success from Flask to Express: {redirect_url}")
+            return redirect(redirect_url, code=302)
+            
+        # Add a similar redirect for other frontend routes commonly accessed directly
+        @app.route('/dashboard')
+        def handle_dashboard_redirect():
+            """Redirect dashboard to the Express server"""
+            host = request.headers.get('Host')
+            replit_match = re.match(r'(.*?)\.replit\.dev', host)
+            
+            if replit_match:
+                redirect_url = f"https://{host}:443/dashboard"
+            else:
+                redirect_url = f"http://{host}:3000/dashboard"
+                
+            app.logger.info(f"Redirecting dashboard from Flask to Express: {redirect_url}")
+            return redirect(redirect_url, code=302)
+            
+        @app.route('/pricing')
+        def handle_pricing_redirect():
+            """Redirect pricing to the Express server"""
+            host = request.headers.get('Host')
+            replit_match = re.match(r'(.*?)\.replit\.dev', host)
+            
+            if replit_match:
+                redirect_url = f"https://{host}:443/pricing"
+            else:
+                redirect_url = f"http://{host}:3000/pricing"
+                
+            app.logger.info(f"Redirecting pricing from Flask to Express: {redirect_url}")
+            return redirect(redirect_url, code=302)
+            
         @app.errorhandler(Exception)
         def handle_exception(e):
             """Return JSON instead of HTML for HTTP errors."""
+            # Check if this is a 404 for a frontend route that should be redirected
+            if isinstance(e, HTTPException) and e.code == 404:
+                path = request.path
+                # If this looks like a frontend route, redirect to Express server
+                if path.startswith('/payment') or path == '/dashboard' or path == '/pricing' or path == '/login':
+                    host = request.headers.get('Host')
+                    replit_match = re.match(r'(.*?)\.replit\.dev', host)
+                    
+                    if replit_match:
+                        redirect_url = f"https://{host}:443{path}"
+                    else:
+                        redirect_url = f"http://{host}:3000{path}"
+                        
+                    # Include query string if any
+                    if request.query_string:
+                        redirect_url += f"?{request.query_string.decode('utf-8')}"
+                        
+                    app.logger.info(f"404 redirect from Flask to Express: {redirect_url}")
+                    return redirect(redirect_url, code=302)
+            
             if isinstance(e, HTTPException):
                 response = {
                     "code": e.code,
