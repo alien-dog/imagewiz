@@ -49,8 +49,13 @@ const CheckoutPage = () => {
         
         console.log('Stripe checkout session created:', response.data);
         
-        // Redirect to Stripe's hosted checkout page
-        window.location.href = response.data.url;
+        if (response.data && response.data.url) {
+          // Redirect to Stripe's hosted checkout page
+          console.log('Redirecting to Stripe checkout URL:', response.data.url);
+          window.location.href = response.data.url;
+        } else {
+          throw new Error('No checkout URL received from server');
+        }
       } catch (err) {
         console.error('Error creating checkout session:', err);
         setError('Failed to initialize payment. Please try again or contact support.');

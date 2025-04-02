@@ -343,6 +343,37 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
 });
 
+// Explicitly handle common frontend routes
+app.get('/pricing', (req, res) => {
+  console.log('🌟 Serving React pricing page');
+  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+});
+
+app.get('/dashboard', (req, res) => {
+  console.log('🌟 Serving React dashboard page');
+  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+});
+
+app.get('/login', (req, res) => {
+  console.log('🌟 Serving React login page');
+  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+});
+
+app.get('/register', (req, res) => {
+  console.log('🌟 Serving React register page');
+  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+});
+
+app.get('/checkout', (req, res) => {
+  console.log('🌟 Serving React checkout page');
+  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+});
+
+app.get('/payment-success', (req, res) => {
+  console.log('🌟 Serving React payment success page');
+  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+});
+
 // Serve static files from the frontend build directory
 app.use(express.static(FRONTEND_DIST_PATH));
 
@@ -369,6 +400,77 @@ app.get('/test-stripe-open.html', (req, res) => {
 
 // STEP 3: BACKEND API PROXYING - Must come AFTER frontend routes
 //==========================================================================
+
+// Add a manual proxy endpoint for payment verification by session_id
+app.get('/api/payment/verify-session/:sessionId', async (req, res) => {
+  console.log('✅ Manual proxy: Received verify-session request for session:', req.params.sessionId);
+  try {
+    // Extract the token from the Authorization header
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      console.log('❌ Error: No authorization header provided');
+      return res.status(401).json({ error: 'No authorization header provided' });
+    }
+    
+    console.log('Manual proxy: Forwarding verify session request with auth header:', authHeader.substring(0, 20) + '...');
+    
+    // URL to forward to the Flask backend
+    const url = `http://localhost:${FLASK_PORT}/payment/verify/${req.params.sessionId}`;
+    console.log('Forwarding to:', url);
+    
+    // Make the request to the Flask backend
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': authHeader,
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      // Log the raw response status
+      console.log('Response status:', response.status, response.statusText);
+      
+      if (!response.ok) {
+        console.error(`❌ Manual proxy: Flask server returned ${response.status} ${response.statusText}`);
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        return res.status(response.status).json({ 
+          error: 'Backend server error',
+          status: response.status,
+          details: errorText
+        });
+      }
+      
+      try {
+        const data = await response.json();
+        console.log('✅ Manual proxy: Verify session response received:', JSON.stringify(data, null, 2));
+        
+        // Success! Return the response to the client
+        return res.status(response.status).json(data);
+      } catch (jsonError: any) {
+        console.error('❌ Manual proxy: Error parsing JSON response:', jsonError.message);
+        const rawText = await response.text();
+        console.error('Raw response text:', rawText.substring(0, 500) + (rawText.length > 500 ? '...' : ''));
+        throw new Error(`Failed to parse JSON response: ${jsonError.message}`);
+      }
+    } catch (fetchError: any) {
+      // Specific error handling for the fetch request
+      console.error('❌ Manual proxy: Fetch error:', fetchError.message);
+      if (fetchError.cause) {
+        console.error('Cause:', fetchError.cause.code, fetchError.cause.message);
+      }
+      throw fetchError;
+    }
+  } catch (error: any) {
+    console.error('❌ Manual proxy: Error forwarding verify session request', error);
+    res.status(500).json({ 
+      error: 'Internal server error', 
+      message: error.message,
+      stack: error.stack
+    });
+  }
+});
 
 // Proxy API requests (except manually handled ones) to Flask backend
 app.use('/api', createProxyMiddleware({

@@ -47,7 +47,7 @@ const PaymentSuccessPage = () => {
         
         // Verify payment with backend
         const token = localStorage.getItem('token');
-        const response = await axios.get(`/api/payment/verify/${sessionId}`, {
+        const response = await axios.get(`/api/payment/verify-session/${sessionId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
