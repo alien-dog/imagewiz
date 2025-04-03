@@ -159,9 +159,19 @@ app.post('/api/payment/create-checkout-session', async (req, res) => {
     }
     
     console.log('Manual proxy: Forwarding checkout request with auth header:', authHeader.substring(0, 20) + '...');
-    console.log('Request body:', JSON.stringify(req.body));
     
-
+    // IMPORTANT: Intercept and fix the success_url to use payment-verify instead of payment-success
+    // This ensures our modern polling-based approach is used and prevents redirect loops
+    if (req.body && req.body.success_url) {
+      // If success_url contains payment-success, replace it with payment-verify
+      if (req.body.success_url.includes('/payment-success')) {
+        const originalUrl = req.body.success_url;
+        req.body.success_url = req.body.success_url.replace('/payment-success', '/payment-verify');
+        console.log(`⚠️ Fixed success_url to use polling verification: ${originalUrl} → ${req.body.success_url}`);
+      }
+    }
+    
+    console.log('Request body:', JSON.stringify(req.body));
     
     // This is the correct URL to forward to the Flask backend
     // Make sure to use /payment/create-checkout-session (no /api prefix)
