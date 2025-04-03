@@ -66,9 +66,9 @@ const CheckoutPage = () => {
           price: location.state.packageDetails.packageName.includes('Lite') 
             ? (location.state.packageDetails.isYearly ? 106.8 : 9.9)
             : (location.state.packageDetails.isYearly ? 262.8 : 24.9),
-          // Explicitly provide success and cancel URLs with domain but NO PORT
-          // Add a timestamp to prevent caching and distinguish redirects
-          success_url: `${baseUrl}/payment-success?t=${Date.now()}`,
+          // Use the payment-verify page with our polling mechanism instead of direct success URL
+          // Add timestamp to prevent caching issues
+          success_url: `${baseUrl}/payment-verify?t=${Date.now()}`,
           cancel_url: `${baseUrl}/pricing?t=${Date.now()}`
         };
         
