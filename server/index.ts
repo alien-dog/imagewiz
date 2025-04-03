@@ -383,6 +383,27 @@ app.get('/checkout', (req, res) => {
   res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
 });
 
+// Special route to handle redirects from Flask when avoiding redirect loops
+app.get('/payment-success-express', (req, res) => {
+  console.log('🌟 Special route: payment-success-express - direct from Flask');
+  console.log('  Query params:', req.query);
+  
+  const sessionId = req.query.session_id;
+  if (sessionId) {
+    console.log('✅ Success! Flask redirected with session_id:', sessionId);
+    
+    // Redirect to the React payment success page using a different URL pattern
+    // This ensures we don't create another redirect loop
+    const redirectUrl = `/payment-success?session_id=${sessionId}&source=express`;
+    console.log(`Redirecting to: ${redirectUrl}`);
+    
+    return res.redirect(redirectUrl);
+  } else {
+    console.log('❌ Error: No session_id in payment-success-express route');
+    return res.redirect('/dashboard');
+  }
+});
+
 app.get('/payment-success', (req, res) => {
   console.log('🌟 Serving React payment success page');
   console.log('  Query params:', req.query);
@@ -390,6 +411,10 @@ app.get('/payment-success', (req, res) => {
   // Check if we have a session ID in the query parameters
   if (req.query.session_id) {
     console.log('  Payment success with session_id:', req.query.session_id);
+    // If this is from our express redirect (to avoid loops), serve directly
+    if (req.query.source === 'express') {
+      console.log('  This is from our express redirect, serving directly');
+    }
   }
   
   res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
@@ -611,10 +636,23 @@ app.use('/processed', createProxyMiddleware({
 app.get('*', (req, res) => {
   console.log(`🌐 Serving SPA route: ${req.path}`);
   
-  // Special handling for payment routes
+  // Improved special handling for payment routes
   if (req.path === '/payment-success' || req.path === '/payment-failure' || 
       req.path === '/undefined' || req.path.startsWith('/payment')) {
-    console.log(`⚠️ Handling special frontend route: ${req.path} → serving index.html`);
+    
+    // Check for payment-success route
+    if (req.path === '/payment-success') {
+      console.log(`⚠️ Catch-all detected /payment-success request with query:`, req.query);
+      
+      // If this has the source=express param, it means we're handling it safely
+      if (req.query.source === 'express') {
+        console.log(`✅ Safe route detected (from Express redirect)`);
+      } else {
+        console.log(`⚠️ Standard payment-success route without express marker`);
+      }
+    } else {
+      console.log(`⚠️ Handling special frontend route: ${req.path} → serving index.html`);
+    }
     
     if (req.path === '/undefined') {
       console.warn(`
@@ -625,6 +663,7 @@ Check that your success_url and cancel_url parameters in Stripe checkout are cor
     }
   }
   
+  // Always serve the SPA for any route not explicitly handled
   res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
 });
 

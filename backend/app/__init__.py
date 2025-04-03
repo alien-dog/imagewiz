@@ -110,73 +110,31 @@ def create_app():
             return jsonify({"status": "ok", "message": "iMagenWiz API is running"})
             
         # Error handler for all exceptions
-        # Special route to handle the payment-success redirect from Stripe
+        # Disable Flask handling of payment-success entirely
+        # This route should be only be handled by Express server
+        # We'll just log attempts to access this from Flask and provide a simple redirect
         @app.route('/payment-success')
         def handle_payment_success():
-            """Redirect payment success to the Express server - with improved handling"""
-            try:
-                # Get all query parameters to preserve them in redirect
-                query_params = request.args.to_dict()
+            """Forward payment success directly to Express without any processing"""
+            # Get host information from headers
+            host = request.headers.get('Host')
+            app.logger.info(f"Payment-success received by Flask, forwarding to Express immediately. Host: {host}")
+            
+            # Create express URL based on environment
+            replit_match = re.match(r'(.*?)\.replit\.dev', host)
+            if replit_match:
+                express_url = f"https://{host}/payment-success-express"
+            else:
+                express_url = f"http://{host}:3000/payment-success-express"
+            
+            # Pass any query parameters directly to Express
+            if request.query_string:
+                express_url += f"?{request.query_string.decode('utf-8')}"
                 
-                # Check for session_id which is crucial for verifying payment
-                session_id = query_params.get('session_id')
-                if not session_id:
-                    app.logger.error("Payment success redirect without session_id")
-                
-                # Get host information from headers
-                host = request.headers.get('Host')
-                app.logger.info(f"Payment redirect received with host: {host}")
-                
-                # Determine if we're on Replit deployment
-                replit_match = re.match(r'(.*?)\.replit\.dev', host)
-                
-                # Build the redirect URL without port specification
-                if replit_match:
-                    # Use HTTPS protocol without port for Replit
-                    base_url = f"https://{host}"
-                else:
-                    # For local development, use HTTP with port 3000
-                    base_url = f"http://{host}:3000"
-                
-                # Prevent redirect loops by checking for loop indicators
-                loop_count = int(query_params.get('_redirect_count', 0))
-                
-                # If we detect a potential loop (3+ redirects), send to Express directly
-                if loop_count >= 2:
-                    app.logger.warning(f"Detected potential redirect loop (count: {loop_count}), redirecting to Express")
-                    # Maintain the session_id for payment verification
-                    if session_id:
-                        redirect_url = f"{base_url}/payment-success?session_id={session_id}"
-                    else:
-                        redirect_url = f"{base_url}/dashboard"
-                    
-                    app.logger.info(f"Emergency redirect to Express: {redirect_url}")
-                    return redirect(redirect_url, code=302)
-                
-                # Increment the redirect counter for loop detection
-                query_params['_redirect_count'] = str(loop_count + 1)
-                
-                # Construct base redirect URL
-                redirect_url = f"{base_url}/payment-success"
-                
-                # Add all query parameters
-                if query_params:
-                    query_string = "&".join([f"{k}={v}" for k, v in query_params.items()])
-                    redirect_url += f"?{query_string}"
-                
-                # Log the redirect info
-                app.logger.info(f"Redirecting payment success: {redirect_url}")
-                app.logger.info(f"Redirect count: {loop_count + 1}")
-                
-                return redirect(redirect_url, code=302)
-            except Exception as e:
-                app.logger.error(f"Error in payment success redirect: {str(e)}")
-                # Log the exception for debugging
-                app.logger.error(f"Payment redirect error: {str(e)}")
-                
-                # Emergency fallback - redirect to root instead of dashboard to avoid 404
-                host = request.headers.get('Host')
-                return redirect(f"https://{host}/", code=302)
+            app.logger.info(f"Immediate redirect to Express server: {express_url}")
+            
+            # Always redirect to Express without any processing here
+            return redirect(express_url, code=302)
             
         # Add a similar redirect for other frontend routes commonly accessed directly
         # Dashboard routes are now handled by Express directly
