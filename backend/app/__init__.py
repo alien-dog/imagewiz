@@ -169,20 +169,8 @@ def create_app():
                 return redirect(f"https://{request.headers.get('Host')}/dashboard", code=302)
             
         # Add a similar redirect for other frontend routes commonly accessed directly
-        @app.route('/dashboard')
-        def handle_dashboard_redirect():
-            """Redirect dashboard to the Express server"""
-            host = request.headers.get('Host')
-            replit_match = re.match(r'(.*?)\.replit\.dev', host)
-            
-            if replit_match:
-                redirect_url = f"https://{host}/dashboard"
-                print(f"Redirecting dashboard to: {redirect_url}")
-            else:
-                redirect_url = f"http://{host}:3000/dashboard"
-                
-            app.logger.info(f"Redirecting dashboard from Flask to Express: {redirect_url}")
-            return redirect(redirect_url, code=302)
+        # Dashboard routes are now handled by Express directly
+        # No need for Flask to redirect, removing this route to prevent redirect loops
             
         @app.route('/pricing')
         def handle_pricing_redirect():
@@ -206,7 +194,8 @@ def create_app():
             if isinstance(e, HTTPException) and e.code == 404:
                 path = request.path
                 # If this looks like a frontend route, redirect to Express server
-                if path.startswith('/payment') or path == '/dashboard' or path == '/pricing' or path == '/login':
+                # Note: We exclude /dashboard as it should only be handled by Express
+                if path.startswith('/payment') or path == '/pricing' or path == '/login':
                     host = request.headers.get('Host')
                     replit_match = re.match(r'(.*?)\.replit\.dev', host)
                     
