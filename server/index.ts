@@ -353,6 +353,18 @@ app.get('/pricing', (req, res) => {
 
 app.get('/dashboard', (req, res) => {
   console.log('🌟 Serving React dashboard page');
+  console.log('  Query params:', req.query);
+  
+  // Always serve the React app's index.html for the dashboard
+  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+});
+
+// Special route for handling redirects from payment success to dashboard
+app.get('/dashboard/:via?', (req, res) => {
+  console.log(`🌟 Serving React dashboard page via ${req.params.via || 'direct'} route`);
+  console.log('  Query params:', req.query);
+  
+  // Always serve the React app's index.html
   res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
 });
 
@@ -373,6 +385,13 @@ app.get('/checkout', (req, res) => {
 
 app.get('/payment-success', (req, res) => {
   console.log('🌟 Serving React payment success page');
+  console.log('  Query params:', req.query);
+  
+  // Check if we have a session ID in the query parameters
+  if (req.query.session_id) {
+    console.log('  Payment success with session_id:', req.query.session_id);
+  }
+  
   res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
 });
 

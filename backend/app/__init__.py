@@ -141,10 +141,16 @@ def create_app():
                 # Prevent redirect loops by checking for loop indicators
                 loop_count = int(query_params.get('_redirect_count', 0))
                 
-                # If we detect a potential loop (3+ redirects), send to dashboard directly
+                # If we detect a potential loop (3+ redirects), send to Express directly
                 if loop_count >= 2:
-                    app.logger.warning(f"Detected potential redirect loop (count: {loop_count}), redirecting to dashboard")
-                    redirect_url = f"{base_url}/dashboard"
+                    app.logger.warning(f"Detected potential redirect loop (count: {loop_count}), redirecting to Express")
+                    # Maintain the session_id for payment verification
+                    if session_id:
+                        redirect_url = f"{base_url}/payment-success?session_id={session_id}"
+                    else:
+                        redirect_url = f"{base_url}/dashboard"
+                    
+                    app.logger.info(f"Emergency redirect to Express: {redirect_url}")
                     return redirect(redirect_url, code=302)
                 
                 # Increment the redirect counter for loop detection
@@ -165,8 +171,12 @@ def create_app():
                 return redirect(redirect_url, code=302)
             except Exception as e:
                 app.logger.error(f"Error in payment success redirect: {str(e)}")
-                # Emergency fallback - redirect to dashboard
-                return redirect(f"https://{request.headers.get('Host')}/dashboard", code=302)
+                # Log the exception for debugging
+                app.logger.error(f"Payment redirect error: {str(e)}")
+                
+                # Emergency fallback - redirect to root instead of dashboard to avoid 404
+                host = request.headers.get('Host')
+                return redirect(f"https://{host}/", code=302)
             
         # Add a similar redirect for other frontend routes commonly accessed directly
         # Dashboard routes are now handled by Express directly
@@ -193,9 +203,22 @@ def create_app():
             # Check if this is a 404 for a frontend route that should be redirected
             if isinstance(e, HTTPException) and e.code == 404:
                 path = request.path
+                
+                # Special case for dashboard - always redirect to Express
+                if path == '/dashboard' or path.startswith('/dashboard/'):
+                    host = request.headers.get('Host')
+                    replit_match = re.match(r'(.*?)\.replit\.dev', host)
+                    
+                    if replit_match:
+                        redirect_url = f"https://{host}/dashboard"
+                    else:
+                        redirect_url = f"http://{host}:3000/dashboard"
+                    
+                    app.logger.info(f"404 dashboard redirect to Express: {redirect_url}")
+                    return redirect(redirect_url, code=302)
+                
                 # If this looks like a frontend route, redirect to Express server
-                # Note: We exclude /dashboard as it should only be handled by Express
-                if path.startswith('/payment') or path == '/pricing' or path == '/login':
+                elif path.startswith('/payment') or path == '/pricing' or path == '/login':
                     host = request.headers.get('Host')
                     replit_match = re.match(r'(.*?)\.replit\.dev', host)
                     
