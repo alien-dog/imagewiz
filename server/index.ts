@@ -383,19 +383,34 @@ app.get('/checkout', (req, res) => {
   res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
 });
 
-// Special route to handle redirects from Flask when avoiding redirect loops
-app.get('/payment-success-express', (req, res) => {
-  console.log('🌟 Special route: payment-success-express - direct from Flask');
+// Direct route from Stripe checkout that bypasses Flask completely
+app.get('/payment-success-direct', (req, res) => {
+  console.log('🌟 Direct Stripe payment success callback received');
   console.log('  Query params:', req.query);
   
   const sessionId = req.query.session_id;
   if (sessionId) {
-    console.log('✅ Success! Flask redirected with session_id:', sessionId);
+    console.log('✅ Success! Stripe directly redirected with session_id:', sessionId);
     
-    // Redirect to the React payment success page using a different URL pattern
-    // This ensures we don't create another redirect loop
-    const redirectUrl = `/payment-success?session_id=${sessionId}&source=express`;
-    console.log(`Redirecting to: ${redirectUrl}`);
+    // Simply serve the React payment-success page directly, no redirects
+    console.log(`Serving payment success page with session_id: ${sessionId}`);
+    return res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+  } else {
+    console.log('❌ Error: No session_id in direct payment success route');
+    return res.redirect('/dashboard');
+  }
+});
+
+// Legacy route - keep for backward compatibility
+app.get('/payment-success-express', (req, res) => {
+  console.log('🌟 Legacy route: payment-success-express - redirecting to direct route');
+  console.log('  Query params:', req.query);
+  
+  const sessionId = req.query.session_id;
+  if (sessionId) {
+    // Redirect to the direct route to avoid any Flask interaction
+    const redirectUrl = `/payment-success-direct?session_id=${sessionId}`;
+    console.log(`Redirecting to direct route: ${redirectUrl}`);
     
     return res.redirect(redirectUrl);
   } else {

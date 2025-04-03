@@ -110,31 +110,9 @@ def create_app():
             return jsonify({"status": "ok", "message": "iMagenWiz API is running"})
             
         # Error handler for all exceptions
-        # Disable Flask handling of payment-success entirely
-        # This route should be only be handled by Express server
-        # We'll just log attempts to access this from Flask and provide a simple redirect
-        @app.route('/payment-success')
-        def handle_payment_success():
-            """Forward payment success directly to Express without any processing"""
-            # Get host information from headers
-            host = request.headers.get('Host')
-            app.logger.info(f"Payment-success received by Flask, forwarding to Express immediately. Host: {host}")
-            
-            # Create express URL based on environment
-            replit_match = re.match(r'(.*?)\.replit\.dev', host)
-            if replit_match:
-                express_url = f"https://{host}/payment-success-express"
-            else:
-                express_url = f"http://{host}:3000/payment-success-express"
-            
-            # Pass any query parameters directly to Express
-            if request.query_string:
-                express_url += f"?{request.query_string.decode('utf-8')}"
-                
-            app.logger.info(f"Immediate redirect to Express server: {express_url}")
-            
-            # Always redirect to Express without any processing here
-            return redirect(express_url, code=302)
+        # Payment-success is no longer handled by Flask at all
+        # We now use /payment-success-direct in Stripe which goes directly to Express
+        # Instead of having a Flask route, we'll just ensure the 404 handler catches these URLs
             
         # Add a similar redirect for other frontend routes commonly accessed directly
         # Dashboard routes are now handled by Express directly
