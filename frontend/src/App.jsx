@@ -14,6 +14,7 @@ import Pricing from './pages/Pricing';
 import PricingNew from './pages/PricingNew';
 import CheckoutPage from './pages/CheckoutPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
+import PaymentVerifyPage from './pages/PaymentVerifyPage';
 import PaymentHistoryPage from './pages/PaymentHistoryPage';
 import Profile from './pages/Profile';
 import NotFound from './pages/NotFound';
@@ -59,6 +60,14 @@ const AppContent = () => {
               element={
                 <ProtectedRoute>
                   <PaymentSuccessPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/payment-verify"
+              element={
+                <ProtectedRoute>
+                  <PaymentVerifyPage />
                 </ProtectedRoute>
               }
             />

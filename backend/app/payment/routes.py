@@ -128,14 +128,14 @@ def create_checkout_session():
         
         # Use origin if available (which should include the protocol)
         if origin:
-            # Use direct Express route to bypass Flask entirely
-            success_url = f"{origin}/payment-success-direct"
+            # NEW APPROACH: Use a simple payment-verify page that will poll the backend
+            success_url = f"{origin}/payment-verify"
         else:
             # Fallback to host with https
             forwarded_proto = request.headers.get('X-Forwarded-Proto', 'https')
-            success_url = f"{forwarded_proto}://{host}/payment-success-direct"
+            success_url = f"{forwarded_proto}://{host}/payment-verify"
             
-        print(f"No success_url provided, using default: {success_url}")
+        print(f"Using simplified payment verification approach: {success_url}")
     
     if not cancel_url:
         # Get the origin from request headers or use the host directly

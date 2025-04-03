@@ -419,6 +419,15 @@ app.get('/payment-success-express', (req, res) => {
   }
 });
 
+app.get('/payment-verify', (req, res) => {
+  console.log('🌟 Serving React payment verify page');
+  console.log('  Query params:', req.query);
+  
+  // This page handles Stripe payment verification via polling the backend API
+  // No redirects needed - just serve the SPA page
+  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+});
+
 app.get('/payment-success', (req, res) => {
   console.log('🌟 Serving React payment success page');
   console.log('  Query params:', req.query);
@@ -653,7 +662,7 @@ app.get('*', (req, res) => {
   
   // Improved special handling for payment routes
   if (req.path === '/payment-success' || req.path === '/payment-failure' || 
-      req.path === '/undefined' || req.path.startsWith('/payment')) {
+      req.path === '/payment-verify' || req.path === '/undefined' || req.path.startsWith('/payment')) {
     
     // Check for payment-success route
     if (req.path === '/payment-success') {
