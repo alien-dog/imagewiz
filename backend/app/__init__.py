@@ -113,32 +113,60 @@ def create_app():
         # Special route to handle the payment-success redirect from Stripe
         @app.route('/payment-success')
         def handle_payment_success():
-            """Redirect payment success to the Express server"""
-            # Get the query parameters
-            session_id = request.args.get('session_id')
-            
-            # In production environments, determine the proper frontend host
-            host = request.headers.get('Host')
-            
-            # Extract the base domain - pattern matching for replit.dev domains
-            base_domain = host
-            replit_match = re.match(r'(.*?)\.replit\.dev', host)
-            
-            if replit_match:
-                # For replit domain, redirect without port specification 
-                # Using port 443 was causing issues, so just use default HTTPS port
-                redirect_url = f"https://{host}/payment-success"
-                print(f"Redirecting payment success to: {redirect_url}")
-            else:
-                # For other environments, redirect to port 3000
-                redirect_url = f"http://{host}:3000/payment-success"
+            """Redirect payment success to the Express server - with improved handling"""
+            try:
+                # Get all query parameters to preserve them in redirect
+                query_params = request.args.to_dict()
                 
-            # Include any query parameters in the redirect
-            if session_id:
-                redirect_url += f"?session_id={session_id}"
+                # Check for session_id which is crucial for verifying payment
+                session_id = query_params.get('session_id')
+                if not session_id:
+                    app.logger.error("Payment success redirect without session_id")
                 
-            app.logger.info(f"Redirecting payment success from Flask to Express: {redirect_url}")
-            return redirect(redirect_url, code=302)
+                # Get host information from headers
+                host = request.headers.get('Host')
+                app.logger.info(f"Payment redirect received with host: {host}")
+                
+                # Determine if we're on Replit deployment
+                replit_match = re.match(r'(.*?)\.replit\.dev', host)
+                
+                # Build the redirect URL without port specification
+                if replit_match:
+                    # Use HTTPS protocol without port for Replit
+                    base_url = f"https://{host}"
+                else:
+                    # For local development, use HTTP with port 3000
+                    base_url = f"http://{host}:3000"
+                
+                # Prevent redirect loops by checking for loop indicators
+                loop_count = int(query_params.get('_redirect_count', 0))
+                
+                # If we detect a potential loop (3+ redirects), send to dashboard directly
+                if loop_count >= 2:
+                    app.logger.warning(f"Detected potential redirect loop (count: {loop_count}), redirecting to dashboard")
+                    redirect_url = f"{base_url}/dashboard"
+                    return redirect(redirect_url, code=302)
+                
+                # Increment the redirect counter for loop detection
+                query_params['_redirect_count'] = str(loop_count + 1)
+                
+                # Construct base redirect URL
+                redirect_url = f"{base_url}/payment-success"
+                
+                # Add all query parameters
+                if query_params:
+                    query_string = "&".join([f"{k}={v}" for k, v in query_params.items()])
+                    redirect_url += f"?{query_string}"
+                
+                # Log the redirect info
+                app.logger.info(f"Redirecting payment success: {redirect_url}")
+                app.logger.info(f"Redirect count: {loop_count + 1}")
+                
+                return redirect(redirect_url, code=302)
+            except Exception as e:
+                app.logger.error(f"Error in payment success redirect: {str(e)}")
+                # Emergency fallback - redirect to dashboard
+                return redirect(f"https://{request.headers.get('Host')}/dashboard", code=302)
             
         # Add a similar redirect for other frontend routes commonly accessed directly
         @app.route('/dashboard')

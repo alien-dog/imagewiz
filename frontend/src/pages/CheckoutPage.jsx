@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, LucideTestTube } from 'lucide-react';
 
 const CheckoutPage = () => {
   const { isAuthenticated, user } = useAuth();
@@ -11,6 +11,9 @@ const CheckoutPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [packageDetails, setPackageDetails] = useState(null);
+  const [useMockPayment, setUseMockPayment] = useState(
+    localStorage.getItem('use_mock_payment') === 'true' || false
+  );
 
   useEffect(() => {
     if (!location.state?.packageDetails) {
@@ -67,16 +70,24 @@ const CheckoutPage = () => {
             ? (location.state.packageDetails.isYearly ? 106.8 : 9.9)
             : (location.state.packageDetails.isYearly ? 262.8 : 24.9),
           // Explicitly provide success and cancel URLs with domain but NO PORT
-          success_url: `${baseUrl}/payment-success`,
-          cancel_url: `${baseUrl}/pricing`
+          // Add a timestamp to prevent caching and distinguish redirects
+          success_url: `${baseUrl}/payment-success?t=${Date.now()}`,
+          cancel_url: `${baseUrl}/pricing?t=${Date.now()}`
         };
         
         console.log('Checkout payload with success/cancel URLs:', payload);
         
         console.log('Creating checkout session with payload:', payload);
         
+        // Determine if we should use mock payment
+        const endpoint = useMockPayment 
+          ? '/api/payment/create-checkout-session?mock=true' 
+          : '/api/payment/create-checkout-session';
+          
+        console.log(`Using ${useMockPayment ? 'mock' : 'real'} payment endpoint:`, endpoint);
+        
         // Use the traditional checkout session API
-        const response = await axios.post('/api/payment/create-checkout-session', payload, {
+        const response = await axios.post(endpoint, payload, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -108,17 +119,50 @@ const CheckoutPage = () => {
         } 
       });
     }
-  }, [isAuthenticated, location.state, navigate]);
+  }, [isAuthenticated, location.state, navigate, useMockPayment]);
 
   if (!isAuthenticated) {
     return null;
   }
+
+  // Toggle mock payment
+  const handleToggleMockPayment = () => {
+    const newValue = !useMockPayment;
+    setUseMockPayment(newValue);
+    localStorage.setItem('use_mock_payment', newValue.toString());
+    // Reload page to apply changes
+    window.location.reload();
+  };
 
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <Loader2 className="h-12 w-12 animate-spin text-teal-500 mb-4" />
         <p className="text-gray-600">Redirecting to secure checkout...</p>
+        
+        {/* Developer testing controls */}
+        <div className="mt-10 p-4 border border-gray-200 rounded-md bg-gray-50">
+          <div className="flex items-center justify-center gap-2">
+            <LucideTestTube className="h-5 w-5 text-purple-500" />
+            <span className="text-sm font-medium text-gray-700">Developer Testing Mode</span>
+          </div>
+          <div className="mt-3 flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="mockPaymentToggle"
+              checked={useMockPayment}
+              onChange={handleToggleMockPayment}
+              className="w-4 h-4 text-teal-600 rounded focus:ring-teal-500"
+            />
+            <label htmlFor="mockPaymentToggle" className="text-sm text-gray-600">
+              Use mock payment (for testing without Stripe)
+            </label>
+          </div>
+          <p className="mt-2 text-xs text-gray-500">
+            Uses a simulated checkout flow that doesn't require Stripe credentials.
+            Useful for development and testing.
+          </p>
+        </div>
       </div>
     );
   }
@@ -148,7 +192,7 @@ const CheckoutPage = () => {
             
             <div className="text-center py-10">
               <Loader2 className="h-12 w-12 animate-spin text-teal-500 mx-auto mb-4" />
-              <p className="text-gray-600 mb-2">Redirecting to Stripe for secure checkout...</p>
+              <p className="text-gray-600 mb-2">Redirecting to {useMockPayment ? 'mock' : 'Stripe'} checkout...</p>
               <p className="text-sm text-gray-500">If you are not redirected automatically, please click the button below.</p>
               <button 
                 onClick={() => window.location.reload()}
@@ -156,6 +200,30 @@ const CheckoutPage = () => {
               >
                 Go to Checkout
               </button>
+              
+              {/* Developer testing controls */}
+              <div className="mt-10 p-4 border border-gray-200 rounded-md bg-gray-50">
+                <div className="flex items-center justify-center gap-2">
+                  <LucideTestTube className="h-5 w-5 text-purple-500" />
+                  <span className="text-sm font-medium text-gray-700">Developer Testing Mode</span>
+                </div>
+                <div className="mt-3 flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="mockPaymentToggle2"
+                    checked={useMockPayment}
+                    onChange={handleToggleMockPayment}
+                    className="w-4 h-4 text-teal-600 rounded focus:ring-teal-500"
+                  />
+                  <label htmlFor="mockPaymentToggle2" className="text-sm text-gray-600">
+                    Use mock payment (for testing without Stripe)
+                  </label>
+                </div>
+                <p className="mt-2 text-xs text-gray-500">
+                  Uses a simulated checkout flow that doesn't require Stripe credentials.
+                  Useful for development and testing.
+                </p>
+              </div>
             </div>
           </div>
         </div>

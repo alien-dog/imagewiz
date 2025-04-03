@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
-import { CheckCircle, ArrowRight, Loader2 } from 'lucide-react';
+import { CheckCircle, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 
 const PaymentSuccessPage = () => {
   const { user, refreshUser } = useAuth();
@@ -12,43 +12,62 @@ const PaymentSuccessPage = () => {
   const [paymentVerified, setPaymentVerified] = useState(false);
   const [error, setError] = useState(null);
   const [paymentDetails, setPaymentDetails] = useState(null);
-  const [redirectCountdown, setRedirectCountdown] = useState(3);
+  const [verificationAttempt, setVerificationAttempt] = useState(0);
+  const [redirectCountdown, setRedirectCountdown] = useState(5);
   
-  // Extract payment information from URL
+  // Check for redirect loops by analyzing URL parameters
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const redirectCount = parseInt(params.get('_redirect_count') || '0', 10);
+    
+    if (redirectCount > 2) {
+      // If we've been redirected too many times, log the issue and provide direct access to dashboard
+      console.error(`Detected redirect loop (${redirectCount} redirects)`);
+      setError('We detected a redirect issue. Please use the button below to go to your dashboard.');
+      setLoading(false);
+    }
+  }, []);
+  
+  // Extract payment information from URL and verify payment
+  useEffect(() => {
+    // Skip verification if we've detected a redirect loop
+    if (error && error.includes('redirect issue')) {
+      return;
+    }
+    
     // Track if component is mounted to prevent state updates after unmount
     let isMounted = true;
     
     // Only run once flag to prevent repeated verification
-    const alreadyRun = React.useRef(false);
+    const verificationRunning = React.useRef(false);
     
     const verifyPayment = async () => {
-      // Skip if already run
-      if (alreadyRun.current) {
+      // Skip if verification is already running
+      if (verificationRunning.current) {
         return;
       }
       
-      // Mark as run immediately to prevent double execution
-      alreadyRun.current = true;
+      // Mark as running to prevent double execution
+      verificationRunning.current = true;
       
       try {
         if (!isMounted) return;
-        setLoading(true);
-        setError(null);
         
         // For Stripe hosted checkout, we get a session_id in the URL
         const params = new URLSearchParams(window.location.search);
         const sessionId = params.get('session_id');
         
         // Debug payment verification
+        console.log('Payment verification attempt #', verificationAttempt);
         console.log('Payment verification triggered with URL params:', window.location.search);
         console.log('Session ID from URL:', sessionId);
         
         if (!sessionId) {
           console.error('ERROR: No session_id found in URL parameters');
           // Instead of throwing error, show a recovery UI
-          setError('No payment session information found. If you have completed a payment, please contact support.');
+          setError('No payment session information found. If you have completed a payment, please check your dashboard to see if credits were added or contact support.');
           setLoading(false);
+          verificationRunning.current = false;
           return; // Exit early instead of throwing
         }
         
@@ -62,82 +81,115 @@ const PaymentSuccessPage = () => {
         console.log('API base URL:', axios.defaults.baseURL);
         console.log('Auth token present:', !!token);
         
-        // Add timeout and retry logic for robustness
-        let retries = 2;
-        let response;
-        
-        while (retries >= 0) {
-          try {
-            response = await axios.get(`/api/payment/verify?session_id=${sessionId}`, {
-              headers: {
-                'Authorization': `Bearer ${token}`
-              },
-              timeout: 10000 // 10 second timeout
-            });
-            break; // Success, exit the retry loop
-          } catch (err) {
-            console.error(`Verification attempt failed (${retries} retries left):`, err);
-            if (retries === 0) {
-              throw err; // No more retries, propagate the error
-            }
-            retries--;
-            // Wait 1 second before retrying
-            await new Promise(resolve => setTimeout(resolve, 1000));
-          }
+        if (!token) {
+          console.error('No auth token available for payment verification');
+          setError('You need to be logged in to verify your payment. Please log in and check your dashboard.');
+          setLoading(false);
+          verificationRunning.current = false;
+          return;
         }
         
-        console.log('Payment verification response:', response.data);
-        
-        if (response.data.status === 'success' && isMounted) {
-          setPaymentVerified(true);
-          setPaymentDetails({
-            packageName: response.data.package_name || 'Credit Package',
-            amountPaid: response.data.amount_paid || 0,
-            creditsAdded: response.data.credits_added || 0,
-            isYearly: response.data.is_yearly || false
+        // Add timeout for robustness
+        try {
+          const response = await axios.get(`/api/payment/verify?session_id=${sessionId}&t=${Date.now()}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            },
+            timeout: 10000 // 10 second timeout
           });
           
-          // Log payment details for debugging
-          console.log('Payment details from backend:', response.data);
-          console.log('Credits added:', response.data.credits_added);
-          console.log('New balance should be:', response.data.new_balance);
+          console.log('Payment verification response:', response.data);
           
-          // Refresh user data to get updated credit balance
-          await refreshUser();
+          if (response.data.status === 'success' && isMounted) {
+            setPaymentVerified(true);
+            setPaymentDetails({
+              packageName: response.data.package_name || 'Credit Package',
+              amountPaid: response.data.amount_paid || 0,
+              creditsAdded: response.data.credits_added || 0,
+              isYearly: response.data.is_yearly || false,
+              newBalance: response.data.new_balance || 0
+            });
+            
+            // Log payment details for debugging
+            console.log('Payment details from backend:', response.data);
+            console.log('Credits added:', response.data.credits_added);
+            console.log('New balance should be:', response.data.new_balance);
+            
+            // Refresh user data to get updated credit balance
+            await refreshUser();
+            
+            // Show success UI first (don't redirect automatically) to allow user to see purchase details
+            console.log('Payment successful, showing success UI');
+            setLoading(false);
+            
+            // Start countdown for dashboard redirect
+            let countdown = 5;
+            setRedirectCountdown(countdown);
+            
+            const intervalId = setInterval(() => {
+              countdown -= 1;
+              setRedirectCountdown(countdown);
+              
+              if (countdown <= 0) {
+                clearInterval(intervalId);
+                console.log('Countdown complete, redirecting to dashboard...');
+                navigate('/dashboard');
+              }
+            }, 1000);
+            
+            // Cleanup interval on unmount
+            return () => clearInterval(intervalId);
+          } else if (isMounted) {
+            console.error('Payment verification failed with response:', response.data);
+            
+            // If this is not our final attempt, try again
+            if (verificationAttempt < 2) {
+              console.log(`Verification attempt ${verificationAttempt + 1} failed, will retry...`);
+              setVerificationAttempt(prev => prev + 1);
+              verificationRunning.current = false;
+              return;
+            }
+            
+            setError('Payment verification failed. Please check your dashboard to see if your credits were applied or contact support.');
+            setLoading(false);
+          }
+        } catch (err) {
+          console.error('Error during payment verification request:', err);
           
-          // Show success UI first (don't redirect automatically) to allow user to see purchase details
-          console.log('Payment successful, showing success UI');
-          setLoading(false);
+          // If this is not our final attempt, try again
+          if (verificationAttempt < 2 && isMounted) {
+            console.log(`Verification attempt ${verificationAttempt + 1} failed with error, will retry...`);
+            setVerificationAttempt(prev => prev + 1);
+            verificationRunning.current = false;
+            return;
+          }
           
-          // Delayed redirect to dashboard after 5 seconds to give user time to see confirmation
-          setTimeout(() => {
-            console.log('Delayed redirect to dashboard executing...');
-            window.location.href = '/dashboard';
-          }, 5000);
-        } else if (isMounted) {
-          console.error('Payment verification failed with response:', response.data);
-          setError('Payment verification failed. Please contact support if your credits are not applied.');
-          setLoading(false);
-        }
-      } catch (err) {
-        if (isMounted) {
-          console.error('Error verifying payment:', err);
-          setError('We could not verify your payment. Please contact support if your credits are not applied.');
+          if (isMounted) {
+            setError('We could not verify your payment. Please check your dashboard to see if your credits were applied or contact support.');
+            setLoading(false);
+          }
         }
       } finally {
         if (isMounted) {
-          setLoading(false);
+          verificationRunning.current = false;
         }
       }
     };
     
-    verifyPayment();
+    // Only execute payment verification if we haven't reached max attempts
+    if (verificationAttempt < 3) {
+      verifyPayment();
+    } else if (loading) {
+      // If we've reached max attempts and are still loading, show error
+      setError('Maximum verification attempts reached. Please check your dashboard to see if your credits were applied.');
+      setLoading(false);
+    }
     
     // Cleanup function to prevent memory leaks and state updates after unmount
     return () => {
       isMounted = false;
     };
-  }, [location, refreshUser, navigate]);
+  }, [location, refreshUser, navigate, verificationAttempt, error]);
   
   if (loading) {
     return (
@@ -197,10 +249,10 @@ const PaymentSuccessPage = () => {
                 
                 <div className="flex flex-col items-center justify-center">
                   <p className="text-sm text-gray-500 mb-2">
-                    Redirecting to dashboard...
+                    Redirecting to dashboard in {redirectCountdown} seconds...
                   </p>
                   <button
-                    onClick={() => window.location.href = '/dashboard'}
+                    onClick={() => navigate('/dashboard')}
                     className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 transition-colors"
                   >
                     Go to Dashboard Now
@@ -215,7 +267,7 @@ const PaymentSuccessPage = () => {
                 </div>
                 
                 <button
-                  onClick={() => window.location.href = '/dashboard'}
+                  onClick={() => navigate('/dashboard')}
                   className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 transition-colors"
                 >
                   Return to Dashboard

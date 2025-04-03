@@ -161,10 +161,56 @@ app.post('/api/payment/create-checkout-session', async (req, res) => {
     console.log('Manual proxy: Forwarding checkout request with auth header:', authHeader.substring(0, 20) + '...');
     console.log('Request body:', JSON.stringify(req.body));
     
+    // Check if this is a test environment query parameter
+    const useMock = req.query.mock === 'true';
+    if (useMock) {
+      console.log('✅ Using mock checkout session as requested');
+      // Forward to mock endpoint
+      const url = `http://localhost:${FLASK_PORT}/payment/mock/mock-create-checkout-session`;
+      console.log('Forwarding to mock endpoint:', url);
+      
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Authorization': authHeader,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(req.body),
+        });
+        
+        // Log the raw response status
+        console.log('Mock checkout response status:', response.status, response.statusText);
+        
+        if (!response.ok) {
+          console.error(`❌ Manual proxy: Flask server returned ${response.status} ${response.statusText} from mock endpoint`);
+          const errorText = await response.text();
+          console.error('Error response from mock endpoint:', errorText);
+          return res.status(response.status).json({ 
+            error: 'Backend server error on mock checkout',
+            status: response.status,
+            details: errorText
+          });
+        }
+        
+        try {
+          const data = await response.json();
+          console.log('✅ Manual proxy: Mock checkout response received:', JSON.stringify(data, null, 2));
+          return res.status(response.status).json(data);
+        } catch (jsonError) {
+          console.error('❌ Manual proxy: Error parsing JSON response from mock endpoint:', jsonError);
+          throw jsonError;
+        }
+      } catch (fetchError) {
+        console.error('❌ Manual proxy: Fetch error to mock endpoint:', fetchError);
+        throw fetchError;
+      }
+    }
+    
     // This is the correct URL to forward to the Flask backend
     // Make sure to use /payment/create-checkout-session (no /api prefix)
     const url = `http://localhost:${FLASK_PORT}/payment/create-checkout-session`;
-    console.log('Forwarding to:', url);
+    console.log('Forwarding to real checkout endpoint:', url);
     
     // Make the request to the Flask backend
     try {
@@ -420,9 +466,52 @@ app.get('/api/payment/verify', async (req, res) => {
     
     console.log('Manual proxy: Forwarding verify payment request with auth header:', authHeader.substring(0, 20) + '...');
     
-    // URL to forward to the Flask backend
+    // Check if this is a mock session ID (cs_test_*)
+    if (sessionId.toString().startsWith('cs_test_')) {
+      console.log('✅ Detected mock session ID, forwarding to mock verification endpoint');
+      // URL to forward to the Flask backend mock endpoint
+      const url = `http://localhost:${FLASK_PORT}/payment/mock/verify-mock-session?session_id=${sessionId}`;
+      console.log('Forwarding to mock endpoint:', url);
+      
+      try {
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Authorization': authHeader,
+          },
+        });
+        
+        // Log the raw response status
+        console.log('Mock verify response status:', response.status, response.statusText);
+        
+        if (!response.ok) {
+          console.error(`❌ Manual proxy: Flask server returned ${response.status} ${response.statusText} from mock endpoint`);
+          const errorText = await response.text();
+          console.error('Error response from mock endpoint:', errorText);
+          return res.status(response.status).json({ 
+            error: 'Backend server error on mock verification',
+            status: response.status,
+            details: errorText
+          });
+        }
+        
+        try {
+          const data = await response.json();
+          console.log('✅ Manual proxy: Mock verification response received:', JSON.stringify(data, null, 2));
+          return res.status(response.status).json(data);
+        } catch (jsonError) {
+          console.error('❌ Manual proxy: Error parsing JSON response from mock endpoint:', jsonError);
+          throw jsonError;
+        }
+      } catch (fetchError) {
+        console.error('❌ Manual proxy: Fetch error to mock endpoint:', fetchError);
+        throw fetchError;
+      }
+    }
+    
+    // URL to forward to the Flask backend for real Stripe verification
     const url = `http://localhost:${FLASK_PORT}/payment/verify?session_id=${sessionId}`;
-    console.log('Forwarding to:', url);
+    console.log('Forwarding to real payment verification endpoint:', url);
     
     // Make the request to the Flask backend
     try {
