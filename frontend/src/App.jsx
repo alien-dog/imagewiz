@@ -13,7 +13,7 @@ import HistoryDetailPage from './pages/HistoryDetailPage';
 import Pricing from './pages/Pricing';
 import PricingNew from './pages/PricingNew';
 import CheckoutPage from './pages/CheckoutPage';
-import PaymentSuccessPage from './pages/PaymentSuccessPage';
+// PaymentSuccessPage was deprecated in favor of PaymentVerifyPage
 import PaymentVerifyPage from './pages/PaymentVerifyPage';
 import PaymentHistoryPage from './pages/PaymentHistoryPage';
 import Profile from './pages/Profile';
@@ -55,14 +55,7 @@ const AppContent = () => {
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/payment-success"
-              element={
-                <ProtectedRoute>
-                  <PaymentSuccessPage />
-                </ProtectedRoute>
-              }
-            />
+            {/* Payment success route has been deprecated in favor of payment-verify */}
             {/* Payment verification page is accessible without authentication 
                 to handle redirects from Stripe */}
             <Route path="/payment-verify" element={<PaymentVerifyPage />} />

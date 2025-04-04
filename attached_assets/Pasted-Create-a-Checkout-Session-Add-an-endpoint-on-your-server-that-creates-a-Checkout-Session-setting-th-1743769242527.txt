@@ -1,0 +1,36 @@
+Create a Checkout Session
+Add an endpoint on your server that creates a Checkout Session, setting the ui_mode to embedded.
+The Checkout Session response includes a client secret, which the client uses to mount Checkout. Return the client_secret in your response.
+
+Supply a return URL
+To define how Stripe redirects your customer after payment, specify the URL of the return page in the return_url parameter while creating the Checkout Session. After the payment attempt, Stripe directs your customer to return page hosted on your website.
+Include the {CHECKOUT_SESSION_ID} template variable in the URL. Before redirecting your customer, Checkout replaces the variable with the Checkout Session ID. You’re responsible for creating and hosting the return page on your website.
+
+Choose the mode
+To handle different transaction types, adjust the mode parameter. For one-time payments, use payment. To initiate recurring payments with subscriptions, switch the mode to subscription. And for setting up future payments, set the mode to setup.
+
+Add Stripe to your React app
+To stay PCI compliant by ensuring that payment details go directly to Stripe and never reach your server, install React Stripe.js.
+
+Load Stripe.js
+To configure the Stripe library, call loadStripe() with your Stripe publishable API key.
+
+Fetch a Checkout Session client secret
+Create an asynchronous fetchClientSecret function that makes a request to your server to create a Checkout Session and retrieve the client secret.
+
+Initialize Checkout
+To allow the child components to access the Stripe service via the embedded Checkout consumer, pass the resulting promise from loadStripe and the client secret as an option to the embedded Checkout provider.
+
+Create an endpoint to retrieve a Checkout Session
+Add an endpoint to retrieve a Checkout Session status.
+
+Add a return component
+To display order information to your customer, add a new route and return component for the URL you provided as the Checkout Session return_url. Stripe redirects to this page after the customer completes the checkout.
+
+Retrieve a Checkout session
+As soon as your return page loads, immediately make a request to the endpoint on your server. Use the Checkout Session ID in the URL to retrieve the status of the Checkout Session.
+
+Handle session
+Handle the result of the session by using its status:
+- complete: The payment succeeded. Use the information from the Checkout Session to render a success page.
+- open: The payment failed or was canceled. Remount Checkout so that your customer can try again.
