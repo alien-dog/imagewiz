@@ -1,3 +1,12 @@
+/**
+ * OrderConfirmationPage (formerly PaymentVerifyPage)
+ * 
+ * This page serves as the order confirmation and payment verification page.
+ * It is displayed to users after they complete checkout with Stripe.
+ * The page polls the backend to verify the payment status and displays
+ * a detailed order summary and receipt.
+ */
+
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -20,12 +29,14 @@ const OrderConfirmationPage = () => {
     // Track if component is mounted to prevent state updates after unmount
     let isMounted = true;
     
-    const params = new URLSearchParams(location.search);
+    // Check if we've been redirected from the legacy route and preserve params
+    const search = location.state?.fromLegacyRoute ? window.location.search : location.search;
+    const params = new URLSearchParams(search);
     const sessionId = params.get('session_id');
     
-    console.log('Payment verification page loaded');
+    console.log('Order confirmation page loaded');
     console.log('Session ID from URL:', sessionId);
-    console.log('Full URL search params:', location.search);
+    console.log('Full URL search params:', search);
     
     // Setup polling function
     const pollPaymentStatus = async () => {
@@ -194,7 +205,7 @@ const OrderConfirmationPage = () => {
       isMounted = false;
       clearInterval(intervalId);
     };
-  }, [location, pollingCount, refreshUser, loading, isAuthenticated, navigate]);
+  }, [location, pollingCount, refreshUser, loading, isAuthenticated, navigate, location.state]);
   
   // Function to start countdown for dashboard redirect
   const startRedirectCountdown = () => {
@@ -350,8 +361,8 @@ const OrderConfirmationPage = () => {
                           <span className="text-gray-500">Receipt ID:</span>
                           <span className="text-gray-700 font-mono text-xs">{
                             // Extract part of the session ID to show as receipt number
-                            location.search.includes('session_id=') 
-                              ? location.search.split('session_id=')[1].split('&')[0].slice(-8) 
+                            search.includes('session_id=') 
+                              ? search.split('session_id=')[1].split('&')[0].slice(-8) 
                               : 'N/A'
                           }</span>
                         </div>

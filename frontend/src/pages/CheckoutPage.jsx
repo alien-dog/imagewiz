@@ -66,9 +66,9 @@ const CheckoutPage = () => {
           price: location.state.packageDetails.packageName.includes('Lite') 
             ? (location.state.packageDetails.isYearly ? 106.8 : 9.9)
             : (location.state.packageDetails.isYearly ? 262.8 : 24.9),
-          // Use the payment-verify page with our polling mechanism instead of direct success URL
+          // Use the order-confirmation page with our polling mechanism instead of direct success URL
           // Add the session_id placeholder for Stripe to replace with the actual session ID
-          success_url: `${baseUrl}/payment-verify?session_id={CHECKOUT_SESSION_ID}&t=${Date.now()}`,
+          success_url: `${baseUrl}/order-confirmation?session_id={CHECKOUT_SESSION_ID}&t=${Date.now()}`,
           cancel_url: `${baseUrl}/pricing?t=${Date.now()}`
         };
         
