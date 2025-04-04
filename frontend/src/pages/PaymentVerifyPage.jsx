@@ -20,11 +20,12 @@ const PaymentVerifyPage = () => {
     // Track if component is mounted to prevent state updates after unmount
     let isMounted = true;
     
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(location.search);
     const sessionId = params.get('session_id');
     
     console.log('Payment verification page loaded');
     console.log('Session ID from URL:', sessionId);
+    console.log('Full URL search params:', location.search);
     
     // Setup polling function
     const pollPaymentStatus = async () => {
@@ -100,6 +101,18 @@ const PaymentVerifyPage = () => {
         }
       } catch (err) {
         console.error('Error during payment verification request:', err);
+        
+        // If the error contains a message about no such checkout.session, handle more gracefully
+        if (err.response && err.response.data && err.response.data.details) {
+          const errorDetails = err.response.data.details;
+          console.log('Error details:', errorDetails);
+          
+          if (errorDetails.includes('No such checkout.session')) {
+            setError('The payment session was not found. This could happen if you\'re using an old or invalid session ID. Please check your dashboard to see if your credits were applied or try making a new purchase.');
+            setLoading(false);
+            return;
+          }
+        }
         
         // If we've tried too many times, stop polling and show error
         if (pollingCount >= 5) {

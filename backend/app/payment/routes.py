@@ -129,11 +129,11 @@ def create_checkout_session():
         # Use origin if available (which should include the protocol)
         if origin:
             # NEW APPROACH: Use a simple payment-verify page that will poll the backend
-            success_url = f"{origin}/payment-verify"
+            success_url = f"{origin}/payment-verify?session_id={{CHECKOUT_SESSION_ID}}"
         else:
             # Fallback to host with https
             forwarded_proto = request.headers.get('X-Forwarded-Proto', 'https')
-            success_url = f"{forwarded_proto}://{host}/payment-verify"
+            success_url = f"{forwarded_proto}://{host}/payment-verify?session_id={{CHECKOUT_SESSION_ID}}"
             
         print(f"Using simplified payment verification approach: {success_url}")
     
@@ -560,6 +560,9 @@ def verify_payment_query():
     if not session_id:
         return jsonify({"error": "Missing session_id parameter"}), 400
     
+    # Log the verification attempt for debugging
+    print(f"Verifying payment for session_id: {session_id}")
+    
     user_id = get_jwt_identity()
     try:
         user_id = int(user_id)
@@ -570,6 +573,8 @@ def verify_payment_query():
     
     if not user:
         return jsonify({"error": "User not found"}), 404
+        
+    print(f"User found: {user.username} (ID: {user.id})")
     
     # Check if payment exists in user's history
     # Use raw SQL to avoid ORM issues with missing columns

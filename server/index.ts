@@ -720,6 +720,16 @@ app.get('*', (req, res) => {
   if (req.path === '/payment-success' || req.path === '/payment-failure' || 
       req.path === '/payment-verify' || req.path === '/undefined' || req.path.startsWith('/payment')) {
     
+    // Special debug logging for payment-verify route
+    if (req.path === '/payment-verify') {
+      console.log(`⚠️ Detected payment-verify route with query params:`, req.query);
+      
+      // If we have a session_id, this is likely a redirect from Stripe
+      if (req.query.session_id) {
+        console.log(`✅ Stripe redirect with session_id detected: ${req.query.session_id}`);
+      }
+    }
+    
     // Check for payment-success route
     if (req.path === '/payment-success') {
       console.log(`⚠️ Catch-all detected /payment-success request with query:`, req.query);
