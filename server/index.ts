@@ -236,14 +236,17 @@ app.post('/api/payment/create-checkout-session', async (req, res) => {
     
     console.log('Manual proxy: Forwarding checkout request with auth header:', authHeader.substring(0, 20) + '...');
     
-    // IMPORTANT: Intercept and fix the success_url to use payment-verify instead of payment-success
+    // IMPORTANT: Ensure success_url uses order-confirmation instead of older paths
     // This ensures our modern polling-based approach is used and prevents redirect loops
     if (req.body && req.body.success_url) {
-      // If success_url contains payment-success, replace it with payment-verify
-      if (req.body.success_url.includes('/payment-success')) {
+      // If success_url contains payment-success or payment-verify, replace with order-confirmation
+      if (req.body.success_url.includes('/payment-success') || req.body.success_url.includes('/payment-verify')) {
         const originalUrl = req.body.success_url;
-        req.body.success_url = req.body.success_url.replace('/payment-success', '/payment-verify');
-        console.log(`⚠️ Fixed success_url to use polling verification: ${originalUrl} → ${req.body.success_url}`);
+        // Replace either payment-success or payment-verify with order-confirmation
+        req.body.success_url = req.body.success_url
+          .replace('/payment-success', '/order-confirmation')
+          .replace('/payment-verify', '/order-confirmation');
+        console.log(`⚠️ Fixed success_url to use order confirmation page: ${originalUrl} → ${req.body.success_url}`);
       }
     }
     
@@ -447,9 +450,9 @@ app.use((req, res, next) => {
         const sessionId = match[1];
         console.log('🔄 REDIRECTING: Found encoded payment verification URL with session ID:', sessionId);
         
-        // Redirect to the correctly formatted URL
-        const fixedUrl = `/payment-verify?session_id=${sessionId}`;
-        console.log('🔄 Redirecting to properly formatted URL:', fixedUrl);
+        // Redirect to the order-confirmation page instead of payment-verify
+        const fixedUrl = `/order-confirmation?session_id=${sessionId}`;
+        console.log('🔄 Redirecting to order confirmation page:', fixedUrl);
         
         // Use 302 (temporary) redirect so browsers don't cache it
         return res.redirect(302, fixedUrl);
@@ -609,9 +612,9 @@ app.get('/payment-verify%3Fsession_id=*', (req, res) => {
   
   console.log('  Extracted session ID:', sessionId);
   
-  // Redirect to the correctly formatted URL
-  const redirectUrl = `/payment-verify?session_id=${sessionId}`;
-  console.log('  Redirecting to:', redirectUrl);
+  // Redirect to the order-confirmation page
+  const redirectUrl = `/order-confirmation?session_id=${sessionId}`;
+  console.log('  Redirecting to order confirmation page:', redirectUrl);
   
   res.redirect(302, redirectUrl);
 });
@@ -636,11 +639,15 @@ app.get('/order-confirmation%3Fsession_id=*', (req, res) => {
 
 // Special handling for the common encoding error with %3F (encoded ?)
 app.get('/payment-verify%3Fsession_id=:sessionId', (req, res) => {
-  console.log('🌟 Serving React payment verify page (encoded URL special case)');
+  console.log('🔄 Detected payment-verify with encoded session ID in URL parameter');
   console.log('  Session ID from URL parameter:', req.params.sessionId);
   
-  // Send the SPA page so client-side routing can take over
-  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+  // Redirect to the order-confirmation page instead
+  const redirectUrl = `/order-confirmation?session_id=${req.params.sessionId}`;
+  console.log('  Redirecting to order confirmation page:', redirectUrl);
+  
+  // Use 302 (temporary) redirect
+  res.redirect(302, redirectUrl);
 });
 
 // Special handling for the common encoding error with %3F (encoded ?) for order-confirmation
