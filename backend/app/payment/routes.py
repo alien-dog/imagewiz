@@ -635,6 +635,14 @@ def verify_payment_query():
                 }), 200
             else:
                 return jsonify({"error": "Payment not completed or unauthorized"}), 400
+        except stripe.error.InvalidRequestError as e:
+            # Session doesn't exist in Stripe
+            print(f"Error verifying payment: {str(e)}")
+            return jsonify({
+                "verified": False,
+                "error": "Payment session not found",
+                "message": "The payment session could not be found in Stripe. It may have expired or been cancelled."
+            }), 404
         except Exception as e:
             print(f"Error verifying payment: {str(e)}")
             return jsonify({"error": str(e)}), 500

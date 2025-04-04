@@ -102,13 +102,41 @@ const PaymentVerifyPage = () => {
       } catch (err) {
         console.error('Error during payment verification request:', err);
         
-        // If the error contains a message about no such checkout.session, handle more gracefully
-        if (err.response && err.response.data && err.response.data.details) {
-          const errorDetails = err.response.data.details;
-          console.log('Error details:', errorDetails);
+        // Handle structured error responses
+        if (err.response && err.response.data) {
+          console.log('Error response data:', err.response.data);
           
-          if (errorDetails.includes('No such checkout.session')) {
-            setError('The payment session was not found. This could happen if you\'re using an old or invalid session ID. Please check your dashboard to see if your credits were applied or try making a new purchase.');
+          // Check for our new structured error response first
+          if (err.response.data.details) {
+            try {
+              // Try to parse details if it's a JSON string
+              let errorDetails = err.response.data.details;
+              if (typeof errorDetails === 'string') {
+                try {
+                  const parsedDetails = JSON.parse(errorDetails);
+                  if (parsedDetails.message) {
+                    setError(parsedDetails.message);
+                    setLoading(false);
+                    return;
+                  }
+                } catch (e) {
+                  // If parsing fails, just use the string as is
+                  if (errorDetails.includes('No such checkout.session') || 
+                      errorDetails.includes('Payment session not found')) {
+                    setError('The payment session was not found. This could happen if you\'re using an old or invalid session ID. Please check your dashboard to see if your credits were applied or try making a new purchase.');
+                    setLoading(false);
+                    return;
+                  }
+                }
+              }
+            } catch (e) {
+              console.error('Error parsing error details:', e);
+            }
+          }
+          
+          // If no structured message was found, check for general error message
+          if (err.response.data.error) {
+            setError(err.response.data.error);
             setLoading(false);
             return;
           }
