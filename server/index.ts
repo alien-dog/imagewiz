@@ -581,13 +581,24 @@ app.get('/payment-verify', (req, res) => {
 
 // Also explicitly handle the URL with encoded query params (safety measure)
 app.get('/payment-verify*', (req, res) => {
-  console.log('🌟 Serving React payment verify page (wildcard route)');
+  console.log('🌟 Intercepting payment-verify wildcard route for redirection');
   console.log('  Original URL:', req.originalUrl);
   console.log('  Path:', req.path);
   console.log('  Query params:', req.query);
   
-  // Ensure the SPA is served regardless of URL encoding
-  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+  // Redirect to order-confirmation with the same parameters
+  if (req.query.session_id) {
+    const redirectUrl = `/order-confirmation?session_id=${req.query.session_id}&t=${Date.now()}`;
+    console.log(`🔄 Redirecting payment-verify to order-confirmation: ${redirectUrl}`);
+    return res.redirect(redirectUrl);
+  } else if (req.query.payment_intent) {
+    const redirectUrl = `/order-confirmation?payment_intent=${req.query.payment_intent}&t=${Date.now()}`;
+    console.log(`🔄 Redirecting payment-verify to order-confirmation: ${redirectUrl}`);
+    return res.redirect(redirectUrl);
+  } else {
+    console.log(`ℹ️ Payment-verify without identifiers - redirecting to generic order confirmation`);
+    return res.redirect('/order-confirmation');
+  }
 });
 
 // Also explicitly handle the URL with encoded query params for order-confirmation
@@ -660,19 +671,22 @@ app.get('/order-confirmation%3Fsession_id=:sessionId', (req, res) => {
 });
 
 app.get('/payment-success', (req, res) => {
-  console.log('🌟 Serving React payment success page');
+  console.log('🌟 Intercepting payment-success route for redirection');
   console.log('  Query params:', req.query);
   
-  // Check if we have a session ID in the query parameters
+  // Redirect to order-confirmation with the same parameters
   if (req.query.session_id) {
-    console.log('  Payment success with session_id:', req.query.session_id);
-    // If this is from our express redirect (to avoid loops), serve directly
-    if (req.query.source === 'express') {
-      console.log('  This is from our express redirect, serving directly');
-    }
+    const redirectUrl = `/order-confirmation?session_id=${req.query.session_id}&t=${Date.now()}`;
+    console.log(`🔄 Redirecting payment-success to order-confirmation: ${redirectUrl}`);
+    return res.redirect(redirectUrl);
+  } else if (req.query.payment_intent) {
+    const redirectUrl = `/order-confirmation?payment_intent=${req.query.payment_intent}&t=${Date.now()}`;
+    console.log(`🔄 Redirecting payment-success to order-confirmation: ${redirectUrl}`);
+    return res.redirect(redirectUrl);
+  } else {
+    console.log(`ℹ️ Payment-success without identifiers - redirecting to generic order confirmation`);
+    return res.redirect('/order-confirmation');
   }
-  
-  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
 });
 
 // Serve static files from the frontend build directory
@@ -940,7 +954,20 @@ app.get('*', (req, res) => {
       req.path === '/undefined' || req.path.startsWith('/payment')) {
     
     // Special debug logging for payment-verify and order-confirmation routes
-    if (req.path === '/payment-verify' || req.path === '/order-confirmation') {
+    if (req.path === '/payment-verify') {
+      console.log(`⚠️ Detected ${req.path} route with query params:`, req.query);
+      
+      // Redirect payment-verify to order-confirmation for consistency
+      if (req.query.session_id) {
+        const redirectUrl = `/order-confirmation?session_id=${req.query.session_id}&t=${Date.now()}`;
+        console.log(`🔄 Redirecting payment-verify to order-confirmation page: ${redirectUrl}`);
+        return res.redirect(redirectUrl);
+      } else {
+        console.log(`ℹ️ Payment-verify without session_id - redirecting to generic order confirmation`);
+        return res.redirect('/order-confirmation');
+      }
+    } 
+    else if (req.path === '/order-confirmation') {
       console.log(`⚠️ Detected ${req.path} route with query params:`, req.query);
       
       // If we have a session_id, this is likely a redirect from Stripe
@@ -949,15 +976,22 @@ app.get('*', (req, res) => {
       }
     }
     
-    // Check for payment-success route
+    // Check for payment-success route and redirect to order-confirmation
     if (req.path === '/payment-success') {
       console.log(`⚠️ Catch-all detected /payment-success request with query:`, req.query);
       
-      // If this has the source=express param, it means we're handling it safely
-      if (req.query.source === 'express') {
-        console.log(`✅ Safe route detected (from Express redirect)`);
+      // Always redirect payment-success to order-confirmation for consistency
+      if (req.query.session_id) {
+        const redirectUrl = `/order-confirmation?session_id=${req.query.session_id}&t=${Date.now()}`;
+        console.log(`🔄 Redirecting old payment-success to new order-confirmation page: ${redirectUrl}`);
+        return res.redirect(redirectUrl);
+      } else if (req.query.payment_intent) {
+        const redirectUrl = `/order-confirmation?payment_intent=${req.query.payment_intent}&t=${Date.now()}`;
+        console.log(`🔄 Redirecting old payment-success to new order-confirmation page: ${redirectUrl}`);
+        return res.redirect(redirectUrl);
       } else {
-        console.log(`⚠️ Standard payment-success route without express marker`);
+        console.log(`ℹ️ Payment-success without identifiers - redirecting to generic order confirmation`);
+        return res.redirect('/order-confirmation');
       }
     } else {
       console.log(`⚠️ Handling special frontend route: ${req.path} → serving index.html`);

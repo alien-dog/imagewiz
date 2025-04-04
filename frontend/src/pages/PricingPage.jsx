@@ -77,11 +77,26 @@ const PricingPage = () => {
     setProcessingPayment(true);
     try {
       // Generate a base URL for success and cancel redirects
-      const baseUrl = window.location.origin;
+      // For Replit hosted apps, construct URLs carefully to ensure redirection works
+      let baseUrl;
+      const url = new URL(window.location.href);
       
-      // Construct explicit absolute URLs for success and cancel
-      const successUrl = `${baseUrl}/payment-success`;
-      const cancelUrl = `${baseUrl}/pricing`;
+      if (url.hostname.includes('.replit.dev')) {
+        // For Replit domains, ALWAYS use https protocol with NO port for most reliable routing
+        baseUrl = `https://${url.hostname}`;
+      } else if (url.hostname === 'localhost' || url.hostname === '0.0.0.0' || url.hostname === '127.0.0.1') {
+        // For local development, keep the port
+        baseUrl = window.location.origin;
+      } else {
+        // For all other environments, use clean URLs without ports
+        baseUrl = `${url.protocol}//${url.hostname}`;
+      }
+      
+      console.log('Using baseUrl for Stripe callbacks:', baseUrl);
+      
+      // Use our new order-confirmation page with session_id parameter
+      const successUrl = `${baseUrl}/order-confirmation?session_id={CHECKOUT_SESSION_ID}&t=${Date.now()}`;
+      const cancelUrl = `${baseUrl}/pricing?t=${Date.now()}`;
       
       console.log(`Creating checkout session for package ${packageId}`, {
         packageId,

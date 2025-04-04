@@ -33,8 +33,9 @@ const CheckoutPage = () => {
         // For Replit hosted apps, construct URLs carefully to ensure redirection works
         let baseUrl;
         if (url.hostname.includes('.replit.dev')) {
-          // For Replit domains, use https protocol with NO port for most reliable routing
+          // For Replit domains, ALWAYS use https protocol with NO port for most reliable routing
           // (Stripe will redirect back to this URL and port numbers can cause issues)
+          // Make absolutely sure there's no port in the URL
           baseUrl = `https://${url.hostname}`;
           console.log('Using Replit domain for callbacks without port:', baseUrl);
         } else if (url.hostname === 'localhost' || url.hostname === '0.0.0.0' || url.hostname === '127.0.0.1') {

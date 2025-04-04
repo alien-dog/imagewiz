@@ -45,11 +45,29 @@ const StripeCheckoutForm = ({ clientSecret, packageDetails }) => {
     }
 
     try {
+      // Calculate the base URL for redirects
+      const url = new URL(window.location.href);
+      let baseUrl;
+      
+      if (url.hostname.includes('.replit.dev')) {
+        // For Replit domains, ALWAYS use https protocol with NO port
+        baseUrl = `https://${url.hostname}`;
+      } else if (url.hostname === 'localhost' || url.hostname === '0.0.0.0' || url.hostname === '127.0.0.1') {
+        // For local development, keep the port
+        baseUrl = window.location.origin;
+      } else {
+        // For all other environments, use clean URLs without ports
+        baseUrl = `${url.protocol}//${url.hostname}`;
+      }
+      
+      console.log('Using baseUrl for Stripe return_url:', baseUrl);
+      
       // Confirm the payment
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: window.location.origin + '/payment-success',
+          // For Replit hosted apps, construct URLs carefully to ensure redirection works
+          return_url: `${baseUrl}/order-confirmation?t=${Date.now()}`,
         },
         redirect: 'if_required',
       });
@@ -58,9 +76,11 @@ const StripeCheckoutForm = ({ clientSecret, packageDetails }) => {
         setMessage(error.message);
         setProcessing(false);
       } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-        // Payment succeeded, redirect to success page
+        // Payment succeeded, refresh user data and redirect to confirmation page
         await refreshUser(); // Refresh user data to update credit balance
-        navigate('/payment-success', { 
+        
+        // Use the new order-confirmation page instead of payment-success
+        navigate(`/order-confirmation?payment_intent=${paymentIntent.id}`, { 
           state: { 
             paymentIntentId: paymentIntent.id,
             packageDetails
