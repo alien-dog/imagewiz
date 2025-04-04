@@ -681,9 +681,6 @@ app.get('/api/payment/verify-session/:sessionId', async (req, res) => {
 app.use('/api', createProxyMiddleware({
   target: `http://localhost:${FLASK_PORT}`,
   changeOrigin: true,
-  pathRewrite: {
-    '^/api': ''  // Remove '/api' prefix when forwarding
-  },
   // @ts-ignore - logLevel is a valid option but TypeScript doesn't recognize it
   logLevel: 'debug',
   onProxyReq: (proxyReq: any, req: any, res: any) => {

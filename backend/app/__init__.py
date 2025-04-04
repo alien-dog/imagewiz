@@ -103,10 +103,17 @@ def create_app():
                 ]
             })
             
-        # Health check route
+        # Health check routes
         @app.route('/api/health')
         def health_check():
             """Return a simple health check response"""
+            return jsonify({"status": "ok", "message": "iMagenWiz API is running"})
+            
+        # Additional health check route without /api prefix - for proxy compatibility
+        @app.route('/health')
+        def health_check_no_prefix():
+            """Return the same health check response for a non-prefixed route"""
+            app.logger.info("Health check called without /api prefix")
             return jsonify({"status": "ok", "message": "iMagenWiz API is running"})
             
         # Error handler for all exceptions
