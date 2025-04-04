@@ -74,6 +74,30 @@ app.use(express.json());
 
 // Special URL decoding middleware for handling encoded query parameters
 app.use((req, res, next) => {
+  // Enhanced request logging for payment-related paths
+  if (req.url.includes('payment')) {
+    console.log('⚡ Payment-related URL detected:', req.originalUrl);
+    console.log('⚡ Method:', req.method);
+    console.log('⚡ Path:', req.path);
+    console.log('⚡ Query:', req.query);
+  }
+  
+  // Special handling for Stripe redirect to payment-verify
+  // Stripe will encode the ? as %3F in the URL when redirecting back
+  if (req.originalUrl.includes('/payment-verify%3Fsession_id=')) {
+    // Extract the session ID from the encoded URL
+    const match = req.originalUrl.match(/payment-verify%3Fsession_id=([^&]+)/);
+    if (match && match[1]) {
+      const sessionId = match[1];
+      console.log('🔄 REDIRECTING: Found encoded payment verification URL with session ID:', sessionId);
+      
+      // Redirect to the properly formatted URL
+      const redirectUrl = `/payment-verify?session_id=${sessionId}`;
+      console.log('🔄 Redirecting to properly formatted URL:', redirectUrl);
+      return res.redirect(redirectUrl);
+    }
+  }
+  
   // Look for common encoding issues in URLs, especially for payment routes
   if (req.url.includes('%3F') || req.url.includes('%3D') || 
       req.url.includes('/payment-verify%3F')) {
@@ -386,6 +410,55 @@ process.on('SIGINT', () => {
 // STEP 2: FRONTEND ROUTES - Must come BEFORE API routes
 //==========================================================================
 
+// Express middleware to enhance URL processing and debugging
+app.use((req, res, next) => {
+  // Log all payment-related requests to help debug
+  if (req.path.includes('payment') || req.originalUrl.includes('payment')) {
+    console.log('⚡ Payment-related URL detected:', req.originalUrl);
+    console.log('⚡ Method:', req.method);
+    console.log('⚡ Path:', req.path);
+    console.log('⚡ Query:', req.query);
+  }
+  
+  // Only apply special handling to non-API, non-asset routes
+  if (!req.path.startsWith('/api') && !req.path.startsWith('/assets')) {
+    const originalUrl = req.originalUrl;
+    
+    // Handle Stripe's encoded query parameter format (? becomes %3F)
+    if (originalUrl.includes('payment-verify%3Fsession_id=')) {
+      // Extract session ID from the encoded URL
+      const match = originalUrl.match(/payment-verify%3Fsession_id=([^&]+)/);
+      if (match && match[1]) {
+        const sessionId = match[1];
+        console.log('🔄 REDIRECTING: Found encoded payment verification URL with session ID:', sessionId);
+        
+        // Redirect to the correctly formatted URL
+        const fixedUrl = `/payment-verify?session_id=${sessionId}`;
+        console.log('🔄 Redirecting to properly formatted URL:', fixedUrl);
+        
+        // Use 302 (temporary) redirect so browsers don't cache it
+        return res.redirect(302, fixedUrl);
+      }
+    }
+    
+    // Additional handling for common payment routes - ensure they're served by React
+    if (req.path === '/payment-verify' || req.path.startsWith('/payment-verify')) {
+      console.log('🔎 Payment verify route detected, ensuring React handles it');
+      // Force express to serve the SPA
+      return res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+    }
+    
+    if (req.path === '/payment-success' || req.path.startsWith('/payment-success')) {
+      console.log('🔎 Payment success route detected, ensuring React handles it');
+      // Force express to serve the SPA
+      return res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+    }
+  }
+  
+  // Continue to next middleware for all other routes
+  next();
+});
+
 // EXPLICITLY handle root route to ensure it's ALWAYS served by Express, not forwarded to Flask
 app.get('/', (req, res) => {
   console.log('🌟 Serving React app root route');
@@ -485,6 +558,24 @@ app.get('/payment-verify*', (req, res) => {
   
   // Ensure the SPA is served regardless of URL encoding
   res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+});
+
+// Handle the specific encoded query case for Stripe redirects
+app.get('/payment-verify%3Fsession_id=*', (req, res) => {
+  console.log('🔄 Detected Stripe redirect with encoded URL format');
+  const originalUrl = req.originalUrl;
+  
+  // Extract the session ID from the encoded URL
+  const sessionIdMatch = originalUrl.match(/payment-verify%3Fsession_id=([^&]+)/);
+  const sessionId = sessionIdMatch ? sessionIdMatch[1] : 'unknown';
+  
+  console.log('  Extracted session ID:', sessionId);
+  
+  // Redirect to the correctly formatted URL
+  const redirectUrl = `/payment-verify?session_id=${sessionId}`;
+  console.log('  Redirecting to:', redirectUrl);
+  
+  res.redirect(302, redirectUrl);
 });
 
 // Special handling for the common encoding error with %3F (encoded ?)
