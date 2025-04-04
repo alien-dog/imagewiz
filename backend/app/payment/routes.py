@@ -128,14 +128,14 @@ def create_checkout_session():
         
         # Use origin if available (which should include the protocol)
         if origin:
-            # NEW APPROACH: Use a simple payment-verify page that will poll the backend
-            success_url = f"{origin}/payment-verify?session_id={{CHECKOUT_SESSION_ID}}"
+            # Use the new OrderConfirmationPage for payment verification
+            success_url = f"{origin}/order-confirmation?session_id={{CHECKOUT_SESSION_ID}}"
         else:
             # Fallback to host with https
             forwarded_proto = request.headers.get('X-Forwarded-Proto', 'https')
-            success_url = f"{forwarded_proto}://{host}/payment-verify?session_id={{CHECKOUT_SESSION_ID}}"
+            success_url = f"{forwarded_proto}://{host}/order-confirmation?session_id={{CHECKOUT_SESSION_ID}}"
             
-        print(f"Using simplified payment verification approach: {success_url}")
+        print(f"Using order confirmation page for payment verification: {success_url}")
     
     if not cancel_url:
         # Get the origin from request headers or use the host directly

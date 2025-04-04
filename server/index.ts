@@ -82,7 +82,7 @@ app.use((req, res, next) => {
     console.log('⚡ Query:', req.query);
   }
   
-  // Special handling for Stripe redirect to payment-verify
+  // Special handling for Stripe redirect to payment-verify or order-confirmation
   // Stripe will encode the ? as %3F in the URL when redirecting back
   if (req.originalUrl.includes('/payment-verify%3Fsession_id=')) {
     // Extract the session ID from the encoded URL
@@ -92,7 +92,22 @@ app.use((req, res, next) => {
       console.log('🔄 REDIRECTING: Found encoded payment verification URL with session ID:', sessionId);
       
       // Redirect to the properly formatted URL
-      const redirectUrl = `/payment-verify?session_id=${sessionId}`;
+      const redirectUrl = `/order-confirmation?session_id=${sessionId}`; // Redirect to new route
+      console.log('🔄 Redirecting to order confirmation page with session ID:', redirectUrl);
+      return res.redirect(redirectUrl);
+    }
+  }
+  
+  // Also handle direct encoded order-confirmation URLs
+  if (req.originalUrl.includes('/order-confirmation%3Fsession_id=')) {
+    // Extract the session ID from the encoded URL
+    const match = req.originalUrl.match(/order-confirmation%3Fsession_id=([^&]+)/);
+    if (match && match[1]) {
+      const sessionId = match[1];
+      console.log('🔄 REDIRECTING: Found encoded order confirmation URL with session ID:', sessionId);
+      
+      // Redirect to the properly formatted URL
+      const redirectUrl = `/order-confirmation?session_id=${sessionId}`;
       console.log('🔄 Redirecting to properly formatted URL:', redirectUrl);
       return res.redirect(redirectUrl);
     }
@@ -448,6 +463,12 @@ app.use((req, res, next) => {
       return res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
     }
     
+    if (req.path === '/order-confirmation' || req.path.startsWith('/order-confirmation')) {
+      console.log('🔎 Order confirmation route detected, ensuring React handles it');
+      // Force express to serve the SPA
+      return res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+    }
+    
     if (req.path === '/payment-success' || req.path.startsWith('/payment-success')) {
       console.log('🔎 Payment success route detected, ensuring React handles it');
       // Force express to serve the SPA
@@ -500,6 +521,12 @@ app.get('/register', (req, res) => {
 
 app.get('/checkout', (req, res) => {
   console.log('🌟 Serving React checkout page');
+  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+});
+
+app.get('/order-confirmation', (req, res) => {
+  console.log('🌟 Serving React order confirmation page - explicit route');
+  console.log('  Query params:', req.query);
   res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
 });
 
@@ -560,6 +587,17 @@ app.get('/payment-verify*', (req, res) => {
   res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
 });
 
+// Also explicitly handle the URL with encoded query params for order-confirmation
+app.get('/order-confirmation*', (req, res) => {
+  console.log('🌟 Serving React order confirmation page (wildcard route)');
+  console.log('  Original URL:', req.originalUrl);
+  console.log('  Path:', req.path);
+  console.log('  Query params:', req.query);
+  
+  // Ensure the SPA is served regardless of URL encoding
+  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+});
+
 // Handle the specific encoded query case for Stripe redirects
 app.get('/payment-verify%3Fsession_id=*', (req, res) => {
   console.log('🔄 Detected Stripe redirect with encoded URL format');
@@ -578,9 +616,36 @@ app.get('/payment-verify%3Fsession_id=*', (req, res) => {
   res.redirect(302, redirectUrl);
 });
 
+// Handle the specific encoded query case for Stripe redirects to order-confirmation
+app.get('/order-confirmation%3Fsession_id=*', (req, res) => {
+  console.log('🔄 Detected Stripe redirect with encoded URL format to order-confirmation');
+  const originalUrl = req.originalUrl;
+  
+  // Extract the session ID from the encoded URL
+  const sessionIdMatch = originalUrl.match(/order-confirmation%3Fsession_id=([^&]+)/);
+  const sessionId = sessionIdMatch ? sessionIdMatch[1] : 'unknown';
+  
+  console.log('  Extracted session ID:', sessionId);
+  
+  // Redirect to the correctly formatted URL
+  const redirectUrl = `/order-confirmation?session_id=${sessionId}`;
+  console.log('  Redirecting to:', redirectUrl);
+  
+  res.redirect(302, redirectUrl);
+});
+
 // Special handling for the common encoding error with %3F (encoded ?)
 app.get('/payment-verify%3Fsession_id=:sessionId', (req, res) => {
   console.log('🌟 Serving React payment verify page (encoded URL special case)');
+  console.log('  Session ID from URL parameter:', req.params.sessionId);
+  
+  // Send the SPA page so client-side routing can take over
+  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+});
+
+// Special handling for the common encoding error with %3F (encoded ?) for order-confirmation
+app.get('/order-confirmation%3Fsession_id=:sessionId', (req, res) => {
+  console.log('🌟 Serving React order confirmation page (encoded URL special case)');
   console.log('  Session ID from URL parameter:', req.params.sessionId);
   
   // Send the SPA page so client-side routing can take over
@@ -862,13 +927,14 @@ app.use('/processed', createProxyMiddleware({
 app.get('*', (req, res) => {
   console.log(`🌐 Serving SPA route: ${req.path}`);
   
-  // Improved special handling for payment routes
+  // Improved special handling for payment routes and order confirmation
   if (req.path === '/payment-success' || req.path === '/payment-failure' || 
-      req.path === '/payment-verify' || req.path === '/undefined' || req.path.startsWith('/payment')) {
+      req.path === '/payment-verify' || req.path === '/order-confirmation' ||
+      req.path === '/undefined' || req.path.startsWith('/payment')) {
     
-    // Special debug logging for payment-verify route
-    if (req.path === '/payment-verify') {
-      console.log(`⚠️ Detected payment-verify route with query params:`, req.query);
+    // Special debug logging for payment-verify and order-confirmation routes
+    if (req.path === '/payment-verify' || req.path === '/order-confirmation') {
+      console.log(`⚠️ Detected ${req.path} route with query params:`, req.query);
       
       // If we have a session_id, this is likely a redirect from Stripe
       if (req.query.session_id) {
