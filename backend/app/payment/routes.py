@@ -178,13 +178,14 @@ def create_checkout_session():
                 # Parse the URL to ensure it's valid and remove port if present
                 parsed_url = success_url
                 
-                # Make sure port number is not in the URL as it can cause issues with redirects
-                if ":3000" in success_url:
-                    parsed_url = success_url.replace(":3000", "")
-                    print(f"Removed port 3000 from success URL: {parsed_url}")
-                elif ":5000" in success_url:
+                # Keep port 3000 as requested by user, but remove port 5000
+                if ":5000" in success_url:
                     parsed_url = success_url.replace(":5000", "")
                     print(f"Removed port 5000 from success URL: {parsed_url}")
+                else:
+                    # Keep port 3000 intact
+                    parsed_url = success_url
+                    print(f"Keeping original URL with port if present: {parsed_url}")
                     
                 # Do NOT add port 443 explicitly - this was causing redirect issues
                 # For Replit hosted apps, use the default HTTPS port (implicit 443)
@@ -214,13 +215,13 @@ def create_checkout_session():
         # Process the cancel_url to handle any port issues
         if cancel_url:
             try:
-                # Remove port if present to avoid redirect issues
-                if ":3000" in cancel_url:
-                    cancel_url = cancel_url.replace(":3000", "")
-                    print(f"Removed port 3000 from cancel URL: {cancel_url}")
-                elif ":5000" in cancel_url:
+                # Keep port 3000 as requested by user, but remove port 5000
+                if ":5000" in cancel_url:
                     cancel_url = cancel_url.replace(":5000", "")
                     print(f"Removed port 5000 from cancel URL: {cancel_url}")
+                else:
+                    # Keep port 3000 intact
+                    print(f"Keeping original cancel URL with port if present: {cancel_url}")
             except Exception as e:
                 print(f"Error processing cancel_url: {e}")
             
