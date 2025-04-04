@@ -481,6 +481,52 @@ app.get('/test-stripe-open.html', (req, res) => {
 // STEP 3: BACKEND API PROXYING - Must come AFTER frontend routes
 //==========================================================================
 
+// Special webhook handling route - must be before general API proxy
+// This route is specifically designed to handle Stripe webhook requests
+app.post('/api/payment/webhook', async (req, res) => {
+  console.log('⚡ Handling Stripe webhook request');
+  
+  // Preserve the raw body for webhook signature verification
+  const rawBody = JSON.stringify(req.body);
+  const signature = req.headers['stripe-signature'];
+  
+  if (!signature) {
+    console.log('❌ Missing Stripe-Signature header in webhook request');
+  } else {
+    console.log('✅ Stripe-Signature header present:', typeof signature === 'string' ? signature : signature[0]);
+  }
+  
+  try {
+    // Forward the webhook directly to Flask
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    // Safely add the Stripe signature if present
+    if (signature) {
+      headers['Stripe-Signature'] = typeof signature === 'string' ? signature : signature[0];
+    }
+    
+    const response = await fetch(`http://localhost:${FLASK_PORT}/payment/webhook`, {
+      method: 'POST',
+      headers,
+      body: rawBody
+    });
+    
+    console.log(`Webhook forwarded to Flask, response status: ${response.status}`);
+    
+    // Get response text
+    const responseText = await response.text();
+    console.log('Webhook response from Flask:', responseText);
+    
+    // Return the same status and response from Flask
+    res.status(response.status).send(responseText);
+  } catch (error) {
+    console.error('Error forwarding webhook to Flask:', error);
+    res.status(500).json({ error: 'Failed to process webhook' });
+  }
+});
+
 // Add a manual proxy endpoint for payment verification with query parameters
 app.get('/api/payment/verify', async (req, res) => {
   console.log('✅ Manual proxy: Received verify payment request with query params:', req.query);

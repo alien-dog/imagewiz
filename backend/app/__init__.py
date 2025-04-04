@@ -166,10 +166,10 @@ def create_app():
                     return redirect(redirect_url, code=302)
                 
                 # If this looks like a frontend route, redirect to Express server
-                # IMPORTANT: Only /payment-success should NOT be redirected
-                # as it can cause redirect loops. /payment-verify should be redirected.
-                elif (path.startswith('/payment') and 
-                      not path.startswith('/payment-success')) or path == '/pricing' or path == '/login' or path == '/payment-verify':
+                # IMPORTANT: ALL payment routes should now be handled by frontend directly
+                # Exclude all payment-related routes to prevent redirect loops
+                elif (not path.startswith('/payment') and not path.startswith('/api/payment')
+                      and (path == '/pricing' or path == '/login')):
                     host = request.headers.get('Host')
                     replit_match = re.match(r'(.*?)\.replit\.dev', host)
                     
