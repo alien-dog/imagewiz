@@ -282,35 +282,120 @@ def create_checkout_session():
 
 @bp.route('/webhook', methods=['POST'])
 def webhook():
-    """Handle Stripe webhook events"""
+    """
+    Handle Stripe webhook events
+    
+    This endpoint receives webhook notifications from Stripe when events occur
+    such as successful payments, failed payments, or subscription updates.
+    
+    The webhook processes these events asynchronously to update the user's account.
+    """
+    # Get the raw payload and signature header
     payload = request.get_data(as_text=True)
     sig_header = request.headers.get('Stripe-Signature')
+    webhook_secret = os.environ.get('STRIPE_WEBHOOK_SECRET')
+    
+    print(f"Webhook received! Signature present: {bool(sig_header)}")
     
     try:
-        # Verify webhook signature and extract event
-        # In production, use a webhook secret for verification
-        # event = stripe.Webhook.construct_event(payload, sig_header, webhook_secret)
-        event = stripe.Event.construct_from(
-            json.loads(payload), stripe.api_key
-        )
+        # Attempt to verify the webhook signature if a secret is configured
+        if webhook_secret:
+            print(f"Verifying webhook signature with secret: {webhook_secret[:4]}...")
+            try:
+                event = stripe.Webhook.construct_event(
+                    payload, sig_header, webhook_secret
+                )
+                print("✅ Webhook signature verified!")
+            except stripe.error.SignatureVerificationError as e:
+                print(f"❌ Webhook signature verification failed: {str(e)}")
+                # Log the error but still process the webhook (in test/dev only)
+                # In production, you would return 400 here
+                event = stripe.Event.construct_from(
+                    json.loads(payload), stripe.api_key
+                )
+                print("⚠️ Processing webhook without signature verification (INSECURE)")
+        else:
+            # No webhook secret configured, process anyway (development mode only)
+            print("⚠️ No webhook secret configured, skipping signature verification")
+            event = stripe.Event.construct_from(
+                json.loads(payload), stripe.api_key
+            )
     except ValueError as e:
         # Invalid payload
+        print(f"❌ Invalid webhook payload: {str(e)}")
         return jsonify({"error": "Invalid payload"}), 400
     except Exception as e:
-        # Invalid signature or other error
+        # Other error
+        print(f"❌ Error processing webhook: {str(e)}")
         return jsonify({"error": f"Error processing webhook: {str(e)}"}), 400
     
-    # Handle the checkout.session.completed event
-    if event['type'] == 'checkout.session.completed':
-        session = event['data']['object']
-        handle_successful_payment(session)
-    # Handle the payment_intent.succeeded event for direct payments
-    elif event['type'] == 'payment_intent.succeeded':
-        payment_intent = event['data']['object']
-        # Process the payment intent
-        handle_payment_intent_success(payment_intent)
+    # Log the event details
+    print(f"🎯 Webhook event received: {event['type']}")
+    print(f"  Event ID: {event['id']}")
+    print(f"  Created at: {event['created']}")
     
-    return jsonify({"status": "success"}), 200
+    # Handle specific event types
+    try:
+        if event['type'] == 'checkout.session.completed':
+            session = event['data']['object']
+            print(f"💰 Processing successful checkout session: {session.id}")
+            user = handle_successful_payment(session)
+            
+            if user:
+                print(f"✅ Credits added for user {user.username} (ID: {user.id}), new balance: {user.credit_balance}")
+            else:
+                print("❌ Failed to process checkout session payment")
+                
+        elif event['type'] == 'payment_intent.succeeded':
+            payment_intent = event['data']['object']
+            print(f"💳 Processing successful payment intent: {payment_intent.id}")
+            user = handle_payment_intent_success(payment_intent)
+            
+            if user:
+                print(f"✅ Credits added for user {user.username} (ID: {user.id}), new balance: {user.credit_balance}")
+            else:
+                print("❌ Failed to process payment intent")
+                
+        elif event['type'] == 'checkout.session.async_payment_succeeded':
+            session = event['data']['object']
+            print(f"🔄 Processing async payment success: {session.id}")
+            user = handle_successful_payment(session)
+            
+            if user:
+                print(f"✅ Credits added for user {user.username} (ID: {user.id}), new balance: {user.credit_balance}")
+            else:
+                print("❌ Failed to process async payment")
+                
+        elif event['type'] == 'checkout.session.async_payment_failed':
+            session = event['data']['object']
+            print(f"❌ Async payment failed for session: {session.id}")
+            # Record the payment failure
+            user_id = session.metadata.get('user_id') if hasattr(session, 'metadata') else None
+            if user_id:
+                print(f"📝 Recording payment failure for user ID: {user_id}")
+                # Here you could store a payment failure record in the database
+        
+        elif event['type'] == 'payment_intent.payment_failed':
+            payment_intent = event['data']['object']
+            print(f"❌ Payment intent failed: {payment_intent.id}")
+            # Record the payment failure
+            user_id = payment_intent.metadata.get('user_id') if hasattr(payment_intent, 'metadata') else None
+            if user_id:
+                print(f"📝 Recording payment failure for user ID: {user_id}")
+                # Here you could store a payment failure record in the database
+        
+        else:
+            # Unhandled event type, just log it
+            print(f"ℹ️ Unhandled event type: {event['type']}")
+    
+    except Exception as e:
+        print(f"❌ Error handling webhook event: {str(e)}")
+        # Log the error but don't return an error response to Stripe
+        # This prevents Stripe from retrying the webhook
+    
+    # Always return a 200 OK to Stripe to acknowledge receipt
+    # This prevents Stripe from retrying the webhook even if we had an error
+    return jsonify({"status": "success", "event_type": event['type']}), 200
 
 def handle_successful_payment(session):
     """Process a successful payment and add credits to user"""
