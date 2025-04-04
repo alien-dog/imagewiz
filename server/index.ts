@@ -530,6 +530,11 @@ app.get('/checkout', (req, res) => {
 app.get('/order-confirmation', (req, res) => {
   console.log('🌟 Serving React order confirmation page - explicit route');
   console.log('  Query params:', req.query);
+  
+  // Log specifically to help diagnose the issue
+  console.log('🔎 Order confirmation route detected, ensuring React handles it');
+  
+  // Make sure we send the React app's index.html for this route
   res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
 });
 
@@ -711,6 +716,12 @@ app.get('/test-stripe-redirect.html', (req, res) => {
 
 app.get('/test-stripe-open.html', (req, res) => {
   res.sendFile(path.join(__dirname, '../test-stripe-open.html'));
+});
+
+// New test file for order confirmation page
+app.get('/test-order-confirmation.html', (req, res) => {
+  console.log('Serving test order confirmation HTML file');
+  res.sendFile(path.join(__dirname, '../test-order-confirmation.html'));
 });
 
 // STEP 3: BACKEND API PROXYING - Must come AFTER frontend routes

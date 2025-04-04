@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Order Confirmation Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    h1 {
+      color: #2B8A94;
+    }
+    button {
+      background-color: #2B8A94;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #1e6e76;
+    }
+    .info {
+      background-color: #f0f9fa;
+      padding: 10px;
+      border-left: 4px solid #2B8A94;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Test Order Confirmation Page</h1>
+  
+  <div class="info">
+    This page helps you test direct access to the order confirmation page without going through the payment flow.
+  </div>
+  
+  <div class="card">
+    <h2>Access Order Confirmation Page Directly</h2>
+    <p>Click the button below to navigate directly to the order confirmation page:</p>
+    
+    <button onclick="window.location.href='/order-confirmation'">Go to Order Confirmation Page</button>
+  </div>
+  
+  <div class="card">
+    <h2>Access with Session ID Parameter</h2>
+    <p>Test with a fake session ID parameter (to simulate Stripe redirect):</p>
+    
+    <button onclick="window.location.href='/order-confirmation?session_id=test_session_123'">Go to Order Confirmation with Test Session ID</button>
+  </div>
+  
+  <div class="card">
+    <h2>Access with Payment Intent Parameter</h2>
+    <p>Test with a fake payment intent parameter (to simulate Stripe redirect):</p>
+    
+    <button onclick="window.location.href='/order-confirmation?payment_intent=test_pi_123'">Go to Order Confirmation with Test Payment Intent</button>
+  </div>
+  
+  <script>
+    console.log('Testing order confirmation page access - client page loaded');
+  </script>
+</body>
+</html>
