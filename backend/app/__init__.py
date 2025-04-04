@@ -120,77 +120,40 @@ def create_app():
             
         @app.route('/pricing')
         def handle_pricing_redirect():
-            """Redirect pricing to the Express server"""
-            host = request.headers.get('Host')
-            replit_match = re.match(r'(.*?)\.replit\.dev', host)
-            
-            if replit_match:
-                redirect_url = f"https://{host}/pricing"
-                print(f"Redirecting pricing to: {redirect_url}")
-            else:
-                # Fix for localhost with port
-                # If host already contains port (like localhost:5000), extract just the hostname
-                if ':' in host:
-                    hostname = host.split(':')[0]
-                    redirect_url = f"http://{hostname}:3000/pricing"
-                else:
-                    redirect_url = f"http://{host}:3000/pricing"
-                
-            app.logger.info(f"Redirecting pricing from Flask to Express: {redirect_url}")
-            return redirect(redirect_url, code=302)
+            """Return JSON response for pricing route"""
+            app.logger.info("Pricing page request received at Flask - should be handled by Express")
+            return jsonify({
+                "error": "Not Found",
+                "message": "The pricing page should be accessed via the Express server at port 3000, not directly through the Flask API",
+                "status": 404
+            }), 404
             
         @app.errorhandler(Exception)
         def handle_exception(e):
             """Return JSON instead of HTML for HTTP errors."""
-            # Check if this is a 404 for a frontend route that should be redirected
+            # Check if this is a 404 for a frontend route
             if isinstance(e, HTTPException) and e.code == 404:
                 path = request.path
                 
-                # Special case for dashboard - always redirect to Express
+                # Instead of redirecting dashboard routes, return a JSON response indicating 
+                # this is a frontend route that should be handled by Express
                 if path == '/dashboard' or path.startswith('/dashboard/'):
-                    host = request.headers.get('Host')
-                    replit_match = re.match(r'(.*?)\.replit\.dev', host)
-                    
-                    if replit_match:
-                        redirect_url = f"https://{host}/dashboard"
-                    else:
-                        # Fix for localhost with port
-                        # If host already contains port (like localhost:5000), extract just the hostname
-                        if ':' in host:
-                            hostname = host.split(':')[0]
-                            redirect_url = f"http://{hostname}:3000/dashboard"
-                        else:
-                            redirect_url = f"http://{host}:3000/dashboard"
-                    
-                    app.logger.info(f"404 dashboard redirect to Express: {redirect_url}")
-                    return redirect(redirect_url, code=302)
+                    app.logger.info(f"404 for dashboard route: {path}")
+                    return jsonify({
+                        "error": "Not Found",
+                        "message": "This route should be accessed via the Express server, not directly through the Flask API",
+                        "status": 404
+                    }), 404
                 
-                # If this looks like a frontend route, redirect to Express server
-                # IMPORTANT: ALL payment routes should now be handled by frontend directly
-                # Exclude all payment-related routes to prevent redirect loops
+                # For other frontend routes, also return a JSON response instead of redirecting
                 elif (not path.startswith('/payment') and not path.startswith('/api/payment')
                       and (path == '/pricing' or path == '/login')):
-                    host = request.headers.get('Host')
-                    replit_match = re.match(r'(.*?)\.replit\.dev', host)
-                    
-                    if replit_match:
-                        redirect_url = f"https://{host}{path}"
-                        print(f"404 handler redirecting to: {redirect_url}")
-                    else:
-                        # Fix for localhost with port
-                        # If host already contains port (like localhost:5000), extract just the hostname
-                        if ':' in host:
-                            hostname = host.split(':')[0]
-                            redirect_url = f"http://{hostname}:3000{path}"
-                        else:
-                            redirect_url = f"http://{host}:3000{path}"
-                        
-                    # Include query string if any
-                    if request.query_string:
-                        redirect_url += f"?{request.query_string.decode('utf-8')}"
-                        
-                    app.logger.info(f"404 redirect from Flask to Express: {redirect_url}")
-                    return redirect(redirect_url, code=302)
+                    app.logger.info(f"404 for frontend route: {path}")
+                    return jsonify({
+                        "error": "Not Found",
+                        "message": "This route should be accessed via the Express server, not directly through the Flask API",
+                        "status": 404
+                    }), 404
             
             if isinstance(e, HTTPException):
                 response = {
