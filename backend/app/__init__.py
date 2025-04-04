@@ -128,7 +128,13 @@ def create_app():
                 redirect_url = f"https://{host}/pricing"
                 print(f"Redirecting pricing to: {redirect_url}")
             else:
-                redirect_url = f"http://{host}:3000/pricing"
+                # Fix for localhost with port
+                # If host already contains port (like localhost:5000), extract just the hostname
+                if ':' in host:
+                    hostname = host.split(':')[0]
+                    redirect_url = f"http://{hostname}:3000/pricing"
+                else:
+                    redirect_url = f"http://{host}:3000/pricing"
                 
             app.logger.info(f"Redirecting pricing from Flask to Express: {redirect_url}")
             return redirect(redirect_url, code=302)
@@ -148,17 +154,22 @@ def create_app():
                     if replit_match:
                         redirect_url = f"https://{host}/dashboard"
                     else:
-                        redirect_url = f"http://{host}:3000/dashboard"
+                        # Fix for localhost with port
+                        # If host already contains port (like localhost:5000), extract just the hostname
+                        if ':' in host:
+                            hostname = host.split(':')[0]
+                            redirect_url = f"http://{hostname}:3000/dashboard"
+                        else:
+                            redirect_url = f"http://{host}:3000/dashboard"
                     
                     app.logger.info(f"404 dashboard redirect to Express: {redirect_url}")
                     return redirect(redirect_url, code=302)
                 
                 # If this looks like a frontend route, redirect to Express server
-                # IMPORTANT: /payment-success and /payment-verify should NOT be redirected
-                # as they can cause redirect loops - let Express handle them directly
+                # IMPORTANT: Only /payment-success should NOT be redirected
+                # as it can cause redirect loops. /payment-verify should be redirected.
                 elif (path.startswith('/payment') and 
-                      not path.startswith('/payment-success') and 
-                      not path.startswith('/payment-verify')) or path == '/pricing' or path == '/login':
+                      not path.startswith('/payment-success')) or path == '/pricing' or path == '/login' or path == '/payment-verify':
                     host = request.headers.get('Host')
                     replit_match = re.match(r'(.*?)\.replit\.dev', host)
                     
@@ -166,7 +177,13 @@ def create_app():
                         redirect_url = f"https://{host}{path}"
                         print(f"404 handler redirecting to: {redirect_url}")
                     else:
-                        redirect_url = f"http://{host}:3000{path}"
+                        # Fix for localhost with port
+                        # If host already contains port (like localhost:5000), extract just the hostname
+                        if ':' in host:
+                            hostname = host.split(':')[0]
+                            redirect_url = f"http://{hostname}:3000{path}"
+                        else:
+                            redirect_url = f"http://{host}:3000{path}"
                         
                     # Include query string if any
                     if request.query_string:
