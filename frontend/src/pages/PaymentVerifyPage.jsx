@@ -5,7 +5,7 @@ import axios from 'axios';
 import { CheckCircle, Loader2, XCircle } from 'lucide-react';
 
 const PaymentVerifyPage = () => {
-  const { user, refreshUser } = useAuth();
+  const { user, refreshUser, login, isAuthenticated } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -45,7 +45,9 @@ const PaymentVerifyPage = () => {
             console.log('Maximum polling attempts reached, redirecting to dashboard');
             setLoading(false);
             setPaymentVerified(true); // Assume success to show a positive message
-            startRedirectCountdown();
+            if (isAuthenticated) {
+              startRedirectCountdown();
+            }
             return;
           }
           
@@ -56,17 +58,31 @@ const PaymentVerifyPage = () => {
         // If session ID is available, verify with backend
         console.log(`Polling attempt #${pollingCount + 1} for session ${sessionId}`);
         
+        // Get token if available (for authenticated users)
         const token = localStorage.getItem('token');
-        if (!token) {
-          setError('Authentication required. Please log in.');
+        
+        // If user is not authenticated, we'll just show a success message
+        // without checking the API, since the webhook would have processed the payment
+        if (!token && !isAuthenticated) {
+          console.log('User is not authenticated, showing generic success message');
+          setPaymentVerified(true);
+          setPaymentDetails({
+            packageName: 'Credit Package',
+            creditsAdded: 'Your account has been credited',
+            newBalance: 'Please log in to see your updated balance'
+          });
           setLoading(false);
           return;
         }
         
+        // For authenticated users, verify with the API
+        let headers = {};
+        if (token) {
+          headers = { 'Authorization': `Bearer ${token}` };
+        }
+        
         const response = await axios.get(`/api/payment/verify?session_id=${sessionId}&t=${Date.now()}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          },
+          headers,
           timeout: 8000 // 8 second timeout
         });
         
@@ -87,7 +103,9 @@ const PaymentVerifyPage = () => {
           await refreshUser();
           
           setLoading(false);
-          startRedirectCountdown();
+          if (isAuthenticated) {
+            startRedirectCountdown();
+          }
           return;
         } else if (response.data.status === 'pending') {
           // Payment is still processing, continue polling
@@ -106,10 +124,9 @@ const PaymentVerifyPage = () => {
         if (err.response && err.response.data) {
           console.log('Error response data:', err.response.data);
           
-          // Check for our new structured error response first
+          // Check for structured error response
           if (err.response.data.details) {
             try {
-              // Try to parse details if it's a JSON string
               let errorDetails = err.response.data.details;
               if (typeof errorDetails === 'string') {
                 try {
@@ -120,7 +137,7 @@ const PaymentVerifyPage = () => {
                     return;
                   }
                 } catch (e) {
-                  // If parsing fails, just use the string as is
+                  // If parsing fails, use the string as is
                   if (errorDetails.includes('No such checkout.session') || 
                       errorDetails.includes('Payment session not found')) {
                     setError('The payment session was not found. This could happen if you\'re using an old or invalid session ID. Please check your dashboard to see if your credits were applied or try making a new purchase.');
@@ -177,7 +194,7 @@ const PaymentVerifyPage = () => {
       isMounted = false;
       clearInterval(intervalId);
     };
-  }, [location, pollingCount, refreshUser, loading]);
+  }, [location, pollingCount, refreshUser, loading, isAuthenticated, navigate]);
   
   // Function to start countdown for dashboard redirect
   const startRedirectCountdown = () => {
@@ -224,12 +241,21 @@ const PaymentVerifyPage = () => {
                   {error}
                 </div>
                 
-                <button
-                  onClick={() => navigate('/dashboard')}
-                  className="px-6 py-3 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors"
-                >
-                  Go to Dashboard
-                </button>
+                {isAuthenticated ? (
+                  <button
+                    onClick={() => navigate('/dashboard')}
+                    className="px-6 py-3 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors"
+                  >
+                    Go to Dashboard
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => navigate('/login')}
+                    className="px-6 py-3 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors"
+                  >
+                    Log In
+                  </button>
+                )}
               </div>
             ) : paymentVerified ? (
               <div className="text-center">
@@ -252,15 +278,31 @@ const PaymentVerifyPage = () => {
                   </div>
                 )}
                 
-                <p className="text-sm text-gray-500 mb-2">
-                  Redirecting to dashboard in {redirectCountdown} seconds...
-                </p>
-                <button
-                  onClick={() => navigate('/dashboard')}
-                  className="px-6 py-3 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors"
-                >
-                  Go to Dashboard Now
-                </button>
+                {isAuthenticated ? (
+                  <>
+                    <p className="text-sm text-gray-500 mb-2">
+                      Redirecting to dashboard in {redirectCountdown} seconds...
+                    </p>
+                    <button
+                      onClick={() => navigate('/dashboard')}
+                      className="px-6 py-3 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors"
+                    >
+                      Go to Dashboard Now
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm text-gray-500 mb-2">
+                      Please log in to access your credits
+                    </p>
+                    <button
+                      onClick={() => navigate('/login')}
+                      className="px-6 py-3 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors"
+                    >
+                      Log In Now
+                    </button>
+                  </>
+                )}
               </div>
             ) : (
               <div className="text-center">

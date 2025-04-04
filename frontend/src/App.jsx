@@ -63,14 +63,9 @@ const AppContent = () => {
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/payment-verify"
-              element={
-                <ProtectedRoute>
-                  <PaymentVerifyPage />
-                </ProtectedRoute>
-              }
-            />
+            {/* Payment verification page is accessible without authentication 
+                to handle redirects from Stripe */}
+            <Route path="/payment-verify" element={<PaymentVerifyPage />} />
             
             {/* Protected routes */}
             <Route

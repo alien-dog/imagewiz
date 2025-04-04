@@ -72,6 +72,43 @@ app.use(cors());
 // Parse JSON request bodies
 app.use(express.json());
 
+// Special URL decoding middleware for handling encoded query parameters
+app.use((req, res, next) => {
+  // Look for common encoding issues in URLs, especially for payment routes
+  if (req.url.includes('%3F') || req.url.includes('%3D') || 
+      req.url.includes('/payment-verify%3F')) {
+    console.log('🔍 Detected URL encoding issues in:', req.url);
+    
+    try {
+      // Try to decode the URL (safely)
+      let decodedUrl = req.url;
+      try {
+        decodedUrl = decodeURIComponent(req.url);
+        console.log('🔄 Decoded URL once:', decodedUrl);
+        
+        // Check if it still has encoded parts
+        if (decodedUrl.includes('%')) {
+          const doubleDecoded = decodeURIComponent(decodedUrl);
+          console.log('🔄 Decoded URL twice:', doubleDecoded);
+          decodedUrl = doubleDecoded;
+        }
+      } catch (e) {
+        console.warn('⚠️ Error decoding URL:', e);
+      }
+      
+      // Only replace if different
+      if (decodedUrl !== req.url) {
+        console.log('✅ Rewrote URL from:', req.url);
+        console.log('✅ Rewrote URL to:', decodedUrl);
+        req.url = decodedUrl;
+      }
+    } catch (error) {
+      console.error('❌ Error in URL decoding middleware:', error);
+    }
+  }
+  next();
+});
+
 // Add a manual proxy endpoint for auth login
 app.post('/api/auth/login', async (req, res) => {
   console.log('Manual proxy: Received login request');
@@ -429,12 +466,33 @@ app.get('/payment-success-express', (req, res) => {
   }
 });
 
+// Handle payment verification with or without query params
 app.get('/payment-verify', (req, res) => {
   console.log('🌟 Serving React payment verify page');
   console.log('  Query params:', req.query);
   
   // This page handles Stripe payment verification via polling the backend API
   // No redirects needed - just serve the SPA page
+  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+});
+
+// Also explicitly handle the URL with encoded query params (safety measure)
+app.get('/payment-verify*', (req, res) => {
+  console.log('🌟 Serving React payment verify page (wildcard route)');
+  console.log('  Original URL:', req.originalUrl);
+  console.log('  Path:', req.path);
+  console.log('  Query params:', req.query);
+  
+  // Ensure the SPA is served regardless of URL encoding
+  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+});
+
+// Special handling for the common encoding error with %3F (encoded ?)
+app.get('/payment-verify%3Fsession_id=:sessionId', (req, res) => {
+  console.log('🌟 Serving React payment verify page (encoded URL special case)');
+  console.log('  Session ID from URL parameter:', req.params.sessionId);
+  
+  // Send the SPA page so client-side routing can take over
   res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
 });
 
