@@ -48,6 +48,11 @@ const CheckoutPage = () => {
           console.log('Using clean URL without port for callbacks:', baseUrl);
         }
         
+        // CRITICAL: Remove port 3000 from baseUrl if it's there
+        // This helps avoid redirect issues when Stripe sends users back
+        baseUrl = baseUrl.replace(':3000', '');
+        console.log('Final baseUrl after port removal:', baseUrl);
+        
         // Log full URL information for debugging
         console.log('URL details:', {
           protocol: url.protocol,

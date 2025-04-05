@@ -617,6 +617,16 @@ app.get('/order-confirmation*', (req, res) => {
   res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
 });
 
+// Handle Stripe redirects where :3000 has been added to the URL
+app.get('/:3000/order-confirmation*', (req, res) => {
+  console.log('⚠️ Detected order confirmation with inappropriate :3000 prefix');
+  const originalUrl = req.originalUrl;
+  const correctedUrl = originalUrl.replace('/:3000', '');
+  
+  console.log(`  Redirecting from ${originalUrl} to ${correctedUrl}`);
+  res.redirect(302, correctedUrl);
+});
+
 // Handle the specific encoded query case for Stripe redirects
 app.get('/payment-verify%3Fsession_id=*', (req, res) => {
   console.log('🔄 Detected Stripe redirect with encoded URL format');
