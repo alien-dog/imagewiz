@@ -57,6 +57,11 @@
         Results will appear here
     </div>
 
+    <div style="margin-top: 15px;">
+        <button id="test_mock_webhook">Test Webhook Fulfillment</button>
+        <button id="test_direct_api">Direct API Response</button>
+    </div>
+
     <script>
         document.getElementById('test_endpoint').addEventListener('click', async function() {
             const sessionId = document.getElementById('session_id').value;
@@ -76,6 +81,90 @@
         document.getElementById('test_redirect').addEventListener('click', function() {
             const sessionId = document.getElementById('session_id').value;
             window.location.href = `/order-confirmation?session_id=${sessionId}`;
+        });
+
+        document.getElementById('test_mock_webhook').addEventListener('click', async function() {
+            const sessionId = document.getElementById('session_id').value;
+            const resultElem = document.getElementById('result');
+            resultElem.innerHTML = 'Testing mock webhook...<br>';
+            
+            try {
+                // Generate mock webhook payload
+                const webhookPayload = {
+                    id: `evt_test_webhook_${sessionId}`,
+                    object: "event",
+                    api_version: "2025-02-24",
+                    created: Math.floor(Date.now() / 1000),
+                    data: {
+                        object: {
+                            id: sessionId,
+                            object: "checkout.session",
+                            amount_total: 990,
+                            currency: "usd",
+                            customer: "cus_test123456",
+                            payment_status: "paid",
+                            status: "complete",
+                            client_reference_id: "2", 
+                            metadata: {
+                                package_id: "lite_monthly",
+                                credit_amount: "50",
+                                is_yearly: "false"
+                            }
+                        }
+                    },
+                    type: "checkout.session.completed",
+                    livemode: false
+                };
+                
+                // Send webhook to backend
+                const response = await fetch('/api/payment/webhook', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(webhookPayload)
+                });
+                
+                const data = await response.text();
+                resultElem.innerHTML += `<p>Webhook Status: ${response.status} ${response.statusText}</p>`;
+                resultElem.innerHTML += `<p>Response:</p><pre>${data}</pre>`;
+                resultElem.innerHTML += `<p>Now you can check the order confirmation page with session ID: ${sessionId}</p>`;
+                resultElem.innerHTML += `<p><a href="/order-confirmation?session_id=${sessionId}" target="_blank">Open Order Confirmation Page</a></p>`;
+            } catch (error) {
+                resultElem.innerHTML += `<p>Error: ${error.message}</p>`;
+            }
+        });
+
+        document.getElementById('test_direct_api').addEventListener('click', async function() {
+            const sessionId = document.getElementById('session_id').value;
+            const resultElem = document.getElementById('result');
+            resultElem.innerHTML = 'Testing direct API fallback...<br>';
+
+            // Try both API endpoints with fallback logic
+            try {
+                // First try payment/verify endpoint
+                const verifyResponse = await fetch(`/api/payment/verify?session_id=${sessionId}`);
+                const verifyData = await verifyResponse.json();
+                
+                resultElem.innerHTML += `<p>Payment Verify Status: ${verifyResponse.status}</p>`;
+                resultElem.innerHTML += `<p>Response:</p><pre>${JSON.stringify(verifyData, null, 2)}</pre>`;
+
+                if (verifyResponse.ok) {
+                    resultElem.innerHTML += `<p>✅ Payment verification successful</p>`;
+                } else {
+                    // Try alternate endpoint
+                    resultElem.innerHTML += `<p>⚠️ Primary verification failed, trying alternate endpoint...</p>`;
+                    
+                    const altResponse = await fetch(`/api/order-confirmation?session_id=${sessionId}&api=true&direct=true`);
+                    const altData = await altResponse.json();
+                    
+                    resultElem.innerHTML += `<p>Alt Endpoint Status: ${altResponse.status}</p>`;
+                    resultElem.innerHTML += `<p>Response:</p><pre>${JSON.stringify(altData, null, 2)}</pre>`;
+                }
+            } catch (error) {
+                resultElem.innerHTML += `<p>Error: ${error.message}</p>`;
+                resultElem.innerHTML += `<p>Using fallback UI would show a success message in this case</p>`;
+            }
         });
     </script>
 </body>
