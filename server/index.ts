@@ -100,7 +100,7 @@ app.use((req, res, next) => {
       console.log('🔄 REDIRECTING: Found encoded payment verification URL with session ID:', sessionId);
       
       // Redirect to the properly formatted URL
-      const redirectUrl = `/order-confirmation?session_id=${sessionId}`; // Redirect to new route
+      const redirectUrl = `/order-confirmation?session_id=${sessionId}&use_html=true`; // Redirect to new route
       console.log('🔄 Redirecting to order confirmation page with session ID:', redirectUrl);
       return res.redirect(redirectUrl);
     }
@@ -115,7 +115,7 @@ app.use((req, res, next) => {
       console.log('🔄 REDIRECTING: Found encoded order confirmation URL with session ID:', sessionId);
       
       // Redirect to the properly formatted URL
-      const redirectUrl = `/order-confirmation?session_id=${sessionId}`;
+      const redirectUrl = `/order-confirmation?session_id=${sessionId}&use_html=true`;
       console.log('🔄 Redirecting to properly formatted URL:', redirectUrl);
       return res.redirect(redirectUrl);
     }
@@ -587,7 +587,7 @@ app.use((req, res, next) => {
         console.log('🔄 REDIRECTING: Found encoded payment verification URL with session ID:', sessionId);
         
         // Redirect to the order-confirmation page instead of payment-verify
-        const fixedUrl = `/order-confirmation?session_id=${sessionId}`;
+        const fixedUrl = `/order-confirmation?session_id=${sessionId}&use_html=true`;
         console.log('🔄 Redirecting to order confirmation page:', fixedUrl);
         
         // Use 302 (temporary) redirect so browsers don't cache it
@@ -727,11 +727,11 @@ app.get('/payment-verify*', (req, res) => {
   
   // Redirect to order-confirmation with the same parameters
   if (req.query.session_id) {
-    const redirectUrl = `/order-confirmation?session_id=${req.query.session_id}&t=${Date.now()}`;
+    const redirectUrl = `/order-confirmation?session_id=${req.query.session_id}&use_html=true&t=${Date.now()}`;
     console.log(`🔄 Redirecting payment-verify to order-confirmation: ${redirectUrl}`);
     return res.redirect(redirectUrl);
   } else if (req.query.payment_intent) {
-    const redirectUrl = `/order-confirmation?payment_intent=${req.query.payment_intent}&t=${Date.now()}`;
+    const redirectUrl = `/order-confirmation?payment_intent=${req.query.payment_intent}&use_html=true&t=${Date.now()}`;
     console.log(`🔄 Redirecting payment-verify to order-confirmation: ${redirectUrl}`);
     return res.redirect(redirectUrl);
   } else {
@@ -831,7 +831,7 @@ app.get('/payment-verify%3Fsession_id=*', (req, res) => {
   console.log('  Extracted session ID:', sessionId);
   
   // Redirect to the order-confirmation page
-  const redirectUrl = `/order-confirmation?session_id=${sessionId}`;
+  const redirectUrl = `/order-confirmation?session_id=${sessionId}&use_html=true`;
   console.log('  Redirecting to order confirmation page:', redirectUrl);
   
   res.redirect(302, redirectUrl);
@@ -865,7 +865,7 @@ app.get('/payment-verify%3Fsession_id=:sessionId', (req, res) => {
   console.log('  Session ID from URL parameter:', req.params.sessionId);
   
   // Redirect to the order-confirmation page instead
-  const redirectUrl = `/order-confirmation?session_id=${req.params.sessionId}`;
+  const redirectUrl = `/order-confirmation?session_id=${req.params.sessionId}&use_html=true`;
   console.log('  Redirecting to order confirmation page:', redirectUrl);
   
   // Use 302 (temporary) redirect
@@ -900,16 +900,16 @@ app.get('/payment-success', (req, res) => {
   
   // Redirect to order-confirmation with the same parameters
   if (req.query.session_id) {
-    const redirectUrl = `/order-confirmation?session_id=${req.query.session_id}&t=${Date.now()}`;
+    const redirectUrl = `/order-confirmation?session_id=${req.query.session_id}&use_html=true&t=${Date.now()}`;
     console.log(`🔄 Redirecting payment-success to order-confirmation: ${redirectUrl}`);
     return res.redirect(redirectUrl);
   } else if (req.query.payment_intent) {
-    const redirectUrl = `/order-confirmation?payment_intent=${req.query.payment_intent}&t=${Date.now()}`;
+    const redirectUrl = `/order-confirmation?payment_intent=${req.query.payment_intent}&use_html=true&t=${Date.now()}`;
     console.log(`🔄 Redirecting payment-success to order-confirmation: ${redirectUrl}`);
     return res.redirect(redirectUrl);
   } else {
     console.log(`ℹ️ Payment-success without identifiers - redirecting to generic order confirmation`);
-    return res.redirect('/order-confirmation');
+    return res.redirect('/order-confirmation?use_html=true');
   }
 });
 
@@ -1358,8 +1358,12 @@ app.use('/order-confirmation', (req, res, next) => {
     console.log('📡 Detected direct API call to order-confirmation with session_id:', req.query.session_id);
     // Forward to the Flask backend
     orderConfirmationApiProxy(req, res, next);
+  } else if (req.query && req.query.use_html === 'true') {
+    // Use our standalone HTML page as a fallback when explicitly requested
+    console.log('📄 Serving standalone HTML page for order confirmation');
+    res.sendFile(path.join(FRONTEND_DIST_PATH, 'order-confirmation.html'));
   } else {
-    // For all non-API requests, serve the React app
+    // For all other non-API requests, serve the React app
     console.log('🌟 Serving React app for order-confirmation (not an API call)');
     res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
   }
@@ -1377,7 +1381,7 @@ app.get('*', (req, res) => {
   // This handles cases where Stripe erroneously redirects to domain root instead of /order-confirmation
   if (req.path === '/' && req.query.session_id) {
     console.log(`🔍 Detected Stripe redirect to root with session_id: ${req.query.session_id}`);
-    const redirectUrl = `/order-confirmation?session_id=${req.query.session_id}&t=${Date.now()}`;
+    const redirectUrl = `/order-confirmation?session_id=${req.query.session_id}&use_html=true&t=${Date.now()}`;
     console.log(`🔄 Redirecting from root to order-confirmation: ${redirectUrl}`);
     return res.redirect(302, redirectUrl);
   }
@@ -1393,12 +1397,12 @@ app.get('*', (req, res) => {
       
       // Redirect payment-verify to order-confirmation for consistency
       if (req.query.session_id) {
-        const redirectUrl = `/order-confirmation?session_id=${req.query.session_id}&t=${Date.now()}`;
+        const redirectUrl = `/order-confirmation?session_id=${req.query.session_id}&use_html=true&t=${Date.now()}`;
         console.log(`🔄 Redirecting payment-verify to order-confirmation page: ${redirectUrl}`);
         return res.redirect(redirectUrl);
       } else {
         console.log(`ℹ️ Payment-verify without session_id - redirecting to generic order confirmation`);
-        return res.redirect('/order-confirmation');
+        return res.redirect('/order-confirmation?use_html=true');
       }
     } 
     else if (req.path === '/order-confirmation') {
@@ -1416,16 +1420,16 @@ app.get('*', (req, res) => {
       
       // Always redirect payment-success to order-confirmation for consistency
       if (req.query.session_id) {
-        const redirectUrl = `/order-confirmation?session_id=${req.query.session_id}&t=${Date.now()}`;
+        const redirectUrl = `/order-confirmation?session_id=${req.query.session_id}&use_html=true&t=${Date.now()}`;
         console.log(`🔄 Redirecting old payment-success to new order-confirmation page: ${redirectUrl}`);
         return res.redirect(redirectUrl);
       } else if (req.query.payment_intent) {
-        const redirectUrl = `/order-confirmation?payment_intent=${req.query.payment_intent}&t=${Date.now()}`;
+        const redirectUrl = `/order-confirmation?payment_intent=${req.query.payment_intent}&use_html=true&t=${Date.now()}`;
         console.log(`🔄 Redirecting old payment-success to new order-confirmation page: ${redirectUrl}`);
         return res.redirect(redirectUrl);
       } else {
         console.log(`ℹ️ Payment-success without identifiers - redirecting to generic order confirmation`);
-        return res.redirect('/order-confirmation');
+        return res.redirect('/order-confirmation?use_html=true');
       }
     } else {
       console.log(`⚠️ Handling special frontend route: ${req.path} → serving index.html`);

@@ -189,7 +189,7 @@
             const isYearly = packageId.includes('yearly');
             
             // Construct the URL for the order confirmation page
-            const url = `/order-confirmation?session_id=${sessionId}&package_id=${packageId}&price=${price}&credits=${credits}&is_yearly=${isYearly}`;
+            const url = `/order-confirmation?session_id=${sessionId}&package_id=${packageId}&price=${price}&credits=${credits}&is_yearly=${isYearly}&use_html=true`;
             
             // Display the URL we're testing with
             document.getElementById('testUrl').textContent = url;
@@ -250,7 +250,7 @@
                     });
             } else {
                 // React component URL
-                url = `/order-confirmation?session_id=${sessionId}&package_id=${packageId}&price=${price}&credits=${credits}&is_yearly=${isYearly}`;
+                url = `/order-confirmation?session_id=${sessionId}&package_id=${packageId}&price=${price}&credits=${credits}&is_yearly=${isYearly}&use_html=true`;
                 
                 // Display the URL
                 document.getElementById('testUrl').textContent = url;
