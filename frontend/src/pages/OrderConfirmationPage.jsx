@@ -1,52 +1,105 @@
-/**
- * OrderConfirmationPage (formerly PaymentVerifyPage)
- * 
- * This page serves as the order confirmation and payment verification page.
- * It is displayed to users after they complete checkout with Stripe.
- * The page polls the backend to verify the payment status and displays
- * a detailed order summary and receipt.
- */
-
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
-import { CheckCircle, Loader2, XCircle, ArrowRight, Calendar, CreditCard, Gift, ShieldCheck, ChevronRight } from 'lucide-react';
+import { CheckCircle, XCircle, Loader2, ArrowRight, Gift, CreditCard, Calendar, ShieldCheck, ChevronRight } from 'lucide-react';
 
 const OrderConfirmationPage = () => {
-  const { user, refreshUser, login, isAuthenticated } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [paymentVerified, setPaymentVerified] = useState(false);
   const [error, setError] = useState(null);
+  const [paymentVerified, setPaymentVerified] = useState(false);
   const [paymentDetails, setPaymentDetails] = useState(null);
   const [pollingCount, setPollingCount] = useState(0);
   const [redirectCountdown, setRedirectCountdown] = useState(3);
   
-  // Extract payment information from URL and start polling verification
+  // Get user from localStorage if available
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem('user');
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+  
+  const isAuthenticated = !!localStorage.getItem('token');
+  
+  // Parse URL parameters
+  const params = new URLSearchParams(location.search || window.location.search);
+  const sessionId = params.get('session_id');
+  const search = location.search || window.location.search;
+  
+  // Function to refresh user data
+  const refreshUser = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      
+      const response = await axios.get('/api/auth/user', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (response.data && response.data.user) {
+        setUser(response.data.user);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        return response.data.user;
+      }
+    } catch (err) {
+      console.error('Error refreshing user data:', err);
+    }
+  };
+
   useEffect(() => {
-    // Track if component is mounted to prevent state updates after unmount
     let isMounted = true;
     
-    // Check if we've been redirected from the legacy route and preserve params
-    const search = location.state?.fromLegacyRoute ? window.location.search : location.search;
-    const params = new URLSearchParams(search);
-    
-    // Try to get session ID from multiple sources (URL params or injected window variable)
-    let sessionId = params.get('session_id');
-    
-    // Check for injected session ID (used for encoded URL cases)
-    if (!sessionId && window.__ORDER_CONFIRMATION_SESSION_ID__) {
-      console.log('Using injected session ID from window variable:', window.__ORDER_CONFIRMATION_SESSION_ID__);
-      sessionId = window.__ORDER_CONFIRMATION_SESSION_ID__;
+    // Skip verification if coming directly from a successful payment
+    if (location.state && location.state.paymentSuccess) {
+      console.log('Payment already verified via state');
+      setPaymentVerified(true);
+      setPaymentDetails(location.state.paymentDetails);
+      setLoading(false);
+      
+      if (isAuthenticated) {
+        startRedirectCountdown();
+      }
+      return;
     }
     
     console.log('Order confirmation page loaded');
     console.log('Session ID from URL:', sessionId);
     console.log('Full URL search params:', search);
     
-    // Setup polling function
+    // Get additional parameters (useful for testing and direct display)
+    const packageId = params.get('package_id');
+    const price = params.get('price');
+    const credits = params.get('credits');
+    const isYearly = params.get('is_yearly');
+    const directMode = params.get('direct') === 'true';
+    
+    console.log('Package ID:', packageId);
+    console.log('Price:', price);
+    console.log('Credits:', credits);
+    console.log('Is Yearly:', isYearly);
+    console.log('Direct Mode:', directMode);
+    
+    // If all direct parameters are provided, we can show confirmation immediately
+    if (directMode && packageId && price && credits) {
+      console.log('Using direct parameters for payment confirmation display');
+      
+      // Create payment details from URL parameters
+      const directDetails = {
+        packageName: packageId
+          ? `${packageId.split('_')[0].charAt(0).toUpperCase() + packageId.split('_')[0].slice(1)} ${isYearly === 'true' ? 'Annual' : 'Monthly'}`
+          : 'Credit Package',
+        amountPaid: parseFloat(price),
+        creditsAdded: parseInt(credits),
+        isYearly: isYearly === 'true',
+        newBalance: parseInt(credits),
+      };
+      
+      setPaymentDetails(directDetails);
+      setPaymentVerified(true);
+      setLoading(false);
+      return;
+    }
+
     const pollPaymentStatus = async () => {
       try {
         if (!isMounted) return;
@@ -100,144 +153,155 @@ const OrderConfirmationPage = () => {
           headers = { 'Authorization': `Bearer ${token}` };
         }
         
+        // First try to use the API endpoint
         try {
-          // First try to use the API endpoint
           const response = await axios.get(`/api/payment/verify?session_id=${sessionId}&t=${Date.now()}`, {
             headers,
             timeout: 8000 // 8 second timeout
           });
-        
-        console.log('Payment verification response:', response.data);
-        
-        if (response.data.status === 'success') {
-          // Payment verified successfully
-          setPaymentVerified(true);
-          setPaymentDetails({
-            packageName: response.data.package_name || 'Credit Package',
-            amountPaid: response.data.amount_paid || 0,
-            creditsAdded: response.data.credits_added || 0,
-            isYearly: response.data.is_yearly || false,
-            newBalance: response.data.new_balance || 0
-          });
           
-          // Refresh user data to get updated credit balance
-          await refreshUser();
+          console.log('Payment verification response:', response.data);
           
-          setLoading(false);
-          if (isAuthenticated) {
-            startRedirectCountdown();
-          }
-          return;
-        } else if (response.data.status === 'pending') {
-          // Payment is still processing, continue polling
-          console.log('Payment is still processing, continuing to poll');
-          setPollingCount(prev => prev + 1);
-        } else {
-          // Payment failed or unknown status
-          console.error('Payment verification failed with response:', response.data);
-          setError('Payment verification failed. Please check your dashboard to see if your credits were applied or contact support.');
-          setLoading(false);
-        }
-      } catch (err) {
-        console.error('Error during payment verification request:', err);
-        console.log('API connection failed, using direct Stripe fulfillment instead');
-        
-        try {
-          // Second fallback: Try the direct fulfillment API route
-          const fallbackResponse = await axios.get(`/api/order-confirmation?session_id=${sessionId}&api=true&t=${Date.now()}`, {
-            headers,
-            timeout: 8000
-          });
-          
-          console.log('Fallback verification response:', fallbackResponse.data);
-          
-          if (fallbackResponse.data.status === 'success') {
+          if (response.data.status === 'success') {
+            // Payment verified successfully
             setPaymentVerified(true);
             setPaymentDetails({
-              packageName: fallbackResponse.data.package_name || 'Credit Package',
-              amountPaid: fallbackResponse.data.amount_paid || 0,
-              creditsAdded: fallbackResponse.data.credits_added || 0,
-              isYearly: fallbackResponse.data.is_yearly || false,
-              newBalance: fallbackResponse.data.new_balance || 0
+              packageName: response.data.package_name || 'Credit Package',
+              amountPaid: response.data.amount_paid || 0,
+              creditsAdded: response.data.credits_added || 0,
+              isYearly: response.data.is_yearly || false,
+              newBalance: response.data.new_balance || 0
             });
             
+            // Refresh user data to get updated credit balance
             await refreshUser();
+            
             setLoading(false);
             if (isAuthenticated) {
               startRedirectCountdown();
             }
             return;
+          } else if (response.data.status === 'pending') {
+            // Payment is still processing, continue polling
+            console.log('Payment is still processing, continuing to poll');
+            setPollingCount(prev => prev + 1);
+          } else {
+            // Payment failed or unknown status
+            console.error('Payment verification failed with response:', response.data);
+            setError('Payment verification failed. Please check your dashboard to see if your credits were applied or contact support.');
+            setLoading(false);
           }
-        } catch (fallbackErr) {
-          console.error('Fallback API also failed:', fallbackErr);
+        } catch (apiError) {
+          console.error('Error during payment verification request:', apiError);
+          console.log('API connection failed, using direct Stripe fulfillment instead');
           
-          // All API attempts failed, handle error
-          // Handle structured error responses
-          if (err.response && err.response.data) {
-            console.log('Error response data:', err.response.data);
+          // Second fallback: Try the direct fulfillment API route
+          try {
+            const fallbackResponse = await axios.get(`/api/order-confirmation?session_id=${sessionId}&api=true&t=${Date.now()}`, {
+              headers,
+              timeout: 8000
+            });
             
-            // Check for structured error response
-            if (err.response.data.details) {
-              try {
-                let errorDetails = err.response.data.details;
-                if (typeof errorDetails === 'string') {
-                  try {
-                    const parsedDetails = JSON.parse(errorDetails);
-                    if (parsedDetails.message) {
-                      setError(parsedDetails.message);
-                      setLoading(false);
-                      return;
-                    }
-                  } catch (e) {
-                    // If parsing fails, use the string as is
-                    if (errorDetails.includes('No such checkout.session') || 
-                        errorDetails.includes('Payment session not found')) {
-                      setError('The payment session was not found. This could happen if you\'re using an old or invalid session ID. Please check your dashboard to see if your credits were applied or try making a new purchase.');
-                      setLoading(false);
-                      return;
+            console.log('Fallback verification response:', fallbackResponse.data);
+            
+            if (fallbackResponse.data.status === 'success') {
+              setPaymentVerified(true);
+              setPaymentDetails({
+                packageName: fallbackResponse.data.package_name || 'Credit Package',
+                amountPaid: fallbackResponse.data.amount_paid || 0,
+                creditsAdded: fallbackResponse.data.credits_added || 0,
+                isYearly: fallbackResponse.data.is_yearly || false,
+                newBalance: fallbackResponse.data.new_balance || 0
+              });
+              
+              await refreshUser();
+              setLoading(false);
+              if (isAuthenticated) {
+                startRedirectCountdown();
+              }
+              return;
+            }
+          } catch (fallbackError) {
+            console.error('Fallback API also failed:', fallbackError);
+            
+            // Handle structured error responses
+            if (apiError.response && apiError.response.data) {
+              console.log('Error response data:', apiError.response.data);
+              
+              // Check for structured error response
+              if (apiError.response.data.details) {
+                try {
+                  let errorDetails = apiError.response.data.details;
+                  if (typeof errorDetails === 'string') {
+                    try {
+                      const parsedDetails = JSON.parse(errorDetails);
+                      if (parsedDetails.message) {
+                        setError(parsedDetails.message);
+                        setLoading(false);
+                        return;
+                      }
+                    } catch (e) {
+                      // If parsing fails, use the string as is
+                      if (errorDetails.includes('No such checkout.session') || 
+                          errorDetails.includes('Payment session not found')) {
+                        setError('The payment session was not found. This could happen if you\'re using an old or invalid session ID. Please check your dashboard to see if your credits were applied or try making a new purchase.');
+                        setLoading(false);
+                        return;
+                      }
                     }
                   }
+                } catch (e) {
+                  console.error('Error parsing error details:', e);
                 }
-              } catch (e) {
-                console.error('Error parsing error details:', e);
+              }
+              
+              // If no structured message was found, check for general error message
+              if (apiError.response.data.error) {
+                setError(apiError.response.data.error);
+                setLoading(false);
+                return;
               }
             }
             
-            // If no structured message was found, check for general error message
-            if (err.response.data.error) {
-              setError(err.response.data.error);
+            // Third fallback option if all API attempts failed: Show success message based on session ID
+            // This is last resort, assumes webhook will handle fulfillment eventually
+            if (sessionId && pollingCount >= 3) {
+              console.log('All API attempts failed, showing optimistic success message');
+              setPaymentVerified(true);
+              setPaymentDetails({
+                packageName: 'Credit Package',
+                amountPaid: 0,
+                creditsAdded: 'Your credits will be added soon',
+                isYearly: false,
+                newBalance: 'Please refresh your dashboard to see your updated balance'
+              });
+              
+              await refreshUser();
               setLoading(false);
               return;
             }
+            
+            // If we've tried too many times, stop polling and show error
+            if (pollingCount >= 5) {
+              setError('We were unable to verify your payment after multiple attempts. Please check your dashboard to see if your credits were applied or contact support.');
+              setLoading(false);
+              return;
+            }
+            
+            // Continue polling on error
+            setPollingCount(prev => prev + 1);
           }
         }
+      } catch (err) {
+        console.error('Unexpected error during payment verification:', err);
         
-        // Third fallback option if all API attempts failed: Show success message based on session ID
-        // This is last resort, assumes webhook will handle fulfillment eventually
-        if (sessionId && pollingCount >= 3) {
-          console.log('All API attempts failed, showing optimistic success message');
-          setPaymentVerified(true);
-          setPaymentDetails({
-            packageName: 'Credit Package',
-            amountPaid: 0,
-            creditsAdded: 'Your credits will be added soon',
-            isYearly: false,
-            newBalance: 'Please refresh your dashboard to see your updated balance'
-          });
-          
-          await refreshUser();
-          setLoading(false);
-          return;
-        }
-        
-        // If we've tried too many times, stop polling and show error
+        // If we've tried too many times, stop polling and show a general error
         if (pollingCount >= 5) {
-          setError('We were unable to verify your payment after multiple attempts. Please check your dashboard to see if your credits were applied or contact support.');
+          setError('We were unable to verify your payment due to a system error. Please check your dashboard to see if your credits were applied or contact support.');
           setLoading(false);
           return;
         }
         
-        // Continue polling on error
         setPollingCount(prev => prev + 1);
       }
     };
@@ -265,7 +329,18 @@ const OrderConfirmationPage = () => {
       isMounted = false;
       clearInterval(intervalId);
     };
-  }, [location, pollingCount, refreshUser, loading, isAuthenticated, navigate, location.state]);
+  }, [
+    location, 
+    pollingCount, 
+    refreshUser, 
+    loading, 
+    isAuthenticated, 
+    navigate, 
+    search, 
+    sessionId, 
+    user, 
+    params
+  ]);
   
   // Function to start countdown for dashboard redirect
   const startRedirectCountdown = () => {

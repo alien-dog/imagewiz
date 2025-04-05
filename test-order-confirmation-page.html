@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iMagenWiz Order Confirmation Tester</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f9fa;
+        }
+        h1, h2, h3 {
+            color: #2E86C1;
+        }
+        h1 {
+            border-bottom: 2px solid #2E86C1;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-left: 4px solid #2E86C1;
+        }
+        .package-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .package-card {
+            background: white;
+            border: 1px solid #e1e4e8;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .package-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            border-color: #2E86C1;
+        }
+        .package-name {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #2E86C1;
+        }
+        .price {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .credits {
+            color: #5a5a5a;
+            margin-bottom: 10px;
+        }
+        .package-type {
+            display: inline-block;
+            background: #e1f5fe;
+            color: #0288d1;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+        .yearly {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+        button {
+            background: #2E86C1;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #1A5276;
+        }
+        .note {
+            background-color: #fff8e1;
+            border-left: 4px solid #ffb300;
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+        .response-area {
+            margin-top: 30px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            display: none;
+        }
+        pre {
+            background: #f1f1f1;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .success {
+            color: #388e3c;
+            font-weight: bold;
+        }
+        .error {
+            color: #d32f2f;
+            font-weight: bold;
+        }
+        .url-display {
+            font-family: monospace;
+            background: #f1f1f1;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            word-break: break-all;
+            display: none;
+        }
+        .nav-tabs {
+            display: flex;
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 20px;
+            padding-left: 0;
+        }
+        .nav-tab {
+            list-style: none;
+            margin-right: 2px;
+        }
+        .nav-link {
+            padding: 10px 15px;
+            border: 1px solid transparent;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+            display: block;
+            text-decoration: none;
+            color: #2E86C1;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .nav-link.active {
+            background-color: #fff;
+            border-color: #dee2e6 #dee2e6 #fff;
+            color: #495057;
+        }
+        .tab-content {
+            padding: 20px 0;
+        }
+        .tab-pane {
+            display: none;
+        }
+        .tab-pane.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>iMagenWiz Order Confirmation Tester</h1>
+
+    <div class="note">
+        <p><strong>About this tool:</strong> This page lets you test the order confirmation flow by simulating successful payments. It's useful for verifying that the payment confirmation system displays correct information for each package type.</p>
+    </div>
+
+    <ul class="nav-tabs">
+        <li class="nav-tab"><a class="nav-link active" onclick="switchTab('quick-test')">Quick Test</a></li>
+        <li class="nav-tab"><a class="nav-link" onclick="switchTab('advanced-test')">Advanced Testing</a></li>
+        <li class="nav-tab"><a class="nav-link" onclick="switchTab('api-test')">API Testing</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="quick-test" class="tab-pane active">
+            <div class="card">
+                <h2>Select a Package to Test</h2>
+                <p>Click on any package to simulate a successful order with that plan:</p>
+                
+                <div class="package-grid">
+                    <div class="package-card" onclick="testOrderConfirmation('lite_monthly')">
+                        <div class="package-type">Monthly</div>
+                        <div class="package-name">Lite Plan</div>
+                        <div class="price">$9.90</div>
+                        <div class="credits">50 Credits</div>
+                        <button>Test This Package</button>
+                    </div>
+                    
+                    <div class="package-card" onclick="testOrderConfirmation('lite_yearly')">
+                        <div class="package-type yearly">Annual</div>
+                        <div class="package-name">Lite Plan</div>
+                        <div class="price">$106.80</div>
+                        <div class="credits">600 Credits</div>
+                        <button>Test This Package</button>
+                    </div>
+                    
+                    <div class="package-card" onclick="testOrderConfirmation('pro_monthly')">
+                        <div class="package-type">Monthly</div>
+                        <div class="package-name">Pro Plan</div>
+                        <div class="price">$24.90</div>
+                        <div class="credits">150 Credits</div>
+                        <button>Test This Package</button>
+                    </div>
+                    
+                    <div class="package-card" onclick="testOrderConfirmation('pro_yearly')">
+                        <div class="package-type yearly">Annual</div>
+                        <div class="package-name">Pro Plan</div>
+                        <div class="price">$262.80</div>
+                        <div class="credits">1800 Credits</div>
+                        <button>Test This Package</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="advanced-test" class="tab-pane">
+            <div class="card">
+                <h2>Advanced Order Confirmation Test</h2>
+                <p>Customize parameters for the test:</p>
+                
+                <div>
+                    <label for="package-select"><strong>Package Type:</strong></label>
+                    <select id="package-select" onchange="updatePackageDetails()">
+                        <option value="lite_monthly">Lite Monthly</option>
+                        <option value="lite_yearly">Lite Yearly</option>
+                        <option value="pro_monthly">Pro Monthly</option>
+                        <option value="pro_yearly">Pro Yearly</option>
+                    </select>
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label for="session-id"><strong>Session ID:</strong> (auto-generated)</label>
+                    <input type="text" id="session-id" readonly style="width: 100%; padding: 8px; margin-top: 5px; font-family: monospace; background: #f1f1f1;" />
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label for="custom-price"><strong>Custom Price:</strong> (optional)</label>
+                    <input type="number" id="custom-price" step="0.01" style="width: 100%; padding: 8px; margin-top: 5px;" />
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label for="custom-credits"><strong>Custom Credits:</strong> (optional)</label>
+                    <input type="number" id="custom-credits" style="width: 100%; padding: 8px; margin-top: 5px;" />
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <button onclick="runAdvancedTest()">Run Advanced Test</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="api-test" class="tab-pane">
+            <div class="card">
+                <h2>API Test</h2>
+                <p>Test the API directly without opening the confirmation page:</p>
+                
+                <div>
+                    <label for="api-package-select"><strong>Package Type:</strong></label>
+                    <select id="api-package-select">
+                        <option value="lite_monthly">Lite Monthly</option>
+                        <option value="lite_yearly">Lite Yearly</option>
+                        <option value="pro_monthly">Pro Monthly</option>
+                        <option value="pro_yearly">Pro Yearly</option>
+                    </select>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <button onclick="runApiTest()">Run API Test</button>
+                </div>
+                
+                <div id="api-response" class="response-area">
+                    <h3>API Response</h3>
+                    <pre id="api-response-json"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="test-url" class="url-display"></div>
+
+    <script>
+        // Generate a Stripe-like test session ID
+        function generateSessionId() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            const sessionIdLength = 20;
+            let sessionId = 'cs_test_';
+            
+            for (let i = 0; i < sessionIdLength; i++) {
+                sessionId += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            
+            return sessionId;
+        }
+        
+        // Get package details based on selection
+        function getPackageDetails(packageId) {
+            const packages = {
+                lite_monthly: { price: 9.90, credits: 50, isYearly: false, name: 'Lite Monthly' },
+                lite_yearly: { price: 106.80, credits: 600, isYearly: true, name: 'Lite Yearly' },
+                pro_monthly: { price: 24.90, credits: 150, isYearly: false, name: 'Pro Monthly' },
+                pro_yearly: { price: 262.80, credits: 1800, isYearly: true, name: 'Pro Yearly' }
+            };
+            
+            return packages[packageId] || packages.lite_monthly;
+        }
+        
+        // Quick test for a specific package
+        function testOrderConfirmation(packageId) {
+            const sessionId = generateSessionId();
+            const packageDetails = getPackageDetails(packageId);
+            
+            // Construct the URL for the order confirmation page
+            const url = `/order-confirmation?session_id=${sessionId}&package_id=${packageId}&price=${packageDetails.price}&credits=${packageDetails.credits}&is_yearly=${packageDetails.isYearly}`;
+            
+            // Display the URL we're testing with
+            document.getElementById('test-url').style.display = 'block';
+            document.getElementById('test-url').textContent = url;
+            
+            // Open in a new tab
+            window.open(url, '_blank');
+        }
+        
+        // Update package details in the advanced test form
+        function updatePackageDetails() {
+            const packageId = document.getElementById('package-select').value;
+            const packageDetails = getPackageDetails(packageId);
+            
+            document.getElementById('custom-price').placeholder = packageDetails.price;
+            document.getElementById('custom-credits').placeholder = packageDetails.credits;
+            
+            // Always regenerate a new session ID
+            document.getElementById('session-id').value = generateSessionId();
+        }
+        
+        // Run advanced test with custom parameters
+        function runAdvancedTest() {
+            const packageId = document.getElementById('package-select').value;
+            const sessionId = document.getElementById('session-id').value;
+            const packageDetails = getPackageDetails(packageId);
+            
+            // Use custom values if provided, otherwise use defaults
+            const price = document.getElementById('custom-price').value || packageDetails.price;
+            const credits = document.getElementById('custom-credits').value || packageDetails.credits;
+            
+            // Construct the URL for the order confirmation page
+            const url = `/order-confirmation?session_id=${sessionId}&package_id=${packageId}&price=${price}&credits=${credits}&is_yearly=${packageDetails.isYearly}`;
+            
+            // Display the URL we're testing with
+            document.getElementById('test-url').style.display = 'block';
+            document.getElementById('test-url').textContent = url;
+            
+            // Open in a new tab
+            window.open(url, '_blank');
+        }
+        
+        // Run API test
+        function runApiTest() {
+            const packageId = document.getElementById('api-package-select').value;
+            const sessionId = generateSessionId();
+            const packageDetails = getPackageDetails(packageId);
+            
+            // Construct the URL for the API
+            const url = `/api/order-confirmation?session_id=${sessionId}&package_id=${packageId}&price=${packageDetails.price}&credits=${packageDetails.credits}&is_yearly=${packageDetails.isYearly}&direct=true`;
+            
+            // Display the API response area
+            document.getElementById('api-response').style.display = 'block';
+            document.getElementById('api-response-json').innerHTML = 'Loading...';
+            
+            // Make the API request
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('api-response-json').innerHTML = JSON.stringify(data, null, 2);
+                    
+                    // Add color to highlight success or failure
+                    if (data.status === 'success') {
+                        document.getElementById('api-response-json').classList.add('success');
+                        document.getElementById('api-response-json').classList.remove('error');
+                    } else {
+                        document.getElementById('api-response-json').classList.add('error');
+                        document.getElementById('api-response-json').classList.remove('success');
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('api-response-json').innerHTML = `Error: ${error.message}`;
+                    document.getElementById('api-response-json').classList.add('error');
+                    document.getElementById('api-response-json').classList.remove('success');
+                });
+        }
+        
+        // Tab switching functionality
+        function switchTab(tabId) {
+            // Hide all tabs
+            const tabPanes = document.querySelectorAll('.tab-pane');
+            tabPanes.forEach(pane => {
+                pane.classList.remove('active');
+            });
+            
+            // Show the selected tab
+            document.getElementById(tabId).classList.add('active');
+            
+            // Update the active tab link
+            const tabLinks = document.querySelectorAll('.nav-link');
+            tabLinks.forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Find the link that was clicked and make it active
+            const clickedLink = document.querySelector(`.nav-link[onclick="switchTab('${tabId}')"]`);
+            clickedLink.classList.add('active');
+        }
+        
+        // Initialize the page
+        window.onload = function() {
+            // Generate an initial session ID
+            document.getElementById('session-id').value = generateSessionId();
+            
+            // Set initial placeholders for advanced test
+            const initialPackage = getPackageDetails('lite_monthly');
+            document.getElementById('custom-price').placeholder = initialPackage.price;
+            document.getElementById('custom-credits').placeholder = initialPackage.credits;
+        };
+    </script>
+</body>
+</html>

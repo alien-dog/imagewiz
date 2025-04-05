@@ -156,6 +156,22 @@ app.use((req, res, next) => {
   next();
 });
 
+// Create a special handler for .html files before any API routes
+app.get('/*.html', (req, res, next) => {
+  const htmlFile = path.join(FRONTEND_DIST_PATH, req.path);
+  console.log(`🌐 Handling HTML file request directly: ${req.path}`);
+  console.log(`Checking for file: ${htmlFile}`);
+  
+  if (fs.existsSync(htmlFile)) {
+    console.log(`✅ Found HTML file, serving: ${htmlFile}`);
+    return res.sendFile(htmlFile);
+  } else {
+    // Continue to other handlers if file not found
+    console.log(`❌ HTML file not found: ${htmlFile}`);
+    next();
+  }
+});
+
 // Add a manual proxy endpoint for auth login
 app.post('/api/auth/login', async (req, res) => {
   console.log('Manual proxy: Received login request');
@@ -919,7 +935,7 @@ app.get('/test-stripe-open.html', (req, res) => {
 
 // New test file for order confirmation page with enhanced logging
 app.get('/test-order-confirmation.html', (req, res) => {
-  console.log('🧪 Serving test order confirmation HTML file');
+  console.log('🧪 Serving test order confirmation HTML file directly from server');
   console.log('  Query params:', req.query);
   
   // If a session_id is provided, log it explicitly
@@ -932,7 +948,8 @@ app.get('/test-order-confirmation.html', (req, res) => {
     console.log('  Test with package_id:', req.query.package_id);
   }
   
-  res.sendFile(path.join(__dirname, '../test-order-confirmation.html'));
+  // Important: Use absolute path to the test file in the server directory
+  res.sendFile(path.join(__dirname, 'test-order-confirmation.html'));
 });
 
 // STEP 3: BACKEND API PROXYING - Must come AFTER frontend routes

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Order Confirmation</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+  <div class="min-h-screen pt-16 pb-20">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div class="bg-teal-600 py-4 px-6">
+          <h1 class="text-xl font-semibold text-white">Test Order Confirmation</h1>
+        </div>
+        
+        <div class="p-8">
+          <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center bg-green-100 rounded-full p-3 mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Test Mode: Order Simulation</h2>
+            <p class="text-gray-600 mb-6 max-w-md mx-auto">
+              This is a test page for simulating order confirmations. Select a package below to see how the order confirmation page would look.
+            </p>
+          </div>
+          
+          <div class="space-y-4 mb-6">
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <h3 class="font-medium text-gray-900 mb-4">Select a Package to Test:</h3>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Lite Monthly -->
+                <div class="border border-gray-200 hover:border-teal-500 rounded-lg p-4 cursor-pointer transition-colors" onclick="simulateOrder('lite', false, 9.90, 50)">
+                  <div class="flex items-center justify-between mb-2">
+                    <h4 class="font-medium text-teal-700">Lite Monthly</h4>
+                    <span class="text-sm bg-teal-100 text-teal-800 px-2 py-1 rounded">$9.90</span>
+                  </div>
+                  <p class="text-sm text-gray-600">50 credits per month</p>
+                </div>
+                
+                <!-- Lite Yearly -->
+                <div class="border border-gray-200 hover:border-teal-500 rounded-lg p-4 cursor-pointer transition-colors" onclick="simulateOrder('lite', true, 106.80, 600)">
+                  <div class="flex items-center justify-between mb-2">
+                    <h4 class="font-medium text-teal-700">Lite Annual</h4>
+                    <span class="text-sm bg-teal-100 text-teal-800 px-2 py-1 rounded">$106.80</span>
+                  </div>
+                  <p class="text-sm text-gray-600">600 credits per year</p>
+                </div>
+                
+                <!-- Pro Monthly -->
+                <div class="border border-gray-200 hover:border-teal-500 rounded-lg p-4 cursor-pointer transition-colors" onclick="simulateOrder('pro', false, 24.90, 150)">
+                  <div class="flex items-center justify-between mb-2">
+                    <h4 class="font-medium text-teal-700">Pro Monthly</h4>
+                    <span class="text-sm bg-teal-100 text-teal-800 px-2 py-1 rounded">$24.90</span>
+                  </div>
+                  <p class="text-sm text-gray-600">150 credits per month</p>
+                </div>
+                
+                <!-- Pro Yearly -->
+                <div class="border border-gray-200 hover:border-teal-500 rounded-lg p-4 cursor-pointer transition-colors" onclick="simulateOrder('pro', true, 262.80, 1800)">
+                  <div class="flex items-center justify-between mb-2">
+                    <h4 class="font-medium text-teal-700">Pro Annual</h4>
+                    <span class="text-sm bg-teal-100 text-teal-800 px-2 py-1 rounded">$262.80</span>
+                  </div>
+                  <p class="text-sm text-gray-600">1800 credits per year</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <h3 class="font-medium text-gray-900 mb-4">Or Test with Custom Parameters:</h3>
+              
+              <form id="customForm" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1" for="packageId">Package ID</label>
+                    <input type="text" id="packageId" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="e.g. lite or pro">
+                  </div>
+                  
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1" for="isYearly">Subscription Type</label>
+                    <select id="isYearly" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                      <option value="false">Monthly</option>
+                      <option value="true">Annual</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1" for="price">Price</label>
+                    <input type="number" id="price" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="e.g. 9.90">
+                  </div>
+                  
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1" for="credits">Credits</label>
+                    <input type="number" id="credits" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="e.g. 50">
+                  </div>
+                </div>
+                
+                <button type="button" onclick="simulateCustomOrder()" class="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700">
+                  Simulate Custom Order
+                </button>
+              </form>
+            </div>
+          </div>
+          
+          <div class="mt-8 text-center">
+            <p class="text-sm text-gray-500 mb-4">
+              This is a test tool for developers to verify the order confirmation page functionality.
+            </p>
+            <a href="/" class="text-teal-600 hover:text-teal-800 font-medium">Back to Home</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    function simulateOrder(packageId, isYearly, price, credits) {
+      const params = new URLSearchParams();
+      params.append('direct', 'true');
+      params.append('package_id', packageId);
+      params.append('is_yearly', isYearly);
+      params.append('price', price);
+      params.append('credits', credits);
+      
+      // Generate a random session ID for testing
+      const testSessionId = 'test_' + Math.random().toString(36).substring(2, 15);
+      params.append('session_id', testSessionId);
+      
+      window.location.href = '/order-confirmation?' + params.toString();
+    }
+    
+    function simulateCustomOrder() {
+      const packageId = document.getElementById('packageId').value || 'custom';
+      const isYearly = document.getElementById('isYearly').value;
+      const price = document.getElementById('price').value || '0.00';
+      const credits = document.getElementById('credits').value || '0';
+      
+      simulateOrder(packageId, isYearly === 'true', parseFloat(price), parseInt(credits));
+    }
+  </script>
+</body>
+</html>

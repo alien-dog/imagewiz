@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Order Confirmation</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #2E86C1;
+            margin-bottom: 25px;
+        }
+        h2 {
+            color: #2E86C1;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background-color: #2E86C1;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #1A5276;
+        }
+        .result {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: -5px;
+        }
+        .row button {
+            margin: 5px;
+        }
+        .note {
+            background-color: #fff8e1;
+            padding: 10px;
+            border-left: 4px solid #ffcc80;
+            margin-bottom: 20px;
+        }
+        .test-group {
+            margin-bottom: 30px;
+        }
+        .url-display {
+            font-family: monospace;
+            background: #f1f1f1;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+        .package-option {
+            display: inline-block;
+            margin: 0 10px 10px 0;
+        }
+        .package-option input {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>iMagenWiz Order Confirmation Test</h1>
+    
+    <div class="note">
+        <strong>Note:</strong> This page contains test buttons to simulate different payment flows. Use these to verify that the order confirmation page and backend processing are working correctly.
+    </div>
+
+    <div class="card">
+        <h2>1. Quick Package Tests</h2>
+        <p>These buttons will open the order confirmation page with a sample session ID and package selection.</p>
+        
+        <div class="test-group">
+            <h3>Lite Plan</h3>
+            <div class="row">
+                <button onclick="testOrderConfirmation('lite_monthly')">Test Lite Monthly ($9.90)</button>
+                <button onclick="testOrderConfirmation('lite_yearly')">Test Lite Yearly ($106.80)</button>
+            </div>
+        </div>
+        
+        <div class="test-group">
+            <h3>Pro Plan</h3>
+            <div class="row">
+                <button onclick="testOrderConfirmation('pro_monthly')">Test Pro Monthly ($24.90)</button>
+                <button onclick="testOrderConfirmation('pro_yearly')">Test Pro Yearly ($262.80)</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>2. Custom Test Configuration</h2>
+        <div>
+            <p><strong>Package:</strong></p>
+            <div>
+                <label class="package-option"><input type="radio" name="package" value="lite_monthly" checked> Lite Monthly</label>
+                <label class="package-option"><input type="radio" name="package" value="lite_yearly"> Lite Yearly</label>
+                <label class="package-option"><input type="radio" name="package" value="pro_monthly"> Pro Monthly</label>
+                <label class="package-option"><input type="radio" name="package" value="pro_yearly"> Pro Yearly</label>
+            </div>
+            <div>
+                <label>
+                    <strong>Test Mode:</strong>
+                    <select id="testMode">
+                        <option value="react">React Component</option>
+                        <option value="api">API Direct</option>
+                    </select>
+                </label>
+            </div>
+            <button onclick="runCustomTest()">Run Custom Test</button>
+        </div>
+        
+        <h3>Generated Test URL</h3>
+        <div id="testUrl" class="url-display"></div>
+        
+        <div class="result" id="apiResult" style="display: none;">
+            <h3>API Response</h3>
+            <pre id="apiResponseDisplay"></pre>
+        </div>
+    </div>
+
+    <script>
+        // Generate a random session ID for testing
+        function generateSessionId() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            const sessionIdLength = 20;
+            let sessionId = 'cs_test_';
+            
+            for (let i = 0; i < sessionIdLength; i++) {
+                sessionId += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            
+            return sessionId;
+        }
+        
+        // Quick test for a specific package
+        function testOrderConfirmation(packageId) {
+            const sessionId = generateSessionId();
+            let price, credits;
+            
+            switch(packageId) {
+                case 'lite_monthly':
+                    price = 9.90;
+                    credits = 50;
+                    break;
+                case 'lite_yearly':
+                    price = 106.80;
+                    credits = 600;
+                    break;
+                case 'pro_monthly':
+                    price = 24.90;
+                    credits = 150;
+                    break;
+                case 'pro_yearly':
+                    price = 262.80;
+                    credits = 1800;
+                    break;
+                default:
+                    price = 9.90;
+                    credits = 50;
+            }
+            
+            const isYearly = packageId.includes('yearly');
+            
+            // Construct the URL for the order confirmation page
+            const url = `/order-confirmation?session_id=${sessionId}&package_id=${packageId}&price=${price}&credits=${credits}&is_yearly=${isYearly}`;
+            
+            // Display the URL we're testing with
+            document.getElementById('testUrl').textContent = url;
+            
+            // Open in a new tab
+            window.open(url, '_blank');
+        }
+        
+        // Custom test configuration
+        function runCustomTest() {
+            const packageId = document.querySelector('input[name="package"]:checked').value;
+            const testMode = document.getElementById('testMode').value;
+            
+            const sessionId = generateSessionId();
+            let price, credits;
+            
+            switch(packageId) {
+                case 'lite_monthly':
+                    price = 9.90;
+                    credits = 50;
+                    break;
+                case 'lite_yearly':
+                    price = 106.80;
+                    credits = 600;
+                    break;
+                case 'pro_monthly':
+                    price = 24.90;
+                    credits = 150;
+                    break;
+                case 'pro_yearly':
+                    price = 262.80;
+                    credits = 1800;
+                    break;
+                default:
+                    price = 9.90;
+                    credits = 50;
+            }
+            
+            const isYearly = packageId.includes('yearly');
+            
+            let url;
+            if (testMode === 'api') {
+                url = `/api/order-confirmation?session_id=${sessionId}&package_id=${packageId}&price=${price}&credits=${credits}&is_yearly=${isYearly}&direct=true`;
+                
+                // Display the API URL
+                document.getElementById('testUrl').textContent = url;
+                
+                // Make an API request
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('apiResponseDisplay').textContent = JSON.stringify(data, null, 2);
+                        document.getElementById('apiResult').style.display = 'block';
+                    })
+                    .catch(error => {
+                        document.getElementById('apiResponseDisplay').textContent = 'Error: ' + error.message;
+                        document.getElementById('apiResult').style.display = 'block';
+                    });
+            } else {
+                // React component URL
+                url = `/order-confirmation?session_id=${sessionId}&package_id=${packageId}&price=${price}&credits=${credits}&is_yearly=${isYearly}`;
+                
+                // Display the URL
+                document.getElementById('testUrl').textContent = url;
+                
+                // Open in a new tab
+                window.open(url, '_blank');
+            }
+        }
+    </script>
+</body>
+</html>
