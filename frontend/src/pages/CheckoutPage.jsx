@@ -74,9 +74,9 @@ const CheckoutPage = () => {
             : (location.state.packageDetails.isYearly ? 262.8 : 24.9),
           // Use the simplest possible URL format for maximum compatibility with Stripe
           // Keep the URL structure as simple as possible - Stripe sometimes has issues with complex URLs
-          // Use payment-verify for React-based verification page WITHOUT port number
-          success_url: `${baseUrl}/payment-verify?session_id={CHECKOUT_SESSION_ID}`,
-          cancel_url: `${baseUrl}/pricing`
+          // Use payment-verify for React-based verification page WITH port 3000 explicitly
+          success_url: `${baseUrl}:3000/payment-verify?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${baseUrl}:3000/pricing`
         };
         
         console.log('Checkout payload with success/cancel URLs:', payload);

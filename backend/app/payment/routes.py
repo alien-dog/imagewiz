@@ -184,12 +184,15 @@ def create_checkout_session():
                 # Make scheme always https for Replit domains
                 scheme = "https" if ".replit.dev" in parsed.netloc else parsed.scheme
                 
-                # Remove any port numbers that might cause issues (3000, 5000, 443)
+                # KEEP port 3000 but remove others
                 netloc = parsed.netloc
-                for port in [":3000", ":5000", ":443"]:
+                # Only remove ports other than 3000, which is required
+                for port in [":5000", ":443"]:
                     if port in netloc:
                         netloc = netloc.replace(port, "")
                         print(f"Removed port {port} from URL")
+                # Keep port 3000 intact
+                print(f"Keeping netloc with port if it has :3000: {netloc}")
                 
                 # Reconstruct the base URL without query params 
                 clean_url = urlunparse((
@@ -224,12 +227,15 @@ def create_checkout_session():
                 # Make scheme always https for Replit domains
                 scheme = "https" if ".replit.dev" in parsed.netloc else parsed.scheme
                 
-                # Remove any port numbers
+                # KEEP port 3000 but remove others
                 netloc = parsed.netloc
-                for port in [":3000", ":5000", ":443"]:
+                # Only remove ports other than 3000, which is required
+                for port in [":5000", ":443"]:
                     if port in netloc:
                         netloc = netloc.replace(port, "")
                         print(f"Removed port {port} from cancel URL")
+                # Keep port 3000 intact
+                print(f"Keeping netloc with port if it has :3000: {netloc}")
                 
                 # Reconstruct the clean URL
                 cancel_url = urlunparse((
