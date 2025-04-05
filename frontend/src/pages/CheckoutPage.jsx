@@ -74,8 +74,8 @@ const CheckoutPage = () => {
             : (location.state.packageDetails.isYearly ? 262.8 : 24.9),
           // Use the simplest possible URL format for maximum compatibility with Stripe
           // Keep the URL structure as simple as possible - Stripe sometimes has issues with complex URLs
-          // We'll handle the redirect to order-confirmation ourselves if needed
-          success_url: `${baseUrl}/order-confirmation?session_id={CHECKOUT_SESSION_ID}`,
+          // Use payment-verify for React-based verification page
+          success_url: `${baseUrl}/payment-verify?session_id={CHECKOUT_SESSION_ID}`,
           cancel_url: `${baseUrl}/pricing`
         };
         

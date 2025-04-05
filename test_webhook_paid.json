@@ -1,11 +1,11 @@
 {
-  "id": "evt_test_webhook_1743863540",
+  "id": "evt_test_webhook_paid_1743863603",
   "object": "event",
   "api_version": "2023-10-16",
-  "created": 1743863540,
+  "created": 1743863603,
   "data": {
     "object": {
-      "id": "cs_test_31bd6c0834af9c5a494d5559483d6db7",
+      "id": "cs_test_a1dY41LIopGUepAJGNQ2SUGLoNyhvj0vPcV28jQqbxQPg0hzkCrbFgPG2L",
       "object": "checkout.session",
       "payment_status": "paid",
       "status": "complete",
@@ -19,7 +19,7 @@
         "credits": "50",
         "price": "9.9",
         "is_yearly": "false",
-        "test_mode": "true"
+        "force_test_success": "true"
       }
     }
   },

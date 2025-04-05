@@ -128,14 +128,14 @@ def create_checkout_session():
         
         # Use origin if available (which should include the protocol)
         if origin:
-            # Use the dedicated HTML page for payment verification
-            success_url = f"{origin}/order-confirmation?session_id={{CHECKOUT_SESSION_ID}}&use_html=true"
+            # Use the React page for payment verification
+            success_url = f"{origin}/payment-verify?session_id={{CHECKOUT_SESSION_ID}}"
         else:
             # Fallback to host with https
             forwarded_proto = request.headers.get('X-Forwarded-Proto', 'https')
-            success_url = f"{forwarded_proto}://{host}/order-confirmation?session_id={{CHECKOUT_SESSION_ID}}&use_html=true"
+            success_url = f"{forwarded_proto}://{host}/payment-verify?session_id={{CHECKOUT_SESSION_ID}}"
             
-        print(f"Using order confirmation page for payment verification: {success_url}")
+        print(f"Using payment-verify page for interactive payment verification: {success_url}")
     
     if not cancel_url:
         # Get the origin from request headers or use the host directly
@@ -201,9 +201,9 @@ def create_checkout_session():
                     ''            # No fragment
                 ))
                 
-                # Create a clean success URL with session_id parameter and use_html flag
-                # Stripe has issues with complex URLs, so we keep it minimal but ensure our HTML fallback is used
-                success_url = f"{clean_url}?session_id={{CHECKOUT_SESSION_ID}}&use_html=true"
+                # Create a clean success URL with session_id parameter
+                # For payment-verify, we don't need the use_html flag since this is handled by React
+                success_url = f"{clean_url}?session_id={{CHECKOUT_SESSION_ID}}"
                 
                 print(f"Processed success URL: {success_url}")
             except Exception as e:
@@ -211,9 +211,9 @@ def create_checkout_session():
                 # Fallback to a basic URL if parsing fails
                 if not success_url.endswith("{CHECKOUT_SESSION_ID}"):
                     if "?" in success_url:
-                        success_url = f"{success_url}&session_id={{CHECKOUT_SESSION_ID}}&use_html=true"
+                        success_url = f"{success_url}&session_id={{CHECKOUT_SESSION_ID}}"
                     else:
-                        success_url = f"{success_url}?session_id={{CHECKOUT_SESSION_ID}}&use_html=true"
+                        success_url = f"{success_url}?session_id={{CHECKOUT_SESSION_ID}}"
         
         # Process the cancel_url using the same robust approach
         if cancel_url:

@@ -1,11 +1,1 @@
-{
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MzMwMDU3NSwianRpIjoiNjAzNmQ1OGMtNWFiYS00ZDg0LWE0NGUtZDg1ODg0ZjUwY2ZjIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6MiwibmJmIjoxNzQzMzAwNTc1LCJjc3JmIjoiMWQzYjU0ZjUtZGFkMy00ZWRlLTkwMjItMDFiYWY3OWQ0YzM5IiwiZXhwIjoxNzQzMzg2OTc1fQ.5ph91_B5fJufd16gZKsInR9HZRUZCr7vhTTaTPhMImY",
-  "message": "Login successful",
-  "user": {
-    "created_at": "2025-03-29T13:35:49",
-    "credit_balance": 0,
-    "id": 2,
-    "is_admin": false,
-    "username": "testuser2"
-  }
-}
+{"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0Mzg2MzM3NywianRpIjoiZmExMTA1NDEtYjcwOC00Y2IyLWFhZTMtNDliODg3ZDY3ZmUyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjIiLCJuYmYiOjE3NDM4NjMzNzcsImNzcmYiOiJlOWZkZmJiYS04OWE5LTQ1MzEtOGVjMC0zZWMyZTgzODBmMWMiLCJleHAiOjE3NDM5NDk3Nzd9.IA45efLJfpNz6q-yyRlQ3wO8hP1SPU-Jg4Cg7ruyRNY","message":"Login successful","user":{"created_at":"2025-03-29T13:35:49","credit_balance":10746,"id":2,"is_admin":false,"username":"testuser2"}}
