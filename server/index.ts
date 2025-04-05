@@ -626,10 +626,7 @@ app.get('/', (req, res) => {
 });
 
 // Serve our test order confirmation page directly from the server folder
-app.get('/test-order-confirmation', (req, res) => {
-  console.log('🧪 Serving test order confirmation page');
-  res.sendFile(path.join(__dirname, 'test-order-confirmation-page.html'));
-});
+// Handler for test-order-confirmation has been moved below
 
 // Explicitly handle common frontend routes
 app.get('/pricing', (req, res) => {
@@ -742,13 +739,20 @@ app.get('/payment-verify*', (req, res) => {
 
 // Also explicitly handle the URL with encoded query params for order-confirmation
 app.get('/order-confirmation*', (req, res) => {
-  console.log('🌟 Serving React order confirmation page (wildcard route)');
+  console.log('🌟 Serving order confirmation page (wildcard route)');
   console.log('  Original URL:', req.originalUrl);
   console.log('  Path:', req.path);
   console.log('  Query params:', req.query);
   
-  // Ensure the SPA is served regardless of URL encoding
-  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+  // Check if we should render HTML version instead of React app
+  if (req.query && req.query.use_html === 'true') {
+    console.log('📄 Serving standalone HTML page for order confirmation (from wildcard route)');
+    res.sendFile(path.join(FRONTEND_DIST_PATH, 'order-confirmation.html'));
+  } else {
+    // Otherwise serve the SPA regardless of URL encoding
+    console.log('🌟 Serving React app for order-confirmation (from wildcard route)');
+    res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+  }
 });
 
 // Handle Stripe redirects where :3000 has been added to the URL
@@ -940,8 +944,9 @@ app.get('/test-stripe-open.html', (req, res) => {
 });
 
 // New test file for order confirmation page with enhanced logging
-app.get('/test-order-confirmation.html', (req, res) => {
+app.get(['/test-order-confirmation', '/test-order-confirmation.html'], (req, res) => {
   console.log('🧪 Serving test order confirmation HTML file directly from server');
+  console.log('  Original URL:', req.originalUrl);
   console.log('  Query params:', req.query);
   
   // If a session_id is provided, log it explicitly
@@ -954,8 +959,17 @@ app.get('/test-order-confirmation.html', (req, res) => {
     console.log('  Test with package_id:', req.query.package_id);
   }
   
-  // Important: Use absolute path to the test file in the server directory
-  res.sendFile(path.join(__dirname, 'test-order-confirmation.html'));
+  // Important: We have files in both frontend/dist and server directory
+  // First try to serve from the frontend/dist directory
+  const frontendPath = path.join(__dirname, '../frontend/dist/test-order-confirmation.html');
+  if (fs.existsSync(frontendPath)) {
+    console.log('  Serving from frontend/dist directory:', frontendPath);
+    res.sendFile(frontendPath);
+  } else {
+    console.log('  Serving from server directory');
+    // Fallback to server directory
+    res.sendFile(path.join(__dirname, 'test-order-confirmation.html'));
+  }
 });
 
 // STEP 3: BACKEND API PROXYING - Must come AFTER frontend routes
