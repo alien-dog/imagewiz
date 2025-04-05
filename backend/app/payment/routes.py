@@ -172,66 +172,82 @@ def create_checkout_session():
     
     # Create Stripe session
     try:
-        # Process the success_url to handle any port issues and add session ID
+        # Process URLs to ensure they're in the simplest, most compatible format for Stripe
         if success_url:
             try:
-                # Parse the URL to ensure it's valid and remove port if present
-                parsed_url = success_url
+                # Always use a robust URL parsing approach
+                from urllib.parse import urlparse, urlunparse
                 
-                # Remove port 3000 and 5000 to avoid redirect issues
-                if ":5000" in success_url:
-                    parsed_url = success_url.replace(":5000", "")
-                    print(f"Removed port 5000 from success URL: {parsed_url}")
-                elif ":3000" in success_url:
-                    parsed_url = success_url.replace(":3000", "")
-                    print(f"Removed port 3000 from success URL for better redirect handling: {parsed_url}")
-                else:
-                    parsed_url = success_url
-                    print(f"URL has no port to remove: {parsed_url}")
-                    
-                # Do NOT add port 443 explicitly - this was causing redirect issues
-                # For Replit hosted apps, use the default HTTPS port (implicit 443)
-                if ".replit.dev" in parsed_url and ":443" in parsed_url:
-                    # Remove explicit port 443 if it's there
-                    try:
-                        from urllib.parse import urlparse, urlunparse
-                        parsed = urlparse(parsed_url)
-                        # Remove the port specification entirely
-                        cleaned_netloc = parsed.netloc.replace(":443", "")
-                        parsed_url = parsed_url.replace(parsed.netloc, cleaned_netloc)
-                        print(f"Removed explicit port for cleaner redirect: {parsed_url}")
-                    except Exception as e:
-                        print(f"Error cleaning URL: {e}")
-                    
-                # Make sure we always append the session_id parameter correctly
-                if '?' not in parsed_url:
-                    success_url = f"{parsed_url}?session_id={{CHECKOUT_SESSION_ID}}"
-                else:
-                    # If URL already has query parameters, append with &
-                    success_url = f"{parsed_url}&session_id={{CHECKOUT_SESSION_ID}}"
+                # Parse the URL to work with its components
+                parsed = urlparse(success_url)
+                
+                # Make scheme always https for Replit domains
+                scheme = "https" if ".replit.dev" in parsed.netloc else parsed.scheme
+                
+                # Remove any port numbers that might cause issues (3000, 5000, 443)
+                netloc = parsed.netloc
+                for port in [":3000", ":5000", ":443"]:
+                    if port in netloc:
+                        netloc = netloc.replace(port, "")
+                        print(f"Removed port {port} from URL")
+                
+                # Reconstruct the base URL without query params 
+                clean_url = urlunparse((
+                    scheme,
+                    netloc,
+                    parsed.path,  # Keep the original path
+                    '',           # No params
+                    '',           # No query
+                    ''            # No fragment
+                ))
+                
+                # Create a clean success URL with just the session_id parameter
+                # Stripe has issues with complex URLs, so we keep it as simple as possible
+                success_url = f"{clean_url}?session_id={{CHECKOUT_SESSION_ID}}"
+                
+                print(f"Processed success URL: {success_url}")
             except Exception as e:
                 print(f"Error processing success_url: {e}")
                 # Fallback to a basic URL if parsing fails
-                success_url = f"{success_url}?session_id={{CHECKOUT_SESSION_ID}}"
+                if not success_url.endswith("{CHECKOUT_SESSION_ID}"):
+                    if "?" in success_url:
+                        success_url = f"{success_url}&session_id={{CHECKOUT_SESSION_ID}}"
+                    else:
+                        success_url = f"{success_url}?session_id={{CHECKOUT_SESSION_ID}}"
         
-        # Process the cancel_url to handle any port issues
+        # Process the cancel_url using the same robust approach
         if cancel_url:
             try:
-                # Remove port 3000 and 5000 to avoid redirect issues
-                if ":5000" in cancel_url:
-                    cancel_url = cancel_url.replace(":5000", "")
-                    print(f"Removed port 5000 from cancel URL: {cancel_url}")
-                elif ":3000" in cancel_url:
-                    cancel_url = cancel_url.replace(":3000", "")
-                    print(f"Removed port 3000 from cancel URL for better redirect handling: {cancel_url}")
-                else:
-                    print(f"URL has no port to remove: {cancel_url}")
+                from urllib.parse import urlparse, urlunparse
+                parsed = urlparse(cancel_url)
+                
+                # Make scheme always https for Replit domains
+                scheme = "https" if ".replit.dev" in parsed.netloc else parsed.scheme
+                
+                # Remove any port numbers
+                netloc = parsed.netloc
+                for port in [":3000", ":5000", ":443"]:
+                    if port in netloc:
+                        netloc = netloc.replace(port, "")
+                        print(f"Removed port {port} from cancel URL")
+                
+                # Reconstruct the clean URL
+                cancel_url = urlunparse((
+                    scheme,
+                    netloc,
+                    parsed.path,
+                    '',
+                    '',
+                    ''
+                ))
+                
+                print(f"Processed cancel URL: {cancel_url}")
             except Exception as e:
                 print(f"Error processing cancel_url: {e}")
-            
+        
         # For debugging, print the final URLs
-        print(f"Success URL: {success_url}")
-        print(f"Cancel URL: {cancel_url}")
+        print(f"Final Success URL: {success_url}")
+        print(f"Final Cancel URL: {cancel_url}")
         
         # Create a customized description if we're using custom values
         product_name = package['name']

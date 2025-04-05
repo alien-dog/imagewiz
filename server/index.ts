@@ -968,6 +968,18 @@ app.use('/processed', createProxyMiddleware({
 //==========================================================================
 app.get('*', (req, res) => {
   console.log(`🌐 Serving SPA route: ${req.path}`);
+  console.log(`  Full URL: ${req.url}`);
+  console.log(`  Original URL: ${req.originalUrl}`);
+  console.log(`  Query params:`, req.query);
+  
+  // Check for root redirects from Stripe with query parameters
+  // This handles cases where Stripe erroneously redirects to domain root instead of /order-confirmation
+  if (req.path === '/' && req.query.session_id) {
+    console.log(`🔍 Detected Stripe redirect to root with session_id: ${req.query.session_id}`);
+    const redirectUrl = `/order-confirmation?session_id=${req.query.session_id}&t=${Date.now()}`;
+    console.log(`🔄 Redirecting from root to order-confirmation: ${redirectUrl}`);
+    return res.redirect(302, redirectUrl);
+  }
   
   // Improved special handling for payment routes and order confirmation
   if (req.path === '/payment-success' || req.path === '/payment-failure' || 

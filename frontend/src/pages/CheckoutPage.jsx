@@ -72,10 +72,11 @@ const CheckoutPage = () => {
           price: location.state.packageDetails.packageName.includes('Lite') 
             ? (location.state.packageDetails.isYearly ? 106.8 : 9.9)
             : (location.state.packageDetails.isYearly ? 262.8 : 24.9),
-          // Use the order-confirmation page with our polling mechanism instead of direct success URL
-          // Add the session_id placeholder for Stripe to replace with the actual session ID
-          success_url: `${baseUrl}/order-confirmation?session_id={CHECKOUT_SESSION_ID}&t=${Date.now()}`,
-          cancel_url: `${baseUrl}/pricing?t=${Date.now()}`
+          // Use the simplest possible URL format for maximum compatibility with Stripe
+          // Keep the URL structure as simple as possible - Stripe sometimes has issues with complex URLs
+          // We'll handle the redirect to order-confirmation ourselves if needed
+          success_url: `${baseUrl}/order-confirmation?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${baseUrl}/pricing`
         };
         
         console.log('Checkout payload with success/cancel URLs:', payload);
