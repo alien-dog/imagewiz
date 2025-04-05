@@ -241,44 +241,78 @@ def fulfill_checkout(session_id):
                     package_id_exists = False
                     print("⚠️ package_id column doesn't exist in recharge_history table")
                 
-                # Create a new recharge history using ORM
-                recharge = RechargeHistory(
-                    user_id=user.id,
-                    amount=price,
-                    credit_gained=credits,
-                    payment_status='completed',
-                    payment_method='stripe',
-                    stripe_payment_id=session_id
-                )
-                
-                # Only set these attributes if the columns exist
-                if is_yearly_exists:
-                    recharge.is_yearly = is_yearly
-                if package_id_exists:
-                    recharge.package_id = package_id or ''
-                
-                db.session.add(recharge)
-            except Exception as schema_error:
-                # Fallback to old schema if ORM approach fails
-                print(f"⚠️ Falling back to basic SQL insert due to: {str(schema_error)}")
-                from sqlalchemy import text
-                
-                # Use raw SQL with only the core columns
-                sql = text("""
-                INSERT INTO recharge_history 
-                (user_id, amount, credit_gained, payment_status, payment_method, stripe_payment_id, created_at)
-                VALUES (:user_id, :amount, :credit_gained, :payment_status, :payment_method, :stripe_payment_id, NOW())
-                """)
-                
-                # Execute the insert with only the required fields
-                db.session.execute(sql, {
+                # Create a dictionary of core field values that will always be needed
+                recharge_values = {
                     'user_id': user.id,
                     'amount': price,
                     'credit_gained': credits,
                     'payment_status': 'completed',
                     'payment_method': 'stripe',
                     'stripe_payment_id': session_id
-                })
+                }
+                
+                # If we're certain the columns exist, use the ORM for a cleaner approach
+                if is_yearly_exists and package_id_exists:
+                    # Create a new recharge history using ORM with all fields
+                    recharge = RechargeHistory(
+                        **recharge_values,
+                        is_yearly=is_yearly,
+                        package_id=package_id or ''
+                    )
+                    db.session.add(recharge)
+                elif is_yearly_exists:
+                    # Create without package_id
+                    recharge = RechargeHistory(
+                        **recharge_values,
+                        is_yearly=is_yearly
+                    )
+                    db.session.add(recharge)
+                elif package_id_exists:
+                    # Create without is_yearly
+                    recharge = RechargeHistory(
+                        **recharge_values,
+                        package_id=package_id or ''
+                    )
+                    db.session.add(recharge)
+                else:
+                    # Use raw SQL with only the core columns if nothing else works
+                    from sqlalchemy import text
+                    
+                    print("⚠️ Using raw SQL insert with only the core fields")
+                    sql = text("""
+                    INSERT INTO recharge_history 
+                    (user_id, amount, credit_gained, payment_status, payment_method, stripe_payment_id, created_at)
+                    VALUES (:user_id, :amount, :credit_gained, :payment_status, :payment_method, :stripe_payment_id, NOW())
+                    """)
+                    
+                    # Execute the insert with only the required fields
+                    db.session.execute(sql, recharge_values)
+            except Exception as schema_error:
+                # Ultimate fallback - try the most basic approach possible
+                print(f"⚠️ Error with ORM approach: {str(schema_error)}")
+                print("⚠️ Using absolute fallback SQL insert with minimal columns")
+                
+                from sqlalchemy import text
+                
+                try:
+                    # Use the most minimal SQL possible as a last resort
+                    sql = text("""
+                    INSERT INTO recharge_history 
+                    (user_id, amount, credit_gained, payment_status, payment_method, stripe_payment_id)
+                    VALUES (:user_id, :amount, :credit_gained, 'completed', 'stripe', :stripe_payment_id)
+                    """)
+                    
+                    # Execute with only the absolutely essential fields
+                    db.session.execute(sql, {
+                        'user_id': user.id,
+                        'amount': price,
+                        'credit_gained': credits,
+                        'stripe_payment_id': session_id
+                    })
+                except Exception as e:
+                    # If even this fails, log it but don't let it prevent the credits from being added
+                    print(f"❌ CRITICAL: Final fallback SQL also failed: {str(e)}")
+                    print("⚠️ Credits will still be added but payment record may be incomplete")
             
             # Commit the transaction
             db.session.commit()

@@ -67,14 +67,19 @@ def create_app():
         
         # Run database migrations for new columns
         try:
-            from .utils.migrate_recharge_history import alter_table_add_is_yearly, alter_table_add_package_id
+            from .utils.migrate_recharge_history import run_migration
             
-            # Add the columns needed for the payment processing
-            alter_table_add_is_yearly()
-            alter_table_add_package_id()
-            app.logger.info("Database migration for recharge_history columns completed")
+            # Execute the migration to add required columns
+            migration_result = run_migration()
+            if migration_result:
+                app.logger.info("Database migration for recharge_history columns completed successfully")
+            else:
+                app.logger.warning("Database migration failed, payments may have limited functionality")
         except Exception as e:
             app.logger.error(f"Error running database migrations: {e}")
+            # Log error details for troubleshooting
+            import traceback
+            app.logger.error(traceback.format_exc())
         
         # Register blueprints
         from .auth import bp as auth_bp

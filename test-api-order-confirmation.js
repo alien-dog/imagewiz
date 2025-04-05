@@ -1,7 +1,7 @@
 /**
  * Simple script to test the order confirmation API endpoint
  */
-const axios = require('axios');
+import axios from 'axios';
 
 // Helper to generate random Stripe-like session IDs for testing
 function generateSessionId() {
