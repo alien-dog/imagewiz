@@ -11,7 +11,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
-import { CheckCircle, Loader2, XCircle, ArrowRight, Calendar, CreditCard, Gift, ShieldCheck } from 'lucide-react';
+import { CheckCircle, Loader2, XCircle, ArrowRight, Calendar, CreditCard, Gift, ShieldCheck, ChevronRight } from 'lucide-react';
 
 const OrderConfirmationPage = () => {
   const { user, refreshUser, login, isAuthenticated } = useAuth();
@@ -395,7 +395,7 @@ const OrderConfirmationPage = () => {
                                 <span className="font-medium">{paymentDetails.creditsAdded}</span> credits added
                               </p>
                               <p className="text-xs text-gray-500">
-                                New balance: <span className="font-medium">{user?.credit_balance || 0}</span> credits
+                                New balance: <span className="font-medium">{user?.credit_balance || paymentDetails.newBalance || 0}</span> credits
                               </p>
                             </div>
                           </div>
@@ -417,6 +417,20 @@ const OrderConfirmationPage = () => {
                               ? search.split('session_id=')[1].split('&')[0].slice(-8) 
                               : 'N/A'
                           }</span>
+                        </div>
+                        
+                        {/* Add customer support info */}
+                        <div className="mt-4 pt-4 border-t border-gray-200">
+                          <div className="flex items-start">
+                            <div className="flex-shrink-0">
+                              <ChevronRight className="h-5 w-5 text-teal-500" />
+                            </div>
+                            <div className="ml-2">
+                              <p className="text-xs text-gray-500">
+                                If you encounter any issues with your credits, please contact our customer support team at <a href="mailto:support@imagenwiz.com" className="text-teal-600 hover:underline">support@imagenwiz.com</a>
+                              </p>
+                            </div>
+                          </div>
                         </div>
                       </>
                     )}
