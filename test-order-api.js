@@ -2,7 +2,7 @@
  * Test script for the order confirmation API endpoint
  * This script tests both regular and test modes to ensure the API behaves correctly
  */
-const axios = require('axios');
+import axios from 'axios';
 
 // Helper to generate random Stripe-like session IDs for testing
 function generateSessionId() {
@@ -32,7 +32,7 @@ async function testPackage(packageId, price, credits, isYearly) {
   
   try {
     console.log(`Testing package: ${packageId} with session ID: ${sessionId}`);
-    const url = `http://localhost:3000/api/order-confirmation?session_id=${sessionId}&package_id=${packageId}&price=${price}&credits=${credits}&is_yearly=${isYearly}`;
+    const url = `https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev/api/order-confirmation?session_id=${sessionId}&package_id=${packageId}&price=${price}&credits=${credits}&is_yearly=${isYearly}`;
     
     console.log(`Request URL: ${url}`);
     const response = await axios.get(url);
@@ -75,7 +75,7 @@ async function testDirect() {
   
   try {
     console.log(`Testing direct API call with session ID: ${sessionId}`);
-    const response = await axios.get(`http://localhost:3000/api/order-confirmation?session_id=${sessionId}`);
+    const response = await axios.get(`https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev/api/order-confirmation?session_id=${sessionId}`);
     
     console.log('Response status:', response.status);
     console.log('Response data:', JSON.stringify(response.data, null, 2));

@@ -6,6 +6,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import cors from 'cors';
 import { createProxyMiddleware } from 'http-proxy-middleware';
+import fs from 'fs';
+import paymentHandler from './payment-handler-es';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -13,7 +15,6 @@ const PORT: number = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 const FLASK_PORT: number = 5000;
 
 // Define the frontend dist path - check all potential locations
-import fs from 'fs';
 
 console.log('Starting Express server with frontend static files');
 console.log('Current directory:', process.cwd());
@@ -1106,6 +1107,10 @@ app.get('/api/payment/verify-session/:sessionId', async (req, res) => {
     });
   }
 });
+
+// Use payment handler for fallback options when backend is unreachable
+console.log('📝 Registering payment handler middleware for fallback responses');
+app.use(paymentHandler);
 
 // Proxy API requests (except manually handled ones) to Flask backend
 app.use('/api', createProxyMiddleware({
