@@ -428,6 +428,8 @@ process.on('SIGINT', () => {
 // STEP 2: FRONTEND ROUTES - Must come BEFORE API routes
 //==========================================================================
 
+// Routes for test pages are defined later in this file
+
 // Express middleware to enhance URL processing and debugging
 app.use((req, res, next) => {
   // Log all payment-related requests to help debug
@@ -720,9 +722,21 @@ app.get('/test-stripe-open.html', (req, res) => {
   res.sendFile(path.join(__dirname, '../test-stripe-open.html'));
 });
 
-// New test file for order confirmation page
+// New test file for order confirmation page with enhanced logging
 app.get('/test-order-confirmation.html', (req, res) => {
-  console.log('Serving test order confirmation HTML file');
+  console.log('🧪 Serving test order confirmation HTML file');
+  console.log('  Query params:', req.query);
+  
+  // If a session_id is provided, log it explicitly
+  if (req.query.session_id) {
+    console.log('  Test with session_id:', req.query.session_id);
+  }
+  
+  // If package_id is provided, log it explicitly
+  if (req.query.package_id) {
+    console.log('  Test with package_id:', req.query.package_id);
+  }
+  
   res.sendFile(path.join(__dirname, '../test-order-confirmation.html'));
 });
 
@@ -961,7 +975,12 @@ const orderConfirmationApiProxy = createProxyMiddleware({
   target: `http://localhost:${FLASK_PORT}`,
   changeOrigin: true,
   logLevel: 'debug',
-  pathRewrite: { '^/api/order-confirmation': '/order-confirmation' },
+  // Special case - our Flask backend expects /payment/order-confirmation
+  pathRewrite: { 
+    '^/api/order-confirmation': '/payment/order-confirmation',
+    // Fix for direct testing
+    '^/api/order-confirmation\\?direct=true': '/payment/order-confirmation',
+  },
   onError: (err, req, res) => {
     console.error('Proxy Error:', err);
     res.status(500).send('Proxy error connecting to backend service');
@@ -992,16 +1011,51 @@ app.use('/api/order-confirmation', (req, res, next) => {
   // Check for direct API response request from test page
   if (req.query.direct === 'true' && req.query.session_id) {
     console.log('📝 Direct API response requested for testing');
+    
+    // For testing, we'll respond with a plausible order confirmation
+    // This emulates what would happen if the webhook had processed the payment
+    const packageDetails = {
+      'lite_monthly': {
+        name: 'Lite Monthly',
+        price: 9.90,
+        credits: 50,
+        is_yearly: false
+      },
+      'lite_yearly': {
+        name: 'Lite Annual',
+        price: 106.80,
+        credits: 600,
+        is_yearly: true
+      },
+      'pro_monthly': {
+        name: 'Pro Monthly',
+        price: 24.90,
+        credits: 150,
+        is_yearly: false
+      },
+      'pro_yearly': {
+        name: 'Pro Annual',
+        price: 262.80,
+        credits: 1800,
+        is_yearly: true
+      }
+    };
+
+    // Use the package ID from the query or default to lite_monthly
+    const packageId = (req.query.package_id as string) || 'lite_monthly';
+    const packageInfo = packageDetails[packageId as keyof typeof packageDetails] || packageDetails.lite_monthly;
+    
     return res.status(200).json({
       status: 'success',
       message: 'Order processed successfully (direct test response)',
-      package_name: 'Credit Package',
-      amount_paid: 9.90,
-      credits_added: 50,
-      is_yearly: false,
-      new_balance: 50,
+      package_name: packageInfo.name,
+      amount_paid: packageInfo.price,
+      credits_added: packageInfo.credits,
+      is_yearly: packageInfo.is_yearly,
+      new_balance: packageInfo.credits,
       session_id: req.query.session_id,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      test_mode: true
     });
   }
 
