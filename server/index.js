@@ -1,50 +1,108 @@
-const express = require('express');
-const { createProxyMiddleware } = require('http-proxy-middleware');
-const path = require('path');
-const cors = require('cors');
+/**
+ * This is the main server file for handling both Express (frontend) and Python Flask (backend) processes.
+ */
 
+const express = require('express');
+const path = require('path');
+const fs = require('fs');
+const { execSync, spawn } = require('child_process');
+const { createProxyMiddleware } = require('http-proxy-middleware');
+const paymentHandler = require('./payment-handler');
+
+// Create Express app
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const FLASK_PORT = 5000;
-const FLASK_URL = 'https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev'
-// Enable CORS
-app.use(cors());
+console.log('Starting Express server with frontend static files');
+console.log('Current directory:', process.cwd());
+console.log('__dirname:', __dirname);
 
-// Proxy API requests to Flask backend
-app.use('/api', createProxyMiddleware({
-  target: 'https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:5000',
-  changeOrigin: true,
-  pathRewrite: {
-    '^/api': '' // Remove /api prefix when forwarding
-  }
-}));
+// Find frontend build directory
+let frontendPath = path.join(process.cwd(), 'frontend', 'dist');
+console.log('Checking for frontend build directories:');
+console.log(`- Checking: ${frontendPath}`);
 
-// Proxy static file requests to Flask for uploaded/processed images
-app.use('/static', createProxyMiddleware({
-  target: 'https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev:5000',
-  changeOrigin: true
-}));
-
-// Serve frontend static assets in production
-if (process.env.NODE_ENV === 'production') {
-  // Serve static files from Vite build
-  app.use(express.static(path.join(__dirname, '../dist')));
-  
-  // Send all other requests to the frontend SPA
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../dist/index.html'));
-  });
+// Verify the frontend path has an index.html
+const hasFrontendIndex = fs.existsSync(path.join(frontendPath, 'index.html'));
+if (hasFrontendIndex) {
+  console.log(`✅ Found valid frontend path with index.html: ${frontendPath}`);
+} else {
+  console.log(`❌ Could not find index.html in ${frontendPath}`);
 }
 
-// Start the server
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Node.js proxy server running on port ${PORT}`);
-  console.log(`Proxying API requests to Flask backend at http://localhost:5000`);
-  
-  if (process.env.NODE_ENV === 'production') {
-    console.log('Running in production mode - serving frontend static assets');
-  } else {
-    console.log('Running in development mode - frontend served by Vite dev server');
+console.log(`Using frontend path: ${frontendPath}`);
+console.log(`Files in ${frontendPath}: ${fs.existsSync(frontendPath) ? fs.readdirSync(frontendPath) : 'Directory not found'}`);
+
+// Start Flask backend
+console.log('Starting Flask backend...');
+const flaskProcess = spawn('bash', ['run_backend.sh'], {
+  detached: true,
+  stdio: 'inherit'
+});
+
+// Set up proxy middleware
+const apiProxy = createProxyMiddleware({
+  target: 'http://localhost:5000',
+  changeOrigin: true,
+  pathRewrite: {
+    '^/api': '/api', // keep /api prefix when forwarding to Flask
+  },
+  onError: (err, req, res) => {
+    console.error('Proxy error:', err);
+    // If the path is for order confirmation, use fallback handler
+    if (req.path.includes('order-confirmation')) {
+      console.log('Using fallback handler for order confirmation');
+      req.url = req.url.replace('/api', ''); // Remove /api prefix for our local handler
+      return paymentHandler(req, res);
+    }
+    
+    res.status(500).json({
+      error: 'Proxy error - Flask backend may not be running',
+      message: err.message,
+      fallback: true
+    });
   }
+});
+
+// Register fallback payment handler for direct access and when backend is unavailable
+app.use(paymentHandler);
+
+// Frontend static files
+app.use(express.static(frontendPath));
+
+// API routes are proxied to Flask
+app.use('/api', apiProxy);
+
+// For any route not starting with /api, serve the frontend
+app.get('*', (req, res) => {
+  console.log('🌟 Serving React app root route');
+  res.sendFile(path.join(frontendPath, 'index.html'));
+});
+
+// Start server
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running at http://0.0.0.0:${PORT}`);
+  
+  // Get the service URL
+  try {
+    const repl_slug = process.env.REPL_SLUG;
+    const repl_owner = process.env.REPL_OWNER;
+    const repl_id = process.env.REPL_ID;
+    
+    if (repl_id) {
+      const serviceUrl = `${repl_id}-00-nzrxz81n08w.kirk.replit.dev`;
+      console.log(`Access your app at: ${serviceUrl}`);
+    }
+  } catch (error) {
+    console.error('Error getting service URL:', error);
+  }
+});
+
+// Handle termination
+process.on('SIGINT', () => {
+  console.log('Shutting down server...');
+  if (flaskProcess && !flaskProcess.killed) {
+    flaskProcess.kill();
+  }
+  process.exit(0);
 });

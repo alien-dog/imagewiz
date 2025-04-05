@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Order Confirmation API</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1rem;
+      line-height: 1.5;
+      color: #333;
+    }
+    h1 {
+      color: #12b5c0;
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 0.5rem;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      border: 1px solid #eaeaea;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background-color: #f8f9fa;
+    }
+    button {
+      background-color: #12b5c0;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 0.5rem;
+      margin-right: 0.5rem;
+    }
+    button:hover {
+      background-color: #0e9ba6;
+    }
+    pre {
+      background-color: #f0f0f0;
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin-top: 1rem;
+    }
+    .response {
+      margin-top: 1rem;
+      border-top: 1px solid #eaeaea;
+      padding-top: 1rem;
+    }
+    .error {
+      color: #e53935;
+    }
+    .success {
+      color: #43a047;
+    }
+  </style>
+</head>
+<body>
+  <h1>iMagenWiz Order Confirmation API Test</h1>
+  
+  <div class="card">
+    <h2>Test API Order Confirmation</h2>
+    <p>Test the API order confirmation endpoint with a random session ID.</p>
+    <p>
+      <button onclick="testOrderConfirmationApi()">Test API Endpoint with Random Session</button>
+    </p>
+    <p>
+      <label for="session-id">Or enter a specific session ID:</label>
+      <input id="session-id" type="text" placeholder="cs_test_..." style="padding: 5px; width: 300px;">
+      <button onclick="testOrderConfirmationApiWithId()">Test with This ID</button>
+    </p>
+    <div class="response" id="api-response"></div>
+  </div>
+
+  <div class="card">
+    <h2>Package Quick Tests</h2>
+    <p>Test API order confirmation with specific package parameters</p>
+    <div class="container">
+      <div>
+        <h3>Lite Monthly ($9.90/mo)</h3>
+        <button onclick="testWithPackage('lite_monthly', 9.90, 50, false)">Test Lite Monthly</button>
+      </div>
+      <div>
+        <h3>Lite Yearly ($106.80/yr)</h3>
+        <button onclick="testWithPackage('lite_yearly', 106.80, 600, true)">Test Lite Yearly</button>
+      </div>
+      <div>
+        <h3>Pro Monthly ($24.90/mo)</h3>
+        <button onclick="testWithPackage('pro_monthly', 24.90, 250, false)">Test Pro Monthly</button>
+      </div>
+      <div>
+        <h3>Pro Yearly ($262.80/yr)</h3>
+        <button onclick="testWithPackage('pro_yearly', 262.80, 3000, true)">Test Pro Yearly</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Helper to generate random Stripe-like session IDs for testing
+    function generateSessionId() {
+      return 'cs_test_' + Math.random().toString(36).substring(2, 15);
+    }
+
+    // Test the order confirmation API with generated session ID
+    async function testOrderConfirmationApi() {
+      const sessionId = generateSessionId();
+      document.getElementById('session-id').value = sessionId;
+      await testOrderConfirmationApiWithId();
+    }
+
+    // Test with provided session ID
+    async function testOrderConfirmationApiWithId() {
+      const sessionId = document.getElementById('session-id').value;
+      if (!sessionId) {
+        document.getElementById('api-response').innerHTML = `
+          <p class="error">Please enter a session ID or use the random generator.</p>
+        `;
+        return;
+      }
+
+      document.getElementById('api-response').innerHTML = `
+        <p>Testing with session ID: ${sessionId}...</p>
+      `;
+
+      try {
+        const response = await fetch(`/api/order-confirmation?session_id=${sessionId}`);
+        const data = await response.json();
+        
+        document.getElementById('api-response').innerHTML = `
+          <p class="${response.ok ? 'success' : 'error'}">Status: ${response.status} ${response.statusText}</p>
+          <pre>${JSON.stringify(data, null, 2)}</pre>
+        `;
+      } catch (error) {
+        document.getElementById('api-response').innerHTML = `
+          <p class="error">Error: ${error.message}</p>
+        `;
+      }
+    }
+
+    // Test with specific package parameters
+    async function testWithPackage(packageId, price, credits, isYearly) {
+      const sessionId = generateSessionId();
+      document.getElementById('session-id').value = sessionId;
+      
+      document.getElementById('api-response').innerHTML = `
+        <p>Testing ${packageId} package with session ID: ${sessionId}...</p>
+      `;
+
+      try {
+        const response = await fetch(`/api/order-confirmation?session_id=${sessionId}&package_id=${packageId}&price=${price}&credits=${credits}&is_yearly=${isYearly}`);
+        const data = await response.json();
+        
+        document.getElementById('api-response').innerHTML = `
+          <p class="${response.ok ? 'success' : 'error'}">Status: ${response.status} ${response.statusText}</p>
+          <pre>${JSON.stringify(data, null, 2)}</pre>
+        `;
+      } catch (error) {
+        document.getElementById('api-response').innerHTML = `
+          <p class="error">Error: ${error.message}</p>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>

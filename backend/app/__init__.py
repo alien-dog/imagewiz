@@ -24,11 +24,18 @@ def create_app():
     # Configure the application
     # Use MySQL database with credentials from .env using quote_plus for password
     from urllib.parse import quote_plus
-    mysql_user = os.environ.get('DB_USER')
-    mysql_password = quote_plus(os.environ.get('DB_PASSWORD', ''))
-    mysql_host = os.environ.get('DB_HOST')
-    mysql_db = os.environ.get('DB_NAME')
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{mysql_user}:{mysql_password}@{mysql_host}/{mysql_db}'
+    
+    # Support both DB_* and MYSQL_* variables for compatibility
+    mysql_host = os.environ.get('DB_HOST', os.environ.get('MYSQL_HOST', '8.130.113.102'))
+    mysql_user = os.environ.get('DB_USER', os.environ.get('MYSQL_USER', 'root'))
+    mysql_password = quote_plus(os.environ.get('DB_PASSWORD', os.environ.get('MYSQL_PASSWORD', 'Ir%86241992')))
+    mysql_db = os.environ.get('DB_NAME', os.environ.get('MYSQL_DB', 'mat_db'))
+    mysql_port = os.environ.get('DB_PORT', os.environ.get('MYSQL_PORT', '3306'))  # Default MySQL port
+    
+    # Log database connection parameters (omitting actual password)
+    print(f"Connecting to MySQL: {mysql_user}@{mysql_host}:{mysql_port}/{mysql_db}")
+    
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{mysql_user}:{mysql_password}@{mysql_host}:{mysql_port}/{mysql_db}'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(
@@ -58,6 +65,17 @@ def create_app():
         # Create tables
         db.create_all()
         
+        # Run database migrations for new columns
+        try:
+            from .utils.migrate_recharge_history import alter_table_add_is_yearly, alter_table_add_package_id
+            
+            # Add the columns needed for the payment processing
+            alter_table_add_is_yearly()
+            alter_table_add_package_id()
+            app.logger.info("Database migration for recharge_history columns completed")
+        except Exception as e:
+            app.logger.error(f"Error running database migrations: {e}")
+        
         # Register blueprints
         from .auth import bp as auth_bp
         app.register_blueprint(auth_bp)
@@ -70,7 +88,9 @@ def create_app():
         
         # Register order confirmation blueprint
         from .payment.order_confirmation import order_bp as order_confirmation_bp
+        from .payment.order_confirmation import api_bp as api_order_confirmation_bp
         app.register_blueprint(order_confirmation_bp)
+        app.register_blueprint(api_order_confirmation_bp)
         
         # Static file routes
         @app.route('/api/uploads/<filename>')
@@ -102,6 +122,7 @@ def create_app():
                     "/api/auth/register",
                     "/api/auth/user",
                     "/api/payment/packages",
+                    "/api/order-confirmation",
                     "/api/matting/process",
                     "/api/matting/history"
                 ]

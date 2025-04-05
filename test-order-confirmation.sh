@@ -1,88 +1,124 @@
 #!/bin/bash
+# Script to quickly test order confirmation page with different packages
 
-# Set colors for better readability
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-BLUE='\033[0;34m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+# Base URL for the service
+BASE_URL="https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev"
 
-# Get the Replit domain from environment
-DOMAIN=$(echo $REPLIT_DOMAINS | tr ',' ' ' | cut -d' ' -f1)
-if [ -z "$DOMAIN" ]; then
-  # Fallback to localhost if not running in Replit
-  DOMAIN="localhost:3000"
-  echo -e "${YELLOW}Running locally, using $DOMAIN${NC}"
+# Generate a random session ID
+SESSION_ID="cs_test_$(openssl rand -hex 10)"
+
+# Default package
+PACKAGE_ID="lite_monthly"
+
+# Process command line arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --package)
+      PACKAGE_ID="$2"
+      shift 2
+      ;;
+    --monthly)
+      if [[ "$PACKAGE_ID" == *"yearly"* ]]; then
+        PACKAGE_ID="${PACKAGE_ID/_yearly/_monthly}"
+      else
+        echo "Using monthly plan"
+      fi
+      shift
+      ;;
+    --yearly)
+      if [[ "$PACKAGE_ID" == *"monthly"* ]]; then
+        PACKAGE_ID="${PACKAGE_ID/_monthly/_yearly}"
+      else
+        echo "Using yearly plan"
+      fi
+      shift
+      ;;
+    --lite)
+      if [[ "$PACKAGE_ID" == "pro_"* ]]; then
+        if [[ "$PACKAGE_ID" == *"_yearly" ]]; then
+          PACKAGE_ID="lite_yearly"
+        else
+          PACKAGE_ID="lite_monthly"
+        fi
+      else
+        echo "Using Lite plan"
+      fi
+      shift
+      ;;
+    --pro)
+      if [[ "$PACKAGE_ID" == "lite_"* ]]; then
+        if [[ "$PACKAGE_ID" == *"_yearly" ]]; then
+          PACKAGE_ID="pro_yearly"
+        else
+          PACKAGE_ID="pro_monthly"
+        fi
+      else
+        echo "Using Pro plan"
+      fi
+      shift
+      ;;
+    --direct)
+      DIRECT_MODE="true"
+      shift
+      ;;
+    --api)
+      API_MODE="true"
+      shift
+      ;;
+    --help)
+      echo "Usage: $0 [OPTIONS]"
+      echo "Test order confirmation page with different packages"
+      echo
+      echo "Options:"
+      echo "  --package PACKAGE_ID  Specify package ID (lite_monthly, lite_yearly, pro_monthly, pro_yearly)"
+      echo "  --lite                Use Lite plan"
+      echo "  --pro                 Use Pro plan"
+      echo "  --monthly             Use monthly billing"
+      echo "  --yearly              Use yearly billing"
+      echo "  --direct              Use direct mode"
+      echo "  --api                 Test API endpoint"
+      echo "  --help                Show this help"
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1"
+      echo "Use --help for usage information"
+      exit 1
+      ;;
+  esac
+done
+
+# Build the URL based on mode
+if [[ "$API_MODE" == "true" ]]; then
+  URL="$BASE_URL/api/order-confirmation?session_id=$SESSION_ID&package_id=$PACKAGE_ID&in_redirect_fix=true"
+  echo "Testing API endpoint with package: $PACKAGE_ID"
+  
+  # Make the request and print the response
+  echo "Making request to: $URL"
+  curl -s "$URL" | jq .
+elif [[ "$DIRECT_MODE" == "true" ]]; then
+  URL="$BASE_URL/order-confirmation?session_id=$SESSION_ID&package_id=$PACKAGE_ID&direct=true&in_redirect_fix=true"
+  echo "Testing direct mode with package: $PACKAGE_ID"
+  echo "Opening URL in browser: $URL"
+  
+  # Print instructions for manual testing
+  echo "---------------------------------------------"
+  echo "To test manually, open this URL in your browser:"
+  echo "$URL"
+  echo "---------------------------------------------"
 else
-  echo -e "${GREEN}Running in Replit environment, using domain: $DOMAIN${NC}"
+  URL="$BASE_URL/order-confirmation?session_id=$SESSION_ID&package_id=$PACKAGE_ID&in_redirect_fix=true"
+  echo "Testing order confirmation page with package: $PACKAGE_ID"
+  echo "Opening URL in browser: $URL"
+  
+  # Print instructions for manual testing
+  echo "---------------------------------------------"
+  echo "To test manually, open this URL in your browser:"
+  echo "$URL"
+  echo "---------------------------------------------"
 fi
 
-echo -e "\n${BLUE}===========================================================${NC}"
-echo -e "${BLUE}Testing Order Confirmation Page Direct Access${NC}"
-echo -e "${BLUE}===========================================================${NC}\n"
-
-# Test 1: Direct access to test HTML page
-echo -e "${YELLOW}Test 1: Accessing test HTML page${NC}"
-curl -s "http://$DOMAIN/test-order-confirmation.html" | grep -q "<title>Test Order Confirmation Page</title>"
-if [ $? -eq 0 ]; then
-  echo -e "${GREEN}✓ Test HTML page loads successfully${NC}"
-else
-  echo -e "${RED}✗ Failed to load test HTML page${NC}"
+# For non-API requests, open the URL in the browser if xdg-open is available
+if [[ "$API_MODE" != "true" ]] && command -v xdg-open &>/dev/null; then
+  xdg-open "$URL"
 fi
-
-# Test 2: Direct access to order confirmation page
-echo -e "\n${YELLOW}Test 2: Accessing order confirmation page directly${NC}"
-response=$(curl -s -i "http://$DOMAIN/order-confirmation")
-echo "$response" | grep -q "HTTP/1.1 200"
-if [ $? -eq 0 ]; then
-  echo -e "${GREEN}✓ Order confirmation page loads with status 200${NC}"
-else
-  echo -e "${RED}✗ Failed to load order confirmation page${NC}"
-  echo -e "${YELLOW}Response headers:${NC}"
-  echo "$response" | grep "HTTP"
-fi
-
-# Test 3: Access with a test session ID
-echo -e "\n${YELLOW}Test 3: Accessing with test session ID${NC}"
-response=$(curl -s -i "http://$DOMAIN/order-confirmation?session_id=test_session_123")
-echo "$response" | grep -q "HTTP/1.1 200"
-if [ $? -eq 0 ]; then
-  echo -e "${GREEN}✓ Order confirmation page with session_id loads with status 200${NC}"
-else
-  echo -e "${RED}✗ Failed to load order confirmation page with session_id${NC}"
-  echo -e "${YELLOW}Response headers:${NC}"
-  echo "$response" | grep "HTTP"
-fi
-
-# Test 4: Access with a test payment intent
-echo -e "\n${YELLOW}Test 4: Accessing with test payment intent${NC}"
-response=$(curl -s -i "http://$DOMAIN/order-confirmation?payment_intent=test_pi_123")
-echo "$response" | grep -q "HTTP/1.1 200"
-if [ $? -eq 0 ]; then
-  echo -e "${GREEN}✓ Order confirmation page with payment_intent loads with status 200${NC}"
-else
-  echo -e "${RED}✗ Failed to load order confirmation page with payment_intent${NC}"
-  echo -e "${YELLOW}Response headers:${NC}"
-  echo "$response" | grep "HTTP"
-fi
-
-# Test 5: Test redirects from legacy routes
-echo -e "\n${YELLOW}Test 5: Testing redirect from payment-verify to order-confirmation${NC}"
-response=$(curl -s -i -L "http://$DOMAIN/payment-verify?session_id=test_session_123")
-echo "$response" | grep -q "HTTP/1.1 200"
-if [ $? -eq 0 ]; then
-  echo -e "${GREEN}✓ Redirect from payment-verify works${NC}"
-else
-  echo -e "${RED}✗ Failed to follow redirect from payment-verify${NC}"
-  echo -e "${YELLOW}Response headers:${NC}"
-  echo "$response" | grep "HTTP"
-fi
-
-echo -e "\n${BLUE}===========================================================${NC}"
-echo -e "${BLUE}All tests completed.${NC}"
-echo -e "${BLUE}===========================================================${NC}\n"
-
-echo -e "${YELLOW}Direct access links:${NC}"
-echo -e "${GREEN}Test page: http://$DOMAIN/test-order-confirmation.html${NC}"
-echo -e "${GREEN}Order confirmation: http://$DOMAIN/order-confirmation${NC}"
-echo -e "${GREEN}With session ID: http://$DOMAIN/order-confirmation?session_id=test_session_123${NC}"

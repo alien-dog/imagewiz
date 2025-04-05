@@ -34,6 +34,11 @@ class User(db.Model):
         }
         
 class RechargeHistory(db.Model):
+    """
+    RechargeHistory tracks payments and credit recharges.
+    The is_yearly and package_id columns may be missing in older database instances
+    and will be added by a migration script.
+    """
     __tablename__ = 'recharge_history'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -43,6 +48,7 @@ class RechargeHistory(db.Model):
     payment_status = db.Column(db.String(20), nullable=False)
     payment_method = db.Column(db.String(50), nullable=False)
     stripe_payment_id = db.Column(db.String(100))
+    # These columns may be missing and need to be added by migrations
     is_yearly = db.Column(db.Boolean, default=False)
     package_id = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)

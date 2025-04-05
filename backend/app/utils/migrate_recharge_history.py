@@ -12,9 +12,13 @@ DB_HOST = os.environ.get('MYSQL_HOST', '8.130.113.102')
 DB_USER = os.environ.get('MYSQL_USER', 'root')
 DB_PASSWORD = os.environ.get('MYSQL_PASSWORD', 'Ir%86241992')
 DB_NAME = os.environ.get('MYSQL_DB', 'mat_db')
+DB_PORT = os.environ.get('MYSQL_PORT', '3306')  # Default MySQL port
 
 # Create database URI with proper escaping
-DB_URI = f"mysql+pymysql://{DB_USER}:{quote_plus(DB_PASSWORD)}@{DB_HOST}/{DB_NAME}"
+DB_URI = f"mysql+pymysql://{DB_USER}:{quote_plus(DB_PASSWORD)}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
+# Print connection info for debugging (hide password)
+print(f"Database migration connecting to: {DB_USER}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
 
 def column_exists(table_name, column_name):
     """Check if a column exists in a table"""

@@ -1,665 +1,221 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>iMagenWiz - Order Confirmation Test</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Order Confirmation</title>
     <style>
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Helvetica Neue', sans-serif;
             line-height: 1.6;
-            max-width: 900px;
+            color: #333;
+            max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-            color: #333;
-            background-color: #f9fafb;
         }
-        h1, h2 {
-            color: #1fb6b6;
+        h1 {
+            color: #2E86C1;
+            margin-bottom: 25px;
         }
-        .header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
+        h2 {
+            color: #2E86C1;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
         }
-        .header img {
-            height: 40px;
-            margin-right: 15px;
-        }
-        .panel {
-            background-color: white;
+        .card {
+            background: #f8f9fa;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             padding: 20px;
             margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         button {
-            background-color: #1fb6b6;
+            background-color: #2E86C1;
             color: white;
             border: none;
             padding: 10px 15px;
+            margin: 5px;
             border-radius: 4px;
             cursor: pointer;
-            transition: background-color 0.2s;
-            margin-right: 10px;
-            margin-bottom: 10px;
+            font-size: 14px;
         }
         button:hover {
-            background-color: #19a2a2;
-        }
-        button.secondary {
-            background-color: #6c757d;
-        }
-        button.secondary:hover {
-            background-color: #5a6268;
-        }
-        input, select {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            margin-bottom: 15px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: inline-block;
-            margin-bottom: 5px;
-            font-weight: 500;
-        }
-        pre {
-            background-color: #f5f5f5;
-            padding: 15px;
-            border-radius: 4px;
-            overflow-x: auto;
-            font-size: 13px;
-            border: 1px solid #eee;
+            background-color: #1A5276;
         }
         .result {
-            margin-top: 20px;
-            padding: 20px;
-            border: 1px solid #ddd;
+            background: #e8f4f8;
+            padding: 15px;
             border-radius: 4px;
-            background-color: white;
-            max-height: 400px;
-            overflow-y: auto;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            overflow-x: auto;
         }
-        .package-selector {
+        .row {
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
+            margin: -5px;
+        }
+        .row button {
+            margin: 5px;
+        }
+        .note {
+            background-color: #fff8e1;
+            padding: 10px;
+            border-left: 4px solid #ffcc80;
             margin-bottom: 20px;
+        }
+        .test-group {
+            margin-bottom: 30px;
+        }
+        .url-display {
+            font-family: monospace;
+            background: #f1f1f1;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            word-break: break-all;
         }
         .package-option {
-            border: 2px solid #eee;
-            border-radius: 8px;
-            padding: 15px;
-            width: calc(50% - 15px);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .package-option:hover {
-            border-color: #1fb6b6;
-        }
-        .package-option.selected {
-            border-color: #1fb6b6;
-            background-color: rgba(31, 182, 182, 0.05);
-        }
-        .package-option h3 {
-            margin-top: 0;
-            color: #1fb6b6;
-        }
-        .package-price {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        .package-credits {
-            font-weight: bold;
-            color: #6c757d;
-        }
-        .badge {
             display: inline-block;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-            margin-left: 8px;
+            margin: 0 10px 10px 0;
         }
-        .badge.yearly {
-            background-color: #d1ecf1;
-            color: #0c5460;
-        }
-        .actions {
-            margin-top: 20px;
-            display: flex;
-            flex-wrap: wrap;
-        }
-        .success {
-            color: #28a745;
-        }
-        .error {
-            color: #dc3545;
-        }
-        .tabs {
-            display: flex;
-            border-bottom: 1px solid #ddd;
-            margin-bottom: 20px;
-        }
-        .tab {
-            padding: 10px 20px;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-        }
-        .tab.active {
-            border-bottom-color: #1fb6b6;
-            font-weight: 500;
-            color: #1fb6b6;
-        }
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        @media (max-width: 768px) {
-            .package-option {
-                width: 100%;
-            }
+        .package-option input {
+            margin-right: 5px;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="100" height="100" rx="20" fill="#1fb6b6"/>
-            <path d="M25 60L50 30L75 60" stroke="white" stroke-width="8" stroke-linecap="round"/>
-            <circle cx="50" cy="45" r="15" fill="white"/>
-        </svg>
-        <h1>iMagenWiz Order Confirmation Test</h1>
-    </div>
+    <h1>iMagenWiz Order Confirmation Test</h1>
     
-    <div class="panel">
-        <p>This page helps test the order confirmation flow with all fallback options. Use it to debug order processing issues without having to make real payments.</p>
+    <div class="note">
+        <strong>Note:</strong> This page contains test buttons to simulate different payment flows. Use these to verify that the order confirmation page and backend processing are working correctly.
+    </div>
+
+    <div class="card">
+        <h2>1. Quick Package Tests</h2>
+        <p>These buttons will open the order confirmation page with a sample session ID and package selection.</p>
         
-        <div style="margin-bottom: 20px;">
-            <h3>Quick Test Packages:</h3>
-            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                <button class="quick-test" data-package="lite_monthly">Test Lite Monthly</button>
-                <button class="quick-test" data-package="lite_yearly">Test Lite Yearly</button>
-                <button class="quick-test" data-package="pro_monthly">Test Pro Monthly</button>
-                <button class="quick-test" data-package="pro_yearly">Test Pro Yearly</button>
+        <div class="test-group">
+            <h3>Lite Plan</h3>
+            <div class="row">
+                <button onclick="testOrderConfirmation('lite_monthly')">Test Lite Monthly ($9.90)</button>
+                <button onclick="testOrderConfirmation('lite_yearly')">Test Lite Yearly ($106.80)</button>
             </div>
         </div>
         
-        <div class="tabs">
-            <div class="tab active" data-tab="test-api">API Testing</div>
-            <div class="tab" data-tab="test-webhook">Webhook Simulation</div>
-            <div class="tab" data-tab="test-ui">UI Testing</div>
-        </div>
-        
-        <div class="tab-content active" id="test-api">
-            <div class="form-group">
-                <label for="session_id">Session ID:</label>
-                <input type="text" id="session_id" value="cs_test_stripe12345678" style="width: 300px;">
-                <button id="generate_session">Generate Random ID</button>
-            </div>
-            
-            <div class="package-selector">
-                <div class="package-option selected" data-package="lite_monthly">
-                    <h3>Lite Monthly</h3>
-                    <div class="package-price">$9.90</div>
-                    <div class="package-credits">50 credits</div>
-                </div>
-                <div class="package-option" data-package="lite_yearly">
-                    <h3>Lite Annual <span class="badge yearly">Save 10%</span></h3>
-                    <div class="package-price">$106.80</div>
-                    <div class="package-credits">600 credits</div>
-                </div>
-                <div class="package-option" data-package="pro_monthly">
-                    <h3>Pro Monthly</h3>
-                    <div class="package-price">$24.90</div>
-                    <div class="package-credits">150 credits</div>
-                </div>
-                <div class="package-option" data-package="pro_yearly">
-                    <h3>Pro Annual <span class="badge yearly">Save 12%</span></h3>
-                    <div class="package-price">$262.80</div>
-                    <div class="package-credits">1800 credits</div>
-                </div>
-            </div>
-            
-            <div class="actions">
-                <button id="test_direct_api">Test Direct API Response</button>
-                <button id="test_endpoint">Test API Endpoint</button>
-                <button id="test_redirect" class="secondary">Open Confirmation Page</button>
-            </div>
-        </div>
-        
-        <div class="tab-content" id="test-webhook">
-            <h3>Simulate Stripe Webhook</h3>
-            <p>This simulates the webhook event that Stripe sends after a successful payment.</p>
-            
-            <div class="form-group">
-                <label for="webhook_session_id">Session ID:</label>
-                <input type="text" id="webhook_session_id" value="cs_live_webhook12345" style="width: 300px;">
-            </div>
-            
-            <div class="form-group">
-                <label for="webhook_package">Package:</label>
-                <select id="webhook_package">
-                    <option value="lite_monthly">Lite Monthly ($9.90)</option>
-                    <option value="lite_yearly">Lite Annual ($106.80)</option>
-                    <option value="pro_monthly">Pro Monthly ($24.90)</option>
-                    <option value="pro_yearly">Pro Annual ($262.80)</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="webhook_user_id">User ID:</label>
-                <input type="number" id="webhook_user_id" value="2" min="1" max="100">
-                <span>(User must exist in database)</span>
-            </div>
-            
-            <div class="actions">
-                <button id="test_mock_webhook">Send Webhook</button>
-                <button id="view_webhook_payload" class="secondary">View Payload</button>
-            </div>
-        </div>
-        
-        <div class="tab-content" id="test-ui">
-            <h3>Test UI Rendering</h3>
-            <p>Test how the order confirmation page looks with various response data.</p>
-            
-            <div class="form-group">
-                <label for="ui_state">Simulated State:</label>
-                <select id="ui_state">
-                    <option value="success">Success</option>
-                    <option value="loading">Loading</option>
-                    <option value="error">Error</option>
-                    <option value="direct">Direct Success</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="ui_package">Package:</label>
-                <select id="ui_package">
-                    <option value="lite_monthly">Lite Monthly ($9.90)</option>
-                    <option value="lite_yearly">Lite Annual ($106.80)</option>
-                    <option value="pro_monthly">Pro Monthly ($24.90)</option>
-                    <option value="pro_yearly">Pro Annual ($262.80)</option>
-                </select>
-            </div>
-            
-            <div class="actions">
-                <button id="test_ui_state">Open UI State</button>
+        <div class="test-group">
+            <h3>Pro Plan</h3>
+            <div class="row">
+                <button onclick="testOrderConfirmation('pro_monthly')">Test Pro Monthly ($24.90)</button>
+                <button onclick="testOrderConfirmation('pro_yearly')">Test Pro Yearly ($262.80)</button>
             </div>
         </div>
     </div>
-    
-    <div class="result" id="result">
-        <p>Results will appear here</p>
+
+    <div class="card">
+        <h2>2. Custom Test Configuration</h2>
+        <div>
+            <p><strong>Package:</strong></p>
+            <div>
+                <label class="package-option"><input type="radio" name="package" value="lite_monthly" checked> Lite Monthly</label>
+                <label class="package-option"><input type="radio" name="package" value="lite_yearly"> Lite Yearly</label>
+                <label class="package-option"><input type="radio" name="package" value="pro_monthly"> Pro Monthly</label>
+                <label class="package-option"><input type="radio" name="package" value="pro_yearly"> Pro Yearly</label>
+            </div>
+            
+            <p><strong>Session ID:</strong> (optional)</p>
+            <input type="text" id="sessionId" placeholder="Enter session ID or leave blank" style="width: 100%; padding: 8px; margin-bottom: 10px;">
+            
+            <p><strong>Test Mode:</strong></p>
+            <div>
+                <label><input type="radio" name="mode" value="frontend" checked> Frontend page</label>
+                <label><input type="radio" name="mode" value="api"> API endpoint</label>
+                <label><input type="radio" name="mode" value="direct"> Direct mode</label>
+            </div>
+            
+            <p><strong>Fix redirect loop:</strong></p>
+            <div>
+                <label><input type="radio" name="redirect_fix" value="true" checked> Yes</label>
+                <label><input type="radio" name="redirect_fix" value="false"> No</label>
+            </div>
+            
+            <button onclick="runCustomTest()" style="margin-top: 15px;">Run Custom Test</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>3. API Response Test</h2>
+        <p>Test the API endpoint directly and see the JSON response below.</p>
+        <button onclick="testApiEndpoint()">Test API Endpoint</button>
+        <div id="apiResult" class="result" style="display: none;"></div>
     </div>
 
     <script>
-        // Tab navigation
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                
-                this.classList.add('active');
-                document.getElementById(this.dataset.tab).classList.add('active');
-            });
-        });
-        
-        // Package selection
-        document.querySelectorAll('.package-option').forEach(option => {
-            option.addEventListener('click', function() {
-                document.querySelectorAll('.package-option').forEach(o => o.classList.remove('selected'));
-                this.classList.add('selected');
-            });
-        });
-        
-        // Generate random session ID
-        document.getElementById('generate_session').addEventListener('click', function() {
-            const prefix = 'cs_test_';
-            const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-            let result = prefix;
-            for (let i = 0; i < 24; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            document.getElementById('session_id').value = result;
-        });
-        
-        // Test API Endpoint
-        document.getElementById('test_endpoint').addEventListener('click', async function() {
-            const sessionId = document.getElementById('session_id').value;
-            const packageId = document.querySelector('.package-option.selected').dataset.package;
-            const resultElem = document.getElementById('result');
-            
-            resultElem.innerHTML = '<p>Testing API endpoint...</p>';
-            
-            try {
-                const response = await fetch(`/api/order-confirmation?session_id=${sessionId}&api=true&package_id=${packageId}`);
-                const data = await response.text();
-                
-                let formattedData;
-                try {
-                    // Try to parse as JSON and format
-                    const jsonData = JSON.parse(data);
-                    formattedData = JSON.stringify(jsonData, null, 2);
-                } catch (e) {
-                    // If not JSON, use as is
-                    formattedData = data;
-                }
-                
-                resultElem.innerHTML = `
-                    <p>Status: <strong>${response.status} ${response.statusText}</strong></p>
-                    <p>Response:</p>
-                    <pre>${formattedData}</pre>
-                `;
-            } catch (error) {
-                resultElem.innerHTML = `
-                    <p class="error">Error: ${error.message}</p>
-                    <pre>${error.stack}</pre>
-                `;
-            }
-        });
-        
-        // Test Order Confirmation Page Redirect
-        document.getElementById('test_redirect').addEventListener('click', function() {
-            const sessionId = document.getElementById('session_id').value;
-            const packageId = document.querySelector('.package-option.selected').dataset.package;
-            window.location.href = `/order-confirmation?session_id=${sessionId}&package_id=${packageId}`;
-        });
-
-        // Test Mock Webhook
-        document.getElementById('test_mock_webhook').addEventListener('click', async function() {
-            const sessionId = document.getElementById('webhook_session_id').value;
-            const packageId = document.getElementById('webhook_package').value;
-            const userId = document.getElementById('webhook_user_id').value;
-            const resultElem = document.getElementById('result');
-            
-            resultElem.innerHTML = '<p>Sending mock webhook event...</p>';
-            
-            // Get package details based on selection
-            const packageDetails = getPackageDetails(packageId);
-            
-            try {
-                // Generate mock webhook payload
-                const webhookPayload = {
-                    id: `evt_test_webhook_${Date.now()}`,
-                    object: "event",
-                    api_version: "2025-02-24",
-                    created: Math.floor(Date.now() / 1000),
-                    data: {
-                        object: {
-                            id: sessionId,
-                            object: "checkout.session",
-                            amount_total: packageDetails.price * 100, // In cents
-                            currency: "usd",
-                            customer: `cus_test_${userId}`,
-                            payment_status: "paid",
-                            status: "complete",
-                            client_reference_id: userId.toString(),
-                            metadata: {
-                                package_id: packageId,
-                                credit_amount: packageDetails.credits.toString(),
-                                is_yearly: packageDetails.isYearly.toString()
-                            }
-                        }
-                    },
-                    type: "checkout.session.completed",
-                    livemode: false
-                };
-                
-                // Send webhook to backend
-                const response = await fetch('/api/payment/webhook', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Stripe-Signature': 'test_webhook_signature'
-                    },
-                    body: JSON.stringify(webhookPayload)
-                });
-                
-                const data = await response.text();
-                
-                resultElem.innerHTML = `
-                    <p>Webhook Status: <strong>${response.status} ${response.statusText}</strong></p>
-                    <p>Response:</p>
-                    <pre>${data}</pre>
-                    <p class="success">✅ Webhook sent successfully!</p>
-                    <p>You can now verify the order by:</p>
-                    <p>1. <a href="/order-confirmation?session_id=${sessionId}" target="_blank">Opening the Order Confirmation Page</a></p>
-                    <p>2. <a href="#" onclick="testVerifyPayment('${sessionId}'); return false;">Testing the payment verification API</a></p>
-                `;
-            } catch (error) {
-                resultElem.innerHTML = `
-                    <p class="error">Error: ${error.message}</p>
-                    <pre>${error.stack}</pre>
-                `;
-            }
-        });
-
-        // View Webhook Payload
-        document.getElementById('view_webhook_payload').addEventListener('click', function() {
-            const sessionId = document.getElementById('webhook_session_id').value;
-            const packageId = document.getElementById('webhook_package').value;
-            const userId = document.getElementById('webhook_user_id').value;
-            const resultElem = document.getElementById('result');
-            
-            // Get package details based on selection
-            const packageDetails = getPackageDetails(packageId);
-            
-            // Generate mock webhook payload
-            const webhookPayload = {
-                id: `evt_test_webhook_${Date.now()}`,
-                object: "event",
-                api_version: "2025-02-24",
-                created: Math.floor(Date.now() / 1000),
-                data: {
-                    object: {
-                        id: sessionId,
-                        object: "checkout.session",
-                        amount_total: packageDetails.price * 100, // In cents
-                        currency: "usd",
-                        customer: `cus_test_${userId}`,
-                        payment_status: "paid",
-                        status: "complete",
-                        client_reference_id: userId.toString(),
-                        metadata: {
-                            package_id: packageId,
-                            credit_amount: packageDetails.credits.toString(),
-                            is_yearly: packageDetails.isYearly.toString()
-                        }
-                    }
-                },
-                type: "checkout.session.completed",
-                livemode: false
-            };
-            
-            resultElem.innerHTML = `
-                <p>Webhook Payload:</p>
-                <pre>${JSON.stringify(webhookPayload, null, 2)}</pre>
-            `;
-        });
-
-        // Test Direct API Response
-        document.getElementById('test_direct_api').addEventListener('click', async function() {
-            const sessionId = document.getElementById('session_id').value;
-            const packageId = document.querySelector('.package-option.selected').dataset.package;
-            const resultElem = document.getElementById('result');
-            
-            resultElem.innerHTML = '<p>Testing direct API fallback response...</p>';
-
-            try {
-                // Use the direct API endpoint with the direct=true flag and the redirect fix flag
-                const response = await fetch(`/api/order-confirmation?session_id=${sessionId}&direct=true&package_id=${packageId}&in_redirect_fix=true`);
-                
-                if (!response.ok) {
-                    throw new Error(`API returned ${response.status} ${response.statusText}`);
-                }
-                
-                const data = await response.json();
-                
-                resultElem.innerHTML = `
-                    <p>Direct API Status: <strong>${response.status} ${response.statusText}</strong></p>
-                    <p>Response:</p>
-                    <pre>${JSON.stringify(data, null, 2)}</pre>
-                    <p class="success">✅ Direct API test successful!</p>
-                    <p><a href="/order-confirmation?session_id=${sessionId}&package_id=${packageId}" target="_blank">Open the Order Confirmation Page</a></p>
-                `;
-            } catch (error) {
-                resultElem.innerHTML = `
-                    <p class="error">Error: ${error.message}</p>
-                    <pre>${error.stack}</pre>
-                `;
-            }
-        });
-
-        // Test UI State
-        document.getElementById('test_ui_state').addEventListener('click', function() {
-            const state = document.getElementById('ui_state').value;
-            const packageId = document.getElementById('ui_package').value;
-            const sessionId = `cs_test_ui_${Date.now()}`;
-            
-            let url = `/order-confirmation?session_id=${sessionId}&package_id=${packageId}`;
-            
-            // Add special parameters based on the selected state
-            switch (state) {
-                case 'loading':
-                    url += '&state=loading';
-                    break;
-                case 'error':
-                    url += '&state=error';
-                    break;
-                case 'direct':
-                    url += '&direct=true';
-                    break;
-            }
-            
-            window.open(url, '_blank');
-        });
-
-        // Utility function to test payment verification
-        window.testVerifyPayment = async function(sessionId) {
-            const resultElem = document.getElementById('result');
-            resultElem.innerHTML = '<p>Testing payment verification API...</p>';
-            
-            try {
-                // Try the payment/verify API
-                const response = await fetch(`/api/order-confirmation?session_id=${sessionId}&api=true`);
-                
-                if (!response.ok) {
-                    throw new Error(`API returned ${response.status} ${response.statusText}`);
-                }
-                
-                const data = await response.json();
-                
-                resultElem.innerHTML = `
-                    <p>Verification Status: <strong>${response.status} ${response.statusText}</strong></p>
-                    <p>Response:</p>
-                    <pre>${JSON.stringify(data, null, 2)}</pre>
-                    <p class="success">✅ Payment verification successful!</p>
-                `;
-            } catch (error) {
-                resultElem.innerHTML = `
-                    <p class="error">Error verifying payment: ${error.message}</p>
-                    <pre>${error.stack}</pre>
-                    <p>Using fallback mechanism:</p>
-                `;
-                
-                // Try the direct fallback with redirect fix
-                try {
-                    const fallbackResponse = await fetch(`/api/order-confirmation?session_id=${sessionId}&direct=true&in_redirect_fix=true`);
-                    const fallbackData = await fallbackResponse.json();
-                    
-                    resultElem.innerHTML += `
-                        <p>Fallback Status: <strong>${fallbackResponse.status} ${fallbackResponse.statusText}</strong></p>
-                        <p>Fallback Response:</p>
-                        <pre>${JSON.stringify(fallbackData, null, 2)}</pre>
-                        <p class="success">✅ Fallback verification successful!</p>
-                    `;
-                } catch (fallbackError) {
-                    resultElem.innerHTML += `
-                        <p class="error">Error with fallback verification: ${fallbackError.message}</p>
-                    `;
-                }
-            }
-        };
-
-        // Get package details based on packageId
-        function getPackageDetails(packageId) {
-            const packages = {
-                lite_monthly: {
-                    name: 'Lite Monthly',
-                    price: 9.90,
-                    credits: 50,
-                    isYearly: false
-                },
-                lite_yearly: {
-                    name: 'Lite Annual',
-                    price: 106.80,
-                    credits: 600,
-                    isYearly: true
-                },
-                pro_monthly: {
-                    name: 'Pro Monthly',
-                    price: 24.90,
-                    credits: 150,
-                    isYearly: false
-                },
-                pro_yearly: {
-                    name: 'Pro Annual',
-                    price: 262.80,
-                    credits: 1800,
-                    isYearly: true
-                }
-            };
-            
-            return packages[packageId] || packages.lite_monthly;
+        function getRandomSessionId() {
+            return 'cs_test_' + Math.random().toString(36).substring(2, 15);
         }
         
-        // Quick Test Package Buttons
-        document.querySelectorAll('.quick-test').forEach(button => {
-            button.addEventListener('click', async function() {
-                const packageId = this.dataset.package;
-                const sessionId = `quick_test_${packageId}_${Date.now()}`;
-                const resultElem = document.getElementById('result');
-                
-                resultElem.innerHTML = `<p>Quick testing ${packageId} package...</p>`;
-                
-                try {
-                    // Use the direct API endpoint with the direct=true flag and the redirect fix flag
-                    const response = await fetch(`/api/order-confirmation?session_id=${sessionId}&direct=true&package_id=${packageId}&in_redirect_fix=true`);
-                    
-                    if (!response.ok) {
-                        throw new Error(`API returned ${response.status} ${response.statusText}`);
-                    }
-                    
-                    const data = await response.json();
-                    
-                    resultElem.innerHTML = `
-                        <p>Quick Test Status: <strong>${response.status} ${response.statusText}</strong></p>
-                        <p>Package: <strong>${packageId}</strong></p>
-                        <p>Response:</p>
-                        <pre>${JSON.stringify(data, null, 2)}</pre>
-                        <p class="success">✅ Quick test successful!</p>
-                        <div style="margin-top: 15px;">
-                            <a href="/order-confirmation?session_id=${sessionId}&package_id=${packageId}" target="_blank">
-                                <button>Open Order Confirmation Page</button>
-                            </a>
-                        </div>
-                    `;
-                } catch (error) {
-                    resultElem.innerHTML = `
-                        <p class="error">Error: ${error.message}</p>
-                        <pre>${error.stack}</pre>
-                    `;
-                }
-            });
-        });
+        function testOrderConfirmation(packageId) {
+            const sessionId = getRandomSessionId();
+            const url = `/order-confirmation?session_id=${sessionId}&package_id=${packageId}&in_redirect_fix=true`;
+            window.open(url, '_blank');
+        }
+        
+        function runCustomTest() {
+            const packageId = document.querySelector('input[name="package"]:checked').value;
+            const sessionId = document.getElementById('sessionId').value || getRandomSessionId();
+            const mode = document.querySelector('input[name="mode"]:checked').value;
+            const redirectFix = document.querySelector('input[name="redirect_fix"]:checked').value;
+            
+            let url;
+            if (mode === 'api') {
+                url = `/api/order-confirmation?session_id=${sessionId}&package_id=${packageId}&in_redirect_fix=${redirectFix}`;
+            } else if (mode === 'direct') {
+                url = `/order-confirmation?session_id=${sessionId}&package_id=${packageId}&direct=true&in_redirect_fix=${redirectFix}`;
+            } else {
+                url = `/order-confirmation?session_id=${sessionId}&package_id=${packageId}&in_redirect_fix=${redirectFix}`;
+            }
+            
+            if (mode === 'api') {
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        const resultElem = document.getElementById('apiResult');
+                        resultElem.textContent = JSON.stringify(data, null, 2);
+                        resultElem.style.display = 'block';
+                    })
+                    .catch(error => {
+                        const resultElem = document.getElementById('apiResult');
+                        resultElem.textContent = 'Error: ' + error.message;
+                        resultElem.style.display = 'block';
+                    });
+            } else {
+                window.open(url, '_blank');
+            }
+        }
+        
+        function testApiEndpoint() {
+            const packageId = document.querySelector('input[name="package"]:checked').value;
+            const sessionId = document.getElementById('sessionId').value || getRandomSessionId();
+            const redirectFix = document.querySelector('input[name="redirect_fix"]:checked').value;
+            
+            const url = `/api/order-confirmation?session_id=${sessionId}&package_id=${packageId}&in_redirect_fix=${redirectFix}`;
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const resultElem = document.getElementById('apiResult');
+                    resultElem.textContent = JSON.stringify(data, null, 2);
+                    resultElem.style.display = 'block';
+                })
+                .catch(error => {
+                    const resultElem = document.getElementById('apiResult');
+                    resultElem.textContent = 'Error: ' + error.message;
+                    resultElem.style.display = 'block';
+                });
+        }
     </script>
 </body>
 </html>
