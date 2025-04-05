@@ -98,8 +98,8 @@ const Pricing = () => {
       
       console.log('Using baseUrl for Stripe callbacks:', baseUrl);
       
-      // Use our new order-confirmation page with session_id parameter
-      const successUrl = `${baseUrl}/order-confirmation?session_id={CHECKOUT_SESSION_ID}&t=${Date.now()}`;
+      // Use payment-verify page with session_id parameter for Stripe redirects
+      const successUrl = `${baseUrl}/payment-verify?session_id={CHECKOUT_SESSION_ID}&t=${Date.now()}`;
       const cancelUrl = `${baseUrl}/pricing?t=${Date.now()}`;
       
       console.log(`Creating checkout session for package ${planId}`, {

@@ -67,7 +67,7 @@ const StripeCheckoutForm = ({ clientSecret, packageDetails }) => {
         elements,
         confirmParams: {
           // For Replit hosted apps, construct URLs carefully to ensure redirection works
-          return_url: `${baseUrl}/order-confirmation?t=${Date.now()}`,
+          return_url: `${baseUrl}/payment-verify?t=${Date.now()}`,
         },
         redirect: 'if_required',
       });
@@ -79,8 +79,8 @@ const StripeCheckoutForm = ({ clientSecret, packageDetails }) => {
         // Payment succeeded, refresh user data and redirect to confirmation page
         await refreshUser(); // Refresh user data to update credit balance
         
-        // Use the new order-confirmation page instead of payment-success
-        navigate(`/order-confirmation?payment_intent=${paymentIntent.id}`, { 
+        // Use payment-verify page for payment confirmation
+        navigate(`/payment-verify?payment_intent=${paymentIntent.id}`, { 
           state: { 
             paymentIntentId: paymentIntent.id,
             packageDetails

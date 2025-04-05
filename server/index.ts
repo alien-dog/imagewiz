@@ -263,14 +263,14 @@ app.post('/api/payment/create-checkout-session', async (req, res) => {
     // IMPORTANT: Ensure success_url uses order-confirmation instead of older paths
     // This ensures our modern polling-based approach is used and prevents redirect loops
     if (req.body && req.body.success_url) {
-      // If success_url contains payment-success or payment-verify, replace with order-confirmation
-      if (req.body.success_url.includes('/payment-success') || req.body.success_url.includes('/payment-verify')) {
+      // No longer redirect payment-verify URLs to order-confirmation
+      // We want to use payment-verify as the main payment verification route now
+      if (req.body.success_url.includes('/payment-success')) {
         const originalUrl = req.body.success_url;
-        // Replace either payment-success or payment-verify with order-confirmation
+        // Replace payment-success with payment-verify
         req.body.success_url = req.body.success_url
-          .replace('/payment-success', '/order-confirmation')
-          .replace('/payment-verify', '/order-confirmation');
-        console.log(`⚠️ Fixed success_url to use order confirmation page: ${originalUrl} → ${req.body.success_url}`);
+          .replace('/payment-success', '/payment-verify');
+        console.log(`⚠️ Updated success_url to use payment verification page: ${originalUrl} → ${req.body.success_url}`);
       }
     }
     
@@ -723,24 +723,13 @@ app.get('/payment-verify', (req, res) => {
 
 // Also explicitly handle the URL with encoded query params (safety measure)
 app.get('/payment-verify*', (req, res) => {
-  console.log('🌟 Intercepting payment-verify wildcard route for redirection');
+  console.log('🌟 Handling payment-verify wildcard route');
   console.log('  Original URL:', req.originalUrl);
   console.log('  Path:', req.path);
   console.log('  Query params:', req.query);
   
-  // Redirect to order-confirmation with the same parameters
-  if (req.query.session_id) {
-    const redirectUrl = `/order-confirmation?session_id=${req.query.session_id}&use_html=true&t=${Date.now()}`;
-    console.log(`🔄 Redirecting payment-verify to order-confirmation: ${redirectUrl}`);
-    return res.redirect(redirectUrl);
-  } else if (req.query.payment_intent) {
-    const redirectUrl = `/order-confirmation?payment_intent=${req.query.payment_intent}&use_html=true&t=${Date.now()}`;
-    console.log(`🔄 Redirecting payment-verify to order-confirmation: ${redirectUrl}`);
-    return res.redirect(redirectUrl);
-  } else {
-    console.log(`ℹ️ Payment-verify without identifiers - redirecting to generic order confirmation`);
-    return res.redirect('/order-confirmation');
-  }
+  // Serve the React app for the payment verification route
+  return res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
 });
 
 // Also explicitly handle the URL with encoded query params for order-confirmation
@@ -840,9 +829,9 @@ app.get('/payment-verify%3Fsession_id=*', (req, res) => {
   
   console.log('  Extracted session ID:', sessionId);
   
-  // Redirect to the order-confirmation page
-  const redirectUrl = `/order-confirmation?session_id=${sessionId}&use_html=true`;
-  console.log('  Redirecting to order confirmation page:', redirectUrl);
+  // Fix the URL properly to use /payment-verify?session_id=
+  const redirectUrl = `/payment-verify?session_id=${sessionId}`;
+  console.log('  Redirecting to properly formatted payment verify page:', redirectUrl);
   
   res.redirect(302, redirectUrl);
 });
@@ -874,9 +863,9 @@ app.get('/payment-verify%3Fsession_id=:sessionId', (req, res) => {
   console.log('🔄 Detected payment-verify with encoded session ID in URL parameter');
   console.log('  Session ID from URL parameter:', req.params.sessionId);
   
-  // Redirect to the order-confirmation page instead
-  const redirectUrl = `/order-confirmation?session_id=${req.params.sessionId}&use_html=true`;
-  console.log('  Redirecting to order confirmation page:', redirectUrl);
+  // Redirect to the payment-verify page with properly formatted query
+  const redirectUrl = `/payment-verify?session_id=${req.params.sessionId}`;
+  console.log('  Redirecting to payment verification page:', redirectUrl);
   
   // Use 302 (temporary) redirect
   res.redirect(302, redirectUrl);

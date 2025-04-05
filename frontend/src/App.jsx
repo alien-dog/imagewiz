@@ -13,8 +13,9 @@ import HistoryDetailPage from './pages/HistoryDetailPage';
 import Pricing from './pages/Pricing';
 import PricingNew from './pages/PricingNew';
 import CheckoutPage from './pages/CheckoutPage';
-// PaymentSuccessPage was deprecated in favor of OrderConfirmationPage (formerly PaymentVerifyPage)
+// Use PaymentVerifyPage as the primary page for payment verification
 import OrderConfirmationPage from './pages/OrderConfirmationPage';
+import PaymentVerifyPage from './pages/PaymentVerifyPage';
 import PaymentHistoryPage from './pages/PaymentHistoryPage';
 import Profile from './pages/Profile';
 import NotFound from './pages/NotFound';
@@ -55,12 +56,12 @@ const AppContent = () => {
                 </ProtectedRoute>
               }
             />
-            {/* Order confirmation/payment verification page is accessible without authentication 
+            {/* Payment verification page is accessible without authentication 
                 to handle redirects from Stripe after checkout */}
-            <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
+            <Route path="/payment-verify" element={<PaymentVerifyPage />} />
             
             {/* Legacy route for backward compatibility - redirects to the new path */}
-            <Route path="/payment-verify" element={<Navigate to="/order-confirmation" replace state={{ fromLegacyRoute: true }} />} />
+            <Route path="/order-confirmation" element={<Navigate to="/payment-verify" replace state={{ fromLegacyRoute: true }} />} />
             
             {/* Protected routes */}
             <Route
