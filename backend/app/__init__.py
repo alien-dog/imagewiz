@@ -68,6 +68,10 @@ def create_app():
         from .payment import bp as payment_bp
         app.register_blueprint(payment_bp)
         
+        # Register order confirmation blueprint
+        from .payment.order_confirmation import order_bp as order_confirmation_bp
+        app.register_blueprint(order_confirmation_bp)
+        
         # Static file routes
         @app.route('/api/uploads/<filename>')
         def serve_upload(filename):

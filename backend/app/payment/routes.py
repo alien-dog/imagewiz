@@ -360,12 +360,24 @@ def webhook():
         if event['type'] == 'checkout.session.completed':
             session = event['data']['object']
             print(f"💰 Processing successful checkout session: {session.id}")
-            user = handle_successful_payment(session)
             
-            if user:
-                print(f"✅ Credits added for user {user.username} (ID: {user.id}), new balance: {user.credit_balance}")
+            # Use the new fulfillment function instead of the old handler
+            from .order_confirmation import fulfill_checkout
+            fulfillment_result = fulfill_checkout(session.id)
+            
+            if fulfillment_result['status'] == 'success':
+                user_data = fulfillment_result.get('user', {})
+                user_id = user_data.get('id', None)
+                username = user_data.get('username', 'unknown')
+                credits_added = fulfillment_result.get('credits_added', 0)
+                new_balance = fulfillment_result.get('new_balance', 0)
+                
+                if fulfillment_result.get('already_fulfilled', False):
+                    print(f"ℹ️ Payment was already fulfilled for user {username} (ID: {user_id})")
+                else:
+                    print(f"✅ Credits added for user {username} (ID: {user_id}), new balance: {new_balance}")
             else:
-                print("❌ Failed to process checkout session payment")
+                print(f"❌ Failed to process checkout session payment: {fulfillment_result.get('error', 'Unknown error')}")
                 
         elif event['type'] == 'payment_intent.succeeded':
             payment_intent = event['data']['object']
@@ -579,7 +591,10 @@ def verify_payment_query():
     """Verify a payment using query parameter and return updated user data"""
     session_id = request.args.get('session_id')
     if not session_id:
-        return jsonify({"error": "Missing session_id parameter"}), 400
+        payment_intent_id = request.args.get('payment_intent')
+        if payment_intent_id:
+            return verify_payment_intent(payment_intent_id)
+        return jsonify({"error": "No session_id or payment_intent provided"}), 400
     
     # Log the verification attempt for debugging
     print(f"Verifying payment for session_id: {session_id}")
@@ -597,99 +612,47 @@ def verify_payment_query():
         
     print(f"User found: {user.username} (ID: {user.id})")
     
-    # Check if payment exists in user's history
-    # Use raw SQL to avoid ORM issues with missing columns
-    from sqlalchemy import text
+    # Use the fulfillment function instead of the old verification process
+    from .order_confirmation import fulfill_checkout
+    fulfillment_result = fulfill_checkout(session_id)
     
-    recharge = None
-    try:
-        # Query with just the basic columns that should always be present
-        sql = text("""
-        SELECT id, user_id, amount, credit_gained, payment_status, payment_method, stripe_payment_id, created_at
-        FROM recharge_history
-        WHERE user_id = :user_id AND stripe_payment_id = :session_id
-        LIMIT 1
-        """)
+    # Return the appropriate response based on the fulfillment result
+    if fulfillment_result['status'] == 'success':
+        # Refresh user data to get updated credit balance
+        user = User.query.get(user_id)
         
-        result = db.session.execute(sql, {"user_id": user.id, "session_id": session_id})
-        row = result.fetchone()
-        
-        if row:
-            # Convert row to a dict-like object
-            recharge = {
-                'id': row.id,
-                'user_id': row.user_id,
-                'amount': float(row.amount),
-                'credit_gained': row.credit_gained,
-                'payment_status': row.payment_status,
-                'payment_method': row.payment_method,
-                'stripe_payment_id': row.stripe_payment_id,
-                'created_at': row.created_at.isoformat()
-            }
-    except Exception as db_error:
-        print(f"Database error when checking for existing payment: {db_error}")
-        # Continue as if the recharge doesn't exist, we'll try to create it from Stripe data
-        recharge = None
-    
-    if not recharge:
-        # Try to retrieve session from Stripe
-        try:
-            session = stripe.checkout.Session.retrieve(session_id)
-            if session.payment_status == 'paid' and str(session.metadata.get('user_id')) == str(user.id):
-                # Payment successful but not recorded yet, process it
-                handle_successful_payment(session)
-                
-                # Get the package information for the response
-                package_id = session.metadata.get('package_id')
-                package = next((p for p in CREDIT_PACKAGES if p['id'] == package_id), None)
-                
-                is_yearly = session.metadata.get('is_yearly', 'false').lower() == 'true'
-                return jsonify({
-                    "status": "success", 
-                    "message": "Payment verified and credits added",
-                    "user": user.to_dict(),
-                    "package_name": package['name'] if package else "Credit Package",
-                    "amount_paid": float(session.metadata.get('price', 0)),
-                    "credits_added": int(session.metadata.get('credits', 0)),
-                    "is_yearly": is_yearly,
-                    "new_balance": user.credit_balance
-                }), 200
-            else:
-                return jsonify({"error": "Payment not completed or unauthorized"}), 400
-        except stripe.error.InvalidRequestError as e:
-            # Session doesn't exist in Stripe
-            print(f"Error verifying payment: {str(e)}")
-            return jsonify({
-                "verified": False,
-                "error": "Payment session not found",
-                "message": "The payment session could not be found in Stripe. It may have expired or been cancelled."
-            }), 404
-        except Exception as e:
-            print(f"Error verifying payment: {str(e)}")
-            return jsonify({"error": str(e)}), 500
-    
-    # If payment was already verified, get package info from the recharge record
-    package_id = None
-    package_name = "Credit Package"  # Default value
-    for pkg in CREDIT_PACKAGES:
-        if pkg['credits'] == recharge['credit_gained']:
-            package_id = pkg['id']
-            package_name = pkg['name']
-            break
-    
-    # is_yearly is already set to False by default above
-    is_yearly = False
-
-    return jsonify({
-        "status": "success",
-        "message": "Payment already verified",
-        "user": user.to_dict(),
-        "package_name": package_name,
-        "amount_paid": float(recharge['amount']),
-        "credits_added": recharge['credit_gained'],
-        "is_yearly": is_yearly,
-        "new_balance": user.credit_balance
-    }), 200
+        # Return success response with all available details
+        return jsonify({
+            "status": "success",
+            "message": "Payment verified and credits added",
+            "user": user.to_dict(),
+            "package_name": fulfillment_result.get("package_name", "Credit Package"),
+            "amount_paid": fulfillment_result.get("amount_paid", 0),
+            "credits_added": fulfillment_result.get("credits_added", 0),
+            "is_yearly": fulfillment_result.get("is_yearly", False),
+            "new_balance": user.credit_balance
+        }), 200
+    elif fulfillment_result['status'] == 'pending':
+        return jsonify({
+            "status": "pending",
+            "message": "Payment is still processing. Please check again later."
+        }), 202
+    elif fulfillment_result['status'] == 'already_fulfilled':
+        # Payment was already processed
+        return jsonify({
+            "status": "success",
+            "message": "Payment already verified",
+            "user": user.to_dict(),
+            "credits_added": fulfillment_result.get("credits_added", 0),
+            "new_balance": user.credit_balance
+        }), 200
+    else:
+        # Error during fulfillment
+        return jsonify({
+            "status": "error", 
+            "error": fulfillment_result.get("error", "Unknown error during payment verification"),
+            "code": fulfillment_result.get("code", "verification_failed")
+        }), 400
 
 
 @bp.route('/verify-payment/<session_id>', methods=['GET'])

@@ -1,75 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Test Order Confirmation Page</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-      line-height: 1.6;
-    }
-    .card {
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-    h1 {
-      color: #2B8A94;
-    }
-    button {
-      background-color: #2B8A94;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #1e6e76;
-    }
-    .info {
-      background-color: #f0f9fa;
-      padding: 10px;
-      border-left: 4px solid #2B8A94;
-      margin-bottom: 20px;
-    }
-  </style>
+    <title>Order Confirmation Test</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #26a69a;
+        }
+        button {
+            background-color: #26a69a;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #20867d;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
-  <h1>Test Order Confirmation Page</h1>
-  
-  <div class="info">
-    This page helps you test direct access to the order confirmation page without going through the payment flow.
-  </div>
-  
-  <div class="card">
-    <h2>Access Order Confirmation Page Directly</h2>
-    <p>Click the button below to navigate directly to the order confirmation page:</p>
+    <h1>Order Confirmation Test Page</h1>
+    <p>This page helps test the order confirmation endpoint with sample session IDs.</p>
     
-    <button onclick="window.location.href='/order-confirmation'">Go to Order Confirmation Page</button>
-  </div>
-  
-  <div class="card">
-    <h2>Access with Session ID Parameter</h2>
-    <p>Test with a fake session ID parameter (to simulate Stripe redirect):</p>
+    <div>
+        <label for="session_id">Session ID:</label>
+        <input type="text" id="session_id" value="cs_test_sample123456789" style="width: 300px;">
+    </div>
     
-    <button onclick="window.location.href='/order-confirmation?session_id=test_session_123'">Go to Order Confirmation with Test Session ID</button>
-  </div>
-  
-  <div class="card">
-    <h2>Access with Payment Intent Parameter</h2>
-    <p>Test with a fake payment intent parameter (to simulate Stripe redirect):</p>
+    <div style="margin-top: 15px;">
+        <button id="test_endpoint">Test API Endpoint</button>
+        <button id="test_redirect">Test Order Confirmation Page</button>
+    </div>
     
-    <button onclick="window.location.href='/order-confirmation?payment_intent=test_pi_123'">Go to Order Confirmation with Test Payment Intent</button>
-  </div>
-  
-  <script>
-    console.log('Testing order confirmation page access - client page loaded');
-  </script>
+    <div class="result" id="result">
+        Results will appear here
+    </div>
+
+    <script>
+        document.getElementById('test_endpoint').addEventListener('click', async function() {
+            const sessionId = document.getElementById('session_id').value;
+            const resultElem = document.getElementById('result');
+            resultElem.innerHTML = 'Testing API endpoint...<br>';
+            
+            try {
+                const response = await fetch(`/api/order-confirmation?session_id=${sessionId}&api=true`);
+                const data = await response.text();
+                resultElem.innerHTML += `<p>Status: ${response.status} ${response.statusText}</p>`;
+                resultElem.innerHTML += `<p>Response:</p><pre>${data}</pre>`;
+            } catch (error) {
+                resultElem.innerHTML += `<p>Error: ${error.message}</p>`;
+            }
+        });
+        
+        document.getElementById('test_redirect').addEventListener('click', function() {
+            const sessionId = document.getElementById('session_id').value;
+            window.location.href = `/order-confirmation?session_id=${sessionId}`;
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,23 @@
+Create a function on your server to fulfill successful payments. Webhooks trigger this function, and it’s called when customers are sent to your website after completing checkout. This guide refers to this function as fulfill_checkout, but you can name the function whatever you wish.
+Prevent extra fulfillments
+Perform fulfillment only once per payment. Because of how this integration and the internet work, your fulfill_checkout function might be called multiple times, possibly concurrently, for the same Checkout Session. Performing checkout only once ensures this won’t cause undesired behavior.
+Your fulfill_checkout function must:
+1. Correctly handle being called multiple times with the same Checkout Session ID.
+2. Accept a Checkout Session ID as an argument.
+3. Retrieve the Checkout Session from the API with the line_items property expanded.
+4. Check the payment_status property to determine if it requires fulfillment.
+5. Perform fulfillment of the line items.
+6. Record fulfillment status for the provided Checkout Session.
+
+To trigger fulfillment, create a webhook event handler to listen for payment events and trigger your fulfill_checkout function.
+When someone pays you, it creates a checkout.session.completed event. Set up an endpoint on your server to accept, process, and confirm receipt of these events.
+
+Listening to webhooks is required to make sure you always trigger fulfillment for every payment, but webhooks can sometimes be delayed. To optimize your payment flow and guarantee immediate fulfillment when your customer is present, trigger fulfillment from your landing page as well. You can configure the landing page by passing return_url when creating the Checkout Session, or passing returnUrl to confirm on the front end.
+Use the Checkout Session ID from the URL you specified to do the following:
+1. When your server receives a request for your checkout landing page, extract the Checkout Session ID from the URL.
+2. Run your fulfill_checkout function with the ID provided.
+3. Render the page after the fulfillment attempt is complete.
+When you render your landing page you can display the following:
+- Details from the fulfillment process.
+- Links or information about services the customer now has access to.
+- Shipping or logistical details for physical goods.

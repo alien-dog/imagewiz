@@ -527,16 +527,8 @@ app.get('/checkout', (req, res) => {
   res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
 });
 
-app.get('/order-confirmation', (req, res) => {
-  console.log('🌟 Serving React order confirmation page - explicit route');
-  console.log('  Query params:', req.query);
-  
-  // Log specifically to help diagnose the issue
-  console.log('🔎 Order confirmation route detected, ensuring React handles it');
-  
-  // Make sure we send the React app's index.html for this route
-  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
-});
+// This explicit /order-confirmation route is now handled by the middleware above
+// The middleware decides whether to proxy to the backend API or serve the React app
 
 // Direct route from Stripe checkout that bypasses Flask completely
 app.get('/payment-success-direct', (req, res) => {
@@ -963,6 +955,57 @@ app.use('/processed', createProxyMiddleware({
   target: `http://localhost:${FLASK_PORT}`,
   changeOrigin: true
 }));
+
+// Define our specialized order confirmation API proxy middleware
+const orderConfirmationApiProxy = createProxyMiddleware({
+  target: `http://localhost:${FLASK_PORT}`,
+  changeOrigin: true,
+  logLevel: 'debug',
+  pathRewrite: { '^/api/order-confirmation': '/order-confirmation' },
+  onError: (err, req, res) => {
+    console.error('Proxy Error:', err);
+    res.status(500).send('Proxy error connecting to backend service');
+  }
+});
+
+// Handle API order-confirmation endpoint explicitly
+app.use('/api/order-confirmation', (req, res, next) => {
+  console.log(`📡 Proxying order-confirmation API call: ${req.method} ${req.url}`);
+  
+  // Detect if we're already in a redirect loop
+  const redirectCount = parseInt(req.query.redirect_count as string) || 0;
+  if (redirectCount > 2) {
+    console.error('⚠️ Detected redirect loop, sending direct response');
+    return res.status(200).json({
+      error: true,
+      message: 'Failed to connect to backend service',
+      debug: 'Redirect loop detected'
+    });
+  }
+  
+  // Add redirect count to prevent loops
+  if (req.query.session_id) {
+    const url = new URL(req.url, `http://${req.headers.host}`);
+    url.searchParams.set('redirect_count', (redirectCount + 1).toString());
+    req.url = url.pathname + url.search;
+  }
+  
+  orderConfirmationApiProxy(req, res, next);
+});
+
+// Special handler for direct order-confirmation route that decides
+// whether to proxy to the API or show the React app
+app.use('/order-confirmation', (req, res, next) => {
+  if (req.query && req.query.session_id && req.method === 'GET' && req.query.api === 'true') {
+    console.log('📡 Detected direct API call to order-confirmation with session_id:', req.query.session_id);
+    // Forward to the Flask backend
+    orderConfirmationApiProxy(req, res, next);
+  } else {
+    // For all non-API requests, serve the React app
+    console.log('🌟 Serving React app for order-confirmation (not an API call)');
+    res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+  }
+});
 
 // STEP 4: CATCH-ALL ROUTE - Must be LAST route defined
 //==========================================================================
