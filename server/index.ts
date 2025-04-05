@@ -707,11 +707,17 @@ app.get('/payment-success-express', (req, res) => {
 
 // Handle payment verification with or without query params
 app.get('/payment-verify', (req, res) => {
-  console.log('🌟 Serving React payment verify page');
+  console.log('🌟 Handling payment-verify route');
   console.log('  Query params:', req.query);
   
-  // This page handles Stripe payment verification via polling the backend API
-  // No redirects needed - just serve the SPA page
+  // If specifically requested to use HTML, use the static HTML page
+  if (req.query.use_html === 'true') {
+    console.log('  Serving dedicated payment-verify HTML page');
+    return res.sendFile(path.join(FRONTEND_DIST_PATH, 'payment-verify.html'));
+  }
+  
+  // Otherwise, serve the React app for a more interactive experience
+  console.log('  Serving React payment verify page');
   res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
 });
 
@@ -744,13 +750,13 @@ app.get('/order-confirmation*', (req, res) => {
   console.log('  Path:', req.path);
   console.log('  Query params:', req.query);
   
-  // Check if we should render HTML version instead of React app
-  if (req.query && req.query.use_html === 'true') {
-    console.log('📄 Serving standalone HTML page for order confirmation (from wildcard route)');
+  // Always use the dedicated HTML page if session_id is present or if use_html=true is specified
+  if ((req.query && req.query.session_id) || (req.query && req.query.use_html === 'true')) {
+    console.log('✅ Serving dedicated order confirmation HTML page for session:', req.query.session_id);
     res.sendFile(path.join(FRONTEND_DIST_PATH, 'order-confirmation.html'));
   } else {
-    // Otherwise serve the SPA regardless of URL encoding
-    console.log('🌟 Serving React app for order-confirmation (from wildcard route)');
+    // Otherwise serve the React SPA
+    console.log('ℹ️ No session_id provided, serving React app for order-confirmation');
     res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
   }
 });
@@ -941,6 +947,18 @@ app.get('/test-stripe-redirect.html', (req, res) => {
 
 app.get('/test-stripe-open.html', (req, res) => {
   res.sendFile(path.join(__dirname, '../test-stripe-open.html'));
+});
+
+// Direct test file to verify file serving
+app.get('/direct-test.html', (req, res) => {
+  console.log('🧪 Serving direct test HTML file from server');
+  res.sendFile(path.join(__dirname, 'direct-test.html'));
+});
+
+// Order test file for simulating the order confirmation flow
+app.get('/test-order.html', (req, res) => {
+  console.log('🧪 Serving order test HTML file from server');
+  res.sendFile(path.join(__dirname, '../test-order.html'));
 });
 
 // New test file for order confirmation page with enhanced logging

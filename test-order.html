@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Order Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        select, input {
+            padding: 8px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        #results {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Order Confirmation Flow</h1>
+    
+    <div class="card">
+        <h2>1. Generate Mock Session ID</h2>
+        <button id="generateSessionId">Generate Session ID</button>
+        <div id="sessionIdResult" class="hidden">
+            <p>Generated Session ID: <span id="sessionId"></span></p>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h2>2. Simulate Order Confirmation</h2>
+        <div>
+            <label for="packageSelect">Select Package:</label>
+            <select id="packageSelect">
+                <option value="lite_monthly">Lite Monthly ($9.90 / 50 credits)</option>
+                <option value="lite_yearly">Lite Yearly ($106.80 / 600 credits)</option>
+                <option value="pro_monthly">Pro Monthly ($24.90 / 150 credits)</option>
+                <option value="pro_yearly">Pro Yearly ($262.80 / 1800 credits)</option>
+            </select>
+        </div>
+        <div>
+            <label for="sessionIdInput">Session ID:</label>
+            <input id="sessionIdInput" placeholder="Enter or generate a session ID" />
+        </div>
+        <button id="testOrderConfirmation">Test Order Confirmation</button>
+    </div>
+    
+    <div class="card">
+        <h2>3. API Response</h2>
+        <pre id="results">No results yet</pre>
+    </div>
+    
+    <script>
+        // Function to generate a random Stripe-like session ID
+        function generateStripeSessionId() {
+            const prefix = 'cs_test_';
+            const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = prefix;
+            for (let i = 0; i < 60; i++) {
+                result += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return result;
+        }
+        
+        // When Generate Session ID button is clicked
+        document.getElementById('generateSessionId').addEventListener('click', function() {
+            const sessionId = generateStripeSessionId();
+            document.getElementById('sessionId').textContent = sessionId;
+            document.getElementById('sessionIdResult').classList.remove('hidden');
+            document.getElementById('sessionIdInput').value = sessionId;
+        });
+        
+        // When Test Order Confirmation button is clicked
+        document.getElementById('testOrderConfirmation').addEventListener('click', async function() {
+            const sessionId = document.getElementById('sessionIdInput').value;
+            if (!sessionId) {
+                alert('Please generate or enter a session ID first.');
+                return;
+            }
+            
+            const packageId = document.getElementById('packageSelect').value;
+            const resultsDiv = document.getElementById('results');
+            
+            resultsDiv.textContent = 'Testing order confirmation...';
+            
+            try {
+                // First, test the API response
+                const response = await fetch(`/api/order-confirmation?session_id=${sessionId}&package_id=${packageId}&direct=true`);
+                const data = await response.json();
+                
+                resultsDiv.textContent = JSON.stringify(data, null, 2);
+                
+                // Now open the order confirmation page in a new tab
+                const url = `/order-confirmation?session_id=${sessionId}&package_id=${packageId}`;
+                window.open(url, '_blank');
+            } catch (error) {
+                resultsDiv.textContent = `Error: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>

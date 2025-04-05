@@ -5,7 +5,7 @@ import axios from 'axios';
 import { CheckCircle, Loader2, XCircle, ArrowRight, Calendar, CreditCard, Gift, ShieldCheck } from 'lucide-react';
 
 const OrderConfirmationPage = () => {
-  const { user, refreshUser, isAuthenticated } = useAuth();
+  const { user, refreshUser, login, isAuthenticated } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -301,6 +301,23 @@ const OrderConfirmationPage = () => {
                             <div className="ml-3">
                               <h4 className="text-sm font-medium text-gray-900">Payment</h4>
                               <p className="text-sm text-gray-600">${paymentDetails.amountPaid?.toFixed(2) || '0.00'}</p>
+                              <p className="text-xs text-gray-500">Paid with credit card</p>
+                            </div>
+                          </div>
+                          
+                          {/* Billing period */}
+                          <div className="flex items-start">
+                            <div className="flex-shrink-0">
+                              <Calendar className="h-5 w-5 text-teal-600 mt-0.5" />
+                            </div>
+                            <div className="ml-3">
+                              <h4 className="text-sm font-medium text-gray-900">Billing period</h4>
+                              <p className="text-sm text-gray-600">
+                                {paymentDetails.isYearly 
+                                  ? `Yearly (${new Date().toLocaleDateString()} - ${new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toLocaleDateString()})` 
+                                  : `Monthly (${new Date().toLocaleDateString()} - ${new Date(new Date().setMonth(new Date().getMonth() + 1)).toLocaleDateString()})`
+                                }
+                              </p>
                             </div>
                           </div>
                           
@@ -311,38 +328,83 @@ const OrderConfirmationPage = () => {
                             </div>
                             <div className="ml-3">
                               <h4 className="text-sm font-medium text-gray-900">Credits</h4>
-                              <p className="text-sm text-gray-600">{paymentDetails.creditsAdded} credits added</p>
-                              <p className="text-xs text-gray-500">New balance: {paymentDetails.newBalance} credits</p>
+                              <p className="text-sm text-gray-600">
+                                <span className="font-medium">{paymentDetails.creditsAdded}</span> credits added
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                New balance: <span className="font-medium">{user?.credit_balance || 0}</span> credits
+                              </p>
                             </div>
                           </div>
+                        </div>
+                        
+                        {/* Divider */}
+                        <div className="border-t border-gray-200 my-4"></div>
+                        
+                        {/* Receipt number */}
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-500">Order Date:</span>
+                          <span className="text-gray-700">{new Date().toLocaleDateString()}</span>
+                        </div>
+                        <div className="flex justify-between text-sm mt-1">
+                          <span className="text-gray-500">Receipt ID:</span>
+                          <span className="text-gray-700 font-mono text-xs">{
+                            // Extract part of the session ID to show as receipt number
+                            location.search.includes('session_id=') 
+                              ? location.search.split('session_id=')[1].split('&')[0].slice(-8) 
+                              : 'N/A'
+                          }</span>
                         </div>
                       </>
                     )}
                   </div>
                 </div>
                 
-                {isAuthenticated && (
-                  <div className="text-center">
-                    <p className="mb-4 text-gray-500">
-                      You will be redirected to the dashboard in {redirectCountdown} seconds...
-                    </p>
-                    <button
-                      onClick={() => navigate('/dashboard')}
-                      className="flex items-center justify-center mx-auto px-6 py-3 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors"
-                    >
-                      Go to Dashboard Now
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </button>
-                  </div>
-                )}
+                {/* Next steps */}
+                <div className="text-center">
+                  {isAuthenticated ? (
+                    <>
+                      <p className="text-sm text-gray-500 mb-2">
+                        Redirecting to dashboard in {redirectCountdown} seconds...
+                      </p>
+                      <button
+                        onClick={() => navigate('/dashboard')}
+                        className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 transition-colors"
+                      >
+                        Go to Dashboard
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm text-gray-500 mb-2">
+                        Please log in to access your credits
+                      </p>
+                      <button
+                        onClick={() => navigate('/login')}
+                        className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 transition-colors"
+                      >
+                        Log In Now
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
             ) : (
               <div className="text-center">
                 <Loader2 className="h-16 w-16 animate-spin text-teal-500 mx-auto mb-4" />
-                <h2 className="text-xl font-bold text-gray-900 mb-2">Processing Your Payment</h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-2">Verifying Payment</h2>
                 <p className="text-gray-600 mb-6">
-                  Please wait while we verify your payment details...
+                  Please wait while we confirm your payment...
                 </p>
+                
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className="px-6 py-3 border border-teal-600 text-teal-600 rounded-md hover:bg-teal-50 transition-colors"
+                >
+                  Skip to Dashboard
+                </button>
               </div>
             )}
           </div>
