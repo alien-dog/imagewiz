@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import { CheckCircle, Loader2, XCircle, ArrowRight, Calendar, CreditCard, Gift, ShieldCheck } from 'lucide-react';
 
-const OrderConfirmationPage = () => {
+const PaymentVerifyPage = () => {
   const { user, refreshUser, login, isAuthenticated } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -13,7 +13,7 @@ const OrderConfirmationPage = () => {
   const [error, setError] = useState(null);
   const [paymentDetails, setPaymentDetails] = useState(null);
   const [pollingCount, setPollingCount] = useState(0);
-  const [redirectCountdown, setRedirectCountdown] = useState(3);
+  const [redirectCountdown, setRedirectCountdown] = useState(5);
   
   // Extract payment information from URL and start polling verification
   useEffect(() => {
@@ -198,7 +198,7 @@ const OrderConfirmationPage = () => {
   
   // Function to start countdown for dashboard redirect
   const startRedirectCountdown = () => {
-    let countdown = 3;
+    let countdown = 5;
     setRedirectCountdown(countdown);
     
     const intervalId = setInterval(() => {
@@ -414,4 +414,4 @@ const OrderConfirmationPage = () => {
   );
 };
 
-export default OrderConfirmationPage;
+export default PaymentVerifyPage;
