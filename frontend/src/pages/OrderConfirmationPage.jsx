@@ -32,7 +32,15 @@ const OrderConfirmationPage = () => {
     // Check if we've been redirected from the legacy route and preserve params
     const search = location.state?.fromLegacyRoute ? window.location.search : location.search;
     const params = new URLSearchParams(search);
-    const sessionId = params.get('session_id');
+    
+    // Try to get session ID from multiple sources (URL params or injected window variable)
+    let sessionId = params.get('session_id');
+    
+    // Check for injected session ID (used for encoded URL cases)
+    if (!sessionId && window.__ORDER_CONFIRMATION_SESSION_ID__) {
+      console.log('Using injected session ID from window variable:', window.__ORDER_CONFIRMATION_SESSION_ID__);
+      sessionId = window.__ORDER_CONFIRMATION_SESSION_ID__;
+    }
     
     console.log('Order confirmation page loaded');
     console.log('Session ID from URL:', sessionId);

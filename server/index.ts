@@ -73,6 +73,13 @@ app.use(cors());
 // Parse JSON request bodies
 app.use(express.json());
 
+// Serve static files from the frontend build directory FIRST (before any API routes)
+// This ensures that static files like HTML, CSS, JS, and images are served directly
+console.log('🌐 Setting up static file serving from:', FRONTEND_DIST_PATH);
+app.use(express.static(FRONTEND_DIST_PATH, {
+  index: false // Don't automatically serve index.html for / to allow our custom handlers
+}));
+
 // Special URL decoding middleware for handling encoded query parameters
 app.use((req, res, next) => {
   // Enhanced request logging for payment-related paths
@@ -819,11 +826,15 @@ app.get('/order-confirmation%3Fsession_id=*', (req, res) => {
   
   console.log('  Extracted session ID:', sessionId);
   
-  // Redirect to the correctly formatted URL
-  const redirectUrl = `/order-confirmation?session_id=${sessionId}`;
-  console.log('  Redirecting to:', redirectUrl);
+  // Instead of redirecting, just serve the SPA directly
+  // This avoids extra roundtrips and potential encoding issues
+  console.log('  Serving SPA directly with session ID:', sessionId);
   
-  res.redirect(302, redirectUrl);
+  // Add the session ID to the query for client-side access
+  req.query.session_id = sessionId;
+  
+  // Serve the SPA
+  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
 });
 
 // Special handling for the common encoding error with %3F (encoded ?)
@@ -844,8 +855,21 @@ app.get('/order-confirmation%3Fsession_id=:sessionId', (req, res) => {
   console.log('🌟 Serving React order confirmation page (encoded URL special case)');
   console.log('  Session ID from URL parameter:', req.params.sessionId);
   
-  // Send the SPA page so client-side routing can take over
-  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+  // Add the session ID to the query for client-side access
+  req.query.session_id = req.params.sessionId;
+  
+  // Inject window variables to make the session ID available to the frontend
+  const indexHtml = fs.readFileSync(path.join(FRONTEND_DIST_PATH, 'index.html'), 'utf8');
+  const sessionIdScript = `<script>
+    window.__ORDER_CONFIRMATION_SESSION_ID__ = "${req.params.sessionId}";
+    console.log("Session ID injected into window:", window.__ORDER_CONFIRMATION_SESSION_ID__);
+  </script>`;
+  
+  // Insert the script right before the closing </head> tag
+  const modifiedHtml = indexHtml.replace('</head>', `${sessionIdScript}</head>`);
+  
+  // Send the modified HTML instead of the file
+  res.send(modifiedHtml);
 });
 
 app.get('/payment-success', (req, res) => {
@@ -867,8 +891,8 @@ app.get('/payment-success', (req, res) => {
   }
 });
 
-// Serve static files from the frontend build directory
-app.use(express.static(FRONTEND_DIST_PATH));
+// Remove duplicate static middleware
+// (already set up at the beginning with higher priority)
 
 // Serve test HTML files
 app.get('/test-login.html', (req, res) => {
