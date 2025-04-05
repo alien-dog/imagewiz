@@ -879,6 +879,8 @@ app.get('/proxy-test.html', (req, res) => {
   res.sendFile(path.join(__dirname, '../proxy-test.html'));
 });
 
+// First handler for test-order-confirmation.html is replaced by the enhanced one below
+
 app.get('/simple-form.html', (req, res) => {
   res.sendFile(path.join(__dirname, '../simple-form.html'));
 });
