@@ -1,0 +1,23 @@
+{
+  "id": "evt_test_webhook_1743863853",
+  "object": "event",
+  "api_version": "2023-10-16",
+  "created": 1743863853,
+  "data": {
+    "object": {
+      "id": "cs_test_a1CtWzvMdiCYrM0SYYWwrMLzGBfI6FuAAuTwyjQIQlJIgh1Kk0SJwT7GC9",
+      "object": "checkout.session",
+      "payment_status": "paid",
+      "status": "complete",
+      "metadata": {
+        "user_id": "2",
+        "package_id": "lite_monthly",
+        "credits": "50",
+        "price": "9.9",
+        "is_yearly": "false",
+        "force_test_success": "true"
+      }
+    }
+  },
+  "type": "checkout.session.completed"
+}
