@@ -1,5 +1,6 @@
 {pkgs}: {
   deps = [
+    pkgs.jq
     pkgs.rustc
     pkgs.openssl
     pkgs.libiconv

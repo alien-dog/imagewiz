@@ -182,6 +182,16 @@
     <div class="panel">
         <p>This page helps test the order confirmation flow with all fallback options. Use it to debug order processing issues without having to make real payments.</p>
         
+        <div style="margin-bottom: 20px;">
+            <h3>Quick Test Packages:</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                <button class="quick-test" data-package="lite_monthly">Test Lite Monthly</button>
+                <button class="quick-test" data-package="lite_yearly">Test Lite Yearly</button>
+                <button class="quick-test" data-package="pro_monthly">Test Pro Monthly</button>
+                <button class="quick-test" data-package="pro_yearly">Test Pro Yearly</button>
+            </div>
+        </div>
+        
         <div class="tabs">
             <div class="tab active" data-tab="test-api">API Testing</div>
             <div class="tab" data-tab="test-webhook">Webhook Simulation</div>
@@ -484,8 +494,8 @@
             resultElem.innerHTML = '<p>Testing direct API fallback response...</p>';
 
             try {
-                // Use the direct API endpoint with the direct=true flag
-                const response = await fetch(`/api/order-confirmation?session_id=${sessionId}&direct=true&package_id=${packageId}`);
+                // Use the direct API endpoint with the direct=true flag and the redirect fix flag
+                const response = await fetch(`/api/order-confirmation?session_id=${sessionId}&direct=true&package_id=${packageId}&in_redirect_fix=true`);
                 
                 if (!response.ok) {
                     throw new Error(`API returned ${response.status} ${response.statusText}`);
@@ -560,9 +570,9 @@
                     <p>Using fallback mechanism:</p>
                 `;
                 
-                // Try the direct fallback
+                // Try the direct fallback with redirect fix
                 try {
-                    const fallbackResponse = await fetch(`/api/order-confirmation?session_id=${sessionId}&direct=true`);
+                    const fallbackResponse = await fetch(`/api/order-confirmation?session_id=${sessionId}&direct=true&in_redirect_fix=true`);
                     const fallbackData = await fallbackResponse.json();
                     
                     resultElem.innerHTML += `
@@ -610,6 +620,46 @@
             
             return packages[packageId] || packages.lite_monthly;
         }
+        
+        // Quick Test Package Buttons
+        document.querySelectorAll('.quick-test').forEach(button => {
+            button.addEventListener('click', async function() {
+                const packageId = this.dataset.package;
+                const sessionId = `quick_test_${packageId}_${Date.now()}`;
+                const resultElem = document.getElementById('result');
+                
+                resultElem.innerHTML = `<p>Quick testing ${packageId} package...</p>`;
+                
+                try {
+                    // Use the direct API endpoint with the direct=true flag and the redirect fix flag
+                    const response = await fetch(`/api/order-confirmation?session_id=${sessionId}&direct=true&package_id=${packageId}&in_redirect_fix=true`);
+                    
+                    if (!response.ok) {
+                        throw new Error(`API returned ${response.status} ${response.statusText}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    resultElem.innerHTML = `
+                        <p>Quick Test Status: <strong>${response.status} ${response.statusText}</strong></p>
+                        <p>Package: <strong>${packageId}</strong></p>
+                        <p>Response:</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                        <p class="success">✅ Quick test successful!</p>
+                        <div style="margin-top: 15px;">
+                            <a href="/order-confirmation?session_id=${sessionId}&package_id=${packageId}" target="_blank">
+                                <button>Open Order Confirmation Page</button>
+                            </a>
+                        </div>
+                    `;
+                } catch (error) {
+                    resultElem.innerHTML = `
+                        <p class="error">Error: ${error.message}</p>
+                        <pre>${error.stack}</pre>
+                    `;
+                }
+            });
+        });
     </script>
 </body>
 </html>
