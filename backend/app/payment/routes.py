@@ -128,12 +128,12 @@ def create_checkout_session():
         
         # Use origin if available (which should include the protocol)
         if origin:
-            # Use the React page for payment verification
-            success_url = f"{origin}/payment-verify?session_id={{CHECKOUT_SESSION_ID}}"
+            # Use the React page for payment verification with port 3000
+            success_url = f"{origin}:3000/payment-verify?session_id={{CHECKOUT_SESSION_ID}}"
         else:
-            # Fallback to host with https
+            # Fallback to host with https and port 3000
             forwarded_proto = request.headers.get('X-Forwarded-Proto', 'https')
-            success_url = f"{forwarded_proto}://{host}/payment-verify?session_id={{CHECKOUT_SESSION_ID}}"
+            success_url = f"{forwarded_proto}://{host}:3000/payment-verify?session_id={{CHECKOUT_SESSION_ID}}"
             
         print(f"Using payment-verify page for interactive payment verification: {success_url}")
     
@@ -144,11 +144,11 @@ def create_checkout_session():
         
         # Use origin if available (which should include the protocol)
         if origin:
-            cancel_url = f"{origin}/pricing"
+            cancel_url = f"{origin}:3000/pricing"
         else:
             # Fallback to host with https
             forwarded_proto = request.headers.get('X-Forwarded-Proto', 'https')
-            cancel_url = f"{forwarded_proto}://{host}/pricing"
+            cancel_url = f"{forwarded_proto}://{host}:3000/pricing"
             
         print(f"No cancel_url provided, using default: {cancel_url}")
     

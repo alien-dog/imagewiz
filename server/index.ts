@@ -586,9 +586,9 @@ app.use((req, res, next) => {
         const sessionId = match[1];
         console.log('🔄 REDIRECTING: Found encoded payment verification URL with session ID:', sessionId);
         
-        // Redirect to the order-confirmation page instead of payment-verify
-        const fixedUrl = `/order-confirmation?session_id=${sessionId}&use_html=true`;
-        console.log('🔄 Redirecting to order confirmation page:', fixedUrl);
+        // Redirect to the properly formatted payment-verify URL
+        const fixedUrl = `/payment-verify?session_id=${sessionId}`;
+        console.log('🔄 Redirecting to payment verification page:', fixedUrl);
         
         // Use 302 (temporary) redirect so browsers don't cache it
         return res.redirect(302, fixedUrl);

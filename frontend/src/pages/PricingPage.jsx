@@ -95,8 +95,9 @@ const PricingPage = () => {
       console.log('Using baseUrl for Stripe callbacks:', baseUrl);
       
       // Use payment-verify page with session_id parameter for Stripe redirects
-      const successUrl = `${baseUrl}/payment-verify?session_id={CHECKOUT_SESSION_ID}&t=${Date.now()}`;
-      const cancelUrl = `${baseUrl}/pricing?t=${Date.now()}`;
+      // Include port 3000 explicitly for Replit environment
+      const successUrl = `${baseUrl}:3000/payment-verify?session_id={CHECKOUT_SESSION_ID}&t=${Date.now()}`;
+      const cancelUrl = `${baseUrl}:3000/pricing?t=${Date.now()}`;
       
       console.log(`Creating checkout session for package ${packageId}`, {
         packageId,
