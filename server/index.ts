@@ -625,6 +625,12 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
 });
 
+// Serve our test order confirmation page directly from the server folder
+app.get('/test-order-confirmation', (req, res) => {
+  console.log('🧪 Serving test order confirmation page');
+  res.sendFile(path.join(__dirname, 'test-order-confirmation-page.html'));
+});
+
 // Explicitly handle common frontend routes
 app.get('/pricing', (req, res) => {
   console.log('🌟 Serving React pricing page');
