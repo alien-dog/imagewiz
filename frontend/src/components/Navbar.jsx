@@ -76,7 +76,14 @@ const Navbar = () => {
                   className="bg-white p-1 rounded-full text-gray-600 hover:text-gray-800 focus:outline-none"
                 >
                   <span>{user?.username}</span>
+                  {user?.is_admin ? <span className="ml-1 text-green-600">(Admin)</span> : null}
                 </Link>
+                {/* Debug info - temporary */}
+                <div className="text-xs text-gray-500 border p-1 rounded bg-gray-50">
+                  <div>Is Admin: {JSON.stringify(user?.is_admin)}</div>
+                  <div>Admin Type: {typeof user?.is_admin}</div>
+                  <div>Username: {user?.username}</div>
+                </div>
                 <button
                   onClick={logout}
                   className="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded"

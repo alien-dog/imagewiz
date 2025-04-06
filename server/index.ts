@@ -193,6 +193,27 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
+// Add a manual proxy endpoint for auth register
+app.post('/api/auth/register', async (req, res) => {
+  console.log('Manual proxy: Received register request');
+  try {
+    const response = await fetch(`http://localhost:${FLASK_PORT}/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(req.body),
+    });
+    
+    const data = await response.json();
+    console.log('Manual proxy: Register response received');
+    res.status(response.status).json(data);
+  } catch (error) {
+    console.error('Manual proxy: Error forwarding register request', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Add a manual proxy endpoint for auth user
 app.get('/api/auth/user', async (req, res) => {
   console.log('Manual proxy: Received user request');

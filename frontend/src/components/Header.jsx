@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
 export const Header = () => {
-  const { currentUser, logout } = useAuth()
+  const { user: currentUser, logout } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   
   const toggleMobileMenu = () => {
@@ -39,6 +39,9 @@ export const Header = () => {
                 <Link to="/dashboard" className="text-gray-600 hover:text-blue-500">Dashboard</Link>
                 <Link to="/upload" className="text-gray-600 hover:text-blue-500">Upload</Link>
                 <Link to="/history" className="text-gray-600 hover:text-blue-500">History</Link>
+                {currentUser && currentUser.is_admin && (
+                  <Link to="/cms" className="text-gray-600 hover:text-blue-500 font-semibold">CMS</Link>
+                )}
                 <div className="relative group">
                   <button className="flex items-center text-gray-600 hover:text-blue-500">
                     <span>Account</span>
@@ -49,7 +52,7 @@ export const Header = () => {
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 hidden group-hover:block">
                     <div className="px-4 py-2 text-sm text-gray-700 border-b">
                       <div>{currentUser.email || currentUser.username}</div>
-                      <div className="text-blue-500">{currentUser.credits || 0} Credits</div>
+                      <div className="text-blue-500">{currentUser.credit_balance || 0} Credits</div>
                     </div>
                     <Link to="/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</Link>
                     <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
@@ -126,6 +129,15 @@ export const Header = () => {
                 >
                   History
                 </Link>
+                {currentUser && currentUser.is_admin && (
+                  <Link 
+                    to="/cms" 
+                    className="block py-2 text-gray-600 hover:text-blue-500 font-semibold"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    CMS
+                  </Link>
+                )}
                 <Link 
                   to="/settings" 
                   className="block py-2 text-gray-600 hover:text-blue-500"
@@ -136,7 +148,7 @@ export const Header = () => {
                 <div className="pt-2 border-t border-gray-200">
                   <div className="py-2 text-sm text-gray-700">
                     <div>{currentUser.email || currentUser.username}</div>
-                    <div className="text-blue-500">{currentUser.credits || 0} Credits</div>
+                    <div className="text-blue-500">{currentUser.credit_balance || 0} Credits</div>
                   </div>
                   <button 
                     onClick={handleLogout}

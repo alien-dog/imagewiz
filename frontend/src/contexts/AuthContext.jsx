@@ -7,7 +7,11 @@ export const AuthContext = createContext();
 
 // Provider component
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  // Try to load user from localStorage
+  const storedUser = localStorage.getItem('user');
+  const initialUser = storedUser ? JSON.parse(storedUser) : null;
+  
+  const [user, setUser] = useState(initialUser);
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,6 +23,18 @@ export const AuthProvider = ({ children }) => {
   console.log("React environment:", import.meta.env);
   console.log("Current axios baseURL:", axios.defaults.baseURL);
 
+  // Custom setUser function that also updates localStorage
+  const updateUser = (userData) => {
+    setUser(userData);
+    if (userData) {
+      localStorage.setItem('user', JSON.stringify(userData));
+      console.log("Updated user in localStorage:", userData.username);
+    } else {
+      localStorage.removeItem('user');
+      console.log("Removed user from localStorage");
+    }
+  };
+
   // Set token in axios headers and localStorage
   const setAuthToken = (token) => {
     if (token) {
@@ -28,7 +44,8 @@ export const AuthProvider = ({ children }) => {
     } else {
       delete axios.defaults.headers.common["Authorization"];
       localStorage.removeItem("token");
-      console.log("Cleared auth token");
+      localStorage.removeItem("user");
+      console.log("Cleared auth token and user");
     }
   };
 
@@ -38,7 +55,7 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       console.log("Attempting registration for:", username);
       
-      // Use relative URLs
+      // Use correct URL with API prefix for Express proxy
       const registerUrl = "/api/auth/register";
       console.log("Making registration request to:", registerUrl);
       
@@ -59,7 +76,7 @@ export const AuthProvider = ({ children }) => {
       console.log("Registration response:", data);
 
       setToken(data.access_token);
-      setUser(data.user);
+      updateUser(data.user);
       setAuthToken(data.access_token);
       return data;
     } catch (err) {
@@ -76,7 +93,7 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       console.log("Login attempt for:", username);
 
-      // Direct fetch approach
+      // Direct fetch approach with Express proxy route
       // Add timestamp to prevent caching
       const timestamp = new Date().getTime();
       const loginUrl = `/api/auth/login?t=${timestamp}`;
@@ -107,7 +124,7 @@ export const AuthProvider = ({ children }) => {
 
       // Set auth state with response data
       setToken(data.access_token);
-      setUser(data.user);
+      updateUser(data.user);
       setAuthToken(data.access_token);
       return data;
     } catch (err) {
@@ -120,7 +137,7 @@ export const AuthProvider = ({ children }) => {
   // Logout user
   const logout = () => {
     setToken(null);
-    setUser(null);
+    updateUser(null);
     setAuthToken(null);
   };
   
@@ -150,9 +167,9 @@ export const AuthProvider = ({ children }) => {
 
       // Handle different response formats
       if (data.user) {
-        setUser(data.user);
+        updateUser(data.user);
       } else if (data && data.id) {
-        setUser(data);
+        updateUser(data);
       } else {
         throw new Error("Invalid user data format");
       }
@@ -168,7 +185,7 @@ export const AuthProvider = ({ children }) => {
   const forceRefreshUserData = async () => {
     try {
       // First clear user data
-      setUser(null);
+      updateUser(null);
       
       // Then fetch fresh data from server with cache-busting
       if (token) {
@@ -194,9 +211,9 @@ export const AuthProvider = ({ children }) => {
 
         // Update user data with latest from server
         if (data.user) {
-          setUser(data.user);
+          updateUser(data.user);
         } else if (data && data.id) {
-          setUser(data);
+          updateUser(data);
         } else {
           throw new Error("Invalid user data format");
         }
@@ -223,7 +240,7 @@ export const AuthProvider = ({ children }) => {
             if (decoded.exp * 1000 < Date.now()) {
               console.log("Token expired, logging out");
               setToken(null);
-              setUser(null);
+              updateUser(null);
               setAuthToken(null);
               setLoading(false);
               return;
@@ -231,7 +248,7 @@ export const AuthProvider = ({ children }) => {
           } catch (jwtError) {
             console.error("JWT decode error:", jwtError);
             setToken(null);
-            setUser(null);
+            updateUser(null);
             setAuthToken(null);
             setLoading(false);
             return;
@@ -257,16 +274,16 @@ export const AuthProvider = ({ children }) => {
 
           // Handle different response formats
           if (data.user) {
-            setUser(data.user);
+            updateUser(data.user);
           } else if (data && data.id) {
-            setUser(data);
+            updateUser(data);
           } else {
             throw new Error("Invalid user data format");
           }
         } catch (err) {
           console.error("Error loading user:", err);
           setToken(null);
-          setUser(null);
+          updateUser(null);
           setAuthToken(null);
         }
       }

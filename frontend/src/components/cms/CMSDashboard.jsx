@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   FileText, 
@@ -9,30 +9,16 @@ import {
   ChevronRight,
   AlertTriangle
 } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 const CMSDashboard = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [user, setUser] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const { user, isAuthenticated } = useAuth();
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    // Get the user from local storage
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-        setIsAdmin(parsedUser.is_admin);
-      } catch (e) {
-        console.error('Error parsing user from local storage:', e);
-        setError('You must be logged in as an administrator to access this page.');
-      }
-    } else {
-      setError('You must be logged in as an administrator to access this page.');
-    }
-  }, []);
+  // Check if user is authenticated and is admin
+  const isAdmin = isAuthenticated && user && user.is_admin;
 
   // Navigation items for the sidebar
   const navItems = [
@@ -83,7 +69,27 @@ const CMSDashboard = ({ children }) => {
     );
   }
 
-  if (!isAdmin) {
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+          <div className="flex items-center text-red-500 mb-4">
+            <AlertTriangle className="h-8 w-8 mr-3" />
+            <h2 className="text-xl font-semibold">Authentication Required</h2>
+          </div>
+          <p className="text-gray-600 mb-4">You must be logged in to access the CMS dashboard.</p>
+          <button
+            className="w-full bg-teal-500 hover:bg-teal-600 text-white py-2 px-4 rounded transition-colors"
+            onClick={() => navigate('/login')}
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+  
+  if (isAuthenticated && !isAdmin) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
@@ -92,6 +98,10 @@ const CMSDashboard = ({ children }) => {
             <h2 className="text-xl font-semibold">Admin Access Required</h2>
           </div>
           <p className="text-gray-600 mb-4">You must have administrator privileges to access the CMS dashboard.</p>
+          <div className="text-sm text-gray-500 mb-4">
+            <p>User: {user?.username}</p>
+            <p>Admin Status: {String(user?.is_admin)}</p>
+          </div>
           <button
             className="w-full bg-teal-500 hover:bg-teal-600 text-white py-2 px-4 rounded transition-colors"
             onClick={() => navigate('/')}
