@@ -176,7 +176,7 @@ app.get('/*.html', (req, res, next) => {
 app.post('/api/auth/login', async (req, res) => {
   console.log('Manual proxy: Received login request');
   try {
-    const response = await fetch(`http://localhost:${FLASK_PORT}/auth/login`, {
+    const response = await fetch(`http://localhost:${FLASK_PORT}/api/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -197,7 +197,7 @@ app.post('/api/auth/login', async (req, res) => {
 app.post('/api/auth/register', async (req, res) => {
   console.log('Manual proxy: Received register request');
   try {
-    const response = await fetch(`http://localhost:${FLASK_PORT}/auth/register`, {
+    const response = await fetch(`http://localhost:${FLASK_PORT}/api/auth/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -226,7 +226,7 @@ app.get('/api/auth/user', async (req, res) => {
     
     console.log('Manual proxy: Forwarding user request with auth header:', authHeader);
     
-    const response = await fetch(`http://localhost:${FLASK_PORT}/auth/user`, {
+    const response = await fetch(`http://localhost:${FLASK_PORT}/api/auth/user`, {
       method: 'GET',
       headers: {
         'Authorization': authHeader,
