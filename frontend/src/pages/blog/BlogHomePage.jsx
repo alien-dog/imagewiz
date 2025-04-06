@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Layout as DashboardLayout } from '../dashboard/Layout';
+import Layout from '../../components/Layout';
 import { getTags } from '../../lib/cms-service';
 import BlogList from '../../components/blog/BlogList';
 import { Tag, ChevronDown, Search, Globe } from 'lucide-react';
@@ -90,7 +90,7 @@ const BlogHomePage = () => {
   };
 
   return (
-    <DashboardLayout>
+    <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Blog Header */}
         <div className="text-center mb-12">
@@ -206,7 +206,7 @@ const BlogHomePage = () => {
         {/* Blog Posts */}
         <BlogList language={language} tag={selectedTag} limit={9} />
       </div>
-    </DashboardLayout>
+    </Layout>
   );
 };
 

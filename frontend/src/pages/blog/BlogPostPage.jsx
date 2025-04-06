@@ -1,12 +1,12 @@
 import React from 'react';
-import { Layout as DashboardLayout } from '../dashboard/Layout';
+import Layout from '../../components/Layout';
 import BlogPost from '../../components/blog/BlogPost';
 
 const BlogPostPage = () => {
   return (
-    <DashboardLayout>
+    <Layout>
       <BlogPost />
-    </DashboardLayout>
+    </Layout>
   );
 };
 
