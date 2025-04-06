@@ -22,20 +22,26 @@ def create_app():
     app = Flask(__name__, static_folder='static')
     
     # Configure the application
-    # Use MySQL database with credentials from .env using quote_plus for password
+    # Use PostgreSQL database from environment
     from urllib.parse import quote_plus
     
-    # Support both DB_* and MYSQL_* variables for compatibility
-    mysql_host = os.environ.get('DB_HOST', os.environ.get('MYSQL_HOST', '8.130.113.102'))
-    mysql_user = os.environ.get('DB_USER', os.environ.get('MYSQL_USER', 'root'))
-    mysql_password = quote_plus(os.environ.get('DB_PASSWORD', os.environ.get('MYSQL_PASSWORD', 'Ir%86241992')))
-    mysql_db = os.environ.get('DB_NAME', os.environ.get('MYSQL_DB', 'mat_db'))
-    mysql_port = os.environ.get('DB_PORT', os.environ.get('MYSQL_PORT', '3306'))  # Default MySQL port
+    # Check if DATABASE_URL environment variable is set (PostgreSQL)
+    database_url = os.environ.get('DATABASE_URL')
     
-    # Log database connection parameters (omitting actual password)
-    print(f"Connecting to MySQL: {mysql_user}@{mysql_host}:{mysql_port}/{mysql_db}")
-    
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{mysql_user}:{mysql_password}@{mysql_host}:{mysql_port}/{mysql_db}'
+    if database_url:
+        print(f"Connecting to PostgreSQL using DATABASE_URL")
+        app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    else:
+        # Fallback to manual configuration
+        pg_host = os.environ.get('PGHOST', 'localhost')
+        pg_user = os.environ.get('PGUSER', 'postgres')
+        pg_password = quote_plus(os.environ.get('PGPASSWORD', 'postgres'))
+        pg_db = os.environ.get('PGDATABASE', 'postgres')
+        pg_port = os.environ.get('PGPORT', '5432')  # Default PostgreSQL port
+        
+        print(f"Connecting to PostgreSQL: {pg_user}@{pg_host}:{pg_port}/{pg_db}")
+        
+        app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{pg_user}:{pg_password}@{pg_host}:{pg_port}/{pg_db}'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(

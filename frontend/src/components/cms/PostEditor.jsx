@@ -241,8 +241,19 @@ const PostEditor = () => {
       setIsLoading(true);
       const response = await uploadMedia(id, formData);
       
-      if (response.media) {
-        setMedia([...media, response.media]);
+      if (response && response.media) {
+        // Add the new media to the existing media array
+        const newMedia = response.media;
+        setMedia([...media, newMedia]);
+        
+        // Automatically set as featured image if it's the first upload
+        if (!formData.featured_image && newMedia.file_path) {
+          setFormData({
+            ...formData,
+            featured_image: newMedia.file_path
+          });
+        }
+        
         setSuccess('Media uploaded successfully.');
         
         // Clear success message after 3 seconds
@@ -264,13 +275,31 @@ const PostEditor = () => {
     setError(null);
     
     try {
+      // Format data to match backend expectations
+      const postData = {
+        slug: formData.slug,
+        featured_image: formData.featured_image,
+        status: formData.status,
+        tags: formData.tag_ids, // Backend expects 'tags' not 'tag_ids'
+        // Add translations as expected by the backend
+        translations: [{
+          language_code: formData.language_code,
+          title: formData.title,
+          content: formData.content,
+          meta_title: formData.meta_title || formData.title,
+          meta_description: formData.meta_description || formData.excerpt,
+        }]
+      };
+      
+      console.log('Submitting post data:', JSON.stringify(postData));
+      
       if (id) {
         // Update existing post
-        await updatePost(id, formData);
+        await updatePost(id, postData);
         setSuccess('Post updated successfully!');
       } else {
         // Create new post
-        const response = await createPost(formData);
+        const response = await createPost(postData);
         setSuccess('Post created successfully!');
         
         // Redirect to edit page if we just created a new post
@@ -285,7 +314,7 @@ const PostEditor = () => {
       }, 3000);
     } catch (err) {
       console.error('Error saving post:', err);
-      setError('Failed to save post. Please try again.');
+      setError('Failed to save post. Please try again: ' + (err.message || 'Unknown error'));
     } finally {
       setIsSaving(false);
     }
@@ -625,17 +654,17 @@ const PostEditor = () => {
                     <div 
                       key={item.id} 
                       className={`relative cursor-pointer border ${
-                        formData.featured_image === item.url ? 'border-teal-500' : 'border-gray-300'
+                        formData.featured_image === item.file_path ? 'border-teal-500' : 'border-gray-300'
                       } rounded overflow-hidden group`}
-                      onClick={() => setFeaturedImage(item.url)}
+                      onClick={() => setFeaturedImage(item.file_path)}
                     >
                       <img 
-                        src={item.url} 
+                        src={item.url || item.file_path} 
                         alt={item.alt_text || 'Media'} 
                         className="w-full h-20 object-cover" 
                       />
                       <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity flex items-center justify-center">
-                        {formData.featured_image === item.url && (
+                        {formData.featured_image === item.file_path && (
                           <div className="bg-teal-500 text-white text-xs px-2 py-1 rounded-full">
                             Featured
                           </div>

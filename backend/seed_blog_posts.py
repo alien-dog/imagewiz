@@ -1,24 +1,28 @@
 """
-Script to seed the CMS database with blog posts
+Script to seed the database with blog posts
 """
 import os
 import sys
-import psycopg2
+import pymysql
 from datetime import datetime
 from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, ForeignKey, Table, Boolean
 from sqlalchemy.orm import relationship, sessionmaker, declarative_base
 from sqlalchemy.sql import func
 
-# Use PostgreSQL database from environment
-DATABASE_URL = os.environ.get('DATABASE_URL')
-if not DATABASE_URL:
-    print("ERROR: DATABASE_URL environment variable is not set.")
-    sys.exit(1)
+# Database connection settings
+mysql_host = os.environ.get('DB_HOST', os.environ.get('MYSQL_HOST', '8.130.113.102'))
+mysql_user = os.environ.get('DB_USER', os.environ.get('MYSQL_USER', 'root'))
+mysql_password = os.environ.get('DB_PASSWORD', os.environ.get('MYSQL_PASSWORD', 'Ir%86241992'))
+mysql_db = os.environ.get('DB_NAME', os.environ.get('MYSQL_DB', 'mat_db'))
+mysql_port = os.environ.get('DB_PORT', os.environ.get('MYSQL_PORT', '3306'))
 
-print(f"Connecting to PostgreSQL database...")
+from urllib.parse import quote_plus
+mysql_password = quote_plus(mysql_password)
+
+print(f"Connecting to MySQL: {mysql_user}@{mysql_host}:{mysql_port}/{mysql_db}")
 
 # Create database engine
-engine = create_engine(DATABASE_URL)
+engine = create_engine(f'mysql+pymysql://{mysql_user}:{mysql_password}@{mysql_host}:{mysql_port}/{mysql_db}')
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -27,7 +31,7 @@ Base = declarative_base()
 
 # Association table for post tags
 post_tags = Table(
-    'cms_post_tags',
+    'post_tags',
     Base.metadata,
     Column('post_id', Integer, ForeignKey('cms_posts.id')),
     Column('tag_id', Integer, ForeignKey('cms_tags.id'))
@@ -80,121 +84,12 @@ class User(Base):
 
     id = Column(Integer, primary_key=True)
     username = Column(String(64), unique=True, nullable=False)
-    password = Column(String(255), nullable=False)
-    credits = Column(Integer, default=0, nullable=False)
-    created_at = Column(DateTime, default=func.now(), nullable=False)
+    email = Column(String(120), unique=True)
+    password = Column(String(255))
     is_admin = Column(Boolean, default=False)
 
 # Blog post content
 blog_posts = [
-    {
-        "slug": "portrait-photography-background-removal-guide",
-        "title": "Professional Portrait Photography: The Complete Guide to AI-Powered Background Removal",
-        "tags": ["Portrait Photography", "Background Removal", "AI Technology", "Professional Photography"],
-        "meta_title": "Professional Portrait Photography Background Removal Guide | iMagenWiz",
-        "meta_description": "Learn how to enhance portrait photography with AI-powered background removal. Professional techniques for photographers to achieve studio-quality results.",
-        "meta_keywords": "portrait photography, background removal, professional portraits, photo editing, AI image processing",
-        "content": """
-<p>Professional portrait photography requires meticulous attention to detail, particularly when it comes to backgrounds. While traditional studio setups with lighting and backdrops remain valuable, AI-powered background removal has revolutionized the portrait photography workflow, offering unprecedented flexibility and creative control.</p>
-
-<h2>The Evolution of Portrait Background Control</h2>
-
-<p>Portrait photography has always balanced the subject's presentation against their environment. Historically, photographers had limited options for background control:</p>
-
-<ul>
-  <li><strong>Studio backdrops:</strong> Physical materials requiring setup and maintenance</li>
-  <li><strong>Environmental selection:</strong> Shooting in specific locations with complementary backgrounds</li>
-  <li><strong>Manual masking:</strong> Time-consuming Photoshop extraction requiring extensive training</li>
-</ul>
-
-<p>Today's AI-powered background removal tools offer a fourth option that combines speed, precision, and flexibility without requiring complex studio setups or extensive post-processing expertise.</p>
-
-<h2>Why AI Background Removal Is Transforming Portrait Photography</h2>
-
-<p>For professional photographers, AI background removal provides several significant advantages:</p>
-
-<h3>Creative Flexibility</h3>
-<p>Separate the creative decisions about your subject from decisions about the background environment. Shoot the subject in the most flattering light and position, then place them in any environment afterward.</p>
-
-<h3>Client Satisfaction</h3>
-<p>Offer clients multiple background options from a single shooting session, increasing perceived value and satisfaction while reducing reshoot requests.</p>
-
-<h3>Time Efficiency</h3>
-<p>What once took 15-30 minutes per image in Photoshop now takes seconds with AI, allowing photographers to process more images and take on more clients.</p>
-
-<h3>Consistency</h3>
-<p>Maintain visual consistency across portrait series even when shooting conditions change, particularly valuable for corporate headshots or school photography.</p>
-
-<h2>Optimal Shooting Techniques for AI Background Removal</h2>
-
-<p>While AI can work with various inputs, these techniques will help you achieve the best results:</p>
-
-<h3>Lighting Setup</h3>
-<p>Create separation between your subject and background with rim lighting or hair lights. Even lighting on your subject with slightly darker background improves AI detection accuracy.</p>
-
-<h3>Background Simplification</h3>
-<p>While not mandatory with modern AI, a relatively simple background (solid color or minimal texture) will yield cleaner results, particularly with complex subjects like curly hair or transparent fabrics.</p>
-
-<h3>Depth of Field</h3>
-<p>Using a wider aperture (f/2.8 or wider) creates natural separation through background blur, which helps the AI algorithms distinguish foreground subjects more accurately.</p>
-
-<h3>Color Contrast</h3>
-<p>When possible, choose background colors that contrast with your subject's clothing and hair to improve edge detection.</p>
-
-<h2>Step-by-Step Portrait Background Removal Workflow</h2>
-
-<ol>
-  <li><strong>Shoot with extraction in mind:</strong> Implement the lighting and composition techniques mentioned above</li>
-  <li><strong>Basic RAW processing:</strong> Apply your standard color correction, exposure, and basic retouching</li>
-  <li><strong>Export for background removal:</strong> Save as JPG or PNG at high quality</li>
-  <li><strong>Process through iMagenWiz:</strong> Upload your portraits for AI background removal</li>
-  <li><strong>Quality check:</strong> Review edge detection, particularly around hair, jewelry, and clothing details</li>
-  <li><strong>Apply background:</strong> Place your subject on the new background, adjusting lighting and shadows for realism</li>
-  <li><strong>Final adjustments:</strong> Apply any global adjustments to ensure cohesive integration</li>
-</ol>
-
-<h2>Advanced Techniques for Realistic Integration</h2>
-
-<p>Background removal is just the first step. These advanced techniques will help your portraits look naturally integrated with their new backgrounds:</p>
-
-<h3>Matching Light Direction</h3>
-<p>Ensure the light direction in your background matches the main light on your subject. Mismatched lighting immediately reads as artificial to viewers.</p>
-
-<h3>Color Grading Harmony</h3>
-<p>Apply subtle color grading to both subject and background to create a unified color palette. Pay particular attention to the color temperature alignment.</p>
-
-<h3>Shadow Creation</h3>
-<p>Add realistic drop shadows to ground your subject in the new environment. The shadow should align with the light source direction and have appropriate softness based on the implied light quality.</p>
-
-<h3>Edge Refinement</h3>
-<p>While AI does an exceptional job with edges, you may occasionally need to refine certain areas, particularly with very fine hair detail or semi-transparent elements.</p>
-
-<h2>Creative Applications for Portrait Photographers</h2>
-
-<p>With background removal mastered, explore these creative applications:</p>
-
-<ul>
-  <li><strong>Composite Storytelling:</strong> Place subjects in fantasy or narrative environments that would be impossible to shoot directly</li>
-  <li><strong>Season Transitions:</strong> Offer clients the ability to update family portraits with seasonal backgrounds throughout the year</li>
-  <li><strong>Corporate Versatility:</strong> Provide business clients with portraits on both traditional and branded backgrounds</li>
-  <li><strong>Artistic Series:</strong> Create conceptual portrait series with visually cohesive environments despite different shooting conditions</li>
-</ul>
-
-<h2>Case Study: Wedding Photography Transformation</h2>
-
-<p>Wedding photographer Elena Chen incorporated AI background removal into her workflow with transformative results:</p>
-
-<blockquote>
-"Weather forced us indoors for what was planned as an outdoor wedding. Rather than disappointing the couple with standard indoor shots, I photographed the key portraits against a simple backdrop, then used iMagenWiz to place them in the garden setting they had envisioned. The clients were thrilled, and no one could tell the final images weren't shot on location."
-</blockquote>
-
-<h2>Conclusion: The Future of Portrait Background Control</h2>
-
-<p>AI-powered background removal has fundamentally changed what's possible in portrait photography, offering professionals unprecedented control, efficiency, and creative flexibility. By combining traditional photographic expertise with these powerful new tools, photographers can exceed client expectations while streamlining their workflow.</p>
-
-<p>iMagenWiz provides portrait photographers with exceptionally accurate background removal optimized specifically for the challenges of human subjects, including industry-leading processing of hair details, transparent fabrics, and complex edges—all while maintaining the natural look that distinguishes professional work.</p>
-"""
-    },
     {
         "slug": "ai-background-removal-techniques",
         "title": "5 Advanced AI Background Removal Techniques for Professional Results",
@@ -378,144 +273,6 @@ blog_posts = [
 
 <p>iMagenWiz provides e-commerce businesses with powerful, intuitive AI background removal tools specifically optimized for product photography, making it simple to achieve professional results regardless of your technical expertise or catalog size.</p>
 """
-    },
-    {
-        "slug": "ai-image-processing-future-trends",
-        "title": "Future Trends in AI Image Processing: Beyond Background Removal",
-        "tags": ["AI Technology", "Image Processing", "Tech Trends", "Visual AI"],
-        "meta_title": "Future Trends in AI Image Processing | iMagenWiz",
-        "meta_description": "Explore the future of AI image processing technologies beyond background removal. Learn how generative AI, neural networks, and computer vision are transforming visual content creation.",
-        "meta_keywords": "AI image processing, future tech trends, computer vision, neural networks, generative AI",
-        "content": """
-<p>Artificial intelligence has already revolutionized image processing, with background removal being just one of many transformative applications. As we look to the future, AI's impact on visual content creation is set to expand dramatically, reshaping how we create, edit, and interact with images across industries.</p>
-
-<h2>The Current State of AI Image Processing</h2>
-
-<p>Today's AI image processing capabilities have evolved from simple filter applications to sophisticated manipulation techniques:</p>
-
-<ul>
-  <li><strong>Object Recognition:</strong> Identifying and categorizing elements within images</li>
-  <li><strong>Semantic Segmentation:</strong> Precise pixel-level understanding of image components</li>
-  <li><strong>Style Transfer:</strong> Applying artistic styles while maintaining content integrity</li>
-  <li><strong>Background Removal:</strong> Intelligent separation of subjects from their surroundings</li>
-  <li><strong>Image Enhancement:</strong> Automatically improving quality, resolution, and clarity</li>
-</ul>
-
-<p>These capabilities have dramatically streamlined workflows for photographers, designers, marketers, and e-commerce businesses. However, the coming wave of AI innovations promises even more profound transformations.</p>
-
-<h2>Emerging Trends Reshaping Visual Content Creation</h2>
-
-<h3>1. Generative Image Synthesis</h3>
-
-<p>Generative Adversarial Networks (GANs) and diffusion models are moving beyond image editing to complete image creation. These systems can generate photorealistic content from text descriptions or rough sketches, enabling:</p>
-
-<ul>
-  <li>Creation of product mockups from specifications without photography</li>
-  <li>Generation of multiple variations of scenes with controlled parameters</li>
-  <li>Automatic filling of removed backgrounds with contextually appropriate content</li>
-  <li>Production of custom stock imagery without traditional photo shoots</li>
-</ul>
-
-<p>This technology will dramatically reduce the resources required for visual content creation while expanding creative possibilities.</p>
-
-<h3>2. Unified 3D Understanding from 2D Images</h3>
-
-<p>Next-generation AI is developing the ability to infer complete 3D structures from single 2D images, enabling:</p>
-
-<ul>
-  <li>Automatic conversion of product photos to 3D models for AR/VR applications</li>
-  <li>More realistic lighting and shadow adjustments after background removal</li>
-  <li>Dynamic perspective shifts of subjects without additional photography</li>
-  <li>Improved compositing with proper depth integration into new scenes</li>
-</ul>
-
-<p>This 3D understanding will bridge the gap between traditional photography and immersive digital experiences.</p>
-
-<h3>3. Context-Aware Image Editing</h3>
-
-<p>Future AI systems will understand not just what's in an image, but the semantic meaning and relationships between elements, allowing for:</p>
-
-<ul>
-  <li>Editing instructions in natural language ("make this look more professional")</li>
-  <li>Intelligent resizing that preserves key subjects while adapting composition</li>
-  <li>Automatic adaptation of images for different cultural markets or audiences</li>
-  <li>Semantic search within image libraries ("find images with happy customers using our product outside")</li>
-</ul>
-
-<p>This higher-level understanding will transform how we interact with visual content management systems.</p>
-
-<h3>4. Real-Time Processing at Scale</h3>
-
-<p>Advances in edge computing and AI optimization are enabling more processing to happen instantly, even on mobile devices:</p>
-
-<ul>
-  <li>Real-time background replacement during video calls or livestreams</li>
-  <li>Instant high-quality image processing within mobile applications</li>
-  <li>Adaptive content that adjusts to viewing context or device capabilities</li>
-  <li>Mass processing capabilities handling millions of images simultaneously</li>
-</ul>
-
-<p>These capabilities will eliminate latency in visual content workflows, enabling truly responsive applications.</p>
-
-<h3>5. Multimodal Content Generation</h3>
-
-<p>AI is increasingly working across text, image, video, and audio simultaneously:</p>
-
-<ul>
-  <li>Automatic creation of variations across all content formats from a single source</li>
-  <li>Synchronization of visual content with narration or music</li>
-  <li>Generation of complete marketing packages with consistent visual language</li>
-  <li>Translation of concepts between different media types while maintaining intent</li>
-</ul>
-
-<p>This integration will streamline content creation across channels and reduce inconsistencies.</p>
-
-<h2>Industry-Specific Transformations</h2>
-
-<p>The impact of these emerging technologies will vary across sectors:</p>
-
-<h3>E-commerce and Retail</h3>
-<p>Virtual try-on technologies will advance beyond simple overlays to physically accurate simulations of how products interact with unique customer attributes. Product photography may be largely replaced by AI-generated imagery customized to each viewer's preferences.</p>
-
-<h3>Marketing and Advertising</h3>
-<p>Personalized visual content will be generated in real-time based on viewer data, with A/B testing occurring instantly and optimizations made automatically. Marketing teams will focus more on strategy and less on production.</p>
-
-<h3>Entertainment and Media</h3>
-<p>Production costs will decrease as AI handles more aspects of visual creation, from background generation to character animation. Independent creators will gain access to tools previously available only to major studios.</p>
-
-<h3>Architecture and Design</h3>
-<p>Conceptual sketches will be instantly transformed into photorealistic renderings with accurate lighting, materials, and environmental integration, shortening the feedback loop in design processes.</p>
-
-<h2>Ethical Considerations and Challenges</h2>
-
-<p>As these technologies advance, several important challenges must be addressed:</p>
-
-<ul>
-  <li><strong>Authenticity Verification:</strong> Distinguishing between captured and generated imagery</li>
-  <li><strong>Creative Ownership:</strong> Addressing copyright in AI-assisted and AI-generated content</li>
-  <li><strong>Representational Bias:</strong> Ensuring diverse and inclusive outputs across different demographics</li>
-  <li><strong>Environmental Impact:</strong> Managing the computational resources required for advanced processing</li>
-</ul>
-
-<p>The industry will need to develop both technical solutions and ethical frameworks to address these concerns.</p>
-
-<h2>Preparing for the AI-Powered Visual Future</h2>
-
-<p>Organizations and professionals can prepare for these transformations by:</p>
-
-<ul>
-  <li>Investing in flexible content management systems that can adapt to emerging AI capabilities</li>
-  <li>Developing workflows that combine human creativity with AI efficiency</li>
-  <li>Building skills in prompt engineering and AI direction rather than just technical execution</li>
-  <li>Adopting metadata standards that will enable future semantic understanding</li>
-</ul>
-
-<h2>Conclusion: From Tools to Creative Partners</h2>
-
-<p>The future of AI in image processing represents a shift from AI as a tool to AI as a creative partner. While today's solutions like background removal automate specific tasks, tomorrow's systems will collaborate on entire creative processes, understanding intent and contributing ideas.</p>
-
-<p>At iMagenWiz, we're actively developing these next-generation capabilities, with background removal representing just the beginning of our vision for AI-powered visual content creation. By combining cutting-edge research with practical applications, we're working to empower creators with increasingly powerful tools that expand creative possibilities while reducing technical barriers.</p>
-"""
     }
 ]
 
@@ -561,7 +318,7 @@ def ensure_admin_user_exists():
         if not admin:
             print("No users found in database. Using a default user.")
             # Create a default admin user if needed
-            admin = User(username="admin", password="admin123", is_admin=True)
+            admin = User(username="admin", email="admin@example.com", is_admin=True)
             session.add(admin)
             session.commit()
     return admin
@@ -569,13 +326,6 @@ def ensure_admin_user_exists():
 def create_blog_posts():
     """Create blog posts from the defined content"""
     try:
-        # Create tables if they don't exist
-        try:
-            Base.metadata.create_all(engine)
-            print("Created database tables")
-        except Exception as e:
-            print(f"Note: Could not create tables: {e}")
-            
         # Ensure English language exists
         language = ensure_language_exists()
         print(f"Language: {language.name} ({language.code})")

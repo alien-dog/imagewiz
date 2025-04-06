@@ -209,7 +209,7 @@ export const uploadMedia = async (postId, formData) => {
         'Content-Type': 'multipart/form-data'
       }
     });
-    return response.data;
+    return response.data; // Returns { media: {...}, message: "Media uploaded successfully" }
   } catch (error) {
     return handleError(error);
   }
@@ -218,7 +218,11 @@ export const uploadMedia = async (postId, formData) => {
 export const getPostMedia = async (postId) => {
   try {
     const response = await axios.get(`${API_URL}/posts/${postId}/media`);
-    return response.data;
+    // The response format is { media: [...], message: "Media retrieved successfully" }
+    // But we want to maintain backward compatibility with existing code
+    return response.data && response.data.media ? 
+      { media: response.data.media } : 
+      { media: [] };
   } catch (error) {
     return handleError(error);
   }

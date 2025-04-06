@@ -2,13 +2,31 @@
 Simple script to check blog posts in the database
 """
 from app import create_app, db
-from app.models.cms import Post
+from app.models.cms import Post, PostTranslation
 
 app = create_app()
 
 with app.app_context():
-    posts = Post.query.all()
-    print(f'Total posts: {len(posts)}')
+    # Check for published posts
+    posts = Post.query.filter_by(status='published').all()
+    print(f"Found {len(posts)} published posts")
+    
+    # Print post details
     for post in posts:
-        post_title = post.translations[0].title if post.translations else "No title"
-        print(f'  - {post.slug} ({post_title})')
+        print(f"Post ID: {post.id}")
+        print(f"  Slug: {post.slug}")
+        print(f"  Status: {post.status}")
+        print(f"  Translations: {len(post.translations)}")
+        
+        # Get English translation
+        en_translation = next((t for t in post.translations if t.language_code == 'en'), None)
+        if en_translation:
+            print(f"  Title (EN): {en_translation.title}")
+        else:
+            print("  No English translation found")
+        
+        print()
+        
+    # Check all translations
+    translations = PostTranslation.query.all()
+    print(f"Found {len(translations)} total translations")

@@ -1,6 +1,6 @@
 from datetime import datetime
 from app import db
-from sqlalchemy.dialects.mysql import TEXT
+from sqlalchemy import Text
 
 # Association table for many-to-many relationship between posts and tags
 post_tags = db.Table('cms_post_tags',
@@ -65,7 +65,7 @@ class PostTranslation(db.Model):
     post_id = db.Column(db.Integer, db.ForeignKey('cms_posts.id'), nullable=False)
     language_code = db.Column(db.String(10), nullable=False)  # e.g., 'en', 'es', 'fr'
     title = db.Column(db.String(255), nullable=False)
-    content = db.Column(TEXT, nullable=False)
+    content = db.Column(Text, nullable=False)
     
     # SEO fields
     meta_title = db.Column(db.String(255))
@@ -108,9 +108,10 @@ class PostMedia(db.Model):
             'id': self.id,
             'post_id': self.post_id,
             'file_path': self.file_path,
+            'url': self.file_path,  # Add url key for frontend compatibility
             'file_type': self.file_type,
-            'alt_text': self.alt_text,
-            'title': self.title,
+            'alt_text': self.alt_text or '',
+            'title': self.title or '',
             'created_at': self.created_at.isoformat()
         }
 

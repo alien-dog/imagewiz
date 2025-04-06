@@ -8,7 +8,8 @@ import {
   Filter, 
   RefreshCw, 
   AlertCircle, 
-  CheckCircle2
+  CheckCircle2,
+  Plus
 } from 'lucide-react';
 import { getPosts, deletePost } from '../../lib/cms-service';
 

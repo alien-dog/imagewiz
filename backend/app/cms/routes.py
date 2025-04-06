@@ -554,7 +554,11 @@ def upload_media(post_id):
         db.session.add(new_media)
         db.session.commit()
         
-        return jsonify(new_media.to_dict()), 201
+        # Return in a format expected by the frontend
+        return jsonify({
+            "media": new_media.to_dict(),
+            "message": "Media uploaded successfully"
+        }), 201
     
     return jsonify({"error": "File type not allowed"}), 400
 
@@ -567,7 +571,11 @@ def get_post_media(post_id):
     
     media = PostMedia.query.filter_by(post_id=post_id).all()
     
-    return jsonify([m.to_dict() for m in media]), 200
+    # Format response to match frontend expectations
+    return jsonify({
+        "media": [m.to_dict() for m in media],
+        "message": "Media retrieved successfully"
+    }), 200
 
 @bp.route('/media/<int:media_id>', methods=['PUT'])
 @jwt_required()
