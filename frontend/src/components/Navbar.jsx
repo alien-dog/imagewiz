@@ -55,7 +55,8 @@ const Navbar = () => {
               >
                 Blog
               </Link>
-              {isAuthenticated && user?.is_admin && (
+              {/* Always show CMS for admin users - desktop menu */}
+              {isAuthenticated && user && user.is_admin === true && (
                 <Link
                   to="/cms"
                   className="border-transparent text-gray-500 hover:border-teal-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
@@ -190,7 +191,8 @@ const Navbar = () => {
             >
               Blog
             </Link>
-            {isAuthenticated && user?.is_admin && (
+            {/* Always show CMS for admin users */}
+            {isAuthenticated && user && user.is_admin === true && (
               <Link
                 to="/cms"
                 className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-teal-500 hover:text-gray-800"
