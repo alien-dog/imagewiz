@@ -9,7 +9,7 @@ import {
   AlertCircle,
   ChevronRight
 } from 'lucide-react';
-import { getPostBySlug } from '../../lib/cms-service';
+import { getBlogPostBySlug } from '../../lib/cms-service';
 
 const BlogPost = () => {
   const { slug } = useParams();
@@ -29,7 +29,7 @@ const BlogPost = () => {
   const fetchPost = async (language) => {
     setLoading(true);
     try {
-      const response = await getPostBySlug(slug, language);
+      const response = await getBlogPostBySlug(slug, language);
       setPost(response.post);
       setAvailableLanguages(response.available_languages || []);
       setError(null);

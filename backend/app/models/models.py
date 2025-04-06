@@ -7,7 +7,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
-    credit_balance = db.Column(db.Integer, default=0, nullable=False)
+    credits = db.Column(db.Integer, default=0, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_admin = db.Column(db.Boolean, default=False)
     
@@ -28,7 +28,7 @@ class User(db.Model):
         return {
             'id': self.id,
             'username': self.username,
-            'credit_balance': self.credit_balance,
+            'credit_balance': self.credits,  # Keep the API response name consistent
             'created_at': self.created_at.isoformat(),
             'is_admin': self.is_admin
         }

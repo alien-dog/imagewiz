@@ -688,3 +688,91 @@ def get_blog_posts():
             'pages': (total + per_page - 1) // per_page  # ceiling division
         }
     }), 200
+
+@bp.route('/blog/<slug>', methods=['GET'])
+def get_blog_post_by_slug(slug):
+    """Get a specific published blog post by slug for public consumption"""
+    # Get query parameters
+    language = request.args.get('language')
+    
+    # Find the published post with the given slug
+    post = Post.query.filter_by(slug=slug, status='published').first()
+    
+    if not post:
+        return jsonify({"error": "Blog post not found"}), 404
+    
+    # Format the post with comprehensive data
+    post_data = post.to_dict(include_translations=True, language=language)
+    
+    # Get author details
+    author = User.query.get(post.author_id)
+    author_data = {
+        "id": author.id,
+        "name": author.username,
+        # Add other author fields as needed
+    }
+    
+    # Find related posts (similar tags, limit to 3)
+    if post.tags:
+        tag_ids = [tag.id for tag in post.tags]
+        related_posts_query = (
+            Post.query
+            .filter(Post.id != post.id, Post.status == 'published')
+            .join(Post.tags)
+            .filter(Tag.id.in_(tag_ids))
+            .group_by(Post.id)
+            .order_by(Post.published_at.desc())
+            .limit(3)
+        )
+        related_posts = [p.to_dict(include_translations=True, language=language) for p in related_posts_query.all()]
+    else:
+        # If no tags, get the latest 3 published posts that aren't this one
+        related_posts_query = (
+            Post.query
+            .filter(Post.id != post.id, Post.status == 'published')
+            .order_by(Post.published_at.desc())
+            .limit(3)
+        )
+        related_posts = [p.to_dict(include_translations=True, language=language) for p in related_posts_query.all()]
+    
+    # Get available languages for this post
+    available_languages = []
+    used_languages = set(trans.language_code for trans in post.translations)
+    all_languages = Language.query.all()
+    for lang in all_languages:
+        if lang.code in used_languages:
+            available_languages.append({
+                "code": lang.code,
+                "name": lang.name,
+                "is_default": lang.is_default
+            })
+    
+    # Get the content for the requested language
+    content = None
+    title = None
+    meta_description = None
+    for trans in post.translations:
+        if (language and trans.language_code == language) or (not language and trans.language_code == 'en'):
+            content = trans.content
+            title = trans.title
+            meta_description = trans.meta_description
+            break
+    
+    # Return a more comprehensive response for the blog post page
+    return jsonify({
+        "post": {
+            "id": post.id,
+            "slug": post.slug,
+            "title": title,
+            "content": content,
+            "meta_description": meta_description,
+            "featured_image": post.featured_image,
+            "created_at": post.created_at.isoformat(),
+            "updated_at": post.updated_at.isoformat() if post.updated_at else None,
+            "published_at": post.published_at.isoformat() if post.published_at else None,
+            "author": author_data,
+            "tags": [tag.to_dict() for tag in post.tags]
+        },
+        "related_posts": related_posts,
+        "available_languages": available_languages
+    }), 200

@@ -263,3 +263,13 @@ export const getBlogPosts = async (params = {}) => {
     return handleError(error);
   }
 };
+
+export const getBlogPostBySlug = async (slug, language = null) => {
+  try {
+    const params = language ? { language } : {};
+    const response = await axios.get(`${API_URL}/blog/${slug}`, { params });
+    return response.data;
+  } catch (error) {
+    return handleError(error);
+  }
+};
