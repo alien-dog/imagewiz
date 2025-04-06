@@ -1,0 +1,280 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { 
+  Edit, 
+  Trash2, 
+  Eye, 
+  Search, 
+  Filter, 
+  RefreshCw, 
+  AlertCircle, 
+  CheckCircle2
+} from 'lucide-react';
+import { getPosts, deletePost } from '../../lib/cms-service';
+
+const PostList = () => {
+  const navigate = useNavigate();
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filters, setFilters] = useState({
+    language: '',
+    status: '',
+    tag: ''
+  });
+  const [showConfirmDelete, setShowConfirmDelete] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
+
+  // Load posts on component mount and when filters change
+  useEffect(() => {
+    fetchPosts();
+  }, [filters]);
+
+  const fetchPosts = async () => {
+    setLoading(true);
+    try {
+      const activeFilters = Object.entries(filters)
+        .filter(([_, value]) => value !== '')
+        .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+      
+      const data = await getPosts(activeFilters);
+      setPosts(data.posts || []);
+      setError(null);
+    } catch (err) {
+      console.error('Error fetching posts:', err);
+      setError('Failed to load posts. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    fetchPosts();
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await deletePost(id);
+      setPosts(posts.filter(post => post.id !== id));
+      setShowConfirmDelete(null);
+      setSuccessMessage('Post successfully deleted');
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 3000);
+    } catch (err) {
+      console.error('Error deleting post:', err);
+      setError('Failed to delete post. Please try again.');
+    }
+  };
+
+  const filteredPosts = posts.filter(post => 
+    post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    post.slug.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Status badge component
+  const StatusBadge = ({ status }) => {
+    const statusClasses = {
+      published: 'bg-green-100 text-green-800',
+      draft: 'bg-gray-100 text-gray-800',
+      archived: 'bg-red-100 text-red-800'
+    };
+    
+    return (
+      <span className={`px-2 py-1 rounded-full text-xs ${statusClasses[status] || 'bg-gray-100'}`}>
+        {status.charAt(0).toUpperCase() + status.slice(1)}
+      </span>
+    );
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-gray-800">Posts</h1>
+        <button
+          className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded flex items-center"
+          onClick={() => navigate('/cms/posts/new')}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          New Post
+        </button>
+      </div>
+
+      {/* Search and Filter Bar */}
+      <div className="bg-gray-50 p-4 rounded-lg">
+        <form onSubmit={handleSearch} className="flex flex-wrap gap-4">
+          <div className="flex-1 min-w-[200px]">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search posts..."
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center">
+              <Filter className="h-5 w-5 mr-1 text-gray-500" />
+              <select
+                className="border border-gray-300 rounded py-2 px-3"
+                value={filters.status}
+                onChange={(e) => setFilters({...filters, status: e.target.value})}
+              >
+                <option value="">All Status</option>
+                <option value="published">Published</option>
+                <option value="draft">Draft</option>
+                <option value="archived">Archived</option>
+              </select>
+            </div>
+            
+            <div>
+              <select
+                className="border border-gray-300 rounded py-2 px-3"
+                value={filters.language}
+                onChange={(e) => setFilters({...filters, language: e.target.value})}
+              >
+                <option value="">All Languages</option>
+                <option value="en">English</option>
+                <option value="es">Spanish</option>
+                <option value="fr">French</option>
+                {/* Add more languages as needed */}
+              </select>
+            </div>
+            
+            <button 
+              type="button"
+              className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded"
+              onClick={fetchPosts}
+            >
+              <RefreshCw className="h-5 w-5" />
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {/* Success Message */}
+      {successMessage && (
+        <div className="bg-green-50 text-green-700 px-4 py-3 rounded flex items-center">
+          <CheckCircle2 className="h-5 w-5 mr-2" />
+          {successMessage}
+        </div>
+      )}
+
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-50 text-red-700 px-4 py-3 rounded flex items-center">
+          <AlertCircle className="h-5 w-5 mr-2" />
+          {error}
+        </div>
+      )}
+
+      {/* Loading or No Posts Message */}
+      {loading ? (
+        <div className="text-center py-8">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-t-teal-500 border-r-teal-500 border-b-transparent border-l-transparent"></div>
+          <p className="mt-2 text-gray-600">Loading posts...</p>
+        </div>
+      ) : filteredPosts.length === 0 ? (
+        <div className="text-center py-8 bg-gray-50 rounded-lg">
+          <p className="text-gray-500">No posts found. Create a new post to get started.</p>
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white rounded-lg overflow-hidden">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Slug</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Language</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Updated</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {filteredPosts.map((post) => (
+                <tr key={post.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900">{post.title}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500">{post.slug}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500">{post.language_code}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <StatusBadge status={post.status} />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500">
+                      {new Date(post.updated_at).toLocaleDateString()}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div className="flex space-x-2">
+                      <button 
+                        className="text-teal-600 hover:text-teal-900"
+                        onClick={() => navigate(`/cms/posts/${post.id}/edit`)}
+                      >
+                        <Edit className="h-5 w-5" />
+                      </button>
+                      <button 
+                        className="text-blue-600 hover:text-blue-900"
+                        onClick={() => navigate(`/blog/${post.slug}`)}
+                      >
+                        <Eye className="h-5 w-5" />
+                      </button>
+                      <button 
+                        className="text-red-600 hover:text-red-900"
+                        onClick={() => setShowConfirmDelete(post.id)}
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showConfirmDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-semibold mb-4">Confirm Delete</h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete this post? This action cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100"
+                onClick={() => setShowConfirmDelete(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                onClick={() => handleDelete(showConfirmDelete)}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default PostList;

@@ -61,9 +61,22 @@ def create_app():
     with app.app_context():
         # Import models
         from .models.models import User, RechargeHistory, MattingHistory
+        # Import CMS models
+        from .models.cms import Post, PostTranslation, PostMedia, Tag, Language
         
         # Create tables
         db.create_all()
+        
+        # Initialize default language (English) if no languages exist
+        default_language = Language.query.first()
+        if not default_language:
+            try:
+                english = Language(code='en', name='English', is_default=True, is_active=True)
+                db.session.add(english)
+                db.session.commit()
+                app.logger.info("Added default English language")
+            except Exception as e:
+                app.logger.error(f"Error adding default language: {e}")
         
         # Run database migrations for new columns
         try:
@@ -97,11 +110,21 @@ def create_app():
         app.register_blueprint(order_confirmation_bp)
         app.register_blueprint(api_order_confirmation_bp)
         
+        # Register CMS blueprint
+        from .cms import bp as cms_bp
+        app.register_blueprint(cms_bp)
+        
         # Static file routes
         @app.route('/api/uploads/<filename>')
         def serve_upload(filename):
             """Serve uploaded files"""
             return send_from_directory(os.path.abspath(app.config['UPLOAD_FOLDER']), filename)
+            
+        @app.route('/api/uploads/cms/<filename>')
+        def serve_cms_upload(filename):
+            """Serve CMS uploaded files"""
+            cms_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'cms')
+            return send_from_directory(os.path.abspath(cms_folder), filename)
             
         @app.route('/api/processed/<filename>')
         def serve_processed(filename):
@@ -129,7 +152,11 @@ def create_app():
                     "/api/payment/packages",
                     "/api/order-confirmation",
                     "/api/matting/process",
-                    "/api/matting/history"
+                    "/api/matting/history",
+                    "/api/cms/blog",
+                    "/api/cms/posts",
+                    "/api/cms/tags",
+                    "/api/cms/languages"
                 ]
             })
             

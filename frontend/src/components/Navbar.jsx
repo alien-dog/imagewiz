@@ -49,6 +49,20 @@ const Navbar = () => {
               >
                 Pricing
               </Link>
+              <Link
+                to="/blog"
+                className="border-transparent text-gray-500 hover:border-teal-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+              >
+                Blog
+              </Link>
+              {isAuthenticated && user?.is_admin && (
+                <Link
+                  to="/cms"
+                  className="border-transparent text-gray-500 hover:border-teal-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                >
+                  CMS
+                </Link>
+              )}
             </div>
           </div>
           <div className="hidden sm:ml-6 sm:flex sm:items-center">
@@ -163,6 +177,20 @@ const Navbar = () => {
             >
               Pricing
             </Link>
+            <Link
+              to="/blog"
+              className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-teal-500 hover:text-gray-800"
+            >
+              Blog
+            </Link>
+            {isAuthenticated && user?.is_admin && (
+              <Link
+                to="/cms"
+                className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-teal-500 hover:text-gray-800"
+              >
+                CMS
+              </Link>
+            )}
           </div>
           <div className="pt-4 pb-3 border-t border-gray-200">
             {isAuthenticated ? (

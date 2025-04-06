@@ -1,0 +1,94 @@
+Here's a structured prompt for your AI code builder to create a multilingual CMS dashboard with SEO-optimized blog integration:
+
+---
+
+**Project:** Multilingual CMS Dashboard with SEO-Optimized Blog Integration
+
+**Core Requirements:**
+1. **Dashboard Features:**
+   - Content creation/editing for blogs & landing pages (WYSIWYG + Markdown support)
+   - Multi-language support (WPML-style translation interface)
+   - SEO management panel for:
+     - Custom meta titles/descriptions
+     - URL slug optimization
+     - Schema markup integration
+     - Open Graph/Twitter card controls
+     - XML sitemap generation
+   - Content categorization (tags/categories with hierarchy)
+   - Media library with AI-powered image optimization
+   - Multi-user roles with permissions (Admin/Editor/Author)
+
+2. **Frontend Requirements:**
+   - SEO-optimized blog template with:
+     - Semantic HTML structure
+     - JSON-LD structured data
+     - Lazy-loaded images
+     - AMP compatibility
+     - Pagination with rel="next/prev"
+   - Language switcher with URL structure options (subdirectory/parameter)
+   - Automatic hreflang tag generation
+   - Canonical URL management
+   - Dynamic OG image generation
+
+3. **Technical Specifications:**
+   - Headless CMS architecture (API-first approach)
+   - Next.js/React frontend for SSR SEO benefits
+   - Internationalization (i18n) with ICU message format
+   - Automatic ALT text generation for images
+   - Built-in performance optimization:
+     - Code splitting
+     - Critical CSS injection
+     - Brotli compression
+   - Security features:
+     - CSRF protection
+     - XSS sanitization
+     - Rate limiting
+     - JWT authentication
+
+4. **SEO Essentials:**
+   - Automatic sitemap.xml generation
+   - Robots.txt management
+   - URL redirect manager
+   - Core Web Vitals optimization
+   - Breadcrumb navigation
+   - Social media sharing integration
+   - Rich snippet templates (Articles/HowTo/FAQ)
+
+5. **Multi-language Support:**
+   - RTL language compatibility
+   - Localized URL routing
+   - Language-specific metadata
+   - Translation memory system
+   - Automatic language detection
+   - Crowdsourced translation interface
+
+**Preferred Stack:**
+- Frontend: Next.js 14 (App Router)
+- Backend: Node.js/NestJS
+- Database: PostgreSQL
+- Search: ElasticSearch
+- i18n: next-intl
+- SEO: next-seo
+- ORM: Prisma
+- Hosting: Vercel + Supabase
+
+**Special Considerations:**
+- Implement dynamic OpenGraph image generation
+- Create automated SEO audit reports
+- Include Lighthouse CI integration
+- Support for multi-domain localization
+- Edge caching for static content
+- Webhook integrations for translation services
+
+**Deliverables:**
+1. Admin dashboard UI components
+2. API endpoints structure
+3. Database schema design
+4. CI/CD pipeline configuration
+5. Localization implementation guide
+6. SEO audit checklist
+7. Performance monitoring setup
+
+---
+
+This prompt provides a comprehensive framework while allowing flexibility for the AI to make technical decisions. Would you like me to elaborate on any specific component or adjust the technical preferences?

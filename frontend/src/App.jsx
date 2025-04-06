@@ -20,6 +20,11 @@ import PaymentHistoryPage from './pages/PaymentHistoryPage';
 import Profile from './pages/Profile';
 import NotFound from './pages/NotFound';
 
+// CMS and Blog Pages
+import CMSDashboardPage from './pages/cms/CMSDashboardPage';
+import BlogHomePage from './pages/blog/BlogHomePage';
+import BlogPostPage from './pages/blog/BlogPostPage';
+
 // Protected route component
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -104,6 +109,18 @@ const AppContent = () => {
                 </ProtectedRoute>
               }
             />
+            
+            {/* CMS routes */}
+            <Route path="/cms/*" element={
+              <ProtectedRoute>
+                <CMSDashboardPage />
+              </ProtectedRoute>
+            } />
+            
+            {/* Blog routes */}
+            <Route path="/blog" element={<BlogHomePage />} />
+            <Route path="/blog/:slug" element={<BlogPostPage />} />
+            <Route path="/blog/tag/:tag" element={<BlogHomePage />} />
             
             {/* 404 route */}
             <Route path="*" element={<NotFound />} />
