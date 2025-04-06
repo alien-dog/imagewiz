@@ -111,3 +111,21 @@ def update_user():
         "message": "User updated successfully",
         "user": user.to_dict()
     }), 200
+    
+@bp.route('/make-admin/<username>', methods=['POST'])
+def make_admin(username):
+    """Make a user an admin - This is a special endpoint for development only"""
+    # Check if user exists
+    user = User.query.filter_by(username=username).first()
+    
+    if not user:
+        return jsonify({"error": f"User {username} not found"}), 404
+    
+    # Make user an admin
+    user.is_admin = True
+    db.session.commit()
+    
+    return jsonify({
+        "message": f"User {username} is now an admin",
+        "user": user.to_dict()
+    }), 200
