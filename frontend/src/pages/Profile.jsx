@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 const Profile = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, forceRefreshUserData } = useAuth();
+  const [refreshing, setRefreshing] = useState(false);
   const [paymentHistory, setPaymentHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [historyError, setHistoryError] = useState('');
@@ -95,8 +96,39 @@ const Profile = () => {
                 <p className="text-sm font-medium text-gray-500">Current Credit Balance</p>
                 <p className="mt-1 text-lg font-bold text-teal-600">{user?.credit_balance || 0}</p>
               </div>
+              <div className="mt-2">
+                <p className="text-sm font-medium text-gray-500">Account Status</p>
+                <p className="mt-1 text-sm text-gray-900">
+                  {user?.is_admin ? (
+                    <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">Admin</span>
+                  ) : (
+                    <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">Standard User</span>
+                  )}
+                </p>
+              </div>
             </div>
-            <div className="mt-6">
+            <div className="mt-6 flex flex-col gap-3">
+              <button
+                onClick={async () => {
+                  setRefreshing(true);
+                  await forceRefreshUserData();
+                  setRefreshing(false);
+                }}
+                disabled={refreshing}
+                className="text-sm px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded flex items-center justify-center"
+              >
+                {refreshing ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Refreshing...
+                  </>
+                ) : (
+                  <>Refresh Account Status</>
+                )}
+              </button>
               <Link
                 to="/dashboard"
                 className="text-sm font-medium text-teal-600 hover:text-teal-500"

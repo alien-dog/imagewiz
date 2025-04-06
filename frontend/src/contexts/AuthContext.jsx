@@ -128,12 +128,16 @@ export const AuthProvider = ({ children }) => {
   const refreshUser = async () => {
     if (!token) return;
     try {
+      // Force clear any possible browser cache with unique timestamp and cache control headers
       const userTimestamp = new Date().getTime();
-      const userUrl = `/api/auth/user?t=${userTimestamp}`;
+      const userUrl = `/api/auth/user?forceRefresh=${userTimestamp}`;
       console.log("Refreshing user data from:", userUrl);
       const response = await fetch(userUrl, {
         headers: {
           Authorization: `Bearer ${token}`,
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
         },
       });
 
@@ -156,6 +160,51 @@ export const AuthProvider = ({ children }) => {
       return data;
     } catch (err) {
       console.error("Error refreshing user:", err);
+      return null;
+    }
+  };
+  
+  // Force a complete refresh - log out and back in with same token
+  const forceRefreshUserData = async () => {
+    try {
+      // First clear user data
+      setUser(null);
+      
+      // Then fetch fresh data from server with cache-busting
+      if (token) {
+        const timestamp = new Date().getTime();
+        const userUrl = `/api/auth/user?forceRefresh=${timestamp}`;
+        console.log("Force refreshing user data from:", userUrl);
+        
+        const response = await fetch(userUrl, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Force refreshed user data:", data);
+
+        // Update user data with latest from server
+        if (data.user) {
+          setUser(data.user);
+        } else if (data && data.id) {
+          setUser(data);
+        } else {
+          throw new Error("Invalid user data format");
+        }
+        
+        return data;
+      }
+    } catch (err) {
+      console.error("Error force refreshing user:", err);
       return null;
     }
   };
@@ -238,6 +287,7 @@ export const AuthProvider = ({ children }) => {
         login,
         logout,
         refreshUser,
+        forceRefreshUserData,
         isAuthenticated: !!user,
       }}
     >
