@@ -368,6 +368,105 @@ app.post('/api/payment/create-checkout-session', async (req, res) => {
   }
 });
 
+// Add manual proxy endpoints for CMS blog routes
+app.get('/api/cms/blog', async (req, res) => {
+  console.log('Manual proxy: Received CMS blog request');
+  try {
+    // Get query parameters
+    const queryParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(req.query)) {
+      if (value) queryParams.append(key, value.toString());
+    }
+    
+    const url = `http://localhost:${FLASK_PORT}/api/cms/blog${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+    console.log(`Forwarding to backend: ${url}`);
+    
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+      headers['Authorization'] = authHeader;
+    }
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+    });
+    
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (error) {
+    console.error('Manual proxy: Error forwarding CMS blog request', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/api/cms/blog/:slug', async (req, res) => {
+  console.log('Manual proxy: Received CMS blog detail request');
+  try {
+    const { slug } = req.params;
+    
+    // Get query parameters
+    const queryParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(req.query)) {
+      if (value) queryParams.append(key, value.toString());
+    }
+    
+    const url = `http://localhost:${FLASK_PORT}/api/cms/blog/${slug}${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+    console.log(`Forwarding to backend: ${url}`);
+    
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+      headers['Authorization'] = authHeader;
+    }
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+    });
+    
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (error) {
+    console.error('Manual proxy: Error forwarding CMS blog detail request', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/api/cms/tags', async (req, res) => {
+  console.log('Manual proxy: Received CMS tags request');
+  try {
+    const url = `http://localhost:${FLASK_PORT}/api/cms/tags`;
+    console.log(`Forwarding to backend: ${url}`);
+    
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+      headers['Authorization'] = authHeader;
+    }
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+    });
+    
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (error) {
+    console.error('Manual proxy: Error forwarding CMS tags request', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Add a manual proxy endpoint for order confirmation API
 app.get('/api/order-confirmation', async (req, res) => {
   console.log('✅ Manual proxy: Received order-confirmation API request');
