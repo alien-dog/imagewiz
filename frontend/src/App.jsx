@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import SimpleLanguageSelector from './components/SimpleLanguageSelector';
 import { Suspense, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -66,6 +67,7 @@ const AppContent = () => {
     <Router>
       <div className="flex flex-col min-h-screen">
         <Suspense fallback={<Loader />}>
+          <SimpleLanguageSelector />
           <Navbar />
           <main className="flex-grow">
             <Routes>
