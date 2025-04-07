@@ -1,0 +1,117 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "pricing": "Tarifs",
+    "blog": "Blog",
+    "dashboard": "Tableau de bord",
+    "history": "Historique",
+    "login": "Connexion",
+    "register": "S'inscrire",
+    "editor": "Éditeur d'image",
+    "account": "Mon compte",
+    "logout": "Déconnexion"
+  },
+  "footer": {
+    "about": "À propos",
+    "contact": "Contact",
+    "terms": "Conditions d'utilisation",
+    "privacy": "Politique de confidentialité",
+    "copyright": "© 2025 iMagenWiz. Tous droits réservés."
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "retry": "Réessayer",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "view": "Voir",
+    "submit": "Soumettre",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "credits": "Crédits",
+    "search": "Rechercher",
+    "filterBy": "Filtrer par",
+    "sortBy": "Trier par",
+    "ascOrder": "Croissant",
+    "descOrder": "Décroissant",
+    "showMore": "Afficher plus",
+    "showLess": "Afficher moins",
+    "all": "Tout",
+    "more": "Plus",
+    "less": "Moins",
+    "select": "Sélectionner",
+    "selectAll": "Sélectionner tout",
+    "selectNone": "Ne rien sélectionner",
+    "noResults": "Aucun résultat trouvé",
+    "notFound": "Non trouvé",
+    "required": "Obligatoire",
+    "optional": "Optionnel",
+    "or": "ou",
+    "and": "et",
+    "continue": "Continuer",
+    "language": "Langue"
+  },
+  "home": {
+    "hero": {
+      "title": "Supprimez les arrière-plans avec l'IA",
+      "subtitle": "Suppression d'arrière-plan rapide, facile et précise grâce à la technologie IA avancée",
+      "cta": "Commencer gratuitement",
+      "secondaryCta": "Voir les tarifs"
+    },
+    "features": {
+      "title": "Fonctionnalités",
+      "subtitle": "Pourquoi choisir iMagenWiz ?",
+      "feature1": {
+        "title": "Précision alimentée par l'IA",
+        "description": "Nos algorithmes IA avancés assurent une détection précise des contours même avec des images complexes"
+      },
+      "feature2": {
+        "title": "Traitement par lot",
+        "description": "Traitez plusieurs images à la fois pour gagner du temps et des efforts"
+      },
+      "feature3": {
+        "title": "Aucun téléchargement requis",
+        "description": "Solution 100% basée sur le cloud accessible depuis n'importe quel appareil avec une connexion internet"
+      },
+      "feature4": {
+        "title": "Résultats rapides",
+        "description": "Obtenez vos images traitées en quelques secondes, pas en minutes"
+      }
+    },
+    "howItWorks": {
+      "title": "Comment ça marche",
+      "step1": {
+        "title": "Téléchargez votre image",
+        "description": "Téléchargez n'importe quelle image dont vous souhaitez supprimer l'arrière-plan"
+      },
+      "step2": {
+        "title": "Traitement IA",
+        "description": "Notre IA analyse et traite votre image en quelques secondes"
+      },
+      "step3": {
+        "title": "Téléchargez le résultat",
+        "description": "Téléchargez votre image avec l'arrière-plan supprimé"
+      }
+    },
+    "testimonials": {
+      "title": "Ce que disent nos utilisateurs",
+      "viewAll": "Voir tous les témoignages"
+    }
+  },
+  "errors": {
+    "required": "Ce champ est obligatoire",
+    "invalidEmail": "Veuillez entrer une adresse e-mail valide",
+    "minLength": "Doit contenir au moins {{min}} caractères",
+    "maxLength": "Doit contenir au maximum {{max}} caractères",
+    "passwordMismatch": "Les mots de passe ne correspondent pas",
+    "invalidCredentials": "Email ou mot de passe invalide",
+    "serverError": "Erreur serveur. Veuillez réessayer plus tard.",
+    "networkError": "Erreur réseau. Veuillez vérifier votre connexion.",
+    "fileTooBig": "Le fichier est trop volumineux. La taille maximale est de {{size}}MB",
+    "fileTypeNotSupported": "Type de fichier non pris en charge. Veuillez télécharger {{types}}",
+    "unexpectedError": "Une erreur inattendue s'est produite"
+  }
+}
