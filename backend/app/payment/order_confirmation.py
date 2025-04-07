@@ -214,34 +214,24 @@ def fulfill_checkout(session_id):
                 "code": "user_not_found"
             }
         
-        # 11. Add credits to user's balance (the actual fulfillment)
-        original_balance = user.credits
-        user.credits += credits
-        
-        # 12. Record the payment using the ORM which is more adaptable to schema changes
-        # This marks the payment as fulfilled
+        # 11. Add credits to user's balance and record payment, with better transaction handling
         try:
-            # First check if the columns exist before inserting with them
+            # Start a clean transaction
+            db.session.begin_nested()  # Use savepoint to provide rollback capability
+            
+            # First, update user credits (highest priority)
+            original_balance = user.credits
+            user.credits += credits
+            
+            # Force an immediate flush of the user credits update
+            db.session.flush()
+            print(f"✅ User credits updated to {user.credits} (pending commit)")
+            
+            # Now try to record the payment
             try:
                 from sqlalchemy import text
                 
-                # Check if is_yearly column exists
-                is_yearly_exists = True
-                package_id_exists = True
-                
-                try:
-                    db.session.execute(text("SELECT is_yearly FROM recharge_history LIMIT 1"))
-                except Exception:
-                    is_yearly_exists = False
-                    print("⚠️ is_yearly column doesn't exist in recharge_history table")
-                
-                try:
-                    db.session.execute(text("SELECT package_id FROM recharge_history LIMIT 1"))
-                except Exception:
-                    package_id_exists = False
-                    print("⚠️ package_id column doesn't exist in recharge_history table")
-                
-                # Create a dictionary of core field values that will always be needed
+                # Create a dictionary of core field values
                 recharge_values = {
                     'user_id': user.id,
                     'amount': price,
@@ -251,82 +241,65 @@ def fulfill_checkout(session_id):
                     'stripe_payment_id': session_id
                 }
                 
-                # If we're certain the columns exist, use the ORM for a cleaner approach
-                if is_yearly_exists and package_id_exists:
-                    # Create a new recharge history using ORM with all fields
-                    recharge = RechargeHistory(
-                        **recharge_values,
-                        is_yearly=is_yearly,
-                        package_id=package_id or ''
-                    )
-                    db.session.add(recharge)
-                elif is_yearly_exists:
-                    # Create without package_id
-                    recharge = RechargeHistory(
-                        **recharge_values,
-                        is_yearly=is_yearly
-                    )
-                    db.session.add(recharge)
-                elif package_id_exists:
-                    # Create without is_yearly
-                    recharge = RechargeHistory(
-                        **recharge_values,
-                        package_id=package_id or ''
-                    )
-                    db.session.add(recharge)
-                else:
-                    # Use raw SQL with only the core columns if nothing else works
-                    from sqlalchemy import text
-                    
-                    print("⚠️ Using raw SQL insert with only the core fields")
-                    sql = text("""
-                    INSERT INTO recharge_history 
-                    (user_id, amount, credit_gained, payment_status, payment_method, stripe_payment_id, created_at)
-                    VALUES (:user_id, :amount, :credit_gained, :payment_status, :payment_method, :stripe_payment_id, NOW())
-                    """)
-                    
-                    # Execute the insert with only the required fields
-                    db.session.execute(sql, recharge_values)
-            except Exception as schema_error:
-                # Ultimate fallback - try the most basic approach possible
-                print(f"⚠️ Error with ORM approach: {str(schema_error)}")
-                print("⚠️ Using absolute fallback SQL insert with minimal columns")
+                # Try to use raw SQL with only the core columns - simplest approach that's most likely to work
+                print("Inserting payment record with basic columns")
+                sql = text("""
+                INSERT INTO recharge_history 
+                (user_id, amount, credit_gained, payment_status, payment_method, stripe_payment_id, created_at)
+                VALUES (:user_id, :amount, :credit_gained, :payment_status, :payment_method, :stripe_payment_id, NOW())
+                """)
                 
-                from sqlalchemy import text
+                # Execute the insert with only the required fields
+                db.session.execute(sql, recharge_values)
+                print("✅ Payment record inserted successfully")
                 
-                try:
-                    # Use the most minimal SQL possible as a last resort
-                    sql = text("""
-                    INSERT INTO recharge_history 
-                    (user_id, amount, credit_gained, payment_status, payment_method, stripe_payment_id)
-                    VALUES (:user_id, :amount, :credit_gained, 'completed', 'stripe', :stripe_payment_id)
-                    """)
-                    
-                    # Execute with only the absolutely essential fields
-                    db.session.execute(sql, {
-                        'user_id': user.id,
-                        'amount': price,
-                        'credit_gained': credits,
-                        'stripe_payment_id': session_id
-                    })
-                except Exception as e:
-                    # If even this fails, log it but don't let it prevent the credits from being added
-                    print(f"❌ CRITICAL: Final fallback SQL also failed: {str(e)}")
-                    print("⚠️ Credits will still be added but payment record may be incomplete")
+            except Exception as insert_error:
+                # If payment record fails, log it but continue with the credits update
+                print(f"⚠️ Warning: Failed to insert payment record: {str(insert_error)}")
+                print("⚠️ Will still proceed with credits update")
             
-            # Commit the transaction
+            # Commit the transaction - this will commit the user credits update even if payment record failed
             db.session.commit()
-            
-            print(f"✅ Successfully inserted payment record for user {user.username}")
+            print(f"✅ Transaction committed successfully")
             print(f"✅ User {user.username} credit balance is now {user.credits}")
             print(f"✅ User {user.username} recharged {credits} credits for ${price}")
+            
         except Exception as e:
+            # Something went wrong with the entire transaction
             db.session.rollback()
-            print(f"❌ Error recording payment: {str(e)}")
+            print(f"❌ Error in payment processing transaction: {str(e)}")
+            
+            # Try one more time with a completely fresh approach - just update credits
+            try:
+                print("Attempting direct credits update as fallback...")
+                # Refetch user to get a fresh state
+                fresh_user = User.query.get(user_id)
+                if fresh_user:
+                    fresh_user.credits += credits
+                    db.session.commit()
+                    print(f"✅ Fallback successful - User credits updated to {fresh_user.credits}")
+                    return {
+                        "status": "success",
+                        "user": fresh_user.to_dict(),
+                        "credits_added": credits,
+                        "original_balance": original_balance,
+                        "new_balance": fresh_user.credits,
+                        "amount_paid": price,
+                        "package_name": package_name,
+                        "is_yearly": is_yearly,
+                        "note": "Payment record may be incomplete but credits were added successfully"
+                    }
+                else:
+                    print(f"❌ Fallback failed - User {user_id} not found on refresh")
+            except Exception as fallback_error:
+                db.session.rollback()
+                print(f"❌ Fallback credits update also failed: {str(fallback_error)}")
+            
+            # If we got here, all approaches failed
             return {
                 "status": "error",
-                "error": f"Failed to record payment: {str(e)}",
-                "code": "payment_record_failed"
+                "error": f"Failed to process payment: {str(e)}",
+                "code": "payment_processing_failed"
             }
         
         # 13. Return success response with all the relevant details

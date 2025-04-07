@@ -893,40 +893,73 @@ def handle_payment_intent_success(payment_intent):
             credit_amount = round(amount * 5)  # $1 = 5 credits as a fallback
             package_id = 'custom'
         
-        # Add credits to user's balance
-        user.credits += credit_amount
-        
+        # Add credits and record payment with improved transaction handling
         try:
-            # Use raw SQL to insert the payment record
-            sql = text("""
-            INSERT INTO recharge_history 
-            (user_id, amount, credit_gained, payment_status, payment_method, stripe_payment_id, created_at)
-            VALUES (:user_id, :amount, :credit_gained, :payment_status, :payment_method, :stripe_payment_id, NOW())
-            """)
+            # Start a clean transaction with a savepoint
+            db.session.begin_nested()  # Creates a savepoint
             
-            db.session.execute(sql, {
-                'user_id': user.id,
-                'amount': amount,
-                'credit_gained': credit_amount,
-                'payment_status': 'completed',
-                'payment_method': 'stripe',
-                'stripe_payment_id': payment_id
-            })
+            # First update the user credits - highest priority
+            original_balance = user.credits
+            user.credits += credit_amount
             
-            db.session.commit()
-            print(f"Successfully inserted payment record for user {user.username}")
-        except Exception as insert_error:
-            db.session.rollback()
-            print(f"Error inserting payment record: {insert_error}")
-            # Try to update the credit balance even if the insert fails
+            # Force an immediate flush of the user credits update
+            db.session.flush()
+            print(f"✅ User credits updated to {user.credits} (pending commit)")
+            
+            # Now try to add the payment record
             try:
-                db.session.commit()
-                print(f"Updated user's credit balance to {user.credits}")
-            except Exception as balance_error:
+                # Use raw SQL to insert the payment record
+                sql = text("""
+                INSERT INTO recharge_history 
+                (user_id, amount, credit_gained, payment_status, payment_method, stripe_payment_id, created_at)
+                VALUES (:user_id, :amount, :credit_gained, :payment_status, :payment_method, :stripe_payment_id, NOW())
+                """)
+                
+                db.session.execute(sql, {
+                    'user_id': user.id,
+                    'amount': amount,
+                    'credit_gained': credit_amount,
+                    'payment_status': 'completed',
+                    'payment_method': 'stripe',
+                    'stripe_payment_id': payment_id
+                })
+                print("✅ Payment record inserted successfully")
+            except Exception as insert_error:
+                # If payment record fails, log it but continue with the credits update
+                print(f"⚠️ Warning: Failed to insert payment record: {str(insert_error)}")
+                print("⚠️ Will still proceed with credits update")
+            
+            # Commit the transaction - this will commit the user credits update even if payment record failed
+            db.session.commit()
+            print(f"✅ Transaction committed successfully")
+            print(f"✅ User {user.username} recharged {credit_amount} credits for ${amount}")
+            print(f"✅ User credit balance is now {user.credits}")
+            
+        except Exception as e:
+            # Something went wrong with the entire transaction
+            db.session.rollback()
+            print(f"❌ Error in payment processing transaction: {str(e)}")
+            
+            # Try one more time with a completely fresh approach - just update credits
+            try:
+                print("Attempting direct credits update as fallback...")
+                # Refetch user to get a fresh state
+                fresh_user = User.query.get(user_id)
+                if fresh_user:
+                    fresh_user.credits += credit_amount
+                    db.session.commit()
+                    print(f"✅ Fallback successful - User credits updated to {fresh_user.credits}")
+                    user = fresh_user  # Update the returned user
+                else:
+                    print(f"❌ Fallback failed - User {user_id} not found on refresh")
+            except Exception as fallback_error:
                 db.session.rollback()
-                print(f"Error updating user's credit balance: {balance_error}")
+                print(f"❌ Fallback credits update also failed: {str(fallback_error)}")
+                # If all approaches failed, we'll return None
+                return None
         
-        print(f"User {user.username} recharged {credit_amount} credits for ${amount}")
+        # If we got here, at least one of our approaches worked
+        print(f"✅ Payment processing completed for user {user.username}")
         return user
     except Exception as e:
         print(f"Error in handle_payment_intent_success: {str(e)}")
