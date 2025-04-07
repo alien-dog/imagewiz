@@ -49,9 +49,11 @@ const CreditUsageCard: React.FC = () => {
           const latestPayment = history[0];
           
           // Set plan details based on package_id and credits
+          // Handle null package_id safely
+          const packageId = latestPayment.package_id || '';
           setPlan({
-            name: latestPayment.package_id.includes('pro') ? 'Pro' : 
-                  latestPayment.package_id.includes('lite') ? 'Lite' : 'Free',
+            name: packageId.includes('pro') ? 'Pro' : 
+                  packageId.includes('lite') ? 'Lite' : 'Credit Package',
             credits: latestPayment.credit_gained
           });
           
