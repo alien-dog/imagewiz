@@ -1,0 +1,98 @@
+{
+  "title": "Choose Your Plan",
+  "subtitle": "Simple pricing for everyone",
+  "selectPlan": "Select a plan that works for you",
+  "monthly": "Monthly",
+  "yearly": "Yearly",
+  "yearlyDiscount": "Save with yearly billing",
+  "credits": "credits",
+  "perMonth": "/month",
+  "perYear": "/year",
+  "forever": "forever",
+  "currentPlan": "Current Plan",
+  "popular": "Most Popular",
+  "getStarted": "Get Started",
+  "upgrade": "Upgrade Now",
+  "contactSales": "Contact Sales",
+  "creditBalance": "Credit Balance",
+  "remainingCredits": "You have {{count}} credits remaining",
+  "plans": {
+    "free": {
+      "name": "Free",
+      "description": "For individuals wanting to try out our service",
+      "price": "0",
+      "credits": "5",
+      "features": [
+        "5 free credits",
+        "Standard quality processing",
+        "Web-based editor",
+        "24-hour support response time",
+        "JPG and PNG downloads"
+      ]
+    },
+    "lite": {
+      "name": "Lite",
+      "description": "For individuals and small teams with regular needs",
+      "priceMonthly": "9.90",
+      "priceYearly": "106.80",
+      "creditsMonthly": "50",
+      "creditsYearly": "600",
+      "features": [
+        "50 credits per month",
+        "High quality processing",
+        "Web-based editor",
+        "12-hour support response time",
+        "All common formats support",
+        "Bulk processing up to 10 images"
+      ]
+    },
+    "pro": {
+      "name": "Pro",
+      "description": "For professionals and businesses with high-volume needs",
+      "priceMonthly": "24.90",
+      "priceYearly": "262.80",
+      "creditsMonthly": "150",
+      "creditsYearly": "1800",
+      "features": [
+        "150 credits per month",
+        "Premium quality processing",
+        "Advanced editing tools",
+        "4-hour support response time",
+        "All formats support including TIFF",
+        "Bulk processing up to 50 images",
+        "API access",
+        "Priority processing"
+      ]
+    }
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "items": [
+      {
+        "question": "What happens when I run out of credits?",
+        "answer": "When you run out of credits, you can purchase more or upgrade your plan. Any unused credits will roll over to the next month."
+      },
+      {
+        "question": "Can I cancel my subscription at any time?",
+        "answer": "Yes, you can cancel your subscription at any time. Your subscription will remain active until the end of your billing period."
+      },
+      {
+        "question": "How are credits calculated?",
+        "answer": "One credit equals one image processed. The size and complexity of the image do not affect credit usage."
+      },
+      {
+        "question": "Do unused credits expire?",
+        "answer": "Credits are valid for 12 months from the date of purchase or renewal."
+      },
+      {
+        "question": "Can I upgrade or downgrade my plan?",
+        "answer": "Yes, you can upgrade or downgrade your plan at any time. When upgrading, you'll be charged the prorated difference. When downgrading, the new plan will take effect at the start of your next billing cycle."
+      }
+    ]
+  },
+  "cta": {
+    "title": "Ready to get started?",
+    "description": "Start with our free plan and upgrade anytime",
+    "button": "Try for Free"
+  }
+}
