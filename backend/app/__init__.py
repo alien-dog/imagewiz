@@ -22,26 +22,25 @@ def create_app():
     app = Flask(__name__, static_folder='static')
     
     # Configure the application
-    # Use PostgreSQL database from environment
+    # Use MySQL database credentials from environment
+    import pymysql
     from urllib.parse import quote_plus
     
-    # Check if DATABASE_URL environment variable is set (PostgreSQL)
-    database_url = os.environ.get('DATABASE_URL')
+    # Configure MySQL connection
+    mysql_user = os.environ.get('DB_USER', 'root')
+    mysql_password = quote_plus(os.environ.get('DB_PASSWORD', ''))
+    mysql_host = os.environ.get('DB_HOST', 'localhost')
+    mysql_db = os.environ.get('DB_NAME', 'imagenwiz')
     
-    if database_url:
-        print(f"Connecting to PostgreSQL using DATABASE_URL")
-        app.config['SQLALCHEMY_DATABASE_URI'] = database_url
-    else:
-        # Fallback to manual configuration
-        pg_host = os.environ.get('PGHOST', 'localhost')
-        pg_user = os.environ.get('PGUSER', 'postgres')
-        pg_password = quote_plus(os.environ.get('PGPASSWORD', 'postgres'))
-        pg_db = os.environ.get('PGDATABASE', 'postgres')
-        pg_port = os.environ.get('PGPORT', '5432')  # Default PostgreSQL port
-        
-        print(f"Connecting to PostgreSQL: {pg_user}@{pg_host}:{pg_port}/{pg_db}")
-        
-        app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{pg_user}:{pg_password}@{pg_host}:{pg_port}/{pg_db}'
+    print(f"Connecting to MySQL: {mysql_user}@{mysql_host}/{mysql_db}")
+    
+    # Configure connection with charset
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{mysql_user}:{mysql_password}@{mysql_host}/{mysql_db}?charset=utf8mb4'
+    # Add connection pool settings separately
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        'pool_recycle': 3600,
+        'pool_pre_ping': True
+    }
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(
@@ -97,14 +96,26 @@ def create_app():
         
         # Run database migrations for new columns
         try:
-            from .utils.migrate_recharge_history import run_migration
+            # Migrate recharge_history table first
+            from .utils.migrate_recharge_history import run_migration as migrate_recharge_history
             
             # Execute the migration to add required columns
-            migration_result = run_migration()
-            if migration_result:
+            recharge_migration_result = migrate_recharge_history()
+            if recharge_migration_result:
                 app.logger.info("Database migration for recharge_history columns completed successfully")
             else:
-                app.logger.warning("Database migration failed, payments may have limited functionality")
+                app.logger.warning("Database migration for recharge_history failed, payments may have limited functionality")
+                
+            # Run user credits migration
+            from .utils.migrate_user_credits import run_migration as migrate_user_credits
+            
+            # Execute the migration to add credits column to users table
+            user_migration_result = migrate_user_credits()
+            if user_migration_result:
+                app.logger.info("Database migration for users table credits column completed successfully")
+            else:
+                app.logger.warning("Database migration for users table credits column failed, payment verification may fail")
+                
         except Exception as e:
             app.logger.error(f"Error running database migrations: {e}")
             # Log error details for troubleshooting
