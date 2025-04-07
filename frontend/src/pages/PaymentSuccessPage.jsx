@@ -242,7 +242,7 @@ const PaymentSuccessPage = () => {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Current Balance:</span>
-                      <span className="font-medium">{user?.credit_balance || 0} credits</span>
+                      <span className="font-medium">{user?.credits || 0} credits</span>
                     </div>
                   </div>
                 )}

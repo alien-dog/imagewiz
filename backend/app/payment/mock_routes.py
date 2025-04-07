@@ -57,7 +57,7 @@ def mock_create_payment_intent():
     # Record the mock payment
     try:
         # Add credits
-        user.credit_balance += credit_amount
+        user.credits += credit_amount
         
         # Create payment record
         payment = RechargeHistory(
@@ -128,7 +128,7 @@ def mock_create_checkout_session():
     # Record mock payment
     try:
         # Add credits to user account
-        user.credit_balance += credit_amount
+        user.credits += credit_amount
         
         # Create payment record
         payment = RechargeHistory(

@@ -17,7 +17,7 @@ echo "Token obtained: ${TOKEN:0:20}..."
 USER_INFO=$(curl -s "http://localhost:3000/api/auth/user" \
   -H "Authorization: Bearer $TOKEN")
 
-INITIAL_BALANCE=$(echo "$USER_INFO" | grep -o '"credit_balance":[0-9]*' | cut -d ":" -f2)
+INITIAL_BALANCE=$(echo "$USER_INFO" | grep -o '"credits":[0-9]*' | cut -d ":" -f2)
 echo "Initial credit balance: $INITIAL_BALANCE"
 
 # Create a checkout session
@@ -105,7 +105,7 @@ echo "Checking for updated credit balance..."
 UPDATED_USER_INFO=$(curl -s "http://localhost:3000/api/auth/user" \
   -H "Authorization: Bearer $TOKEN")
 
-FINAL_BALANCE=$(echo "$UPDATED_USER_INFO" | grep -o '"credit_balance":[0-9]*' | cut -d ":" -f2)
+FINAL_BALANCE=$(echo "$UPDATED_USER_INFO" | grep -o '"credits":[0-9]*' | cut -d ":" -f2)
 echo "Final credit balance: $FINAL_BALANCE"
 
 # Calculate and display the difference

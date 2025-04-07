@@ -28,7 +28,7 @@ class User(db.Model):
         return {
             'id': self.id,
             'username': self.username,
-            'credit_balance': self.credits,  # Keep the API response name consistent
+            'credits': self.credits,  # Updated for consistency
             'created_at': self.created_at.isoformat(),
             'is_admin': self.is_admin
         }

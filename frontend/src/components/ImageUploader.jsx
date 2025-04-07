@@ -76,7 +76,7 @@ const ImageUploader = () => {
       return;
     }
 
-    if (user?.credit_balance < 1) {
+    if (user?.credits < 1) {
       setError('Insufficient credits. Please purchase more credits.');
       return;
     }
@@ -175,13 +175,13 @@ const ImageUploader = () => {
 
           <div className="flex justify-between items-center mt-6">
             <div className="text-sm text-gray-600">
-              {user ? `Credits available: ${user.credit_balance}` : 'Loading credits...'}
+              {user ? `Credits available: ${user.credits}` : 'Loading credits...'}
             </div>
             <button
               onClick={handleUpload}
-              disabled={!file || isUploading || user?.credit_balance < 1}
+              disabled={!file || isUploading || user?.credits < 1}
               className={`px-6 py-2 rounded-md text-white font-medium 
-                ${!file || isUploading || user?.credit_balance < 1
+                ${!file || isUploading || user?.credits < 1
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-teal-500 hover:bg-teal-600'
                 }`}

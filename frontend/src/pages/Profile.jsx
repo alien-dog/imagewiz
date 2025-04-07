@@ -94,7 +94,7 @@ const Profile = () => {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">Current Credit Balance</p>
-                <p className="mt-1 text-lg font-bold text-teal-600">{user?.credit_balance || 0}</p>
+                <p className="mt-1 text-lg font-bold text-teal-600">{user?.credits || 0}</p>
               </div>
               <div className="mt-2">
                 <p className="text-sm font-medium text-gray-500">Account Status</p>
@@ -152,7 +152,7 @@ const Profile = () => {
               </Link>
             </div>
             <p className="text-gray-600 mb-4">
-              Your current credit balance: <span className="font-bold">{user?.credit_balance || 0}</span> credits
+              Your current credit balance: <span className="font-bold">{user?.credits || 0}</span> credits
             </p>
             <div className="text-sm text-gray-500">
               <p>Need more credits? Visit our pricing page to purchase additional credit packages.</p>

@@ -9,9 +9,9 @@ async function verifyUserCredits() {
   
   try {
     // Login first to get the auth token
-    console.log('Logging in as testuser3...');
+    console.log('Logging in as testuser2...');
     const loginResponse = await axios.post('http://localhost:3000/api/auth/login', {
-      username: 'testuser3',
+      username: 'testuser2',
       password: 'password123'
     });
     
@@ -27,17 +27,17 @@ async function verifyUserCredits() {
         console.log('\nUser Information:');
         console.log('=================');
         console.log(`Username: ${userData.username}`);
-        console.log(`Credit Balance: ${userData.credit_balance}`);
+        console.log(`Credit Balance: ${userData.credits}`);
         console.log(`Account Created: ${userData.created_at}`);
         console.log(`Admin Status: ${userData.is_admin ? 'Yes' : 'No'}`);
         
         // Verify credits are correct after our tests
-        if (userData.credit_balance >= 2000) {
+        if (userData.credits >= 2000) {
           console.log('\n✅ Credit balance verification PASSED! User has sufficient credits.');
           console.log('   This indicates payments were processed correctly and credits were added to the account.');
         } else {
           console.log('\n❌ Credit balance verification FAILED! User has insufficient credits.');
-          console.log(`   Expected at least 2000 credits, but found ${userData.credit_balance}.`);
+          console.log(`   Expected at least 2000 credits, but found ${userData.credits}.`);
         }
         
         return userData;

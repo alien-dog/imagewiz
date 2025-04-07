@@ -73,7 +73,7 @@ const Navbar = () => {
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">
                 <span className="text-gray-700">
-                  {t('common.credits')}: {user?.credit_balance || 0}
+                  {t('common.credits')}: {user?.credits || 0}
                 </span>
                 <Link
                   to="/profile"
@@ -205,7 +205,7 @@ const Navbar = () => {
             {isAuthenticated ? (
               <div className="space-y-1">
                 <div className="pl-3 pr-4 py-2 text-gray-700">
-                  {t('common.credits')}: {user?.credit_balance || 0}
+                  {t('common.credits')}: {user?.credits || 0}
                 </div>
                 <Link
                   to="/profile"

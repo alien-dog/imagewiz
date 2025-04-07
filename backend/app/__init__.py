@@ -56,6 +56,17 @@ def create_app():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     os.makedirs(app.config['PROCESSED_FOLDER'], exist_ok=True)
     
+    # Set server's external URL for image processing responses
+    replit_domain = os.environ.get('REPLIT_DOMAIN')
+    if replit_domain:
+        app.config['SERVER_EXTERNAL_URL'] = f"https://{replit_domain}"
+    else:
+        # Get the hostname from the app config
+        app.config['SERVER_EXTERNAL_URL'] = os.environ.get('SERVER_EXTERNAL_URL')
+        
+    if app.config['SERVER_EXTERNAL_URL']:
+        app.logger.info(f"Using external URL for image links: {app.config['SERVER_EXTERNAL_URL']}")
+    
     # Initialize extensions with app
     db.init_app(app)
     jwt.init_app(app)

@@ -391,7 +391,7 @@ def webhook():
             user = handle_payment_intent_success(payment_intent)
             
             if user:
-                print(f"✅ Credits added for user {user.username} (ID: {user.id}), new balance: {user.credit_balance}")
+                print(f"✅ Credits added for user {user.username} (ID: {user.id}), new balance: {user.credits}")
             else:
                 print("❌ Failed to process payment intent")
                 
@@ -401,7 +401,7 @@ def webhook():
             user = handle_successful_payment(session)
             
             if user:
-                print(f"✅ Credits added for user {user.username} (ID: {user.id}), new balance: {user.credit_balance}")
+                print(f"✅ Credits added for user {user.username} (ID: {user.id}), new balance: {user.credits}")
             else:
                 print("❌ Failed to process async payment")
                 
@@ -532,7 +532,7 @@ def handle_successful_payment(session):
             # Continue with the payment processing
         
         # Add credits to user's balance
-        user.credit_balance += credits
+        user.credits += credits
         
         # Instead of using the ORM, let's directly execute SQL to insert only the columns we know exist
         from sqlalchemy import text
@@ -555,14 +555,14 @@ def handle_successful_payment(session):
                 'stripe_payment_id': session_id
             })
             
-            # The credits have already been added to user.credit_balance earlier in this function
+            # The credits have already been added to user.credits earlier in this function
             # DO NOT add the credits again to avoid doubling them
             
             # Commit all changes
             db.session.commit()
             
             print(f"Successfully inserted payment record for user {user.username}")
-            print(f"User {user.username} credit balance is now {user.credit_balance}")
+            print(f"User {user.username} credit balance is now {user.credits}")
         except Exception as insert_error:
             db.session.rollback()
             print(f"Error inserting payment record: {insert_error}")
@@ -571,13 +571,13 @@ def handle_successful_payment(session):
                 # Make sure we don't double-add credits
                 # We need to query the user again to get the latest credit balance
                 fresh_user = User.query.get(user.id)
-                if fresh_user.credit_balance == user.credit_balance - credits:
+                if fresh_user.credits == user.credits - credits:
                     # Only add credits if they weren't added before
-                    fresh_user.credit_balance += credits
+                    fresh_user.credits += credits
                     db.session.commit()
-                    print(f"Updated user's credit balance to {fresh_user.credit_balance}")
+                    print(f"Updated user's credit balance to {fresh_user.credits}")
                 else:
-                    print(f"Credits already added, current balance: {fresh_user.credit_balance}")
+                    print(f"Credits already added, current balance: {fresh_user.credits}")
             except Exception as balance_error:
                 db.session.rollback()
                 print(f"Error updating user's credit balance: {balance_error}")
@@ -636,7 +636,7 @@ def verify_payment_query():
             "amount_paid": fulfillment_result.get("amount_paid", 0),
             "credits_added": fulfillment_result.get("credits_added", 0),
             "is_yearly": fulfillment_result.get("is_yearly", False),
-            "new_balance": user.credit_balance
+            "new_balance": user.credits
         }), 200
     elif fulfillment_result['status'] == 'pending':
         return jsonify({
@@ -650,7 +650,7 @@ def verify_payment_query():
             "message": "Payment already verified",
             "user": user.to_dict(),
             "credits_added": fulfillment_result.get("credits_added", 0),
-            "new_balance": user.credit_balance
+            "new_balance": user.credits
         }), 200
     else:
         # Error during fulfillment
@@ -894,7 +894,7 @@ def handle_payment_intent_success(payment_intent):
             package_id = 'custom'
         
         # Add credits to user's balance
-        user.credit_balance += credit_amount
+        user.credits += credit_amount
         
         try:
             # Use raw SQL to insert the payment record
@@ -921,7 +921,7 @@ def handle_payment_intent_success(payment_intent):
             # Try to update the credit balance even if the insert fails
             try:
                 db.session.commit()
-                print(f"Updated user's credit balance to {user.credit_balance}")
+                print(f"Updated user's credit balance to {user.credits}")
             except Exception as balance_error:
                 db.session.rollback()
                 print(f"Error updating user's credit balance: {balance_error}")
@@ -1013,7 +1013,7 @@ def verify_payment_intent(payment_intent_id):
                     "amount_paid": amount,
                     "credits_added": credits,
                     "is_yearly": is_yearly,
-                    "new_balance": user.credit_balance
+                    "new_balance": user.credits
                 }), 200
             else:
                 return jsonify({"error": "Payment not completed or unauthorized"}), 400
@@ -1039,7 +1039,7 @@ def verify_payment_intent(payment_intent_id):
         "amount_paid": float(recharge['amount']),
         "credits_added": recharge['credit_gained'],
         "is_yearly": False,  # Default since column might not exist
-        "new_balance": user.credit_balance
+        "new_balance": user.credits
     }), 200
 
 @bp.route('/test-stripe-connection', methods=['GET'])

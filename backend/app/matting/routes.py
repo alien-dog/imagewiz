@@ -25,7 +25,7 @@ def process_matting():
         return jsonify({"error": "User not found"}), 404
     
     # Check if user has enough credits
-    if user.credit_balance < 1:
+    if user.credits < 1:
         return jsonify({"error": "Insufficient credits. Please recharge your account."}), 402
     
     # Check if file part exists in request
@@ -59,12 +59,32 @@ def process_matting():
         return jsonify({"error": "Failed to process image"}), 500
     
     # Generate URLs for the images
-    host = request.host_url.rstrip('/')
+    # Hardcode the external URL for now to ensure consistent URLs
+    host = "https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev"
+    
+    # Fallback to checking environment variables and config if the hardcoded URL is later removed
+    if not host:
+        import os
+        external_url = os.environ.get('REPLIT_DOMAIN')
+        
+        # Use external URL if available, otherwise fallback to request host
+        if external_url:
+            host = f"https://{external_url}"
+        else:
+            # Fall back to the request host if no environment variable is set
+            host = request.host_url.rstrip('/')
+            
+        # For local development, if hostname is localhost, use the server's external URL if available
+        if 'localhost' in host:
+            server_url = current_app.config.get('SERVER_EXTERNAL_URL')
+            if server_url:
+                host = server_url
+            
     original_url = f"{host}/uploads/{unique_original}"
     processed_url = f"{host}/processed/{unique_processed}"
     
     # Deduct credit from user
-    user.credit_balance -= 1
+    user.credits -= 1
     
     # Record the matting history
     history = MattingHistory(
@@ -81,7 +101,7 @@ def process_matting():
         "message": "Image processed successfully",
         "original_image": original_url,
         "processed_image": processed_url,
-        "credits_remaining": user.credit_balance,
+        "credits_remaining": user.credits,
         "history_id": history.id
     }), 200
 

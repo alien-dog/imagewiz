@@ -56,7 +56,7 @@ const DashboardPage = () => {
                 </div>
                 <div>
                   <div className="text-sm font-medium">Available Credits</div>
-                  <div className="text-2xl font-bold">{user?.credit_balance || 0}</div>
+                  <div className="text-2xl font-bold">{user?.credits || 0}</div>
                 </div>
                 <button 
                   onClick={handleRefreshCredits}

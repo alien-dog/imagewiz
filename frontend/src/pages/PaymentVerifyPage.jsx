@@ -32,11 +32,11 @@ const PaymentVerifyPage = () => {
       try {
         if (!isMounted) return;
         
-        // If no session ID is provided, we'll repeatedly check if the user's credit balance has increased
+        // If no session ID is provided, we'll repeatedly check if the user's credits have increased
         if (!sessionId) {
-          console.log('No session ID provided, checking user credit balance');
+          console.log('No session ID provided, checking user credits');
           
-          // Best effort approach: just refresh the user data to see if their credit balance has changed
+          // Best effort approach: just refresh the user data to see if their credits have changed
           await refreshUser();
           setPollingCount(prev => prev + 1);
           
@@ -99,7 +99,7 @@ const PaymentVerifyPage = () => {
             newBalance: response.data.new_balance || 0
           });
           
-          // Refresh user data to get updated credit balance
+          // Refresh user data to get updated credits
           await refreshUser();
           
           setLoading(false);
@@ -332,7 +332,7 @@ const PaymentVerifyPage = () => {
                                 <span className="font-medium">{paymentDetails.creditsAdded}</span> credits added
                               </p>
                               <p className="text-xs text-gray-500">
-                                New balance: <span className="font-medium">{user?.credit_balance || 0}</span> credits
+                                New balance: <span className="font-medium">{user?.credits || 0}</span> credits
                               </p>
                             </div>
                           </div>

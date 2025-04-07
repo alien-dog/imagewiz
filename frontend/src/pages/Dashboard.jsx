@@ -80,7 +80,7 @@ const Dashboard = () => {
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Your Credits</h2>
             <div className="flex items-center justify-between mb-4">
               <span className="text-gray-700">Available Credits:</span>
-              <span className="text-2xl font-bold text-teal-600">{user?.credit_balance || 0}</span>
+              <span className="text-2xl font-bold text-teal-600">{user?.credits || 0}</span>
             </div>
             <div className="text-sm text-gray-600 mb-6">
               Each image processing uses 1 credit

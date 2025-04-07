@@ -56,7 +56,7 @@ const CreditUsageCard: React.FC = () => {
           });
           
           // Calculate usage data
-          const used = latestPayment.credit_gained - (user.credit_balance || 0);
+          const used = latestPayment.credit_gained - (user.credits || 0);
           const total = latestPayment.credit_gained;
           const percentage = Math.min(Math.round((used / total) * 100), 100);
           
@@ -73,7 +73,7 @@ const CreditUsageCard: React.FC = () => {
           });
           
           // Calculate usage for free plan
-          const used = 3 - (user.credit_balance || 0);
+          const used = 3 - (user.credits || 0);
           const total = 3;
           const percentage = Math.min(Math.round((used / total) * 100), 100);
           
@@ -143,7 +143,7 @@ const CreditUsageCard: React.FC = () => {
           </div>
         )}
         <div className="mt-2">
-          <span className="font-medium">{user?.credit_balance || 0}</span> credits remaining
+          <span className="font-medium">{user?.credits || 0}</span> credits remaining
         </div>
       </div>
     </div>

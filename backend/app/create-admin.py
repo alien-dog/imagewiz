@@ -55,7 +55,7 @@ def create_admin_user():
             username=username,
             password=hashed_password,
             is_admin=True,
-            credit_balance=1000,  # Give admin a starting balance
+            credits=1000,  # Give admin a starting balance
             created_at=datetime.utcnow()
         )
         

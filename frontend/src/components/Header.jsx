@@ -52,7 +52,7 @@ export const Header = () => {
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 hidden group-hover:block">
                     <div className="px-4 py-2 text-sm text-gray-700 border-b">
                       <div>{currentUser.email || currentUser.username}</div>
-                      <div className="text-blue-500">{currentUser.credit_balance || 0} Credits</div>
+                      <div className="text-blue-500">{currentUser.credits || 0} Credits</div>
                     </div>
                     <Link to="/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</Link>
                     <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
@@ -148,7 +148,7 @@ export const Header = () => {
                 <div className="pt-2 border-t border-gray-200">
                   <div className="py-2 text-sm text-gray-700">
                     <div>{currentUser.email || currentUser.username}</div>
-                    <div className="text-blue-500">{currentUser.credit_balance || 0} Credits</div>
+                    <div className="text-blue-500">{currentUser.credits || 0} Credits</div>
                   </div>
                   <button 
                     onClick={handleLogout}
