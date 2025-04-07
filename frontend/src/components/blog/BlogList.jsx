@@ -145,11 +145,15 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
     
     return (
       <div className="mb-12">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6 inline-flex items-center">
+          <span className="bg-teal-100 text-teal-800 text-sm font-semibold mr-3 px-3 py-1 rounded-full">Featured</span>
+          Latest Article
+        </h2>
         <div 
           className="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer flex flex-col md:flex-row"
           onClick={() => handlePostClick(featuredPost.slug)}
         >
-          <div className="md:w-1/2 h-64 md:h-auto overflow-hidden bg-gray-100">
+          <div className="relative md:w-1/2 h-64 md:h-auto overflow-hidden bg-gray-100">
             {featuredPost.featured_image ? (
               <img 
                 src={featuredPost.featured_image} 
@@ -161,40 +165,55 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
                 <span className="text-2xl font-bold">iMagenWiz</span>
               </div>
             )}
+            
+            {/* Reading time badge */}
+            <div className="absolute top-4 right-4 bg-black/70 text-white text-sm font-medium px-3 py-1.5 rounded-md backdrop-blur-sm flex items-center">
+              <Clock className="h-4 w-4 mr-2" />
+              {formatReadTime(featuredPost.content)}
+            </div>
           </div>
           
           <div className="md:w-1/2 p-6 md:p-8 flex flex-col justify-between">
             <div>
-              <div className="flex items-center mb-4">
-                <span className="bg-teal-100 text-teal-800 text-xs font-semibold mr-2 px-3 py-1 rounded-full">Featured</span>
-                {featuredPost.tags && featuredPost.tags[0] && (
-                  <span className="bg-gray-100 text-gray-700 text-xs font-medium px-3 py-1 rounded-full">
-                    {featuredPost.tags[0].name}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {featuredPost.tags && featuredPost.tags.slice(0, 3).map(tag => (
+                  <span 
+                    key={tag.id}
+                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-teal-50 text-teal-700 border border-teal-100"
+                  >
+                    <TagIcon className="h-3 w-3 mr-1.5" />
+                    {tag.name}
                   </span>
-                )}
+                ))}
               </div>
               
-              <h2 className="text-2xl font-bold mb-4 text-gray-800 group-hover:text-teal-600 transition-colors">
+              <h2 className="text-2xl md:text-3xl font-bold mb-4 text-gray-800 group-hover:text-teal-600 transition-colors leading-tight">
                 {featuredPost.title}
               </h2>
               
-              <p className="text-gray-600 mb-6">
+              <div className="flex items-center mb-4 text-sm text-gray-500">
+                <Calendar className="h-4 w-4 mr-1.5 text-teal-500" />
+                <span>{formatDate(featuredPost.created_at)}</span>
+              </div>
+              
+              <p className="text-gray-600 mb-6 text-base leading-relaxed">
                 {truncateText(featuredPost.excerpt || featuredPost.content, 240)}
               </p>
             </div>
             
-            <div className="flex items-center text-sm text-gray-500 mt-auto">
+            <div className="flex items-center justify-between text-sm mt-auto border-t border-gray-100 pt-4">
               <div className="flex items-center">
-                <User className="h-4 w-4 mr-1" />
-                <span className="mr-4">{featuredPost.author?.name || 'iMagenWiz Team'}</span>
+                <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center mr-2">
+                  <span className="text-teal-700 font-semibold text-sm">
+                    {featuredPost.author?.name ? featuredPost.author.name.charAt(0).toUpperCase() : 'A'}
+                  </span>
+                </div>
+                <span className="text-gray-700 font-medium">{featuredPost.author?.name || 'iMagenWiz Team'}</span>
               </div>
-              <div className="flex items-center">
-                <Calendar className="h-4 w-4 mr-1" />
-                <span className="mr-4">{formatDate(featuredPost.created_at)}</span>
-              </div>
-              <div className="flex items-center">
-                <Clock className="h-4 w-4 mr-1" />
-                <span>{formatReadTime(featuredPost.content)}</span>
+              
+              <div className="flex items-center text-teal-600 font-medium group-hover:text-teal-700">
+                Read Full Article
+                <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-0.5" />
               </div>
             </div>
           </div>
@@ -210,7 +229,7 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
         className="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full cursor-pointer"
         onClick={() => handlePostClick(post.slug)}
       >
-        <div className="h-48 overflow-hidden bg-gray-100">
+        <div className="relative h-48 overflow-hidden bg-gray-100">
           {post.featured_image ? (
             <img 
               src={post.featured_image} 
@@ -222,37 +241,51 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
               <span className="text-xl font-bold">iMagenWiz</span>
             </div>
           )}
+          {/* Reading time badge */}
+          <div className="absolute top-3 right-3 bg-black/70 text-white text-xs font-medium px-2.5 py-1.5 rounded-md backdrop-blur-sm flex items-center">
+            <Clock className="h-3 w-3 mr-1.5" />
+            {formatReadTime(post.content)}
+          </div>
         </div>
         
         <div className="p-5 flex-grow flex flex-col">
-          <div className="mb-2 flex flex-wrap gap-2">
+          {/* Tags */}
+          <div className="mb-3 flex flex-wrap gap-2">
             {post.tags && post.tags.slice(0, 2).map((tag) => (
               <span 
                 key={tag.id}
-                className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-50 text-teal-700 border border-teal-100"
               >
+                <TagIcon className="h-3 w-3 mr-1" />
                 {tag.name}
               </span>
             ))}
           </div>
           
-          <h3 className="text-xl font-semibold mb-3 text-gray-800 group-hover:text-teal-600 transition-colors line-clamp-2">
+          {/* Title - more prominent */}
+          <h3 className="text-xl md:text-2xl font-bold mb-3 text-gray-800 group-hover:text-teal-600 transition-colors line-clamp-2">
             {post.title}
           </h3>
           
+          {/* Date */}
+          <div className="flex items-center mb-3 text-sm text-gray-500">
+            <Calendar className="h-4 w-4 mr-1.5 text-teal-500" />
+            <span>{formatDate(post.created_at)}</span>
+          </div>
+          
+          {/* Excerpt */}
           <p className="text-gray-600 mb-4 text-sm line-clamp-3 flex-grow">
             {truncateText(post.excerpt || post.content)}
           </p>
           
-          <div className="flex items-center justify-between text-sm text-gray-500 mt-auto pt-4 border-t border-gray-100">
-            <div className="flex items-center">
-              <Calendar className="h-4 w-4 mr-1" />
-              <span>{formatDate(post.created_at)}</span>
-            </div>
-            
-            <div className="flex items-center">
-              <Clock className="h-4 w-4 mr-1" />
-              <span>{formatReadTime(post.content)}</span>
+          {/* Read more link */}
+          <div className="mt-auto pt-4 border-t border-gray-100 flex justify-between items-center">
+            <span className="text-xs text-gray-500">
+              {post.author?.name ? `By ${post.author.name}` : 'By iMagenWiz Team'}
+            </span>
+            <div className="flex items-center text-teal-600 font-medium text-sm group-hover:text-teal-700">
+              Read Article
+              <ChevronRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-0.5" />
             </div>
           </div>
         </div>

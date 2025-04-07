@@ -194,8 +194,62 @@ const BlogPost = () => {
   // Generate table of contents
   const tableOfContents = getTocFromContent();
 
+  // Process content to add heading IDs for better SEO and navigation
+  const enhanceContentForSEO = () => {
+    if (!post || !post.content) return post.content || '';
+    
+    // Replace headings with properly ID'd headings for anchor links
+    let processedContent = post.content;
+    const headingMatches = [...post.content.matchAll(/<h([2-3])[^>]*>(.*?)<\/h\1>/g)];
+    
+    headingMatches.forEach((match, index) => {
+      const fullMatch = match[0];
+      const headingLevel = match[1];
+      const headingText = match[2].replace(/<[^>]*>?/gm, ''); // Remove any HTML tags
+      const headingId = `heading-${index}`;
+      const slug = headingText.toLowerCase().replace(/[^\w\s]/gi, '').replace(/\s+/g, '-');
+      
+      // Replace with properly ID'd heading with additional semantic markup
+      const newHeading = `<h${headingLevel} id="${headingId}" data-slug="${slug}" class="group flex items-center">${headingText}<a href="#${headingId}" class="ml-2 opacity-0 group-hover:opacity-100 transition-opacity" aria-label="Link to this section"><svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg></a></h${headingLevel}>`;
+      
+      processedContent = processedContent.replace(fullMatch, newHeading);
+    });
+    
+    return processedContent;
+  };
+
+  // Create proper metadata for SEO
+  const blogPostStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": post.title,
+    "image": post.featured_image || "",
+    "datePublished": post.published_at || post.created_at,
+    "dateModified": post.updated_at || post.created_at,
+    "author": {
+      "@type": "Person",
+      "name": post.author?.name || "iMagenWiz Team"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "iMagenWiz",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "/logo.png"
+      }
+    },
+    "description": post.meta_description || "",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": window.location.href
+    }
+  };
+
   return (
-    <div>
+    <div className="pb-16">
+      {/* Add structured data for SEO */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostStructuredData) }} />
+      
       {/* Hero Section with Featured Image */}
       <div className="bg-gradient-to-b from-teal-500/10 to-transparent">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-6">
@@ -203,6 +257,7 @@ const BlogPost = () => {
           <button
             onClick={() => navigate('/blog')}
             className="inline-flex items-center text-gray-600 hover:text-teal-600 mb-8 transition-colors bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm"
+            aria-label="Return to blog homepage"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to All Articles
@@ -212,7 +267,7 @@ const BlogPost = () => {
           {availableLanguages.length > 1 && (
             <div className="mb-6 flex items-center">
               <Globe className="h-5 w-5 text-teal-500 mr-2" />
-              <div className="flex space-x-2">
+              <div className="flex space-x-2" role="group" aria-label="Language selector">
                 {availableLanguages.map(lang => (
                   <button
                     key={lang.code}
@@ -222,6 +277,8 @@ const BlogPost = () => {
                         : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
                     }`}
                     onClick={() => changeLanguage(lang.code)}
+                    aria-label={`Switch to ${lang.name}`}
+                    aria-pressed={currentLanguage === lang.code}
                   >
                     {lang.name}
                   </button>
@@ -232,7 +289,14 @@ const BlogPost = () => {
         </div>
       </div>
       
-      <article className="max-w-4xl mx-auto px-4 sm:px-6 -mt-6">
+      <article className="max-w-4xl mx-auto px-4 sm:px-6 -mt-6" itemScope itemType="https://schema.org/BlogPosting">
+        {/* Hidden SEO metadata */}
+        <meta itemProp="headline" content={post.title} />
+        <meta itemProp="author" content={post.author?.name || "iMagenWiz Team"} />
+        <meta itemProp="datePublished" content={post.published_at || post.created_at} />
+        <meta itemProp="dateModified" content={post.updated_at || post.created_at} />
+        <meta itemProp="image" content={post.featured_image || ""} />
+        
         {/* Tags */}
         {post.tags && post.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-5">
@@ -241,6 +305,7 @@ const BlogPost = () => {
                 key={tag.id}
                 className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-teal-50 text-teal-700 hover:bg-teal-100 transition-colors border border-teal-100 shadow-sm"
                 onClick={() => navigate(`/blog?tag=${tag.slug}`)}
+                aria-label={`View all posts with tag: ${tag.name}`}
               >
                 <TagIcon className="h-3 w-3 mr-1.5" />
                 {tag.name}
@@ -251,18 +316,23 @@ const BlogPost = () => {
         
         {/* Post Header */}
         <header className="mb-8">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-6 leading-tight">{post.title}</h1>
+          <h1 
+            className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-6 leading-tight" 
+            itemProp="headline"
+          >
+            {post.title}
+          </h1>
           
           <div className="flex flex-wrap gap-4 md:gap-6 items-center text-gray-500 text-sm mb-6">
             {post.author && (
-              <div className="flex items-center">
+              <div className="flex items-center" itemProp="author" itemScope itemType="https://schema.org/Person">
                 <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center mr-3 border-2 border-white shadow-sm">
                   <span className="text-teal-700 font-semibold text-lg">
                     {post.author.name ? post.author.name.charAt(0).toUpperCase() : 'A'}
                   </span>
                 </div>
                 <div>
-                  <div className="font-medium text-gray-900">{post.author.name || 'iMagenWiz Team'}</div>
+                  <div className="font-medium text-gray-900" itemProp="name">{post.author.name || 'iMagenWiz Team'}</div>
                   <div className="text-xs text-gray-500">Content Writer</div>
                 </div>
               </div>
@@ -271,7 +341,7 @@ const BlogPost = () => {
             <div className="flex items-center space-x-4">
               <div className="flex items-center text-gray-500">
                 <Calendar className="h-4 w-4 mr-1.5 text-teal-500" />
-                <span>{formatDate(post.created_at)}</span>
+                <time dateTime={post.created_at} itemProp="datePublished">{formatDate(post.created_at)}</time>
               </div>
               
               <div className="flex items-center text-gray-500">
@@ -288,12 +358,16 @@ const BlogPost = () => {
                 src={post.featured_image}
                 alt={post.title}
                 className="w-full h-auto object-cover"
+                itemProp="image"
               />
             </div>
           )}
           
           {post.meta_description && (
-            <div className="mt-6 text-lg text-gray-600 leading-relaxed border-l-4 border-teal-300 pl-4 py-2 bg-teal-50/50 rounded-r-md">
+            <div 
+              className="mt-6 text-lg text-gray-600 leading-relaxed border-l-4 border-teal-300 pl-4 py-2 bg-teal-50/50 rounded-r-md"
+              itemProp="description"
+            >
               {post.meta_description}
             </div>
           )}
@@ -306,17 +380,18 @@ const BlogPost = () => {
               {/* Table of Contents */}
               {tableOfContents.length > 0 && (
                 <div className="mb-8 bg-gray-50 rounded-xl p-5 border border-gray-100 shadow-sm">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                  <h2 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
                     <BookOpen className="h-5 w-5 mr-2 text-teal-500" />
                     Table of Contents
-                  </h3>
-                  <nav className="space-y-1">
+                  </h2>
+                  <nav className="space-y-1" aria-label="Article Sections">
                     {tableOfContents.map(heading => (
                       <a
                         key={heading.id}
                         href={`#${heading.id}`}
                         className={`block py-1 px-2 text-gray-600 hover:text-teal-700 hover:bg-teal-50 rounded text-sm
                           ${heading.level === 3 ? 'ml-3' : ''}`}
+                        aria-label={`Jump to section: ${heading.text}`}
                       >
                         {heading.text}
                       </a>
@@ -327,11 +402,12 @@ const BlogPost = () => {
               
               {/* Share Section */}
               <div className="bg-gray-50 rounded-xl p-5 border border-gray-100 shadow-sm">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">Share Article</h3>
+                <h2 className="text-lg font-semibold text-gray-800 mb-3">Share Article</h2>
                 <div className="flex flex-col space-y-2">
                   <button
                     onClick={() => handleSocialShare('facebook')}
                     className="flex items-center w-full py-2 px-3 rounded-md text-sm bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                    aria-label="Share on Facebook"
                   >
                     <Facebook className="h-4 w-4 mr-2" />
                     Share on Facebook
@@ -339,6 +415,7 @@ const BlogPost = () => {
                   <button
                     onClick={() => handleSocialShare('twitter')}
                     className="flex items-center w-full py-2 px-3 rounded-md text-sm bg-blue-400 text-white hover:bg-blue-500 transition-colors"
+                    aria-label="Share on Twitter"
                   >
                     <Twitter className="h-4 w-4 mr-2" />
                     Share on Twitter
@@ -346,6 +423,7 @@ const BlogPost = () => {
                   <button
                     onClick={() => handleSocialShare('linkedin')}
                     className="flex items-center w-full py-2 px-3 rounded-md text-sm bg-blue-700 text-white hover:bg-blue-800 transition-colors"
+                    aria-label="Share on LinkedIn"
                   >
                     <Linkedin className="h-4 w-4 mr-2" />
                     Share on LinkedIn
@@ -354,12 +432,13 @@ const BlogPost = () => {
                     <button
                       onClick={handleShareClick}
                       className="flex items-center w-full py-2 px-3 rounded-md text-sm text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 transition-colors"
+                      aria-label="Copy article link to clipboard"
                     >
                       <LinkIcon className="h-4 w-4 mr-2 text-teal-500" />
                       Copy Link
                     </button>
                     {showShareTooltip && (
-                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-xs rounded shadow-lg whitespace-nowrap">
+                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-xs rounded shadow-lg whitespace-nowrap" role="alert">
                         Link copied!
                         <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-t-4 border-l-4 border-r-4 border-t-gray-800 border-l-transparent border-r-transparent"></div>
                       </div>
@@ -371,11 +450,11 @@ const BlogPost = () => {
           </aside>
           
           {/* Main Content */}
-          <div className="lg:flex-1">
-            {/* Post Content */}
+          <div className="lg:flex-1" itemProp="articleBody">
+            {/* Post Content - enhanced with proper heading IDs */}
             <div 
-              className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-headings:font-semibold prose-h2:text-2xl prose-h3:text-xl prose-h4:text-lg prose-p:text-gray-800 prose-p:leading-relaxed prose-a:text-teal-600 prose-a:no-underline hover:prose-a:underline prose-a:font-medium prose-strong:text-gray-900 prose-strong:font-semibold prose-ul:my-6 prose-li:my-2 prose-li:text-gray-700 prose-img:rounded-lg prose-img:shadow-md prose-blockquote:border-teal-500 prose-blockquote:bg-teal-50/50 prose-blockquote:rounded-r-md prose-blockquote:py-1 prose-blockquote:text-gray-700 prose-blockquote:not-italic"
-              dangerouslySetInnerHTML={{ __html: post.content }}
+              className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-headings:font-semibold prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3 prose-h4:text-lg prose-h4:mt-5 prose-h4:mb-2 prose-p:text-gray-800 prose-p:leading-relaxed prose-a:text-teal-600 prose-a:no-underline hover:prose-a:underline prose-a:font-medium prose-strong:text-gray-900 prose-strong:font-semibold prose-ul:my-6 prose-li:my-2 prose-li:text-gray-700 prose-img:rounded-lg prose-img:shadow-md prose-blockquote:border-teal-500 prose-blockquote:bg-teal-50/50 prose-blockquote:rounded-r-md prose-blockquote:py-1 prose-blockquote:text-gray-700 prose-blockquote:not-italic prose-code:text-teal-700 prose-code:bg-teal-50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none"
+              dangerouslySetInnerHTML={{ __html: enhanceContentForSEO() }}
             />
             
             {/* Mobile Share Buttons */}
