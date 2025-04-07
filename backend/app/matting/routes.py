@@ -8,6 +8,9 @@ from app import db
 from . import bp
 from .service import process_image, generate_unique_filename
 
+# Ensure we have access to os.path functions
+from os import path
+
 # Helper function to check if a file has an allowed extension
 def allowed_file(filename):
     """Check if the file has an allowed extension"""
@@ -48,11 +51,15 @@ def process_matting():
     unique_processed = f"processed_{unique_original}"
     
     # Save original file
-    original_path = os.path.join(current_app.config['UPLOAD_FOLDER'], unique_original)
+    # Use the OS module directly to create the paths
+    upload_folder = current_app.config['UPLOAD_FOLDER']
+    processed_folder = current_app.config['PROCESSED_FOLDER']
+    
+    original_path = upload_folder + '/' + unique_original
     file.save(original_path)
     
     # Process image
-    processed_path = os.path.join(current_app.config['PROCESSED_FOLDER'], unique_processed)
+    processed_path = processed_folder + '/' + unique_processed
     success = process_image(original_path, processed_path)
     
     if not success:
