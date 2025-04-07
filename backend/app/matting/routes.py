@@ -59,12 +59,14 @@ def process_matting():
         return jsonify({"error": "Failed to process image"}), 500
     
     # Generate URLs for the images
+    # Import the os module at the top level
+    import os
+    
     # Hardcode the external URL for now to ensure consistent URLs
     host = "https://e3d010d3-10b7-4398-916c-9569531b7cb9-00-nzrxz81n08w.kirk.replit.dev"
     
     # Fallback to checking environment variables and config if the hardcoded URL is later removed
     if not host:
-        import os
         external_url = os.environ.get('REPLIT_DOMAIN')
         
         # Use external URL if available, otherwise fallback to request host

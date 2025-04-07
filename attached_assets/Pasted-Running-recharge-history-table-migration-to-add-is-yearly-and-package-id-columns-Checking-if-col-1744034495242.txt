@@ -1,0 +1,36 @@
+Running recharge_history table migration to add is_yearly and package_id columns...
+Checking if column exists: is_yearly
+Error checking if column exists: (psycopg2.errors.UndefinedColumn) column "is_yearly" does not exist
+LINE 1: SELECT is_yearly FROM recharge_history LIMIT 1
+               ^
+
+[SQL: SELECT is_yearly FROM recharge_history LIMIT 1]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+Checking if column exists: package_id
+Error checking if column exists: (psycopg2.errors.InFailedSqlTransaction) current transaction is aborted, commands ignored until end of transaction block
+
+[SQL: SELECT package_id FROM recharge_history LIMIT 1]
+(Background on this error at: https://sqlalche.me/e/20/2j85)
+Adding is_yearly column to recharge_history table...
+Migration failed: (psycopg2.errors.InFailedSqlTransaction) current transaction is aborted, commands ignored until end of transaction block
+
+[SQL: ALTER TABLE recharge_history ADD COLUMN is_yearly BOOLEAN DEFAULT false]
+(Background on this error at: https://sqlalche.me/e/20/2j85)
+[2025-04-07 14:00:47,779] WARNING in __init__: Database migration failed, payments may have limited functionality
+DEBUG: Stripe API key is configured with key starting with: sk_t...
+DEBUG: Key length: 107 characters
+DEBUG: Key appears to be a valid test key format (sk_test_)
+DEBUG: Stripe API key set in library, API version: 2025-02-24.acacia
+DEBUG: Testing Stripe API connectivity...
+DEBUG: Successfully connected to Stripe API on startup
+DEBUG: Mock payment routes registered
+DEBUG: Payment diagnostic routes registered
+ * Debugger is active!
+ * Debugger PIN: 691-428-818
+🌐 Serving SPA route: /images/hero-image.png
+  Full URL: /images/hero-image.png
+  Original URL: /images/hero-image.png
+  Query params: {}
+172.31.128.76 - - [07/Apr/2025 14:00:53] "GET / HTTP/1.1" 200 -
+[2025-04-07 14:01:19,543] ERROR in __init__: Error: cannot access local variable 'os' where it is not associated with a value
+127.0.0.1 - - [07/Apr/2025 14:01:19] "POST /matting/process HTTP/1.1" 500 -
