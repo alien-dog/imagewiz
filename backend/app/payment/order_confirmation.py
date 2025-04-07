@@ -103,7 +103,7 @@ def fulfill_checkout(session_id):
                     "credits_added": credits_added,
                     "package_name": "Credit Package",  # Default since we don't store original package name
                     "amount_paid": session.amount_total / 100.0 if hasattr(session, 'amount_total') else 0,
-                    "new_balance": user.credit_balance
+                    "new_balance": user.credits
                 }
         except Exception as db_error:
             print(f"⚠️ Warning: Error checking for existing payment: {db_error}")
@@ -215,8 +215,8 @@ def fulfill_checkout(session_id):
             }
         
         # 11. Add credits to user's balance (the actual fulfillment)
-        original_balance = user.credit_balance
-        user.credit_balance += credits
+        original_balance = user.credits
+        user.credits += credits
         
         # 12. Record the payment using the ORM which is more adaptable to schema changes
         # This marks the payment as fulfilled
@@ -318,7 +318,7 @@ def fulfill_checkout(session_id):
             db.session.commit()
             
             print(f"✅ Successfully inserted payment record for user {user.username}")
-            print(f"✅ User {user.username} credit balance is now {user.credit_balance}")
+            print(f"✅ User {user.username} credit balance is now {user.credits}")
             print(f"✅ User {user.username} recharged {credits} credits for ${price}")
         except Exception as e:
             db.session.rollback()
@@ -335,7 +335,7 @@ def fulfill_checkout(session_id):
             "user": user.to_dict(),
             "credits_added": credits,
             "original_balance": original_balance,
-            "new_balance": user.credit_balance,
+            "new_balance": user.credits,
             "amount_paid": price,
             "package_name": package_name,
             "is_yearly": is_yearly
