@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useContext } from "react";
+import { createContext, useState, useEffect, useContext, useRef } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
@@ -15,6 +15,10 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Rate limiting for user refresh - track last refresh time
+  const lastUserRefreshTime = useRef(0);
+  const userRefreshLimit = 60000; // 60 seconds in milliseconds
 
   // Set up axios defaults - use relative URLs to ensure proxy works correctly
   axios.defaults.baseURL = '';  // Empty baseURL to use relative URLs
@@ -141,12 +145,27 @@ export const AuthProvider = ({ children }) => {
     setAuthToken(null);
   };
   
-  // Refresh user data from backend
+  // Refresh user data from backend with rate limiting
   const refreshUser = async () => {
     if (!token) return;
+    
     try {
+      // Rate limiting check - only refresh if it's been more than 60 seconds since last refresh
+      const currentTime = Date.now();
+      const timeSinceLastRefresh = currentTime - lastUserRefreshTime.current;
+      
+      // If the last refresh was less than 60 seconds ago, use cached data
+      if (timeSinceLastRefresh < userRefreshLimit) {
+        console.log(`Rate limited: User data refreshed recently (${Math.round(timeSinceLastRefresh / 1000)}s ago). Using cached data.`);
+        // Return the current user data from state
+        return user;
+      }
+      
+      // Update the last refresh time
+      lastUserRefreshTime.current = currentTime;
+      
       // Force clear any possible browser cache with unique timestamp and cache control headers
-      const userTimestamp = new Date().getTime();
+      const userTimestamp = currentTime;
       const userUrl = `/api/auth/user?forceRefresh=${userTimestamp}`;
       console.log("Refreshing user data from:", userUrl);
       const response = await fetch(userUrl, {
@@ -181,15 +200,29 @@ export const AuthProvider = ({ children }) => {
     }
   };
   
-  // Force a complete refresh - log out and back in with same token
+  // Force a complete refresh with rate limiting
   const forceRefreshUserData = async () => {
     try {
+      // Rate limiting check for force refresh
+      // We'll allow force refresh to bypass rate limiting for manual user actions
+      // But still track the last refresh time
+      const currentTime = Date.now();
+      const timeSinceLastRefresh = currentTime - lastUserRefreshTime.current;
+      
+      // Log whether we're rate-limiting this request
+      if (timeSinceLastRefresh < userRefreshLimit) {
+        console.log(`Force refresh requested, bypassing rate limit (${Math.round(timeSinceLastRefresh / 1000)}s since last refresh)`);
+      }
+      
+      // Update the last refresh time regardless
+      lastUserRefreshTime.current = currentTime;
+      
       // First clear user data
       updateUser(null);
       
       // Then fetch fresh data from server with cache-busting
       if (token) {
-        const timestamp = new Date().getTime();
+        const timestamp = currentTime;
         const userUrl = `/api/auth/user?forceRefresh=${timestamp}`;
         console.log("Force refreshing user data from:", userUrl);
         
