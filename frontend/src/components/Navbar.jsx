@@ -89,6 +89,7 @@ const Navbar = () => {
                 >
                   {t('nav.logout')}
                 </button>
+                <LanguageSelector variant="outline" />
               </div>
             ) : (
               <div className="space-x-4">

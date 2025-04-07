@@ -1,7 +1,13 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import HttpBackend from 'i18next-http-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
+
+// Import English resources (always available as fallback)
+import commonEN from './locales/en/common.json';
+import authEN from './locales/en/auth.json';
+import pricingEN from './locales/en/pricing.json';
+import blogEN from './locales/en/blog.json';
+import cmsEN from './locales/en/cms.json';
 
 // Define supported languages with their native names
 export const SUPPORTED_LANGUAGES = [
@@ -23,24 +29,28 @@ export const SUPPORTED_LANGUAGES = [
   { code: 'zh-TW', name: 'Traditional Chinese', nativeName: '繁體中文' }
 ];
 
+// Create resources object with English translations
+const resources = {
+  en: {
+    common: commonEN,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogEN,
+    cms: cmsEN
+  }
+};
+
 // Initialize i18next
 i18n
-  // Load translations using HTTP backend
-  .use(HttpBackend)
   // Detect user language
   .use(LanguageDetector)
   // Pass the i18n instance to react-i18next
   .use(initReactI18next)
   // Initialize configuration
   .init({
+    resources,
     fallbackLng: 'en',
     supportedLngs: SUPPORTED_LANGUAGES.map(lang => lang.code),
-    
-    // Backend configuration
-    backend: {
-      // Path to load translations from
-      loadPath: '/locales/{{lng}}/{{ns}}.json',
-    },
     
     // Default namespace
     defaultNS: 'common',
@@ -60,9 +70,6 @@ i18n
     interpolation: {
       escapeValue: false, // Not needed for React
     },
-    
-    // Allow loading missing keys from server
-    saveMissing: process.env.NODE_ENV === 'development',
     
     // Enable local caching
     detection: {
