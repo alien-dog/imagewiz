@@ -37,29 +37,45 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
                   ${variant === 'outline' 
                     ? 'border border-gray-300 hover:bg-gray-50' 
                     : 'bg-teal-500 text-white hover:bg-teal-600'}`}
+        aria-label={`Change language (current: ${currentLanguage.name})`}
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" 
-          stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="2" y1="12" x2="22" y2="12"></line>
-          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-        </svg>
+        <span className="text-lg mr-1">{currentLanguage.flag}</span>
         <span className="hidden md:inline">{currentLanguage.nativeName}</span>
+        <svg 
+          className="w-4 h-4 ml-1" 
+          xmlns="http://www.w3.org/2000/svg" 
+          viewBox="0 0 20 20" 
+          fill="currentColor"
+        >
+          <path 
+            fillRule="evenodd" 
+            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" 
+            clipRule="evenodd" 
+          />
+        </svg>
       </button>
       
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-80 overflow-y-auto">
+        <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-80 overflow-y-auto">
+          <div className="sticky top-0 bg-gray-100 px-4 py-2 font-medium text-sm border-b border-gray-200">
+            {t('language.select', 'Select language')}
+          </div>
+          
           {SUPPORTED_LANGUAGES.map((language) => (
             <button
               key={language.code}
-              className={`flex items-center gap-2 w-full text-left px-4 py-2 text-sm hover:bg-gray-100
-                        ${language.code === i18n.language ? 'bg-gray-100 font-medium' : ''}`}
+              className={`flex items-center w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100 last:border-b-0
+                        ${language.code === i18n.language ? 'bg-gray-50 font-medium' : ''}`}
               onClick={() => handleLanguageChange(language.code)}
             >
-              <span>{language.nativeName}</span>
-              <span className="text-gray-500 ml-auto text-xs">
-                {language.name}
-              </span>
+              <span className="text-xl mr-3">{language.flag}</span>
+              <div>
+                <div className="font-medium">{language.nativeName}</div>
+                <div className="text-gray-500 text-xs">{language.name}</div>
+              </div>
+              {language.code === i18n.language && (
+                <span className="ml-auto text-teal-500">✓</span>
+              )}
             </button>
           ))}
         </div>
