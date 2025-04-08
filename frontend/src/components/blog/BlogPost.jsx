@@ -18,6 +18,7 @@ import {
   Linkedin
 } from 'lucide-react';
 import { getBlogPostBySlug } from '../../lib/cms-service';
+import BlogImage from './BlogImage';
 
 const BlogPost = () => {
   const { slug } = useParams();
@@ -382,7 +383,7 @@ const BlogPost = () => {
           {/* Featured Image */}
           {post.featured_image && (
             <div className="mb-8 rounded-xl overflow-hidden shadow-lg">
-              <img
+              <BlogImage
                 src={post.featured_image}
                 alt={post.title}
                 className="w-full h-auto object-cover"
@@ -570,7 +571,7 @@ const BlogPost = () => {
               >
                 <div className="h-48 overflow-hidden bg-gray-100">
                   {relatedPost.featured_image ? (
-                    <img
+                    <BlogImage
                       src={relatedPost.featured_image}
                       alt={relatedPost.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"

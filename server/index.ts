@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import cors from 'cors';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import fs from 'fs';
+import http from 'http';
 import paymentHandler from './payment-handler-es';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -1340,28 +1341,92 @@ app.use('/uploads', createProxyMiddleware({
   changeOrigin: true
 }));
 
-// Add specific route for blog images
-app.use('/uploads/blog', (req, res) => {
+// Add specific route for blog images with proper path handling
+app.use('/uploads/blog', (req, res, next) => {
   const imagePath = req.path;
-  console.log(`🖼️ Serving blog image: ${imagePath}`);
+  console.log(`🖼️ Serving blog image from /uploads/blog: ${imagePath}`);
   
-  // Forward to Flask backend's static/uploads/blog folder
-  const url = `http://localhost:${FLASK_PORT}/static/uploads/blog${imagePath}`;
-  console.log(`Forwarding to: ${url}`);
+  // Get the image filename only
+  const imageFilename = imagePath.split('/').pop();
   
-  // Proxy the request to the Flask backend
-  createProxyMiddleware({
-    target: `http://localhost:${FLASK_PORT}`,
-    changeOrigin: true,
-    pathRewrite: {
-      '^/uploads/blog': '/static/uploads/blog'
-    },
-    logLevel: 'debug',
-    onError: (err, req, res) => {
-      console.error('Blog image proxy error:', err);
-      res.status(404).send('Image not found');
-    }
-  })(req, res, () => {});
+  // Create the Flask static path
+  const flaskStaticPath = `/static/uploads/blog/${imageFilename}`;
+  console.log(`🔄 Proxying to Flask backend: ${flaskStaticPath}`);
+  
+  // Direct proxy to the Flask backend's static file
+  const proxyReq = http.request({
+    host: 'localhost',
+    port: FLASK_PORT,
+    path: flaskStaticPath,
+    method: 'GET',
+  }, (proxyRes) => {
+    // Set appropriate headers
+    res.writeHead(proxyRes.statusCode || 200, proxyRes.headers);
+    
+    // Pipe the response from Flask directly to the client
+    proxyRes.pipe(res, { end: true });
+  });
+  
+  // Handle errors
+  proxyReq.on('error', (err) => {
+    console.error('Blog image proxy error:', err);
+    res.status(404).send('Image not found');
+  });
+  
+  // End the proxy request
+  proxyReq.end();
+});
+
+// Direct route for handling blog images with various path patterns
+// This handles both /blog/image.jpg and /uploads/blog/image.jpg paths
+app.use('/blog', (req, res, next) => {
+  const imagePath = req.path;
+  // Only handle image files
+  if (imagePath.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
+    console.log(`🖼️ Direct serving of blog image: ${imagePath}`);
+    
+    // Get just the filename from the path
+    const imageFilename = imagePath.split('/').pop();
+    
+    // Create the Flask static path
+    const flaskStaticPath = `/static/uploads/blog/${imageFilename}`;
+    console.log(`🔄 Proxying to Flask backend: ${flaskStaticPath}`);
+    
+    // Direct proxy to the Flask backend's static file
+    const proxyReq = http.request({
+      host: 'localhost',
+      port: FLASK_PORT,
+      path: flaskStaticPath,
+      method: 'GET',
+    }, (proxyRes) => {
+      // Set appropriate headers
+      res.writeHead(proxyRes.statusCode || 200, proxyRes.headers);
+      
+      // Pipe the response from Flask directly to the client
+      proxyRes.pipe(res, { end: true });
+    });
+    
+    // Handle errors
+    proxyReq.on('error', (err) => {
+      console.error('Direct blog image proxy error:', err);
+      
+      // Try an alternative path if the first fails
+      console.log(`🔄 Retrying with alternative path for: ${imageFilename}`);
+      const alternativePath = `/uploads/blog/${imageFilename}`;
+      console.log(`👉 Alternative path: ${alternativePath}`);
+      
+      // Forward to the uploads route instead
+      req.url = alternativePath;
+      next();
+    });
+    
+    // End the proxy request
+    proxyReq.end();
+  } else {
+    // For non-image URLs (like /blog/some-slug), mark as 'app-route' and send to React app
+    console.log(`🌟 Serving React app blog route`);
+    next();
+  }
 });
 
 // Proxy processed requests to Flask backend

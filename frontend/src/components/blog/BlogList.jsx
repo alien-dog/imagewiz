@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Calendar, Tag as TagIcon, ChevronRight, Clock, User, ArrowRight } from 'lucide-react';
 import { getBlogPosts } from '../../lib/cms-service';
 import { useTranslation } from 'react-i18next';
+import BlogImage from './BlogImage';
 
 const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
   const navigate = useNavigate();
@@ -157,7 +158,7 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
         >
           <div className="relative md:w-1/2 h-64 md:h-auto overflow-hidden bg-gray-100">
             {featuredPost.featured_image ? (
-              <img 
+              <BlogImage 
                 src={featuredPost.featured_image} 
                 alt={featuredPost.title} 
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -233,8 +234,8 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
       >
         <div className="relative h-48 overflow-hidden bg-gray-100">
           {post.featured_image ? (
-            <img 
-              src={post.featured_image} 
+            <BlogImage 
+              src={post.featured_image}
               alt={post.title} 
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
