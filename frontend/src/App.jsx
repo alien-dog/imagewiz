@@ -52,10 +52,21 @@ const AppContent = () => {
   // Set document language and direction on language change
   useEffect(() => {
     document.documentElement.lang = i18n.language;
-    document.documentElement.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
+    // Only set RTL for Arabic language, all others use LTR
+    const isRTL = i18n.language === 'ar';
+    document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+    
+    // Force editor components to use correct text direction
+    const editorContainers = document.querySelectorAll('[contenteditable="true"]');
+    editorContainers.forEach(editor => {
+      if (editor && editor.style) {
+        editor.style.direction = isRTL ? 'rtl' : 'ltr';
+        editor.style.textAlign = isRTL ? 'right' : 'left';
+      }
+    });
     
     // Log language changes for debugging
-    console.log(`Language changed to: ${i18n.language}`);
+    console.log(`Language changed to: ${i18n.language}, direction: ${document.documentElement.dir}`);
   }, [i18n.language]);
   
   // Loading component for suspense fallback

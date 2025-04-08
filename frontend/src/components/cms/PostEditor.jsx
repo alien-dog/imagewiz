@@ -23,14 +23,22 @@ import {
 } from '../../lib/cms-service';
 
 // Simple WYSIWYG editor component
-const RichTextEditor = ({ value, onChange }) => {
+const RichTextEditor = ({ value, onChange, languageCode }) => {
   const editorRef = useRef(null);
+  // Determine if the language is RTL (currently only Arabic is RTL)
+  const isRTL = languageCode === 'ar';
 
   useEffect(() => {
     if (editorRef.current) {
       editorRef.current.innerHTML = value || '';
+      
+      // Force text direction based on language
+      if (editorRef.current.style) {
+        editorRef.current.style.direction = isRTL ? 'rtl' : 'ltr';
+        editorRef.current.style.textAlign = isRTL ? 'right' : 'left';
+      }
     }
-  }, [value]);
+  }, [value, isRTL]);
 
   const handleInput = () => {
     if (editorRef.current) {
@@ -39,9 +47,9 @@ const RichTextEditor = ({ value, onChange }) => {
   };
 
   return (
-    <div className="border border-gray-300 rounded-md overflow-hidden">
+    <div className="border border-gray-300 rounded-md overflow-hidden" style={{ direction: 'ltr' }}>
       <div className="bg-gray-100 p-2 border-b border-gray-300">
-        <div className="flex space-x-2" dir="ltr">
+        <div className="flex space-x-2" dir="ltr" style={{ direction: 'ltr' }}>
           <button
             type="button"
             className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 font-bold"
@@ -94,7 +102,8 @@ const RichTextEditor = ({ value, onChange }) => {
         className="p-3 min-h-[300px] focus:outline-none"
         contentEditable
         onInput={handleInput}
-        dir="ltr"
+        dir={isRTL ? "rtl" : "ltr"}
+        style={{ direction: isRTL ? 'rtl' : 'ltr', textAlign: isRTL ? 'right' : 'left' }}
       />
     </div>
   );
@@ -452,6 +461,7 @@ const PostEditor = () => {
               <RichTextEditor
                 value={formData.content}
                 onChange={(value) => setFormData({ ...formData, content: value })}
+                languageCode={formData.language_code}
               />
             </div>
             
