@@ -745,6 +745,17 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
 });
 
+// EXPLICITLY handle blog routes to ensure they're ALWAYS served by Express, not forwarded to Flask
+app.get('/blog', (req, res) => {
+  console.log('🌟 Serving React app blog route');
+  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+});
+
+app.get('/blog/*', (req, res) => {
+  console.log('🌟 Serving React app blog subroute:', req.path);
+  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+});
+
 // Serve our test order confirmation page directly from the server folder
 // Handler for test-order-confirmation has been moved below
 
@@ -781,16 +792,7 @@ app.get('/register', (req, res) => {
   res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
 });
 
-// Add blog routes to ensure proper SPA serving
-app.get('/blog', (req, res) => {
-  console.log('🌟 Serving React app blog route');
-  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
-});
-
-app.get('/blog/:slug', (req, res) => {
-  console.log('🌟 Serving React app blog post route:', req.params.slug);
-  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
-});
+// Blog routes have been added above to ensure proper SPA serving
 
 app.get('/checkout', (req, res) => {
   console.log('🌟 Serving React checkout page');
@@ -1337,6 +1339,30 @@ app.use('/uploads', createProxyMiddleware({
   target: `http://localhost:${FLASK_PORT}`,
   changeOrigin: true
 }));
+
+// Add specific route for blog images
+app.use('/uploads/blog', (req, res) => {
+  const imagePath = req.path;
+  console.log(`🖼️ Serving blog image: ${imagePath}`);
+  
+  // Forward to Flask backend's static/uploads/blog folder
+  const url = `http://localhost:${FLASK_PORT}/static/uploads/blog${imagePath}`;
+  console.log(`Forwarding to: ${url}`);
+  
+  // Proxy the request to the Flask backend
+  createProxyMiddleware({
+    target: `http://localhost:${FLASK_PORT}`,
+    changeOrigin: true,
+    pathRewrite: {
+      '^/uploads/blog': '/static/uploads/blog'
+    },
+    logLevel: 'debug',
+    onError: (err, req, res) => {
+      console.error('Blog image proxy error:', err);
+      res.status(404).send('Image not found');
+    }
+  })(req, res, () => {});
+});
 
 // Proxy processed requests to Flask backend
 app.use('/processed', createProxyMiddleware({

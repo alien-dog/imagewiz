@@ -22,20 +22,28 @@ def create_app():
     app = Flask(__name__, static_folder='static')
     
     # Configure the application
-    # Use MySQL database credentials from environment
-    import pymysql
+    # Use PostgreSQL database from DATABASE_URL
     from urllib.parse import quote_plus
     
-    # Configure MySQL connection
-    mysql_user = os.environ.get('DB_USER', 'root')
-    mysql_password = quote_plus(os.environ.get('DB_PASSWORD', ''))
-    mysql_host = os.environ.get('DB_HOST', 'localhost')
-    mysql_db = os.environ.get('DB_NAME', 'imagenwiz')
+    # Get the DATABASE_URL from environment variables
+    database_url = os.environ.get('DATABASE_URL')
     
-    print(f"Connecting to MySQL: {mysql_user}@{mysql_host}/{mysql_db}")
+    if database_url:
+        print(f"Using DATABASE_URL for PostgreSQL connection")
+        app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    else:
+        # Fallback to direct PostgreSQL configuration
+        pg_user = os.environ.get('PGUSER', 'postgres')
+        pg_password = quote_plus(os.environ.get('PGPASSWORD', ''))
+        pg_host = os.environ.get('PGHOST', 'localhost')
+        pg_db = os.environ.get('PGDATABASE', 'postgres')
+        pg_port = os.environ.get('PGPORT', '5432')
+        
+        print(f"Connecting to PostgreSQL: {pg_user}@{pg_host}:{pg_port}/{pg_db}")
+        
+        # Configure connection with SSL mode
+        app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{pg_user}:{pg_password}@{pg_host}:{pg_port}/{pg_db}'
     
-    # Configure connection with charset
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{mysql_user}:{mysql_password}@{mysql_host}/{mysql_db}?charset=utf8mb4'
     # Add connection pool settings separately
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         'pool_recycle': 3600,
@@ -153,6 +161,14 @@ def create_app():
             """Serve CMS uploaded files"""
             cms_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'cms')
             return send_from_directory(os.path.abspath(cms_folder), filename)
+            
+        @app.route('/static/uploads/blog/<path:filename>')
+        def serve_blog_upload(filename):
+            """Serve blog uploaded files from static folder"""
+            app.logger.info(f"Serving blog image: {filename}")
+            blog_folder = os.path.join(app.static_folder, 'uploads', 'blog')
+            app.logger.info(f"Blog folder path: {blog_folder}")
+            return send_from_directory(os.path.abspath(blog_folder), filename)
             
         @app.route('/api/processed/<filename>')
         def serve_processed(filename):

@@ -1,0 +1,9 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#e6f7f8"/>
+  <rect x="100" y="100" width="600" height="400" rx="15" fill="#ffffff" stroke="#6bc5c8" stroke-width="5"/>
+  <circle cx="250" cy="230" r="80" fill="#6bc5c8" opacity="0.7"/>
+  <rect x="350" y="150" width="300" height="200" fill="#f0f0f0"/>
+  <path d="M350,150 L650,350 M350,350 L650,150" stroke="#6bc5c8" stroke-width="3"/>
+  <text x="400" y="450" font-family="Arial" font-size="30" fill="#333333">AI Background Removal</text>
+  <text x="400" y="480" font-family="Arial" font-size="20" fill="#666666">iMagenWiz</text>
+</svg>
