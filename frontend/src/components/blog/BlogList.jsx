@@ -36,13 +36,18 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
         params.search = search;
       }
       
+      console.log('Fetching blog posts with params:', params);
       const response = await getBlogPosts(params);
+      console.log('Blog API response:', response);
+      
       const allPosts = response.posts || [];
+      console.log('Retrieved posts count:', allPosts.length);
       
       // Set a featured post only on the first page when no filters are applied
       if (currentPage === 1 && !tag && !search && allPosts.length > 0) {
         setFeaturedPost(allPosts[0]);
         setPosts(allPosts.slice(1));
+        console.log('Set featured post:', allPosts[0].title);
       } else {
         setFeaturedPost(null);
         setPosts(allPosts);
@@ -52,7 +57,7 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
       setError(null);
     } catch (err) {
       console.error('Error fetching blog posts:', err);
-      setError('Could not load blog posts. Please try again later.');
+      setError('Could not load blog posts. Please try again later. Error: ' + (err.message || 'Unknown error'));
     } finally {
       setLoading(false);
     }

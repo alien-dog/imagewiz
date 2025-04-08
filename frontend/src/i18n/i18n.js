@@ -125,6 +125,13 @@ i18n
     },
   });
 
+// Helper function to check if a language code is RTL
+export const isRTL = (languageCode) => {
+  // RTL languages: Arabic, Hebrew, Persian (Farsi), Urdu
+  const rtlLanguages = ['ar', 'he', 'fa', 'ur'];
+  return rtlLanguages.includes(languageCode);
+};
+
 // Utility function to change language
 export const changeLanguage = async (lng) => {
   // First set the localStorage value - critical for page reloads
@@ -132,7 +139,16 @@ export const changeLanguage = async (lng) => {
   
   // Update the document properties
   document.documentElement.lang = lng;
-  document.documentElement.dir = lng === 'ar' ? 'rtl' : 'ltr'; // Set RTL for Arabic
+  document.documentElement.dir = isRTL(lng) ? 'rtl' : 'ltr';
+  
+  // Add RTL class to body for global styling
+  if (isRTL(lng)) {
+    document.body.classList.add('rtl');
+  } else {
+    document.body.classList.remove('rtl');
+  }
+  
+  console.log(`Setting language to ${lng}, direction: ${isRTL(lng) ? 'rtl' : 'ltr'}`);
   
   // Change the language in i18next - this should trigger React components to update
   try {
@@ -142,6 +158,12 @@ export const changeLanguage = async (lng) => {
     // Force update any existing dynamic content by dispatching a custom event
     const event = new CustomEvent('languageChanged', { detail: { language: lng } });
     document.dispatchEvent(event);
+    
+    // Add a global reload trigger after short delay to ensure UI elements update properly
+    setTimeout(() => {
+      const forceRerenderEvent = new CustomEvent('forceRerender', { detail: { language: lng } });
+      document.dispatchEvent(forceRerenderEvent);
+    }, 100);
   } catch (error) {
     console.error('Error changing language:', error);
   }

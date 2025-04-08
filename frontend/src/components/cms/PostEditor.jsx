@@ -356,7 +356,12 @@ const PostEditor = () => {
   
   const handleMediaUpload = async (e) => {
     const file = e.target.files[0];
-    if (!file) return;
+    if (!file) {
+      console.log('No file selected');
+      return;
+    }
+    
+    console.log('Selected file:', file.name, 'type:', file.type, 'size:', file.size);
     
     if (!id) {
       setError('Please save the post first before uploading media.');
@@ -368,15 +373,20 @@ const PostEditor = () => {
     
     try {
       setIsLoading(true);
+      console.log('Uploading media for post ID:', id);
       const response = await uploadMedia(id, formData);
+      
+      console.log('Upload response:', response);
       
       if (response && response.media) {
         // Add the new media to the existing media array
         const newMedia = response.media;
+        console.log('New media added:', newMedia);
         setMedia([...media, newMedia]);
         
-        // Automatically set as featured image if it's the first upload
+        // Automatically set as featured image if there's no featured image yet
         if (!formData.featured_image && newMedia.file_path) {
+          console.log('Setting as featured image:', newMedia.file_path);
           setFormData({
             ...formData,
             featured_image: newMedia.file_path
@@ -389,10 +399,13 @@ const PostEditor = () => {
         setTimeout(() => {
           setSuccess(null);
         }, 3000);
+      } else {
+        console.error('Invalid response format:', response);
+        setError('Invalid server response. Media data missing.');
       }
     } catch (err) {
       console.error('Error uploading media:', err);
-      setError('Failed to upload media. Please try again.');
+      setError(`Failed to upload media: ${err.message || 'Unknown error'}`);
     } finally {
       setIsLoading(false);
     }

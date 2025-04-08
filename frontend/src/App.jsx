@@ -5,8 +5,9 @@ import Footer from './components/Footer';
 import { Suspense, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
-// Initialize i18n
+// Initialize i18n with helper functions
 import './i18n/i18n';
+import { isRTL } from './i18n/i18n';
 
 // Pages
 import Home from './pages/Home';
@@ -54,21 +55,23 @@ const AppContent = () => {
     // Set the document language attribute
     document.documentElement.lang = i18n.language;
     
-    // Use comprehensive RTL check for proper RTL language support
-    // This includes Arabic, Hebrew, Urdu, and Farsi
-    const isRTL = ['ar', 'he', 'ur', 'fa'].includes(i18n.language);
+    // Use the imported isRTL helper for consistent RTL detection
+    const rtl = isRTL(i18n.language);
     
     // Set the document direction attribute
-    document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+    document.documentElement.dir = rtl ? 'rtl' : 'ltr';
     
     // Add a global CSS class to the body for easier RTL/LTR styling
-    if (isRTL) {
+    if (rtl) {
       document.body.classList.add('rtl-layout');
       document.body.classList.remove('ltr-layout');
     } else {
       document.body.classList.add('ltr-layout');
       document.body.classList.remove('rtl-layout');
     }
+    
+    console.log(`App.jsx: Set language to ${i18n.language}, direction: ${rtl ? 'rtl' : 'ltr'}`);
+    
     
     // Add a global stylesheet for RTL/LTR fixes
     let styleEl = document.getElementById('direction-style');

@@ -1,15 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SUPPORTED_LANGUAGES, changeLanguage } from '../i18n/i18n';
+import { SUPPORTED_LANGUAGES, changeLanguage, isRTL } from '../i18n/i18n';
 
 const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
   const { i18n, t } = useTranslation('common');
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   
+  // Enhanced language detection with fallback
+  const currentLanguageCode = i18n.language || localStorage.getItem('i18nextLng') || 'en';
   const currentLanguage = SUPPORTED_LANGUAGES.find(
-    (lang) => lang.code === i18n.language
+    (lang) => lang.code === currentLanguageCode
   ) || SUPPORTED_LANGUAGES[0];
+  
+  console.log('Current language:', currentLanguageCode, 'Direction:', isRTL(currentLanguageCode) ? 'RTL' : 'LTR');
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -23,14 +27,33 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+  
+  // Ensure the document direction matches the current language on component mount
+  useEffect(() => {
+    // Set document direction based on current language
+    const direction = isRTL(currentLanguageCode) ? 'rtl' : 'ltr';
+    if (document.documentElement.dir !== direction) {
+      console.log(`Updating document direction to ${direction} based on language ${currentLanguageCode}`);
+      document.documentElement.dir = direction;
+      
+      // Also update body class for consistent styling
+      if (isRTL(currentLanguageCode)) {
+        document.body.classList.add('rtl');
+      } else {
+        document.body.classList.remove('rtl');
+      }
+    }
+  }, [currentLanguageCode]);
 
   const handleLanguageChange = async (languageCode) => {
     try {
       // Don't change if it's already the current language
-      if (languageCode === i18n.language) {
+      if (languageCode === currentLanguageCode) {
         setIsOpen(false);
         return;
       }
+      
+      console.log(`Changing language from ${currentLanguageCode} to ${languageCode}`);
       
       // Change the language
       await changeLanguage(languageCode);
@@ -96,7 +119,7 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
               <button
                 key={language.code}
                 className={`flex items-center w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100 last:border-b-0
-                          ${language.code === i18n.language ? 'bg-gray-50 font-medium' : ''}`}
+                          ${language.code === currentLanguageCode ? 'bg-gray-50 font-medium' : ''}`}
                 onClick={() => handleLanguageChange(language.code)}
               >
                 <span className="text-xl mr-3">{language.flag}</span>
@@ -104,7 +127,7 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
                   <div className="font-medium">{language.nativeName}</div>
                   <div className="text-gray-500 text-xs">{language.name}</div>
                 </div>
-                {language.code === i18n.language && (
+                {language.code === currentLanguageCode && (
                   <span className="ml-auto text-teal-500">✓</span>
                 )}
               </button>
