@@ -41,10 +41,10 @@ const RichTextEditor = ({ value, onChange }) => {
   return (
     <div className="border border-gray-300 rounded-md overflow-hidden">
       <div className="bg-gray-100 p-2 border-b border-gray-300">
-        <div className="flex space-x-2">
+        <div className="flex space-x-2" dir="ltr">
           <button
             type="button"
-            className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50"
+            className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 font-bold"
             onClick={() => document.execCommand('bold', false, '')}
           >
             B
@@ -94,6 +94,7 @@ const RichTextEditor = ({ value, onChange }) => {
         className="p-3 min-h-[300px] focus:outline-none"
         contentEditable
         onInput={handleInput}
+        dir="ltr"
       />
     </div>
   );
