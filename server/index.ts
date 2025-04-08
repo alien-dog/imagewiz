@@ -1642,6 +1642,79 @@ app.use('/uploads', createProxyMiddleware({
   changeOrigin: true
 }));
 
+// Helper function to try alternative paths for blog images
+function tryAlternativePath(req, res, next, imageFilename) {
+  console.log(`🔄 Trying alternative path pattern for image: ${imageFilename}`);
+  
+  // Try alternative path variants
+  const alternativePaths = [
+    `/api/static/uploads/blog/${imageFilename}`,  // Direct Flask API static path
+    `/static/uploads/blog/${imageFilename}`,      // Flask static path
+    `/api/uploads/blog/${imageFilename}`          // API proxy path
+  ];
+  
+  console.log(`👉 Trying alternative paths for: ${imageFilename}`);
+  
+  // Try each path in sequence
+  tryNextPath(0);
+  
+  function tryNextPath(index) {
+    if (index >= alternativePaths.length) {
+      console.error(`❌ All image paths failed for: ${imageFilename}`);
+      // Send a default teal-colored SVG placeholder instead of 404
+      const placeholderSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+        <rect width="800" height="600" fill="#4DB6AC"/>
+        <text x="400" y="300" font-family="Arial" font-size="32" fill="white" text-anchor="middle">iMagenWiz</text>
+      </svg>`;
+      
+      res.setHeader('Content-Type', 'image/svg+xml');
+      res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
+      res.status(200).send(placeholderSvg);
+      return;
+    }
+    
+    const currentPath = alternativePaths[index];
+    console.log(`👉 [${index + 1}/${alternativePaths.length}] Trying: ${currentPath}`);
+    
+    // Strip /api prefix for actual Flask request
+    const flaskPath = currentPath.replace(/^\/api/, '');
+    
+    const proxyReq = http.request({
+      host: 'localhost',
+      port: FLASK_PORT,
+      path: flaskPath,
+      method: 'GET',
+    }, (proxyRes) => {
+      if (proxyRes.statusCode === 200) {
+        console.log(`✅ Successfully retrieved image from alternative path: ${currentPath}`);
+        
+        // Add caching headers
+        res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 24 hours
+        
+        // Set appropriate headers
+        res.writeHead(proxyRes.statusCode, proxyRes.headers);
+        
+        // Pipe the response from Flask directly to the client
+        proxyRes.pipe(res, { end: true });
+      } else {
+        console.log(`⚠️ Path failed [${index + 1}/${alternativePaths.length}]: ${currentPath}`);
+        // Try next path
+        tryNextPath(index + 1);
+      }
+    });
+    
+    // Handle errors for this path attempt
+    proxyReq.on('error', (err) => {
+      console.error(`❌ Error for path [${index + 1}/${alternativePaths.length}]: ${currentPath}`, err.message);
+      // Try next path
+      tryNextPath(index + 1);
+    });
+    
+    // End the proxy request
+    proxyReq.end();
+  }
+}
+
 // Add specific route for blog images with proper path handling
 app.use('/uploads/blog', (req, res, next) => {
   const imagePath = req.path;
@@ -1661,17 +1734,29 @@ app.use('/uploads/blog', (req, res, next) => {
     path: flaskStaticPath,
     method: 'GET',
   }, (proxyRes) => {
-    // Set appropriate headers
-    res.writeHead(proxyRes.statusCode || 200, proxyRes.headers);
-    
-    // Pipe the response from Flask directly to the client
-    proxyRes.pipe(res, { end: true });
+    // If successful response
+    if (proxyRes.statusCode === 200) {
+      console.log(`✅ Successfully retrieved image: ${imagePath}`);
+      
+      // Add caching headers
+      res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 24 hours
+      
+      // Set appropriate headers
+      res.writeHead(proxyRes.statusCode, proxyRes.headers);
+      
+      // Pipe the response from Flask directly to the client
+      proxyRes.pipe(res, { end: true });
+    } else {
+      // Failed to get the image, try alternative paths
+      console.log(`⚠️ Image not found at ${flaskStaticPath}, status: ${proxyRes.statusCode}`);
+      tryAlternativePath(req, res, next, imageFilename);
+    }
   });
   
   // Handle errors
   proxyReq.on('error', (err) => {
     console.error('Blog image proxy error:', err);
-    res.status(404).send('Image not found');
+    tryAlternativePath(req, res, next, imageFilename);
   });
   
   // End the proxy request
@@ -1700,25 +1785,29 @@ app.use('/blog', (req, res, next) => {
       path: flaskStaticPath,
       method: 'GET',
     }, (proxyRes) => {
-      // Set appropriate headers
-      res.writeHead(proxyRes.statusCode || 200, proxyRes.headers);
-      
-      // Pipe the response from Flask directly to the client
-      proxyRes.pipe(res, { end: true });
+      // If successful response
+      if (proxyRes.statusCode === 200) {
+        console.log(`✅ Successfully retrieved image via /blog route: ${imageFilename}`);
+        
+        // Add caching headers
+        res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 24 hours
+        
+        // Set appropriate headers
+        res.writeHead(proxyRes.statusCode, proxyRes.headers);
+        
+        // Pipe the response from Flask directly to the client
+        proxyRes.pipe(res, { end: true });
+      } else {
+        // Failed to get the image, try alternative paths
+        console.log(`⚠️ Image not found at ${flaskStaticPath}, status: ${proxyRes.statusCode}`);
+        tryAlternativePath(req, res, next, imageFilename);
+      }
     });
     
     // Handle errors
     proxyReq.on('error', (err) => {
       console.error('Direct blog image proxy error:', err);
-      
-      // Try an alternative path if the first fails
-      console.log(`🔄 Retrying with alternative path for: ${imageFilename}`);
-      const alternativePath = `/uploads/blog/${imageFilename}`;
-      console.log(`👉 Alternative path: ${alternativePath}`);
-      
-      // Forward to the uploads route instead
-      req.url = alternativePath;
-      next();
+      tryAlternativePath(req, res, next, imageFilename);
     });
     
     // End the proxy request

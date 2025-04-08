@@ -10,6 +10,7 @@ const BlogImage = ({ src, alt, className = '', width, height }) => {
   const [imageSrc, setImageSrc] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [currentTryIndex, setCurrentTryIndex] = useState(0);
   
   useEffect(() => {
     if (!src) {
@@ -22,134 +23,115 @@ const BlogImage = ({ src, alt, className = '', width, height }) => {
     // Reset states when src changes
     setLoading(true);
     setError(false);
+    setCurrentTryIndex(0);
     
-    // Normalize image source
-    const normalizedSrc = normalizeSrc(src);
-    setImageSrc(normalizedSrc);
+    // Get all possible paths to try
+    const pathsToTry = getAllPossiblePaths(src);
+    tryLoadingImage(pathsToTry, 0);
+  }, [src]);
+  
+  // Function to try loading images from an array of possible paths
+  const tryLoadingImage = (paths, index) => {
+    if (index >= paths.length) {
+      // We've tried all paths, show error fallback
+      console.error(`Failed to load image after trying all paths for: ${src}`);
+      setError(true);
+      setLoading(false);
+      return;
+    }
     
-    // Preload the image
+    const currentPath = paths[index];
+    console.log(`Trying to load image [${index + 1}/${paths.length}]: ${currentPath}`);
+    setImageSrc(currentPath);
+    
     const img = new Image();
     img.onload = () => {
+      console.log(`✅ Successfully loaded image: ${currentPath}`);
       setLoading(false);
     };
     img.onerror = () => {
-      console.error(`Failed to load image: ${normalizedSrc}`);
-      
-      // Try alternative path format
-      const altSrc = getAlternativePath(src);
-      if (altSrc !== normalizedSrc) {
-        console.log(`Trying alternative path: ${altSrc}`);
-        setImageSrc(altSrc);
-        
-        // Try loading with alternative path
-        const altImg = new Image();
-        altImg.onload = () => {
-          setLoading(false);
-        };
-        altImg.onerror = () => {
-          console.error(`Failed to load alternative image: ${altSrc}`);
-          setError(true);
-          setLoading(false);
-        };
-        altImg.src = altSrc;
-      } else {
-        setError(true);
-        setLoading(false);
-      }
+      console.warn(`❌ Failed to load image path [${index + 1}/${paths.length}]: ${currentPath}`);
+      // Try next path
+      tryLoadingImage(paths, index + 1);
     };
-    img.src = normalizedSrc;
-  }, [src]);
+    img.src = currentPath;
+  };
   
-  // Function to normalize image source
-  const normalizeSrc = (src) => {
-    if (!src) return '';
+  // Function to get all possible paths to try, ordered by most likely to work
+  const getAllPossiblePaths = (src) => {
+    if (!src) return [];
     
-    // If src is already a full URL (starts with http)
+    const paths = [];
+    
+    // If src is already a full URL, use it first
     if (src.startsWith('http')) {
-      return src;
+      paths.push(src);
     }
     
-    // Clean any double slashes
-    let cleanSrc = src.replace(/\/\//g, '/');
+    // Extract the filename for building alternate paths
+    let filename = src.split('/').pop();
     
-    // If the path doesn't start with /, add it
+    // Clean any double slashes and ensure we have a path starting with /
+    let cleanSrc = src.replace(/\/\//g, '/');
     if (!cleanSrc.startsWith('/')) {
       cleanSrc = '/' + cleanSrc;
     }
     
-    // Handle different path formats
+    // Add path variations in order of priority
+    
+    // 1. Try the /uploads/blog/filename.jpg format (used by Express proxy endpoint)
+    paths.push(`/uploads/blog/${filename}`);
+    
+    // 2. Try direct blog filename format
+    paths.push(`/blog/${filename}`);
+    
+    // 3. If we have a path with /static/ convert it
     if (cleanSrc.includes('/static/uploads/blog/')) {
-      // Convert flask static path to frontend path
-      return cleanSrc.replace('/static/uploads/blog/', '/uploads/blog/');
-    } else if (cleanSrc.includes('/uploads/blog/')) {
-      // Path is already in the correct format
-      return cleanSrc;
-    } else if (cleanSrc.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
-      // It's an image filename, add /blog/ prefix
-      const filename = cleanSrc.split('/').pop();
-      return `/blog/${filename}`;
+      paths.push(cleanSrc.replace('/static/uploads/blog/', '/uploads/blog/'));
     }
     
-    // Return the path as is if none of the above conditions match
-    return cleanSrc;
+    // 4. Try full Flask static path (proxied)
+    paths.push(`/static/uploads/blog/${filename}`);
+    
+    // 5. Add the original path if not already added
+    if (!paths.includes(cleanSrc)) {
+      paths.push(cleanSrc);
+    }
+    
+    // 6. If we have any default images to try
+    paths.push('/blog/ai-background-removal.jpg');
+    paths.push('/blog/product-photography-tips.jpg');
+    
+    // Filter out duplicates
+    return [...new Set(paths)];
   };
   
-  // Function to get alternative path format
-  const getAlternativePath = (src) => {
-    if (!src) return '';
-    
-    // Extract the filename
-    const filename = src.split('/').pop();
-    
-    // If already using /blog/filename.jpg, try /uploads/blog/filename.jpg
-    if (src.match(/^\/blog\/[^\/]+\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
-      return `/uploads/blog/${filename}`;
-    }
-    
-    // If using /uploads/blog/filename.jpg, try /blog/filename.jpg
-    if (src.match(/^\/uploads\/blog\/[^\/]+\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
-      return `/blog/${filename}`;
-    }
-    
-    // If using /static/uploads/blog/filename.jpg, try direct blog path
-    if (src.match(/^\/static\/uploads\/blog\/[^\/]+\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
-      return `/blog/${filename}`;
-    }
-    
-    // If it's a full URL with uploads/blog, extract filename and try /blog/filename.jpg
-    if (src.match(/\/uploads\/blog\/[^\/]+\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
-      return `/blog/${filename}`;
-    }
-    
-    // Return the original normalized source as fallback
-    return normalizeSrc(src);
-  };
-  
+  // Loading placeholder
   if (loading) {
     return (
-      <div className={`bg-gray-100 animate-pulse rounded ${className}`} 
+      <div className={`bg-gradient-to-br from-teal-400 to-teal-600 rounded flex items-center justify-center ${className}`} 
         style={{ width: width || '100%', height: height || '200px' }}>
-        <div className="flex items-center justify-center h-full">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        <div className="flex flex-col items-center justify-center h-full text-white p-4">
+          <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin mb-2"></div>
+          <span className="text-lg font-bold">{t('common.companyName', 'iMagenWiz')}</span>
         </div>
       </div>
     );
   }
   
+  // Error fallback
   if (error) {
     return (
-      <div className={`bg-gray-50 border border-gray-200 rounded flex items-center justify-center ${className}`}
+      <div className={`bg-gradient-to-br from-teal-400 to-teal-600 rounded flex items-center justify-center ${className}`}
         style={{ width: width || '100%', height: height || '200px' }}>
-        <div className="text-center p-4">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 mx-auto mb-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          <p className="text-gray-500 text-sm">{t('Image could not be loaded')}</p>
+        <div className="text-center p-4 text-white">
+          <span className="text-2xl font-bold block">{t('common.companyName', 'iMagenWiz')}</span>
         </div>
       </div>
     );
   }
   
+  // Successful image load
   return (
     <img
       src={imageSrc}

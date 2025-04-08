@@ -229,6 +229,8 @@ const BlogPost = () => {
     
     // Replace headings with properly ID'd headings for anchor links
     let processedContent = post.content;
+    
+    // Step 1: Enhance headings with IDs and anchor links
     const headingMatches = [...post.content.matchAll(/<h([2-3])[^>]*>(.*?)<\/h\1>/g)];
     
     headingMatches.forEach((match, index) => {
@@ -242,6 +244,49 @@ const BlogPost = () => {
       const newHeading = `<h${headingLevel} id="${headingId}" data-slug="${slug}" class="group flex items-center">${headingText}<a href="#${headingId}" class="ml-2 opacity-0 group-hover:opacity-100 transition-opacity" aria-label="Link to this section"><svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg></a></h${headingLevel}>`;
       
       processedContent = processedContent.replace(fullMatch, newHeading);
+    });
+    
+    // Step 2: Process image tags to ensure proper loading and fallbacks
+    // This wraps standard <img> tags with additional attributes for better loading behavior
+    const imgMatches = [...processedContent.matchAll(/<img\s+[^>]*src=["']([^"']+)["'][^>]*\/?>/g)];
+    
+    imgMatches.forEach((match) => {
+      const fullImgTag = match[0];
+      const imgSrc = match[1];
+      
+      // Extract alt text if present
+      const altMatch = fullImgTag.match(/alt=["']([^"']*)["']/);
+      const altText = altMatch ? altMatch[1] : '';
+      
+      // Extract any classes if present
+      const classMatch = fullImgTag.match(/class=["']([^"']*)["']/);
+      const imgClass = classMatch ? classMatch[1] : '';
+      
+      // Create a more robust image tag with loading attributes
+      const enhancedImg = `<img 
+        src="${imgSrc}" 
+        alt="${altText}" 
+        class="${imgClass} rounded shadow-sm" 
+        loading="lazy" 
+        onerror="this.onerror=null; 
+                 if (!this.src.includes('?fallback=true')) {
+                   // Try alternative path patterns
+                   const filename = this.src.split('/').pop();
+                   if (this.src.includes('/uploads/blog/')) {
+                     this.src = '/blog/' + filename + '?fallback=true';
+                   } else if (this.src.includes('/blog/')) {
+                     this.src = '/uploads/blog/' + filename + '?fallback=true';
+                   } else if (this.src.includes('/static/uploads/blog/')) {
+                     this.src = '/uploads/blog/' + filename + '?fallback=true';
+                   } else {
+                     this.src = '/uploads/blog/' + filename + '?fallback=true';
+                   }
+                 } else {
+                   this.style.display = 'none';
+                 }"
+      />`;
+      
+      processedContent = processedContent.replace(fullImgTag, enhancedImg);
     });
     
     return processedContent;
