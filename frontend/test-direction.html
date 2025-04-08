@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text Direction Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .rtl-text {
+      direction: rtl;
+      text-align: right;
+      unicode-bidi: isolate;
+    }
+    
+    .ltr-text {
+      direction: ltr;
+      text-align: left;
+      unicode-bidi: isolate;
+    }
+    
+    .test-container {
+      margin-bottom: 20px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    
+    h2 {
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Text Direction Test</h1>
+  
+  <div class="test-container">
+    <h2>Arabic Text (RTL)</h2>
+    <div class="rtl-text" contenteditable="true" dir="rtl">
+      هذا نص باللغة العربية لاختبار اتجاه النص من اليمين إلى اليسار. يجب أن يظهر هذا النص بشكل صحيح.
+    </div>
+  </div>
+  
+  <div class="test-container">
+    <h2>Hebrew Text (RTL)</h2>
+    <div class="rtl-text" contenteditable="true" dir="rtl">
+      זהו טקסט בעברית לבדיקת כיוון טקסט מימין לשמאל. טקסט זה אמור להיות מוצג כראוי.
+    </div>
+  </div>
+  
+  <div class="test-container">
+    <h2>English Text (LTR)</h2>
+    <div class="ltr-text" contenteditable="true" dir="ltr">
+      This is English text to test left-to-right text direction. This text should display properly.
+    </div>
+  </div>
+  
+  <div class="test-container">
+    <h2>Mixed Text</h2>
+    <div contenteditable="true">
+      This is English text followed by Arabic: هذا نص باللغة العربية and then English again.
+    </div>
+  </div>
+</body>
+</html>

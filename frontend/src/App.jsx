@@ -54,9 +54,9 @@ const AppContent = () => {
     // Set the document language attribute
     document.documentElement.lang = i18n.language;
     
-    // Only Arabic is RTL for now in our supported languages
-    // This should be extended in the future if we add more RTL languages like Hebrew, Farsi, etc.
-    const isRTL = i18n.language === 'ar';
+    // Use comprehensive RTL check for proper RTL language support
+    // This includes Arabic, Hebrew, Urdu, and Farsi
+    const isRTL = ['ar', 'he', 'ur', 'fa'].includes(i18n.language);
     
     // Set the document direction attribute
     document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
