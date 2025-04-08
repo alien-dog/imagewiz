@@ -643,11 +643,18 @@ def get_blog_posts():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
     
+    current_app.logger.info(f"GET /blog - Params: language={language}, tag={tag}, search={search}, page={page}, per_page={per_page}")
+    
     # Limit per_page to avoid potential performance issues
     per_page = min(per_page, 50)
     
     # Base query - only published posts
     query = Post.query.filter_by(status='published')
+    
+    # Log the initial query SQL
+    current_app.logger.info(f"Initial query: {str(query)}")
+    current_app.logger.info(f"Total posts in database: {Post.query.count()}")
+    current_app.logger.info(f"Published posts: {Post.query.filter_by(status='published').count()}")
     
     # Apply filters
     if tag:
@@ -668,9 +675,11 @@ def get_blog_posts():
     
     # Get total count for pagination
     total = query.count()
+    current_app.logger.info(f"Total posts matching filters: {total}")
     
     # Paginate
     posts = query.offset((page - 1) * per_page).limit(per_page).all()
+    current_app.logger.info(f"Retrieved posts count: {len(posts)}")
     
     # Format results
     result = []
@@ -695,10 +704,18 @@ def get_blog_post_by_slug(slug):
     # Get query parameters
     language = request.args.get('language')
     
+    current_app.logger.info(f"GET /blog/{slug} - Params: language={language}")
+    
     # Find the published post with the given slug
     post = Post.query.filter_by(slug=slug, status='published').first()
+    current_app.logger.info(f"Post found: {post is not None}")
     
     if not post:
+        current_app.logger.info(f"No published post found with slug: {slug}")
+        # Try to find any post with this slug regardless of status to debug
+        any_post = Post.query.filter_by(slug=slug).first()
+        if any_post:
+            current_app.logger.info(f"Found post with slug {slug} but status is {any_post.status}")
         return jsonify({"error": "Blog post not found"}), 404
     
     # Format the post with comprehensive data

@@ -30,6 +30,14 @@ class Post(db.Model):
     
     def to_dict(self, include_translations=True, language=None):
         """Convert post to dictionary for API responses"""
+        import logging
+        logger = logging.getLogger('flask.app')
+        
+        logger.info(f"Converting post {self.id} to dict, include_translations={include_translations}, language={language}")
+        
+        # Log some debug info about this post
+        logger.info(f"Post {self.id}: slug={self.slug}, status={self.status}, translations_count={len(self.translations)}")
+        
         result = {
             'id': self.id,
             'slug': self.slug,
@@ -46,12 +54,32 @@ class Post(db.Model):
         if include_translations:
             if language:
                 # Get specific language
+                logger.info(f"Looking for translation in language: {language}")
                 translation = next((t for t in self.translations if t.language_code == language), None)
                 if translation:
+                    logger.info(f"Found translation for language {language}")
                     result['translation'] = translation.to_dict()
+                else:
+                    logger.info(f"No translation found for language {language}")
+                    # Get default language as fallback
+                    default_trans = next((t for t in self.translations if t.language_code == 'en'), None)
+                    if default_trans:
+                        logger.info(f"Using default English translation as fallback")
+                        result['translation'] = default_trans.to_dict()
+                    else:
+                        logger.info(f"No default English translation found either")
+                        # If no English translation, use first available
+                        if self.translations:
+                            first_trans = self.translations[0]
+                            logger.info(f"Using first available translation: {first_trans.language_code}")
+                            result['translation'] = first_trans.to_dict()
             else:
                 # Get all translations
+                logger.info(f"Including all {len(self.translations)} translations")
                 result['translations'] = [trans.to_dict() for trans in self.translations]
+                # Log language codes of available translations
+                trans_langs = [t.language_code for t in self.translations]
+                logger.info(f"Translation languages: {trans_langs}")
         
         return result
 
