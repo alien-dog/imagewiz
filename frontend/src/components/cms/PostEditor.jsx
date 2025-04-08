@@ -209,6 +209,9 @@ const PostEditor = () => {
   const [media, setMedia] = useState([]);
   const [confirmDelete, setConfirmDelete] = useState(null);
   
+  // Helper function to check if a language is RTL
+  const isRTL = (langCode) => ['ar', 'he', 'ur', 'fa'].includes(langCode);
+  
   // Form state
   const [formData, setFormData] = useState({
     title: '',
@@ -315,10 +318,14 @@ const PostEditor = () => {
         // Force re-evaluation of text direction for all inputs
         const inputs = document.querySelectorAll('input[dir], textarea[dir]');
         inputs.forEach(input => {
-          const shouldBeRTL = value === 'ar';
-          input.dir = shouldBeRTL ? 'rtl' : 'ltr';
-          input.style.direction = shouldBeRTL ? 'rtl' : 'ltr';
-          input.style.textAlign = shouldBeRTL ? 'right' : 'left';
+          // Skip slug field which should always be LTR
+          if (input.id === 'slug') return;
+          
+          // Use our helper function to check RTL
+          const rtl = isRTL(value);
+          input.dir = rtl ? 'rtl' : 'ltr';
+          input.style.direction = rtl ? 'rtl' : 'ltr';
+          input.style.textAlign = rtl ? 'right' : 'left';
         });
       }, 50);
     } else {
@@ -546,12 +553,12 @@ const PostEditor = () => {
                 value={formData.title}
                 onChange={handleTitleChange}
                 required
-                dir={formData.language_code === 'ar' ? 'rtl' : 'ltr'}
+                dir={isRTL(formData.language_code) ? 'rtl' : 'ltr'}
                 style={{
-                  direction: formData.language_code === 'ar' ? 'rtl' : 'ltr',
-                  textAlign: formData.language_code === 'ar' ? 'right' : 'left'
+                  direction: isRTL(formData.language_code) ? 'rtl' : 'ltr',
+                  textAlign: isRTL(formData.language_code) ? 'right' : 'left'
                 }}
-                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 ${formData.language_code === 'ar' ? 'rtl-text' : 'ltr-text'}`}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
               />
             </div>
             
@@ -568,7 +575,7 @@ const PostEditor = () => {
                 required
                 dir="ltr"
                 style={{ direction: 'ltr', textAlign: 'left' }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 ltr-text"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
               />
             </div>
             
@@ -593,12 +600,12 @@ const PostEditor = () => {
                 value={formData.excerpt}
                 onChange={handleInputChange}
                 rows={3}
-                dir={formData.language_code === 'ar' ? 'rtl' : 'ltr'}
+                dir={isRTL(formData.language_code) ? 'rtl' : 'ltr'}
                 style={{
-                  direction: formData.language_code === 'ar' ? 'rtl' : 'ltr',
-                  textAlign: formData.language_code === 'ar' ? 'right' : 'left'
+                  direction: isRTL(formData.language_code) ? 'rtl' : 'ltr',
+                  textAlign: isRTL(formData.language_code) ? 'right' : 'left'
                 }}
-                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 ${formData.language_code === 'ar' ? 'rtl-text' : 'ltr-text'}`}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
               />
             </div>
           </div>
@@ -717,12 +724,12 @@ const PostEditor = () => {
                   name="meta_title"
                   value={formData.meta_title}
                   onChange={handleInputChange}
-                  dir={formData.language_code === 'ar' ? 'rtl' : 'ltr'}
+                  dir={isRTL(formData.language_code) ? 'rtl' : 'ltr'}
                   style={{
-                    direction: formData.language_code === 'ar' ? 'rtl' : 'ltr',
-                    textAlign: formData.language_code === 'ar' ? 'right' : 'left'
+                    direction: isRTL(formData.language_code) ? 'rtl' : 'ltr',
+                    textAlign: isRTL(formData.language_code) ? 'right' : 'left'
                   }}
-                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 ${formData.language_code === 'ar' ? 'rtl-text' : 'ltr-text'}`}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
                 />
               </div>
               
@@ -736,12 +743,12 @@ const PostEditor = () => {
                   value={formData.meta_description}
                   onChange={handleInputChange}
                   rows={3}
-                  dir={formData.language_code === 'ar' ? 'rtl' : 'ltr'}
+                  dir={isRTL(formData.language_code) ? 'rtl' : 'ltr'}
                   style={{
-                    direction: formData.language_code === 'ar' ? 'rtl' : 'ltr',
-                    textAlign: formData.language_code === 'ar' ? 'right' : 'left'
+                    direction: isRTL(formData.language_code) ? 'rtl' : 'ltr',
+                    textAlign: isRTL(formData.language_code) ? 'right' : 'left'
                   }}
-                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 ${formData.language_code === 'ar' ? 'rtl-text' : 'ltr-text'}`}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
                 />
               </div>
             </div>
