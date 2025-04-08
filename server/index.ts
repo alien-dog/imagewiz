@@ -8,6 +8,7 @@ import cors from 'cors';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import fs from 'fs';
 import http from 'http';
+import multer from 'multer';
 import paymentHandler from './payment-handler-es';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -468,6 +469,34 @@ app.get('/api/cms/tags', async (req, res) => {
   }
 });
 
+app.get('/api/cms/languages', async (req, res) => {
+  console.log('Manual proxy: Received CMS languages request');
+  try {
+    const url = `http://localhost:${FLASK_PORT}/api/cms/languages`;
+    console.log(`Forwarding to backend: ${url}`);
+    
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+      headers['Authorization'] = authHeader;
+    }
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+    });
+    
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (error) {
+    console.error('Manual proxy: Error forwarding CMS languages request', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Add manual proxy endpoints for CMS posts routes
 app.get('/api/cms/posts', async (req, res) => {
   console.log('Manual proxy: Received CMS posts request');
@@ -623,6 +652,119 @@ app.delete('/api/cms/posts/:id', async (req, res) => {
     res.status(response.status).json(data);
   } catch (error) {
     console.error('Manual proxy: Error forwarding CMS post delete request', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Add routes for post media handling
+app.get('/api/cms/posts/:id/media', async (req, res) => {
+  console.log('Manual proxy: Received CMS post media request');
+  try {
+    const { id } = req.params;
+    const url = `http://localhost:${FLASK_PORT}/api/cms/posts/${id}/media`;
+    console.log(`Forwarding to backend: ${url}`);
+    
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+      headers['Authorization'] = authHeader;
+    }
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+    });
+    
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (error) {
+    console.error('Manual proxy: Error forwarding CMS post media request', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Configure multer for file uploads
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB max file size
+  }
+});
+
+app.post('/api/cms/posts/:id/media', upload.single('file'), async (req, res) => {
+  console.log('Manual proxy: Received CMS post media upload request');
+  try {
+    const { id } = req.params;
+    const url = `http://localhost:${FLASK_PORT}/api/cms/posts/${id}/media`;
+    console.log(`Forwarding to backend: ${url}`);
+    
+    const headers: HeadersInit = {};
+    
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+      headers['Authorization'] = authHeader;
+    }
+    
+    // For multipart form data, we're not setting Content-Type as fetch will set it with the boundary
+    
+    // Create a form data object to pass through
+    const formData = new FormData();
+    
+    // Append all the fields from the request body to the form data
+    for (const key in req.body) {
+      formData.append(key, req.body[key]);
+    }
+    
+    // Handle file upload if present
+    if (req.file) {
+      console.log('File upload detected:', req.file.originalname, req.file.mimetype, req.file.size);
+      formData.append('file', new Blob([req.file.buffer], { type: req.file.mimetype }), req.file.originalname);
+    } else {
+      console.log('No file upload detected in request');
+    }
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: formData
+    });
+    
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (error) {
+    console.error('Manual proxy: Error forwarding CMS post media upload request', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.delete('/api/cms/posts/:id/translations/:language_code', async (req, res) => {
+  console.log('Manual proxy: Received CMS post translation delete request');
+  try {
+    const { id, language_code } = req.params;
+    const url = `http://localhost:${FLASK_PORT}/api/cms/posts/${id}/translations/${language_code}`;
+    console.log(`Forwarding to backend: ${url}`);
+    
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+      headers['Authorization'] = authHeader;
+    }
+    
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers,
+    });
+    
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (error) {
+    console.error('Manual proxy: Error forwarding CMS post translation delete request', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
