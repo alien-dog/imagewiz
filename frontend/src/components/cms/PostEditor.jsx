@@ -384,13 +384,22 @@ const PostEditor = () => {
         console.log('Added temporary media:', tempMedia);
         setMedia([...media, tempMedia]);
         
-        // Automatically set as featured image if there's none yet
-        if (!formData.featured_image) {
-          console.log('Setting temporary featured image:', tempUrl);
-          setFeaturedImage(tempUrl);
-        }
+        // Always set as featured image for direct uploads in new posts
+        console.log('Setting as featured image:', tempUrl);
+        setFeaturedImage(tempUrl);
         
-        setSuccess('Media added locally. It will be uploaded when you save the post.');
+        // Highlight media library section
+        setTimeout(() => {
+          const mediaLibrary = document.getElementById('media-library');
+          if (mediaLibrary) {
+            mediaLibrary.classList.add('ring-2', 'ring-teal-500');
+            setTimeout(() => {
+              mediaLibrary.classList.remove('ring-2', 'ring-teal-500');
+            }, 2000);
+          }
+        }, 500);
+        
+        setSuccess('Media added and set as featured image');
       } else {
         // For existing posts, upload media to the server
         console.log('Uploading media for post ID:', id);
@@ -404,18 +413,40 @@ const PostEditor = () => {
           console.log('New media added:', newMedia);
           setMedia([...media, newMedia]);
           
-          // Automatically set as featured image if there's no featured image yet
-          if (!formData.featured_image && newMedia.file_path) {
+          // Always set as featured image for direct uploads
+          if (newMedia.file_path) {
             console.log('Setting as featured image:', newMedia.file_path);
             setFeaturedImage(newMedia.file_path);
           }
           
-          setSuccess('Media uploaded successfully.');
+          // Highlight media library section
+          setTimeout(() => {
+            const mediaLibrary = document.getElementById('media-library');
+            if (mediaLibrary) {
+              mediaLibrary.classList.add('ring-2', 'ring-teal-500');
+              setTimeout(() => {
+                mediaLibrary.classList.remove('ring-2', 'ring-teal-500');
+              }, 2000);
+            }
+          }, 500);
+          
+          setSuccess('Media uploaded and set as featured image');
         } else {
           console.error('Invalid response format:', response);
           setError('Invalid server response. Media data missing.');
         }
       }
+      
+      // Scroll to show the media library with newly added image
+      setTimeout(() => {
+        const mediaLibrary = document.getElementById('media-library');
+        if (mediaLibrary) {
+          mediaLibrary.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 500);
+      
+      // Clear file input to allow reselecting the same file
+      e.target.value = '';
       
       // Clear success message after 3 seconds
       setTimeout(() => {
@@ -508,6 +539,10 @@ const PostEditor = () => {
     };
     setFormData(updatedFormData);
     console.log('Updated form data with featured image:', updatedFormData);
+    
+    // Show success message for feedback
+    setSuccess(url ? 'Featured image set successfully!' : 'Featured image removed');
+    setTimeout(() => setSuccess(null), 3000);
   };
   
   if (isLoading) {
@@ -801,17 +836,47 @@ const PostEditor = () => {
                     alt="Featured" 
                     className="w-full h-40 object-cover rounded border border-gray-300" 
                   />
-                  <button
-                    type="button"
-                    className="mt-2 text-sm text-red-600 hover:text-red-800"
-                    onClick={() => setFeaturedImage('')}
-                  >
-                    Remove Image
-                  </button>
+                  <div className="flex justify-between mt-2">
+                    <button
+                      type="button"
+                      className="text-sm text-red-600 hover:text-red-800"
+                      onClick={() => setFeaturedImage('')}
+                    >
+                      Remove Image
+                    </button>
+                    <button
+                      type="button"
+                      className="text-sm text-teal-600 hover:text-teal-800"
+                      onClick={() => {
+                        // Scroll to media library
+                        const mediaLibrary = document.getElementById('media-library');
+                        if (mediaLibrary) {
+                          mediaLibrary.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }}
+                    >
+                      Change Image
+                    </button>
+                  </div>
                 </div>
               ) : (
-                <div className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center mb-3">
-                  <p className="text-gray-500">No featured image selected</p>
+                <div 
+                  className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center mb-3 cursor-pointer hover:border-teal-500 hover:bg-teal-50 transition-colors"
+                  onClick={() => {
+                    // Scroll to media library
+                    const mediaLibrary = document.getElementById('media-library');
+                    if (mediaLibrary) {
+                      mediaLibrary.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                >
+                  <p className="text-gray-500 mb-2">No featured image selected</p>
+                  <button
+                    type="button"
+                    className="px-4 py-2 bg-teal-500 text-white rounded-md hover:bg-teal-600 transition-colors"
+                  >
+                    Select Image
+                  </button>
                 </div>
               )}
               
@@ -829,10 +894,10 @@ const PostEditor = () => {
               </div>
             </div>
             
-            {/* Display uploaded media */}
-            {media.length > 0 && (
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-medium text-gray-700 mb-3">Media Library</h3>
+            {/* Media Library - Always visible */}
+            <div id="media-library" className="bg-gray-50 p-4 rounded-lg">
+              <h3 className="font-medium text-gray-700 mb-3">Media Library</h3>
+              {media.length > 0 ? (
                 <div className="grid grid-cols-2 gap-2">
                   {media.map((item) => (
                     <div 
@@ -857,8 +922,12 @@ const PostEditor = () => {
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
+              ) : (
+                <div className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center mb-3">
+                  <p className="text-gray-500">No media uploaded yet. Upload an image using the field above.</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </form>
