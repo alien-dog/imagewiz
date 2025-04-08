@@ -1,0 +1,103 @@
+{
+  "title": "Blog",
+  "description": "Dernières nouvelles, conseils et informations",
+  "searchPlaceholder": "Rechercher des articles...",
+  "featuredTopics": "Sujets en vedette",
+  "viewAllTopics": "Voir tous les sujets",
+  "allCategories": "Toutes les catégories",
+  "latestArticles": "Derniers articles",
+  "filteredArticles": "Articles filtrés",
+  "searchResults": "Résultats de recherche",
+  "category": "Catégorie",
+  "searchTerm": "Terme de recherche",
+  "tagged": "Étiquetés",
+  "articles": "Articles",
+  "featuredPost": {
+    "label": "En vedette",
+    "readMore": "Lire la suite"
+  },
+  "categories": {
+    "all": "Tous les articles",
+    "tutorials": "Tutoriels",
+    "news": "Actualités",
+    "tips": "Astuces",
+    "casestudies": "Études de cas",
+    "technology": "Technologie",
+    "design": "Design"
+  },
+  "postInfo": {
+    "by": "Par",
+    "on": "le",
+    "readingTime": "{{time}} min de lecture",
+    "comments": "{{count}} Commentaires",
+    "views": "{{count}} Vues",
+    "tags": "Tags:",
+    "lastUpdated": "Dernière mise à jour le",
+    "role": "Rédacteur de contenu"
+  },
+  "subscription": {
+    "title": "Abonnez-vous à notre newsletter",
+    "description": "Recevez les derniers articles et nouvelles directement dans votre boîte de réception",
+    "placeholder": "Votre adresse e-mail",
+    "button": "S'abonner",
+    "success": "Merci pour votre abonnement !",
+    "error": "Une erreur est survenue. Veuillez réessayer."
+  },
+  "tableOfContents": {
+    "title": "Table des matières"
+  },
+  "share": {
+    "title": "Partager cet article",
+    "twitter": "Partager sur Twitter",
+    "facebook": "Partager sur Facebook",
+    "linkedin": "Partager sur LinkedIn",
+    "copyLink": "Copier le lien",
+    "linkCopied": "Lien copié dans le presse-papiers !",
+    "facebook_short": "Facebook",
+    "twitter_short": "Twitter",
+    "linkedin_short": "LinkedIn",
+    "copyLink_short": "Copier le lien"
+  },
+  "relatedPosts": {
+    "title": "Articles associés",
+    "empty": "Aucun article associé trouvé",
+    "backToAll": "Retour à tous les articles",
+    "browseAll": "Parcourir tous les articles",
+    "readFull": "Lire l'article complet"
+  },
+  "comments": {
+    "title": "Commentaires",
+    "writeComment": "Écrire un commentaire",
+    "placeholder": "Partagez vos pensées...",
+    "submit": "Publier le commentaire",
+    "reply": "Répondre",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "noComments": "Pas encore de commentaires. Soyez le premier à commenter !",
+    "loadMore": "Charger plus de commentaires",
+    "anonymous": "Anonyme",
+    "loginToComment": "Veuillez vous connecter pour commenter"
+  },
+  "pagination": {
+    "previous": "Précédent",
+    "next": "Suivant",
+    "page": "Page {{current}} sur {{total}}"
+  },
+  "notFound": {
+    "title": "Article non trouvé",
+    "description": "L'article de blog que vous recherchez n'existe pas ou a été supprimé.",
+    "button": "Retour au blog"
+  },
+  "status": {
+    "notFound": "Article non trouvé",
+    "notFoundDesc": "L'article de blog que vous recherchez n'existe pas ou a été supprimé.",
+    "error": "Erreur lors du chargement de l'article",
+    "errorDesc": "Un problème est survenu lors du chargement de l'article. Veuillez réessayer plus tard.",
+    "loading": "Chargement de l'article..."
+  },
+  "author": {
+    "aboutTitle": "À propos de l'auteur",
+    "defaultName": "Équipe iMagenWiz",
+    "bio": "Rédacteur de contenu chez iMagenWiz. Passionné par l'exploration de l'intersection entre la technologie IA et le design créatif pour aider les entreprises à obtenir de meilleurs résultats visuels."
+  }
+}

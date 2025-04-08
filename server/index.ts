@@ -781,6 +781,17 @@ app.get('/register', (req, res) => {
   res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
 });
 
+// Add blog routes to ensure proper SPA serving
+app.get('/blog', (req, res) => {
+  console.log('🌟 Serving React app blog route');
+  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+});
+
+app.get('/blog/:slug', (req, res) => {
+  console.log('🌟 Serving React app blog post route:', req.params.slug);
+  res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));
+});
+
 app.get('/checkout', (req, res) => {
   console.log('🌟 Serving React checkout page');
   res.sendFile(path.join(FRONTEND_DIST_PATH, 'index.html'));

@@ -32,6 +32,7 @@ import cmsEN from './locales/en/cms.json';
 
 // Import French resources
 import commonFR from './locales/fr/common.json';
+import blogFR from './locales/fr/blog.json';
 
 // Create resources object with available translations
 const resources = {
@@ -46,7 +47,7 @@ const resources = {
     common: commonFR,
     auth: authEN,     // Fall back to English for missing translations
     pricing: pricingEN,
-    blog: blogEN,
+    blog: blogFR,
     cms: cmsEN
   }
 };

@@ -59,7 +59,7 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString(language || i18n.language || 'en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
@@ -67,13 +67,13 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
   };
 
   const formatReadTime = (content) => {
-    if (!content) return '3 min read';
+    if (!content) return t('postInfo.readingTime', '{{time}} min read', { time: 3 });
     
     // Average reading speed: 200 words per minute
     const wordCount = content.split(/\s+/).length;
     const readTimeMinutes = Math.max(1, Math.ceil(wordCount / 200));
     
-    return `${readTimeMinutes} min read`;
+    return t('postInfo.readingTime', '{{time}} min read', { time: readTimeMinutes });
   };
 
   const truncateText = (text, maxLength = 160) => {
@@ -93,7 +93,7 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
     return (
       <div className="w-full py-12 flex flex-col items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500 mb-4"></div>
-        <p className="text-gray-500">Loading articles...</p>
+        <p className="text-gray-500">{t('status.loading', 'Loading articles...')}</p>
       </div>
     );
   };
@@ -107,7 +107,7 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
             onClick={fetchPosts}
             className="px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600 transition-colors"
           >
-            Try Again
+            {t('status.tryAgain', 'Try Again')}
           </button>
         </div>
       </div>
@@ -118,19 +118,19 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
     return (
       <div className="w-full py-12 text-center">
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 inline-block max-w-lg">
-          <h3 className="text-xl font-semibold text-gray-700 mb-3">No Articles Found</h3>
+          <h3 className="text-xl font-semibold text-gray-700 mb-3">{t('notFound.title', 'No Articles Found')}</h3>
           <p className="text-gray-500 mb-6">
             {tag 
-              ? `No posts found for the selected category. Try a different filter.`
+              ? t('notFound.tagEmpty', 'No posts found for the selected category. Try a different filter.')
               : search
-                ? `No results found for "${search}". Try a different search term.`
-                : 'No blog posts available at the moment. Please check back later.'}
+                ? t('notFound.searchEmpty', 'No results found for "{{search}}". Try a different search term.', { search })
+                : t('notFound.description', 'No blog posts available at the moment. Please check back later.')}
           </p>
           <button
             onClick={() => navigate('/blog')}
             className="inline-flex items-center text-teal-600 hover:text-teal-800 font-medium"
           >
-            Browse all articles
+            {t('relatedPosts.browseAll', 'Browse all articles')}
             <ArrowRight className="ml-2 h-4 w-4" />
           </button>
         </div>
@@ -148,8 +148,8 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
     return (
       <div className="mb-12">
         <h2 className="text-2xl font-bold text-gray-800 mb-6 inline-flex items-center">
-          <span className="bg-teal-100 text-teal-800 text-sm font-semibold mr-3 px-3 py-1 rounded-full">Featured</span>
-          Latest Article
+          <span className="bg-teal-100 text-teal-800 text-sm font-semibold mr-3 px-3 py-1 rounded-full">{t('featuredPost.label', 'Featured')}</span>
+          {t('latestArticles', 'Latest Articles')}
         </h2>
         <div 
           className="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer flex flex-col md:flex-row"
@@ -286,7 +286,7 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
               {post.author?.name ? `${t('postInfo.by', 'By')} ${post.author.name}` : `${t('postInfo.by', 'By')} ${t('author.defaultName', 'iMagenWiz Team')}`}
             </span>
             <div className="flex items-center text-teal-600 font-medium text-sm group-hover:text-teal-700">
-              Read Article
+              {t('relatedPosts.readFull', 'Read Article')}
               <ChevronRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-0.5" />
             </div>
           </div>
@@ -340,7 +340,7 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
               <svg className="mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
-              Previous
+              {t('pagination.previous', 'Previous')}
             </button>
             
             <div className="hidden md:inline-flex">
@@ -361,7 +361,7 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
             
             <div className="md:hidden">
               <span className="text-gray-700 text-sm">
-                Page {currentPage} of {totalPages}
+                {t('pagination.page', 'Page {{current}} of {{total}}', { current: currentPage, total: totalPages })}
               </span>
             </div>
             
@@ -374,7 +374,7 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
                   : 'text-gray-700 hover:bg-teal-50 hover:text-teal-700'
               }`}
             >
-              Next
+              {t('pagination.next', 'Next')}
               <svg className="ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
               </svg>
