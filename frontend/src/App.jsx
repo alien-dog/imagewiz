@@ -51,19 +51,60 @@ const AppContent = () => {
   
   // Set document language and direction on language change
   useEffect(() => {
+    // Set the document language attribute
     document.documentElement.lang = i18n.language;
-    // Only set RTL for Arabic language, all others use LTR
+    
+    // Only Arabic is RTL for now in our supported languages
+    // This should be extended in the future if we add more RTL languages like Hebrew, Farsi, etc.
     const isRTL = i18n.language === 'ar';
+    
+    // Set the document direction attribute
     document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
     
-    // Force editor components to use correct text direction
-    const editorContainers = document.querySelectorAll('[contenteditable="true"]');
-    editorContainers.forEach(editor => {
-      if (editor && editor.style) {
-        editor.style.direction = isRTL ? 'rtl' : 'ltr';
-        editor.style.textAlign = isRTL ? 'right' : 'left';
+    // Add a global CSS class to the body for easier RTL/LTR styling
+    if (isRTL) {
+      document.body.classList.add('rtl-layout');
+      document.body.classList.remove('ltr-layout');
+    } else {
+      document.body.classList.add('ltr-layout');
+      document.body.classList.remove('rtl-layout');
+    }
+    
+    // Add a global stylesheet for RTL/LTR fixes
+    let styleEl = document.getElementById('direction-style');
+    if (!styleEl) {
+      styleEl = document.createElement('style');
+      styleEl.id = 'direction-style';
+      document.head.appendChild(styleEl);
+    }
+    
+    // Add important override styles for CMS editors
+    styleEl.textContent = `
+      /* Global direction styles */
+      html[dir="ltr"] .force-ltr {
+        direction: ltr !important;
+        text-align: left !important;
       }
-    });
+      html[dir="rtl"] .force-rtl {
+        direction: rtl !important;
+        text-align: right !important;
+      }
+      /* Override for CMS editor containers */
+      .ltr-text {
+        direction: ltr !important;
+        text-align: left !important;
+        unicode-bidi: isolate !important;
+      }
+      .rtl-text {
+        direction: rtl !important;
+        text-align: right !important;
+        unicode-bidi: isolate !important;
+      }
+      /* Isolate CMS editor from global direction */
+      .editor-content[contenteditable="true"] {
+        unicode-bidi: isolate;
+      }
+    `;
     
     // Log language changes for debugging
     console.log(`Language changed to: ${i18n.language}, direction: ${document.documentElement.dir}`);

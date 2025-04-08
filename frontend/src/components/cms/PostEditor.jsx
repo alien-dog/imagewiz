@@ -22,89 +22,177 @@ import {
   deleteTranslation
 } from '../../lib/cms-service';
 
-// Simple WYSIWYG editor component
+// Improved WYSIWYG editor component with better text direction handling
 const RichTextEditor = ({ value, onChange, languageCode }) => {
+  const editorContainerRef = useRef(null);
   const editorRef = useRef(null);
-  // Determine if the language is RTL (currently only Arabic is RTL)
-  const isRTL = languageCode === 'ar';
-
+  const isRTL = languageCode === 'ar'; // Only Arabic is RTL for now
+  
+  // Initial setup and value update
   useEffect(() => {
-    if (editorRef.current) {
-      editorRef.current.innerHTML = value || '';
-      
-      // Force text direction based on language
-      if (editorRef.current.style) {
-        editorRef.current.style.direction = isRTL ? 'rtl' : 'ltr';
-        editorRef.current.style.textAlign = isRTL ? 'right' : 'left';
-      }
+    const editor = editorRef.current;
+    if (!editor) return;
+    
+    // Only update content if it's different to avoid losing cursor position
+    if (editor.innerHTML !== value) {
+      editor.innerHTML = value || '';
     }
-  }, [value, isRTL]);
-
+    
+    // Apply text direction directly to the HTML element
+    resetDirection();
+    
+    // Reset cursor to end after content update if focused
+    if (document.activeElement === editor) {
+      const selection = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(editor);
+      range.collapse(false); // Collapse to end
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+  }, [value, languageCode]);
+  
+  // Reset text direction whenever language changes
+  const resetDirection = () => {
+    if (!editorRef.current) return;
+    
+    // Clear any existing direction to avoid conflicts
+    editorRef.current.removeAttribute('style');
+    
+    // Apply new direction based on language
+    const dirStyle = isRTL ? 'rtl' : 'ltr';
+    const alignStyle = isRTL ? 'right' : 'left';
+    
+    // Set multiple direction attributes to ensure consistency
+    editorRef.current.dir = dirStyle;
+    editorRef.current.setAttribute('dir', dirStyle);
+    
+    // Force direction with inline styles (highest specificity)
+    Object.assign(editorRef.current.style, {
+      direction: dirStyle,
+      textAlign: alignStyle,
+      unicodeBidi: 'isolate', // Isolate bidirectional algorithm
+    });
+    
+    // Additional important override
+    editorRef.current.classList.remove(isRTL ? 'ltr-text' : 'rtl-text');
+    editorRef.current.classList.add(isRTL ? 'rtl-text' : 'ltr-text');
+  };
+  
+  // Apply formatting command
+  const applyFormatting = (command, value = null) => {
+    // Ensure editor has focus when applying formatting
+    if (editorRef.current) {
+      editorRef.current.focus();
+      document.execCommand(command, false, value || '');
+      
+      // Ensure text direction is maintained after formatting
+      resetDirection();
+      
+      // Update onChange with new content after formatting
+      onChange(editorRef.current.innerHTML);
+    }
+  };
+  
+  // Handle user input 
   const handleInput = () => {
     if (editorRef.current) {
       onChange(editorRef.current.innerHTML);
     }
   };
+  
+  // Handle focus to ensure correct direction
+  const handleFocus = () => {
+    resetDirection();
+  };
+  
+  // Create link with proper handling
+  const createLink = () => {
+    const url = prompt('Enter link URL:');
+    if (url) {
+      applyFormatting('createLink', url);
+    }
+  };
 
+  // Use an extra wrapper with forced LTR for toolbar buttons
   return (
-    <div className="border border-gray-300 rounded-md overflow-hidden" style={{ direction: 'ltr' }}>
-      <div className="bg-gray-100 p-2 border-b border-gray-300">
-        <div className="flex space-x-2" dir="ltr" style={{ direction: 'ltr' }}>
+    <div className="border border-gray-300 rounded-md overflow-hidden" ref={editorContainerRef}>
+      {/* Toolbar - always LTR regardless of content language */}
+      <div className="bg-gray-100 p-2 border-b border-gray-300" style={{direction: 'ltr'}} dir="ltr">
+        <div className="flex space-x-2">
           <button
             type="button"
             className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 font-bold"
-            onClick={() => document.execCommand('bold', false, '')}
+            onClick={() => applyFormatting('bold')}
           >
             B
           </button>
           <button
             type="button"
             className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 italic"
-            onClick={() => document.execCommand('italic', false, '')}
+            onClick={() => applyFormatting('italic')}
           >
             I
           </button>
           <button
             type="button"
             className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 underline"
-            onClick={() => document.execCommand('underline', false, '')}
+            onClick={() => applyFormatting('underline')}
           >
             U
           </button>
           <button
             type="button"
             className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50"
-            onClick={() => document.execCommand('insertUnorderedList', false, '')}
+            onClick={() => applyFormatting('insertUnorderedList')}
           >
             • List
           </button>
           <button
             type="button"
             className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50"
-            onClick={() => document.execCommand('insertOrderedList', false, '')}
+            onClick={() => applyFormatting('insertOrderedList')}
           >
             1. List
           </button>
           <button
             type="button"
             className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50"
-            onClick={() => {
-              const url = prompt('Enter link URL:');
-              if (url) document.execCommand('createLink', false, url);
-            }}
+            onClick={createLink}
           >
             Link
           </button>
         </div>
       </div>
+      
+      {/* Editor area with language-specific direction */}
       <div
         ref={editorRef}
-        className="p-3 min-h-[300px] focus:outline-none"
         contentEditable
+        className={`p-3 min-h-[300px] focus:outline-none editor-content ${isRTL ? 'rtl-text' : 'ltr-text'}`}
         onInput={handleInput}
+        onFocus={handleFocus}
         dir={isRTL ? "rtl" : "ltr"}
-        style={{ direction: isRTL ? 'rtl' : 'ltr', textAlign: isRTL ? 'right' : 'left' }}
+        style={{
+          direction: isRTL ? 'rtl' : 'ltr',
+          textAlign: isRTL ? 'right' : 'left',
+          unicodeBidi: 'isolate',
+        }}
       />
+      
+      {/* Hidden styles to ensure RTL/LTR works properly */}
+      <style jsx="true">{`
+        .ltr-text {
+          direction: ltr !important;
+          text-align: left !important;
+          unicode-bidi: isolate !important;
+        }
+        .rtl-text {
+          direction: rtl !important;
+          text-align: right !important;
+          unicode-bidi: isolate !important;
+        }
+      `}</style>
     </div>
   );
 };
@@ -213,10 +301,33 @@ const PostEditor = () => {
   
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    
+    // Special handling for language_code changes
+    if (name === 'language_code') {
+      // When changing language, update the form with the new language
+      setFormData({
+        ...formData,
+        language_code: value
+      });
+      
+      // Apply a slight delay to allow React to update the DOM before resetting direction
+      setTimeout(() => {
+        // Force re-evaluation of text direction for all inputs
+        const inputs = document.querySelectorAll('input[dir], textarea[dir]');
+        inputs.forEach(input => {
+          const shouldBeRTL = value === 'ar';
+          input.dir = shouldBeRTL ? 'rtl' : 'ltr';
+          input.style.direction = shouldBeRTL ? 'rtl' : 'ltr';
+          input.style.textAlign = shouldBeRTL ? 'right' : 'left';
+        });
+      }, 50);
+    } else {
+      // For all other inputs, simply update the value
+      setFormData({
+        ...formData,
+        [name]: value
+      });
+    }
   };
   
   const handleTagChange = (e) => {
@@ -435,7 +546,12 @@ const PostEditor = () => {
                 value={formData.title}
                 onChange={handleTitleChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                dir={formData.language_code === 'ar' ? 'rtl' : 'ltr'}
+                style={{
+                  direction: formData.language_code === 'ar' ? 'rtl' : 'ltr',
+                  textAlign: formData.language_code === 'ar' ? 'right' : 'left'
+                }}
+                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 ${formData.language_code === 'ar' ? 'rtl-text' : 'ltr-text'}`}
               />
             </div>
             
@@ -450,7 +566,9 @@ const PostEditor = () => {
                 value={formData.slug}
                 onChange={handleInputChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                dir="ltr"
+                style={{ direction: 'ltr', textAlign: 'left' }}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 ltr-text"
               />
             </div>
             
@@ -475,7 +593,12 @@ const PostEditor = () => {
                 value={formData.excerpt}
                 onChange={handleInputChange}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                dir={formData.language_code === 'ar' ? 'rtl' : 'ltr'}
+                style={{
+                  direction: formData.language_code === 'ar' ? 'rtl' : 'ltr',
+                  textAlign: formData.language_code === 'ar' ? 'right' : 'left'
+                }}
+                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 ${formData.language_code === 'ar' ? 'rtl-text' : 'ltr-text'}`}
               />
             </div>
           </div>
@@ -594,7 +717,12 @@ const PostEditor = () => {
                   name="meta_title"
                   value={formData.meta_title}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  dir={formData.language_code === 'ar' ? 'rtl' : 'ltr'}
+                  style={{
+                    direction: formData.language_code === 'ar' ? 'rtl' : 'ltr',
+                    textAlign: formData.language_code === 'ar' ? 'right' : 'left'
+                  }}
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 ${formData.language_code === 'ar' ? 'rtl-text' : 'ltr-text'}`}
                 />
               </div>
               
@@ -608,7 +736,12 @@ const PostEditor = () => {
                   value={formData.meta_description}
                   onChange={handleInputChange}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  dir={formData.language_code === 'ar' ? 'rtl' : 'ltr'}
+                  style={{
+                    direction: formData.language_code === 'ar' ? 'rtl' : 'ltr',
+                    textAlign: formData.language_code === 'ar' ? 'right' : 'left'
+                  }}
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 ${formData.language_code === 'ar' ? 'rtl-text' : 'ltr-text'}`}
                 />
               </div>
             </div>
