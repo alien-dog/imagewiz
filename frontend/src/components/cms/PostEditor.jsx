@@ -26,7 +26,8 @@ import {
 const RichTextEditor = ({ value, onChange, languageCode }) => {
   const editorContainerRef = useRef(null);
   const editorRef = useRef(null);
-  const isRTL = languageCode === 'ar'; // Only Arabic is RTL for now
+  // Use expanded RTL check for all RTL languages
+  const isRTL = ['ar', 'he', 'ur', 'fa'].includes(languageCode)
   
   // Initial setup and value update
   useEffect(() => {
