@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -6,8 +6,30 @@ import LanguageSelector from './LanguageSelector';
 
 const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth();
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [currentLang, setCurrentLang] = useState(i18n.language);
+
+  // Listen for language changes from anywhere in the app
+  useEffect(() => {
+    const handleLanguageChange = (event) => {
+      setCurrentLang(event.detail?.language || i18n.language);
+    };
+    
+    // Listen for the custom languageChanged event
+    document.addEventListener('languageChanged', handleLanguageChange);
+    
+    // Also listen for i18next's own language change event
+    const onLanguageChanged = () => {
+      setCurrentLang(i18n.language);
+    };
+    i18n.on('languageChanged', onLanguageChanged);
+    
+    return () => {
+      document.removeEventListener('languageChanged', handleLanguageChange);
+      i18n.off('languageChanged', onLanguageChanged);
+    };
+  }, [i18n]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);

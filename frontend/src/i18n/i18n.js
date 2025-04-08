@@ -43,9 +43,46 @@ const resources = {
     cms: cmsEN
   },
   fr: {
-    common: commonFR
+    common: commonFR,
+    auth: authEN,     // Fall back to English for missing translations
+    pricing: pricingEN,
+    blog: blogEN,
+    cms: cmsEN
   }
 };
+
+// Add basic common resources for all other languages to prevent loading failures
+// This ensures language switching works even if full translations aren't available
+SUPPORTED_LANGUAGES.forEach(lang => {
+  if (!resources[lang.code]) {
+    resources[lang.code] = {
+      common: {
+        "app.name": "iMagenWiz",
+        "language": {
+          "select": "Select language"
+        },
+        "nav": {
+          "home": "Home",
+          "dashboard": "Dashboard",
+          "history": "History",
+          "pricing": "Pricing",
+          "blog": "Blog",
+          "login": "Login",
+          "register": "Register",
+          "logout": "Logout",
+          "account": "Account",
+          "editor": "CMS"
+        },
+        "credits": "Credits"
+      },
+      // Use English for other namespaces as fallback
+      auth: authEN,
+      pricing: pricingEN,
+      blog: blogEN,
+      cms: cmsEN
+    };
+  }
+});
 
 // Initialize i18next
 i18n
@@ -89,12 +126,24 @@ i18n
 
 // Utility function to change language
 export const changeLanguage = async (lng) => {
-  await i18n.changeLanguage(lng);
+  // First set the localStorage value - critical for page reloads
+  localStorage.setItem('i18nextLng', lng);
+  
+  // Update the document properties
   document.documentElement.lang = lng;
   document.documentElement.dir = lng === 'ar' ? 'rtl' : 'ltr'; // Set RTL for Arabic
   
-  // Store language preference
-  localStorage.setItem('i18nextLng', lng);
+  // Change the language in i18next - this should trigger React components to update
+  try {
+    await i18n.changeLanguage(lng);
+    console.log(`Language changed to: ${lng}`);
+    
+    // Force update any existing dynamic content by dispatching a custom event
+    const event = new CustomEvent('languageChanged', { detail: { language: lng } });
+    document.dispatchEvent(event);
+  } catch (error) {
+    console.error('Error changing language:', error);
+  }
 };
 
 // Export i18n instance

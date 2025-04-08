@@ -25,8 +25,30 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
   }, []);
 
   const handleLanguageChange = async (languageCode) => {
-    await changeLanguage(languageCode);
-    setIsOpen(false);
+    try {
+      // Don't change if it's already the current language
+      if (languageCode === i18n.language) {
+        setIsOpen(false);
+        return;
+      }
+      
+      // Change the language
+      await changeLanguage(languageCode);
+      
+      // Force reload if translation data isn't fully loaded for this language
+      const hasTranslations = i18n.hasResourceBundle(languageCode, 'common');
+      if (!hasTranslations) {
+        // If we don't have the translations for this language, reload the page
+        console.log(`Translations for ${languageCode} not loaded, reloading page...`);
+        setTimeout(() => window.location.reload(), 100);
+      }
+      
+      setIsOpen(false);
+    } catch (error) {
+      console.error('Failed to change language:', error);
+      // Fall back to reload as a last resort
+      window.location.reload();
+    }
   };
 
   return (
@@ -56,28 +78,38 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
       </button>
       
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-80 overflow-y-auto">
-          <div className="sticky top-0 bg-gray-100 px-4 py-2 font-medium text-sm border-b border-gray-200">
+        <div 
+          className="fixed md:absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-md shadow-lg z-50 overflow-y-auto"
+          style={{
+            maxHeight: 'calc(100vh - 150px)', 
+            top: '100%',
+            left: window.innerWidth <= 768 ? '50%' : 'auto',
+            transform: window.innerWidth <= 768 ? 'translateX(-50%)' : 'none'
+          }}
+        >
+          <div className="sticky top-0 bg-gray-100 px-4 py-2 font-medium text-sm border-b border-gray-200 z-10">
             {t('language.select', 'Select language')}
           </div>
           
-          {SUPPORTED_LANGUAGES.map((language) => (
-            <button
-              key={language.code}
-              className={`flex items-center w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100 last:border-b-0
-                        ${language.code === i18n.language ? 'bg-gray-50 font-medium' : ''}`}
-              onClick={() => handleLanguageChange(language.code)}
-            >
-              <span className="text-xl mr-3">{language.flag}</span>
-              <div>
-                <div className="font-medium">{language.nativeName}</div>
-                <div className="text-gray-500 text-xs">{language.name}</div>
-              </div>
-              {language.code === i18n.language && (
-                <span className="ml-auto text-teal-500">✓</span>
-              )}
-            </button>
-          ))}
+          <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
+            {SUPPORTED_LANGUAGES.map((language) => (
+              <button
+                key={language.code}
+                className={`flex items-center w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100 last:border-b-0
+                          ${language.code === i18n.language ? 'bg-gray-50 font-medium' : ''}`}
+                onClick={() => handleLanguageChange(language.code)}
+              >
+                <span className="text-xl mr-3">{language.flag}</span>
+                <div>
+                  <div className="font-medium">{language.nativeName}</div>
+                  <div className="text-gray-500 text-xs">{language.name}</div>
+                </div>
+                {language.code === i18n.language && (
+                  <span className="ml-auto text-teal-500">✓</span>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>

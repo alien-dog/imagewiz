@@ -53,6 +53,9 @@ const AppContent = () => {
   useEffect(() => {
     document.documentElement.lang = i18n.language;
     document.documentElement.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
+    
+    // Log language changes for debugging
+    console.log(`Language changed to: ${i18n.language}`);
   }, [i18n.language]);
   
   // Loading component for suspense fallback
@@ -64,7 +67,8 @@ const AppContent = () => {
   
   return (
     <Router>
-      <div className="flex flex-col min-h-screen">
+      {/* Use the language code as a key to force remount when language changes */}
+      <div className="flex flex-col min-h-screen" key={i18n.language}>
         <Suspense fallback={<Loader />}>
           <Navbar />
           <main className="flex-grow">
