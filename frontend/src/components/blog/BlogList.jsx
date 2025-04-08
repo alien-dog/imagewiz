@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Tag as TagIcon, ChevronRight, Clock, User, ArrowRight } from 'lucide-react';
 import { getBlogPosts } from '../../lib/cms-service';
+import { useTranslation } from 'react-i18next';
 
 const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation(['blog', 'common']);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -162,7 +164,7 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
               />
             ) : (
               <div className="flex items-center justify-center h-full bg-gradient-to-r from-teal-500 to-teal-600 text-white">
-                <span className="text-2xl font-bold">iMagenWiz</span>
+                <span className="text-2xl font-bold">{t('common.companyName', 'iMagenWiz')}</span>
               </div>
             )}
             
@@ -208,11 +210,11 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
                     {featuredPost.author?.name ? featuredPost.author.name.charAt(0).toUpperCase() : 'A'}
                   </span>
                 </div>
-                <span className="text-gray-700 font-medium">{featuredPost.author?.name || 'iMagenWiz Team'}</span>
+                <span className="text-gray-700 font-medium">{featuredPost.author?.name || t('author.defaultName', 'iMagenWiz Team')}</span>
               </div>
               
               <div className="flex items-center text-teal-600 font-medium group-hover:text-teal-700">
-                Read Full Article
+                {t('relatedPosts.readFull', 'Read Full Article')}
                 <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-0.5" />
               </div>
             </div>
@@ -238,7 +240,7 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
             />
           ) : (
             <div className="flex items-center justify-center h-full bg-gradient-to-br from-teal-400 to-teal-600 text-white">
-              <span className="text-xl font-bold">iMagenWiz</span>
+              <span className="text-xl font-bold">{t('common.companyName', 'iMagenWiz')}</span>
             </div>
           )}
           {/* Reading time badge */}
@@ -281,7 +283,7 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
           {/* Read more link */}
           <div className="mt-auto pt-4 border-t border-gray-100 flex justify-between items-center">
             <span className="text-xs text-gray-500">
-              {post.author?.name ? `By ${post.author.name}` : 'By iMagenWiz Team'}
+              {post.author?.name ? `${t('postInfo.by', 'By')} ${post.author.name}` : `${t('postInfo.by', 'By')} ${t('author.defaultName', 'iMagenWiz Team')}`}
             </span>
             <div className="flex items-center text-teal-600 font-medium text-sm group-hover:text-teal-700">
               Read Article

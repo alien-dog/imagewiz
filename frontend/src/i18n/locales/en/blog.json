@@ -24,7 +24,8 @@
     "comments": "{{count}} Comments",
     "views": "{{count}} Views",
     "tags": "Tags:",
-    "lastUpdated": "Last updated on"
+    "lastUpdated": "Last updated on",
+    "role": "Content Writer"
   },
   "subscription": {
     "title": "Subscribe to our newsletter",
@@ -43,11 +44,17 @@
     "facebook": "Share on Facebook",
     "linkedin": "Share on LinkedIn",
     "copyLink": "Copy link",
-    "linkCopied": "Link copied to clipboard!"
+    "linkCopied": "Link copied to clipboard!",
+    "facebook_short": "Facebook",
+    "twitter_short": "Twitter",
+    "linkedin_short": "LinkedIn",
+    "copyLink_short": "Copy Link"
   },
   "relatedPosts": {
     "title": "Related Posts",
-    "empty": "No related posts found"
+    "empty": "No related posts found",
+    "backToAll": "Back to All Articles",
+    "browseAll": "Browse All Articles"
   },
   "comments": {
     "title": "Comments",
@@ -71,5 +78,17 @@
     "title": "Post Not Found",
     "description": "The blog post you are looking for doesn't exist or has been removed.",
     "button": "Back to Blog"
+  },
+  "status": {
+    "notFound": "Article Not Found",
+    "notFoundDesc": "The blog post you're looking for doesn't exist or has been removed.",
+    "error": "Error Loading Article",
+    "errorDesc": "There was a problem loading the blog post. Please try again later.",
+    "loading": "Loading article..."
+  },
+  "author": {
+    "aboutTitle": "About the Author",
+    "defaultName": "iMagenWiz Team",
+    "bio": "Content writer at iMagenWiz. Passionate about exploring the intersection of AI technology and creative design to help businesses achieve better visual results."
   }
 }

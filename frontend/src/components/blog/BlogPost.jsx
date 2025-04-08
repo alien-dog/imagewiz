@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { 
   Calendar, 
   Tag as TagIcon, 
@@ -21,11 +22,12 @@ import { getBlogPostBySlug } from '../../lib/cms-service';
 const BlogPost = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation('blog');
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [availableLanguages, setAvailableLanguages] = useState([]);
-  const [currentLanguage, setCurrentLanguage] = useState('en'); // Default language
+  const [currentLanguage, setCurrentLanguage] = useState(i18n.language); // Use i18n language
   const [showShareTooltip, setShowShareTooltip] = useState(false);
   const [estimatedReadTime, setEstimatedReadTime] = useState('');
 
@@ -116,9 +118,35 @@ const BlogPost = () => {
     window.open(shareUrl, '_blank', 'width=600,height=400');
   };
 
+  // Handle language changes for blog content
   const changeLanguage = (language) => {
     setCurrentLanguage(language);
+    
+    // If the language is supported by i18n, update the global language as well
+    if (i18n.languages.includes(language)) {
+      // Import from i18n/i18n.js to ensure consistent language changes
+      import('../../i18n/i18n').then(({ changeLanguage: globalChangeLanguage }) => {
+        globalChangeLanguage(language);
+      });
+    }
   };
+  
+  // Listen for global language changes
+  useEffect(() => {
+    // When the global language changes, update the article language if possible
+    const onLanguageChanged = () => {
+      const globalLang = i18n.language;
+      // Only change if the current post is available in the new language
+      if (availableLanguages.some(lang => lang.code === globalLang)) {
+        setCurrentLanguage(globalLang);
+      }
+    };
+    
+    i18n.on('languageChanged', onLanguageChanged);
+    return () => {
+      i18n.off('languageChanged', onLanguageChanged);
+    };
+  }, [i18n, availableLanguages]);
 
   const getTocFromContent = () => {
     if (!post || !post.content) return [];
@@ -139,7 +167,7 @@ const BlogPost = () => {
     return (
       <div className="w-full py-16 flex flex-col items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500 mb-4"></div>
-        <p className="text-gray-500">Loading article...</p>
+        <p className="text-gray-500">{t('status.loading', 'Loading article...')}</p>
       </div>
     );
   };
@@ -149,13 +177,13 @@ const BlogPost = () => {
       <div className="max-w-4xl mx-auto py-12 px-4">
         <div className="bg-red-50 border border-red-200 rounded-lg p-8 text-center">
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-red-700 mb-2">Article Not Found</h2>
+          <h2 className="text-xl font-semibold text-red-700 mb-2">{t('status.error', 'Error Loading Article')}</h2>
           <p className="text-red-600 mb-6">{error}</p>
           <button
             onClick={() => navigate('/blog')}
             className="bg-teal-500 hover:bg-teal-600 text-white px-6 py-2 rounded-lg transition-colors"
           >
-            Browse All Articles
+            {t('relatedPosts.browseAll', 'Browse All Articles')}
           </button>
         </div>
       </div>
@@ -165,15 +193,15 @@ const BlogPost = () => {
   const renderNotFound = () => {
     return (
       <div className="max-w-4xl mx-auto py-12 px-4 text-center">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Article Not Found</h2>
+        <h2 className="text-2xl font-semibold text-gray-700 mb-4">{t('status.notFound', 'Article Not Found')}</h2>
         <p className="text-gray-500 mb-6">
-          The blog post you're looking for doesn't exist or has been removed.
+          {t('status.notFoundDesc', 'The blog post you\'re looking for doesn\'t exist or has been removed.')}
         </p>
         <button
           onClick={() => navigate('/blog')}
           className="bg-teal-500 hover:bg-teal-600 text-white px-6 py-2 rounded-lg transition-colors"
         >
-          Browse All Articles
+          {t('relatedPosts.browseAll', 'Browse All Articles')}
         </button>
       </div>
     );
@@ -228,7 +256,7 @@ const BlogPost = () => {
     "dateModified": post.updated_at || post.created_at,
     "author": {
       "@type": "Person",
-      "name": post.author?.name || "iMagenWiz Team"
+      "name": post.author?.name || t('author.defaultName', "iMagenWiz Team")
     },
     "publisher": {
       "@type": "Organization",
@@ -260,7 +288,7 @@ const BlogPost = () => {
             aria-label="Return to blog homepage"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to All Articles
+            {t('relatedPosts.backToAll', 'Back to All Articles')}
           </button>
           
           {/* Language Selector */}
@@ -292,7 +320,7 @@ const BlogPost = () => {
       <article className="max-w-4xl mx-auto px-4 sm:px-6 -mt-6" itemScope itemType="https://schema.org/BlogPosting">
         {/* Hidden SEO metadata */}
         <meta itemProp="headline" content={post.title} />
-        <meta itemProp="author" content={post.author?.name || "iMagenWiz Team"} />
+        <meta itemProp="author" content={post.author?.name || t('author.defaultName', "iMagenWiz Team")} />
         <meta itemProp="datePublished" content={post.published_at || post.created_at} />
         <meta itemProp="dateModified" content={post.updated_at || post.created_at} />
         <meta itemProp="image" content={post.featured_image || ""} />
@@ -332,8 +360,8 @@ const BlogPost = () => {
                   </span>
                 </div>
                 <div>
-                  <div className="font-medium text-gray-900" itemProp="name">{post.author.name || 'iMagenWiz Team'}</div>
-                  <div className="text-xs text-gray-500">Content Writer</div>
+                  <div className="font-medium text-gray-900" itemProp="name">{post.author.name || t('author.defaultName', 'iMagenWiz Team')}</div>
+                  <div className="text-xs text-gray-500">{t('postInfo.role', 'Content Writer')}</div>
                 </div>
               </div>
             )}
@@ -382,7 +410,7 @@ const BlogPost = () => {
                 <div className="mb-8 bg-gray-50 rounded-xl p-5 border border-gray-100 shadow-sm">
                   <h2 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
                     <BookOpen className="h-5 w-5 mr-2 text-teal-500" />
-                    Table of Contents
+                    {t('tableOfContents.title', 'Table of Contents')}
                   </h2>
                   <nav className="space-y-1" aria-label="Article Sections">
                     {tableOfContents.map(heading => (
@@ -402,7 +430,7 @@ const BlogPost = () => {
               
               {/* Share Section */}
               <div className="bg-gray-50 rounded-xl p-5 border border-gray-100 shadow-sm">
-                <h2 className="text-lg font-semibold text-gray-800 mb-3">Share Article</h2>
+                <h2 className="text-lg font-semibold text-gray-800 mb-3">{t('share.title', 'Share Article')}</h2>
                 <div className="flex flex-col space-y-2">
                   <button
                     onClick={() => handleSocialShare('facebook')}
@@ -410,7 +438,7 @@ const BlogPost = () => {
                     aria-label="Share on Facebook"
                   >
                     <Facebook className="h-4 w-4 mr-2" />
-                    Share on Facebook
+                    {t('share.facebook', 'Share on Facebook')}
                   </button>
                   <button
                     onClick={() => handleSocialShare('twitter')}
@@ -418,7 +446,7 @@ const BlogPost = () => {
                     aria-label="Share on Twitter"
                   >
                     <Twitter className="h-4 w-4 mr-2" />
-                    Share on Twitter
+                    {t('share.twitter', 'Share on Twitter')}
                   </button>
                   <button
                     onClick={() => handleSocialShare('linkedin')}
@@ -426,7 +454,7 @@ const BlogPost = () => {
                     aria-label="Share on LinkedIn"
                   >
                     <Linkedin className="h-4 w-4 mr-2" />
-                    Share on LinkedIn
+                    {t('share.linkedin', 'Share on LinkedIn')}
                   </button>
                   <div className="relative mt-2">
                     <button
@@ -435,11 +463,11 @@ const BlogPost = () => {
                       aria-label="Copy article link to clipboard"
                     >
                       <LinkIcon className="h-4 w-4 mr-2 text-teal-500" />
-                      Copy Link
+                      {t('share.copyLink', 'Copy Link')}
                     </button>
                     {showShareTooltip && (
                       <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-xs rounded shadow-lg whitespace-nowrap" role="alert">
-                        Link copied!
+                        {t('share.linkCopied', 'Link copied!')}
                         <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-t-4 border-l-4 border-r-4 border-t-gray-800 border-l-transparent border-r-transparent"></div>
                       </div>
                     )}
@@ -459,28 +487,28 @@ const BlogPost = () => {
             
             {/* Mobile Share Buttons */}
             <div className="mt-10 lg:hidden">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Share Article</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">{t('share.title', 'Share Article')}</h3>
               <div className="flex space-x-2">
                 <button
                   onClick={() => handleSocialShare('facebook')}
                   className="flex-1 flex items-center justify-center py-2 px-3 rounded-md text-sm bg-blue-600 text-white hover:bg-blue-700 transition-colors"
                 >
                   <Facebook className="h-4 w-4 md:mr-2" />
-                  <span className="hidden md:inline">Facebook</span>
+                  <span className="hidden md:inline">{t('share.facebook_short', 'Facebook')}</span>
                 </button>
                 <button
                   onClick={() => handleSocialShare('twitter')}
                   className="flex-1 flex items-center justify-center py-2 px-3 rounded-md text-sm bg-blue-400 text-white hover:bg-blue-500 transition-colors"
                 >
                   <Twitter className="h-4 w-4 md:mr-2" />
-                  <span className="hidden md:inline">Twitter</span>
+                  <span className="hidden md:inline">{t('share.twitter_short', 'Twitter')}</span>
                 </button>
                 <button
                   onClick={() => handleSocialShare('linkedin')}
                   className="flex-1 flex items-center justify-center py-2 px-3 rounded-md text-sm bg-blue-700 text-white hover:bg-blue-800 transition-colors"
                 >
                   <Linkedin className="h-4 w-4 md:mr-2" />
-                  <span className="hidden md:inline">LinkedIn</span>
+                  <span className="hidden md:inline">{t('share.linkedin_short', 'LinkedIn')}</span>
                 </button>
                 <div className="relative flex-1">
                   <button
@@ -488,11 +516,11 @@ const BlogPost = () => {
                     className="w-full flex items-center justify-center py-2 px-3 rounded-md text-sm text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 transition-colors"
                   >
                     <LinkIcon className="h-4 w-4 md:mr-2 text-teal-500" />
-                    <span className="hidden md:inline">Copy Link</span>
+                    <span className="hidden md:inline">{t('share.copyLink_short', 'Copy Link')}</span>
                   </button>
                   {showShareTooltip && (
                     <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-xs rounded shadow-lg">
-                      Link copied!
+                      {t('share.linkCopied', 'Link copied!')}
                       <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-t-4 border-l-4 border-r-4 border-t-gray-800 border-l-transparent border-r-transparent"></div>
                     </div>
                   )}
@@ -508,7 +536,7 @@ const BlogPost = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 mt-16 pt-8 border-t border-gray-200">
           <h3 className="text-xl font-semibold text-gray-800 flex items-center">
             <User className="h-5 w-5 mr-2 text-teal-500" />
-            About the Author
+            {t('author.aboutTitle', 'About the Author')}
           </h3>
           <div className="mt-4 bg-gradient-to-br from-teal-50 to-teal-50/30 rounded-xl p-6 border border-teal-100/50 shadow-sm flex flex-col sm:flex-row items-center sm:items-start gap-6">
             <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-teal-100 flex items-center justify-center border-2 border-white shadow-md">
@@ -517,9 +545,9 @@ const BlogPost = () => {
               </span>
             </div>
             <div>
-              <div className="font-bold text-xl text-gray-800 mb-2 text-center sm:text-left">{post.author.name || 'iMagenWiz Team'}</div>
+              <div className="font-bold text-xl text-gray-800 mb-2 text-center sm:text-left">{post.author.name || t('author.defaultName', 'iMagenWiz Team')}</div>
               <p className="text-gray-600 leading-relaxed">
-                Content writer at iMagenWiz. Passionate about exploring the intersection of AI technology and creative design to help businesses achieve better visual results.
+                {t('author.bio', 'Content writer at iMagenWiz. Passionate about exploring the intersection of AI technology and creative design to help businesses achieve better visual results.')}
               </p>
             </div>
           </div>
@@ -531,7 +559,7 @@ const BlogPost = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 pt-8 border-t border-gray-200">
           <h3 className="text-2xl font-bold text-gray-800 mb-8 flex items-center">
             <BookOpen className="h-6 w-6 mr-2 text-teal-500" />
-            You Might Also Like
+            {t('relatedPosts.title', 'You Might Also Like')}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {post.related_posts.map(relatedPost => (
@@ -549,7 +577,7 @@ const BlogPost = () => {
                     />
                   ) : (
                     <div className="flex items-center justify-center h-full bg-gradient-to-r from-teal-400 to-teal-600 text-white">
-                      <span className="text-xl font-bold">iMagenWiz</span>
+                      <span className="text-xl font-bold">{t('common.companyName', 'iMagenWiz')}</span>
                     </div>
                   )}
                 </div>
@@ -583,7 +611,7 @@ const BlogPost = () => {
                     </div>
                     
                     <div className="text-teal-600 hover:text-teal-800 text-sm font-medium flex items-center group">
-                      Read More 
+                      {t('relatedPosts.readMore', 'Read More')} 
                       <ChevronRight className="h-4 w-4 ml-1 transform group-hover:translate-x-0.5 transition-transform" />
                     </div>
                   </div>
