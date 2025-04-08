@@ -387,10 +387,12 @@ const PostEditor = () => {
         // Automatically set as featured image if there's no featured image yet
         if (!formData.featured_image && newMedia.file_path) {
           console.log('Setting as featured image:', newMedia.file_path);
-          setFormData({
+          const updatedFormData = {
             ...formData,
             featured_image: newMedia.file_path
-          });
+          };
+          setFormData(updatedFormData);
+          console.log('Updated form data with featured image:', updatedFormData);
         }
         
         setSuccess('Media uploaded successfully.');
@@ -483,10 +485,13 @@ const PostEditor = () => {
   };
   
   const setFeaturedImage = (url) => {
-    setFormData({
+    console.log('Setting featured image via function to:', url);
+    const updatedFormData = {
       ...formData,
       featured_image: url
-    });
+    };
+    setFormData(updatedFormData);
+    console.log('Updated form data with featured image:', updatedFormData);
   };
   
   if (isLoading) {
@@ -783,7 +788,7 @@ const PostEditor = () => {
                   <button
                     type="button"
                     className="mt-2 text-sm text-red-600 hover:text-red-800"
-                    onClick={() => setFormData({ ...formData, featured_image: '' })}
+                    onClick={() => setFeaturedImage('')}
                   >
                     Remove Image
                   </button>
