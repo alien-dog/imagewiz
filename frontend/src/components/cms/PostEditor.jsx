@@ -362,49 +362,65 @@ const PostEditor = () => {
     }
     
     console.log('Selected file:', file.name, 'type:', file.type, 'size:', file.size);
+    setIsLoading(true);
     
-    if (!id) {
-      setError('Please save the post first before uploading media.');
-      return;
-    }
-    
-    const formData = new FormData();
-    formData.append('file', file);
+    // Create FormData object for API upload
+    const mediaFormData = new FormData();
+    mediaFormData.append('file', file);
     
     try {
-      setIsLoading(true);
-      console.log('Uploading media for post ID:', id);
-      const response = await uploadMedia(id, formData);
-      
-      console.log('Upload response:', response);
-      
-      if (response && response.media) {
-        // Add the new media to the existing media array
-        const newMedia = response.media;
-        console.log('New media added:', newMedia);
-        setMedia([...media, newMedia]);
+      // For new posts, create a temporary local media object
+      if (!id) {
+        console.log('Creating temporary media for new post');
+        const tempUrl = URL.createObjectURL(file);
+        const tempMedia = {
+          id: `temp-${Date.now()}`, // Temporary ID for React keys
+          file_path: tempUrl,
+          url: tempUrl,
+          alt_text: file.name,
+          is_temp: true // Flag to identify temporary uploads
+        };
         
-        // Automatically set as featured image if there's no featured image yet
-        if (!formData.featured_image && newMedia.file_path) {
-          console.log('Setting as featured image:', newMedia.file_path);
-          const updatedFormData = {
-            ...formData,
-            featured_image: newMedia.file_path
-          };
-          setFormData(updatedFormData);
-          console.log('Updated form data with featured image:', updatedFormData);
+        console.log('Added temporary media:', tempMedia);
+        setMedia([...media, tempMedia]);
+        
+        // Automatically set as featured image if there's none yet
+        if (!formData.featured_image) {
+          console.log('Setting temporary featured image:', tempUrl);
+          setFeaturedImage(tempUrl);
         }
         
-        setSuccess('Media uploaded successfully.');
-        
-        // Clear success message after 3 seconds
-        setTimeout(() => {
-          setSuccess(null);
-        }, 3000);
+        setSuccess('Media added locally. It will be uploaded when you save the post.');
       } else {
-        console.error('Invalid response format:', response);
-        setError('Invalid server response. Media data missing.');
+        // For existing posts, upload media to the server
+        console.log('Uploading media for post ID:', id);
+        const response = await uploadMedia(id, mediaFormData);
+        
+        console.log('Upload response:', response);
+        
+        if (response && response.media) {
+          // Add the new media to the existing media array
+          const newMedia = response.media;
+          console.log('New media added:', newMedia);
+          setMedia([...media, newMedia]);
+          
+          // Automatically set as featured image if there's no featured image yet
+          if (!formData.featured_image && newMedia.file_path) {
+            console.log('Setting as featured image:', newMedia.file_path);
+            setFeaturedImage(newMedia.file_path);
+          }
+          
+          setSuccess('Media uploaded successfully.');
+        } else {
+          console.error('Invalid response format:', response);
+          setError('Invalid server response. Media data missing.');
+        }
       }
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setSuccess(null);
+      }, 3000);
     } catch (err) {
       console.error('Error uploading media:', err);
       setError(`Failed to upload media: ${err.message || 'Unknown error'}`);
@@ -799,30 +815,28 @@ const PostEditor = () => {
                 </div>
               )}
               
-              {id && (
-                <div>
-                  <label htmlFor="media-upload" className="block text-sm font-medium text-gray-700 mb-1">
-                    Upload New Media
-                  </label>
-                  <input
-                    type="file"
-                    id="media-upload"
-                    accept="image/*"
-                    onChange={handleMediaUpload}
-                    className="w-full"
-                  />
-                </div>
-              )}
+              <div>
+                <label htmlFor="media-upload" className="block text-sm font-medium text-gray-700 mb-1">
+                  Upload New Media
+                </label>
+                <input
+                  type="file"
+                  id="media-upload"
+                  accept="image/*"
+                  onChange={handleMediaUpload}
+                  className="w-full"
+                />
+              </div>
             </div>
             
             {/* Display uploaded media */}
-            {id && media.length > 0 && (
+            {media.length > 0 && (
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h3 className="font-medium text-gray-700 mb-3">Media Library</h3>
                 <div className="grid grid-cols-2 gap-2">
                   {media.map((item) => (
                     <div 
-                      key={item.id} 
+                      key={item.id || item.file_path} 
                       className={`relative cursor-pointer border ${
                         formData.featured_image === item.file_path ? 'border-teal-500' : 'border-gray-300'
                       } rounded overflow-hidden group`}
