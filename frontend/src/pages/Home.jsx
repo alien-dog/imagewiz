@@ -45,10 +45,11 @@ const Home = () => {
             </div>
             <div className="md:w-1/2">
               <img
-                src="/images/hero-image.png"
+                src="/images/hero-image.svg"
                 alt="AI Background Removal Demo"
                 className="rounded-lg shadow-xl"
                 onError={(e) => {
+                  console.error("Failed to load hero image:", e);
                   e.target.onerror = null;
                   e.target.src = 'https://via.placeholder.com/600x400?text=iMagenWiz+Demo';
                 }}
