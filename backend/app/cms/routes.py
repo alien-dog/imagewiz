@@ -641,7 +641,7 @@ def get_blog_posts():
     tag = request.args.get('tag')
     search = request.args.get('search')
     page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 10, type=int)
+    per_page = request.args.get('limit', 10, type=int)  # Use 'limit' for consistency with frontend
     
     current_app.logger.info(f"GET /blog - Params: language={language}, tag={tag}, search={search}, page={page}, per_page={per_page}")
     
@@ -656,14 +656,22 @@ def get_blog_posts():
     current_app.logger.info(f"Total posts in database: {Post.query.count()}")
     current_app.logger.info(f"Published posts: {Post.query.filter_by(status='published').count()}")
     
-    # Apply filters
+    # Apply language filter - Only show posts that have a translation in the requested language
+    if language:
+        current_app.logger.info(f"Filtering by language: {language}")
+        query = query.join(PostTranslation).filter(PostTranslation.language_code == language)
+        
+    # Apply tag filter
     if tag:
         query = query.join(Post.tags).filter(Tag.slug == tag)
     
+    # Apply search filter
     if search:
         search_term = f"%{search}%"
         # Search in translations
-        query = query.join(PostTranslation).filter(
+        if not language:  # Only add this join if we haven't already joined for language filtering
+            query = query.join(PostTranslation)
+        query = query.filter(
             or_(
                 PostTranslation.title.like(search_term),
                 PostTranslation.content.like(search_term)
@@ -685,16 +693,25 @@ def get_blog_posts():
     result = []
     for post in posts:
         post_dict = post.to_dict(include_translations=True, language=language)
-        result.append(post_dict)
+        
+        # Only include posts that have a translation in the requested language
+        if language and 'translation' in post_dict:
+            result.append(post_dict)
+        elif not language:
+            result.append(post_dict)
+    
+    # Calculate total pages
+    total_pages = (total + per_page - 1) // per_page if total > 0 else 1
     
     # Return with pagination metadata
     return jsonify({
         'posts': result,
+        'total_pages': total_pages,
         'pagination': {
             'total': total,
             'page': page,
             'per_page': per_page,
-            'pages': (total + per_page - 1) // per_page  # ceiling division
+            'pages': total_pages
         }
     }), 200
 
@@ -718,6 +735,32 @@ def get_blog_post_by_slug(slug):
             current_app.logger.info(f"Found post with slug {slug} but status is {any_post.status}")
         return jsonify({"error": "Blog post not found"}), 404
     
+    # If language is specified, verify that the post has a translation in that language
+    if language:
+        has_translation = False
+        for trans in post.translations:
+            if trans.language_code == language:
+                has_translation = True
+                break
+                
+        if not has_translation:
+            current_app.logger.info(f"No translation found for language: {language}")
+            # Return available languages so the client can offer alternatives
+            available_langs = [t.language_code for t in post.translations]
+            current_app.logger.info(f"Available languages: {available_langs}")
+            
+            # If English is available, suggest it as default
+            if 'en' in available_langs:
+                suggested_language = 'en'
+            else:
+                suggested_language = available_langs[0] if available_langs else None
+                
+            return jsonify({
+                "error": f"This post is not available in {language}",
+                "available_languages": available_langs,
+                "suggested_language": suggested_language
+            }), 404
+    
     # Format the post with comprehensive data
     post_data = post.to_dict(include_translations=True, language=language)
     
@@ -730,26 +773,51 @@ def get_blog_post_by_slug(slug):
     }
     
     # Find related posts (similar tags, limit to 3)
+    # Also filter related posts to only include those available in the requested language
     if post.tags:
         tag_ids = [tag.id for tag in post.tags]
+        related_posts_query = Post.query.filter(
+            Post.id != post.id, 
+            Post.status == 'published'
+        )
+        
+        # Filter by language if specified
+        if language:
+            related_posts_query = related_posts_query.join(PostTranslation).filter(
+                PostTranslation.language_code == language
+            )
+            
+        # Continue building the query
         related_posts_query = (
-            Post.query
-            .filter(Post.id != post.id, Post.status == 'published')
+            related_posts_query
             .join(Post.tags)
             .filter(Tag.id.in_(tag_ids))
             .group_by(Post.id)
             .order_by(Post.published_at.desc())
             .limit(3)
         )
+        
         related_posts = [p.to_dict(include_translations=True, language=language) for p in related_posts_query.all()]
     else:
         # If no tags, get the latest 3 published posts that aren't this one
+        related_posts_query = Post.query.filter(
+            Post.id != post.id, 
+            Post.status == 'published'
+        )
+        
+        # Filter by language if specified
+        if language:
+            related_posts_query = related_posts_query.join(PostTranslation).filter(
+                PostTranslation.language_code == language
+            )
+            
+        # Continue building the query
         related_posts_query = (
-            Post.query
-            .filter(Post.id != post.id, Post.status == 'published')
+            related_posts_query
             .order_by(Post.published_at.desc())
             .limit(3)
         )
+        
         related_posts = [p.to_dict(include_translations=True, language=language) for p in related_posts_query.all()]
     
     # Get available languages for this post
@@ -768,11 +836,19 @@ def get_blog_post_by_slug(slug):
     content = None
     title = None
     meta_description = None
+    excerpt = None
     for trans in post.translations:
         if (language and trans.language_code == language) or (not language and trans.language_code == 'en'):
             content = trans.content
             title = trans.title
             meta_description = trans.meta_description
+            
+            # Generate excerpt from content if not provided
+            if trans.content:
+                # Strip HTML tags and limit to ~200 characters
+                import re
+                plain_text = re.sub(r'<[^>]*>', '', trans.content)
+                excerpt = plain_text[:200] + ('...' if len(plain_text) > 200 else '')
             break
     
     # Return a more comprehensive response for the blog post page
@@ -782,6 +858,7 @@ def get_blog_post_by_slug(slug):
             "slug": post.slug,
             "title": title,
             "content": content,
+            "excerpt": excerpt,
             "meta_description": meta_description,
             "featured_image": post.featured_image,
             "created_at": post.created_at.isoformat(),
@@ -791,5 +868,6 @@ def get_blog_post_by_slug(slug):
             "tags": [tag.to_dict() for tag in post.tags]
         },
         "related_posts": related_posts,
-        "available_languages": available_languages
+        "available_languages": available_languages,
+        "current_language": language or "en"
     }), 200

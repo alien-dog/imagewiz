@@ -43,14 +43,22 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
       const allPosts = response.posts || [];
       console.log('Retrieved posts count:', allPosts.length);
       
+      // Only include posts that have the translation we want
+      const postsWithTranslation = allPosts.filter(post => {
+        // Check if the post has the translation data in the requested language
+        return post.translation && post.translation.title && post.translation.content;
+      });
+      
+      console.log('Posts with translation:', postsWithTranslation.length);
+      
       // Set a featured post only on the first page when no filters are applied
-      if (currentPage === 1 && !tag && !search && allPosts.length > 0) {
-        setFeaturedPost(allPosts[0]);
-        setPosts(allPosts.slice(1));
-        console.log('Set featured post:', allPosts[0].title);
+      if (currentPage === 1 && !tag && !search && postsWithTranslation.length > 0) {
+        setFeaturedPost(postsWithTranslation[0]);
+        setPosts(postsWithTranslation.slice(1));
+        console.log('Set featured post:', postsWithTranslation[0].translation?.title);
       } else {
         setFeaturedPost(null);
-        setPosts(allPosts);
+        setPosts(postsWithTranslation);
       }
       
       setTotalPages(response.total_pages || 1);
@@ -151,6 +159,12 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
   const renderFeaturedPost = () => {
     if (!featuredPost) return null;
     
+    // Get the correct translation content
+    const translation = featuredPost.translation || {};
+    const title = translation.title || '';
+    const content = translation.content || '';
+    const excerpt = translation.excerpt || '';
+    
     return (
       <div className="mb-12">
         <h2 className="text-2xl font-bold text-gray-800 mb-6 inline-flex items-center">
@@ -165,7 +179,7 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
             {featuredPost.featured_image ? (
               <BlogImage 
                 src={featuredPost.featured_image} 
-                alt={featuredPost.title} 
+                alt={title} 
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
             ) : (
@@ -177,7 +191,7 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
             {/* Reading time badge */}
             <div className="absolute top-4 right-4 bg-black/70 text-white text-sm font-medium px-3 py-1.5 rounded-md backdrop-blur-sm flex items-center">
               <Clock className="h-4 w-4 mr-2" />
-              {formatReadTime(featuredPost.content)}
+              {formatReadTime(content)}
             </div>
           </div>
           
@@ -196,7 +210,7 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
               </div>
               
               <h2 className="text-2xl md:text-3xl font-bold mb-4 text-gray-800 group-hover:text-teal-600 transition-colors leading-tight">
-                {featuredPost.title}
+                {title}
               </h2>
               
               <div className="flex items-center mb-4 text-sm text-gray-500">
@@ -205,7 +219,7 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
               </div>
               
               <p className="text-gray-600 mb-6 text-base leading-relaxed">
-                {truncateText(featuredPost.excerpt || featuredPost.content, 240)}
+                {truncateText(excerpt || content, 240)}
               </p>
             </div>
             
@@ -231,6 +245,12 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
   };
 
   const renderPostCard = (post) => {
+    // Get the translation content
+    const translation = post.translation || {};
+    const title = translation.title || '';
+    const content = translation.content || '';
+    const excerpt = translation.excerpt || '';
+    
     return (
       <article 
         key={post.id} 
@@ -241,7 +261,7 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
           {post.featured_image ? (
             <BlogImage 
               src={post.featured_image}
-              alt={post.title} 
+              alt={title} 
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           ) : (
@@ -252,7 +272,7 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
           {/* Reading time badge */}
           <div className="absolute top-3 right-3 bg-black/70 text-white text-xs font-medium px-2.5 py-1.5 rounded-md backdrop-blur-sm flex items-center">
             <Clock className="h-3 w-3 mr-1.5" />
-            {formatReadTime(post.content)}
+            {formatReadTime(content)}
           </div>
         </div>
         
@@ -272,7 +292,7 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
           
           {/* Title - more prominent */}
           <h3 className="text-xl md:text-2xl font-bold mb-3 text-gray-800 group-hover:text-teal-600 transition-colors line-clamp-2">
-            {post.title}
+            {title}
           </h3>
           
           {/* Date */}
@@ -283,7 +303,7 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
           
           {/* Excerpt */}
           <p className="text-gray-600 mb-4 text-sm line-clamp-3 flex-grow">
-            {truncateText(post.excerpt || post.content)}
+            {truncateText(excerpt || content)}
           </p>
           
           {/* Read more link */}
