@@ -7,7 +7,7 @@
     "history": "Historique",
     "login": "Connexion",
     "register": "S'inscrire",
-    "editor": "Éditeur d'image",
+    "editor": "CMS",
     "account": "Mon compte",
     "logout": "Déconnexion"
   },
@@ -52,49 +52,79 @@
     "or": "ou",
     "and": "et",
     "continue": "Continuer",
-    "language": "Langue"
+    "language": "Langue",
+    "learnMore": "En savoir plus",
+    "companyName": "iMagenWiz"
   },
   "home": {
     "hero": {
-      "title": "Supprimez les arrière-plans avec l'IA",
-      "subtitle": "Suppression d'arrière-plan rapide, facile et précise grâce à la technologie IA avancée",
-      "cta": "Commencer gratuitement",
-      "secondaryCta": "Voir les tarifs"
+      "title": "Supprimez les",
+      "titleHighlight": "Arrière-plans",
+      "titleEnd": "en Quelques Secondes",
+      "subtitle": "Notre technologie alimentée par l'IA rend la suppression d'arrière-plan rapide, facile et précise. Parfait pour l'e-commerce, le marketing ou les projets personnels.",
+      "getStarted": "Commencer gratuitement",
+      "secondaryCta": "Voir les tarifs",
+      "tag": "Nouvelle Technologie IA",
+      "trust": "Utilisé par plus de 10 000 utilisateurs dans le monde",
+      "imageCaption": "Traitement IA en temps réel"
     },
     "features": {
-      "title": "Fonctionnalités",
-      "subtitle": "Pourquoi choisir iMagenWiz ?",
-      "feature1": {
-        "title": "Précision alimentée par l'IA",
-        "description": "Nos algorithmes IA avancés assurent une détection précise des contours même avec des images complexes"
+      "title": "Pourquoi Choisir",
+      "subtitle": "Nos technologies d'IA avancées fournissent des résultats de premier ordre pour tous vos besoins d'édition d'image",
+      "fast": {
+        "title": "Ultra Rapide",
+        "description": "Traitez des images en quelques secondes, pas en minutes. Notre IA est optimisée pour la vitesse sans sacrifier la qualité."
       },
-      "feature2": {
-        "title": "Traitement par lot",
-        "description": "Traitez plusieurs images à la fois pour gagner du temps et des efforts"
+      "precise": {
+        "title": "Résultats Précis",
+        "description": "Notre IA détecte avec précision les contours, les cheveux et les détails complexes que d'autres outils manquent, même dans les images difficiles."
       },
-      "feature3": {
-        "title": "Aucun téléchargement requis",
-        "description": "Solution 100% basée sur le cloud accessible depuis n'importe quel appareil avec une connexion internet"
-      },
-      "feature4": {
-        "title": "Résultats rapides",
-        "description": "Obtenez vos images traitées en quelques secondes, pas en minutes"
+      "easy": {
+        "title": "Facile à Utiliser",
+        "description": "Il suffit de télécharger votre image et de télécharger le résultat. Aucune expertise technique requise. Parfait pour tous les niveaux de compétence."
       }
     },
+    "stats": {
+      "accuracy": "Taux de Précision",
+      "time": "Temps de Traitement Moyen",
+      "images": "Images Traitées par Jour",
+      "languages": "Langues Supportées"
+    },
     "howItWorks": {
-      "title": "Comment ça marche",
-      "step1": {
-        "title": "Téléchargez votre image",
-        "description": "Téléchargez n'importe quelle image dont vous souhaitez supprimer l'arrière-plan"
+      "title": "Comment Ça",
+      "titleHighlight": "Fonctionne",
+      "subtitle": "Trois étapes simples pour supprimer les arrière-plans d'image en quelques secondes",
+      "tag": "PROCESSUS SIMPLE"
+    },
+    "steps": {
+      "upload": {
+        "title": "Téléchargez une Image",
+        "description": "Téléchargez n'importe quelle image depuis votre appareil sur notre plateforme sécurisée. Nous prenons en charge les formats JPG, PNG et WebP."
       },
-      "step2": {
-        "title": "Traitement IA",
-        "description": "Notre IA analyse et traite votre image en quelques secondes"
+      "process": {
+        "title": "Traitement par IA",
+        "description": "Notre IA avancée détecte et supprime automatiquement l'arrière-plan en quelques secondes avec une haute précision."
       },
-      "step3": {
-        "title": "Téléchargez le résultat",
-        "description": "Téléchargez votre image avec l'arrière-plan supprimé"
+      "download": {
+        "title": "Téléchargez le Résultat",
+        "description": "Téléchargez votre PNG transparent ou choisissez un arrière-plan personnalisé. Possibilités illimitées."
       }
+    },
+    "testimonial": {
+      "quote": "\"iMagenWiz a révolutionné notre flux de travail de photographie de produits. Ce qui prenait des heures ne prend maintenant que quelques secondes, et les résultats sont impeccables !\"",
+      "author": "Sarah Johnson, Responsable E-commerce"
+    },
+    "cta": {
+      "title": "Prêt à transformer vos images ?",
+      "subtitle": "Rejoignez des milliers de professionnels qui font confiance à iMagenWiz pour leurs besoins de traitement d'image. Commencez dès aujourd'hui et constatez la différence.",
+      "getStarted": "Commencer Gratuitement",
+      "viewPricing": "Voir les Tarifs"
+    },
+    "trust": {
+      "secure": "Traitement Sécurisé",
+      "accuracy": "Précision 99,8%",
+      "cloud": "Traitement Cloud",
+      "support": "Support 24/7"
     },
     "testimonials": {
       "title": "Ce que disent nos utilisateurs",

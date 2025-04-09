@@ -1,0 +1,147 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "pricing": "Precios",
+    "blog": "Blog",
+    "dashboard": "Panel de Control",
+    "history": "Historial",
+    "login": "Iniciar Sesión",
+    "register": "Registrarse",
+    "editor": "CMS",
+    "account": "Mi Cuenta",
+    "logout": "Cerrar Sesión"
+  },
+  "footer": {
+    "about": "Acerca de",
+    "contact": "Contacto",
+    "terms": "Términos de Servicio",
+    "privacy": "Política de Privacidad",
+    "copyright": "© 2025 iMagenWiz. Todos los derechos reservados."
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Se ha producido un error",
+    "retry": "Reintentar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "view": "Ver",
+    "submit": "Enviar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "credits": "Créditos",
+    "search": "Buscar",
+    "filterBy": "Filtrar por",
+    "sortBy": "Ordenar por",
+    "ascOrder": "Ascendente",
+    "descOrder": "Descendente",
+    "showMore": "Mostrar más",
+    "showLess": "Mostrar menos",
+    "all": "Todo",
+    "more": "Más",
+    "less": "Menos",
+    "select": "Seleccionar",
+    "selectAll": "Seleccionar todo",
+    "selectNone": "No seleccionar nada",
+    "noResults": "No se encontraron resultados",
+    "notFound": "No encontrado",
+    "required": "Obligatorio",
+    "optional": "Opcional",
+    "or": "o",
+    "and": "y",
+    "continue": "Continuar",
+    "language": "Idioma",
+    "learnMore": "Saber más",
+    "companyName": "iMagenWiz"
+  },
+  "home": {
+    "hero": {
+      "title": "Elimina",
+      "titleHighlight": "Fondos",
+      "titleEnd": "en Segundos",
+      "subtitle": "Nuestra tecnología impulsada por IA hace que la eliminación de fondos sea rápida, fácil y precisa. Perfecto para comercio electrónico, marketing o proyectos personales.",
+      "getStarted": "Comenzar Gratis",
+      "secondaryCta": "Ver Precios",
+      "tag": "Nueva Tecnología de IA",
+      "trust": "Confiado por más de 10,000 usuarios en todo el mundo",
+      "imageCaption": "Procesamiento con IA en tiempo real"
+    },
+    "features": {
+      "title": "¿Por Qué Elegir",
+      "subtitle": "Nuestras tecnologías avanzadas de IA proporcionan resultados líderes en la industria para todas sus necesidades de edición de imágenes",
+      "fast": {
+        "title": "Rápido como un Rayo",
+        "description": "Procese imágenes en segundos, no en minutos. Nuestra IA está optimizada para la velocidad sin sacrificar la calidad."
+      },
+      "precise": {
+        "title": "Resultados Precisos",
+        "description": "Nuestra IA detecta con precisión bordes, cabello y detalles complejos que otras herramientas no detectan, incluso en imágenes complicadas."
+      },
+      "easy": {
+        "title": "Fácil de Usar",
+        "description": "Simplemente suba su imagen y descargue el resultado. No se requieren conocimientos técnicos. Perfecto para cualquier nivel de habilidad."
+      }
+    },
+    "stats": {
+      "accuracy": "Tasa de Precisión",
+      "time": "Tiempo Medio de Procesamiento",
+      "images": "Imágenes Procesadas Diariamente",
+      "languages": "Idiomas Admitidos"
+    },
+    "howItWorks": {
+      "title": "Cómo",
+      "titleHighlight": "Funciona",
+      "subtitle": "Tres sencillos pasos para eliminar fondos de imágenes en segundos",
+      "tag": "PROCESO SIMPLE"
+    },
+    "steps": {
+      "upload": {
+        "title": "Sube tu Imagen",
+        "description": "Sube cualquier imagen desde tu dispositivo a nuestra plataforma segura. Soportamos formatos JPG, PNG y WebP."
+      },
+      "process": {
+        "title": "Procesamiento con IA",
+        "description": "Nuestra IA avanzada detecta y elimina automáticamente el fondo en segundos con alta precisión."
+      },
+      "download": {
+        "title": "Descarga el Resultado",
+        "description": "Descarga tu PNG transparente o elige un fondo personalizado. Posibilidades ilimitadas."
+      }
+    },
+    "testimonial": {
+      "quote": "\"iMagenWiz ha revolucionado nuestro flujo de trabajo de fotografía de productos. Lo que solía tomar horas ahora toma segundos, ¡y los resultados son impecables!\"",
+      "author": "Sarah Johnson, Gerente de Comercio Electrónico"
+    },
+    "cta": {
+      "title": "¿Listo para transformar tus imágenes?",
+      "subtitle": "Únete a miles de profesionales que confían en iMagenWiz para sus necesidades de procesamiento de imágenes. Comienza hoy y nota la diferencia.",
+      "getStarted": "Comenzar Gratis",
+      "viewPricing": "Ver Precios"
+    },
+    "trust": {
+      "secure": "Procesamiento Seguro",
+      "accuracy": "Precisión del 99,8%",
+      "cloud": "Procesamiento en la Nube",
+      "support": "Soporte 24/7"
+    },
+    "testimonials": {
+      "title": "Lo que dicen nuestros usuarios",
+      "viewAll": "Ver todos los testimonios"
+    }
+  },
+  "errors": {
+    "required": "Este campo es obligatorio",
+    "invalidEmail": "Por favor ingrese una dirección de correo válida",
+    "minLength": "Debe tener al menos {{min}} caracteres",
+    "maxLength": "Debe tener como máximo {{max}} caracteres",
+    "passwordMismatch": "Las contraseñas no coinciden",
+    "invalidCredentials": "Correo o contraseña inválidos",
+    "serverError": "Error del servidor. Por favor intente más tarde.",
+    "networkError": "Error de red. Por favor verifique su conexión.",
+    "fileTooBig": "El archivo es demasiado grande. El tamaño máximo es {{size}}MB",
+    "fileTypeNotSupported": "Tipo de archivo no soportado. Por favor suba {{types}}",
+    "unexpectedError": "Se ha producido un error inesperado"
+  }
+}

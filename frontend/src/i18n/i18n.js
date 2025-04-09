@@ -34,6 +34,10 @@ import cmsEN from './locales/en/cms.json';
 import commonFR from './locales/fr/common.json';
 import blogFR from './locales/fr/blog.json';
 
+// Import Spanish resources
+import commonES from './locales/es/common.json';
+import blogES from './locales/es/blog.json';
+
 // Create resources object with available translations
 const resources = {
   en: {
@@ -49,37 +53,57 @@ const resources = {
     pricing: pricingEN,
     blog: blogFR,
     cms: cmsEN
+  },
+  es: {
+    common: commonES,
+    auth: authEN,     // Fall back to English for missing translations
+    pricing: pricingEN,
+    blog: blogES,
+    cms: cmsEN
   }
 };
 
-// Add basic common resources for all other languages to prevent loading failures
-// This ensures language switching works even if full translations aren't available
+// Add complete resources for all other languages to prevent loading failures
+// This imports all translations from English and Spanish as a baseline
 SUPPORTED_LANGUAGES.forEach(lang => {
   if (!resources[lang.code]) {
     resources[lang.code] = {
+      // For languages other than English, French and Spanish, use a mix of Spanish and English
+      // translations as a baseline. This ensures all keys are present and provides a starting
+      // point for future translations.
       common: {
-        "app.name": "iMagenWiz",
-        "language": {
-          "select": "Select language"
-        },
+        ...commonES, // Use Spanish as the base for common translations
+        // Essential navigation elements
         "nav": {
-          "home": "Home",
-          "dashboard": "Dashboard",
-          "history": "History",
-          "pricing": "Pricing",
-          "blog": "Blog",
-          "login": "Login",
-          "register": "Register",
-          "logout": "Logout",
-          "account": "Account",
-          "editor": "CMS"
+          "home": commonES.nav.home || "Home",
+          "dashboard": commonES.nav.dashboard || "Dashboard",
+          "pricing": commonES.nav.pricing || "Pricing",
+          "blog": commonES.nav.blog || "Blog",
+          "login": commonES.nav.login || "Login",
+          "register": commonES.nav.register || "Register",
+          "logout": commonES.nav.logout || "Logout",
+          "account": commonES.nav.account || "Account",
+          "editor": commonES.nav.editor || "CMS",
+          "history": commonES.nav.history || "History"
         },
-        "credits": "Credits"
+        // Core UI elements that should be available in all languages
+        "common": {
+          ...commonES.common,
+          "loading": commonES.common.loading || "Loading...",
+          "error": commonES.common.error || "Error",
+          "save": commonES.common.save || "Save",
+          "cancel": commonES.common.cancel || "Cancel",
+          "delete": commonES.common.delete || "Delete",
+          "edit": commonES.common.edit || "Edit",
+          "language": commonES.common.language || "Language",
+          "learnMore": commonES.common.learnMore || "Learn more",
+          "credits": commonES.common.credits || "Credits"
+        }
       },
       // Use English for other namespaces as fallback
       auth: authEN,
       pricing: pricingEN,
-      blog: blogEN,
+      blog: blogES, // Use Spanish blog translations as they're more likely to be understood across languages
       cms: cmsEN
     };
   }
