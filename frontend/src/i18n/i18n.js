@@ -214,6 +214,48 @@ const resources = {
     pricing: pricingEN,
     blog: blogEN,
     cms: cmsEN
+  },
+  "it": {
+    common: commonIT,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogEN,
+    cms: cmsEN
+  },
+  "tr": {
+    common: commonTR,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogEN,
+    cms: cmsEN
+  },
+  "hu": {
+    common: commonHU,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogEN,
+    cms: cmsEN
+  },
+  "pl": {
+    common: commonPL,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogEN,
+    cms: cmsEN
+  },
+  "no": {
+    common: commonNO,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogEN,
+    cms: cmsEN
+  },
+  "el": {
+    common: commonEL,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogEN,
+    cms: cmsEN
   }
 };
 
