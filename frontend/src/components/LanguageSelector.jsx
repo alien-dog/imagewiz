@@ -5,6 +5,8 @@ import { SUPPORTED_LANGUAGES, isRTL } from '../i18n/i18n';
 const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
   const { i18n, t } = useTranslation('common');
   const [isOpen, setIsOpen] = useState(false);
+  const [isChanging, setIsChanging] = useState(false);
+  const [selectedLang, setSelectedLang] = useState(null);
   const dropdownRef = useRef(null);
   
   // Enhanced language detection with fallback
@@ -12,6 +14,11 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
   const currentLanguage = SUPPORTED_LANGUAGES.find(
     (lang) => lang.code === currentLanguageCode
   ) || SUPPORTED_LANGUAGES[0];
+  
+  // Debug logging
+  useEffect(() => {
+    console.log(`LanguageSelector - Current language: ${currentLanguageCode}`, currentLanguage);
+  }, [currentLanguageCode]);
   
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -42,23 +49,24 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
     }
   }, [currentLanguageCode]);
 
-  const handleLanguageChange = (languageCode) => {
-    if (languageCode === currentLanguageCode) {
+  const handleLanguageChange = (language) => {
+    if (language.code === currentLanguageCode) {
       setIsOpen(false);
       return;
     }
     
-    // Direct implementation of language change using URL search param to avoid caching issues
-    const currentUrl = new URL(window.location.href);
+    // Visual feedback during language change
+    setIsChanging(true);
+    setSelectedLang(language.code);
     
-    // Force language via URL parameter
-    currentUrl.searchParams.set('lang', languageCode);
+    // Update localStorage immediately
+    localStorage.setItem('i18nextLng', language.code);
     
-    // Store in localStorage for persistence
-    localStorage.setItem('i18nextLng', languageCode);
-    
-    // Hard reload
-    window.location.href = currentUrl.toString();
+    // Forced reload approach - this works more reliably than any other method
+    setTimeout(() => {
+      // Force reload with the new language
+      window.location.reload();
+    }, 300);
   };
 
   return (
@@ -68,27 +76,36 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
         className={`flex items-center gap-2 px-3 py-2 text-sm rounded-md 
                   ${variant === 'outline' 
                     ? 'border border-gray-300 hover:bg-gray-50' 
-                    : 'bg-teal-500 text-white hover:bg-teal-600'}`}
+                    : 'bg-teal-500 text-white hover:bg-teal-600'}
+                  ${isChanging ? 'opacity-70 pointer-events-none' : ''}`}
         aria-label={`Change language (current: ${currentLanguage.name})`}
+        disabled={isChanging}
       >
         <span className="text-lg mr-1" role="img" aria-label={currentLanguage.name}>{currentLanguage.flag}</span>
         <span className="hidden md:inline">{currentLanguage.nativeName}</span>
-        <svg 
-          className="w-4 h-4 ml-1" 
-          xmlns="http://www.w3.org/2000/svg" 
-          viewBox="0 0 20 20" 
-          fill="currentColor"
-          aria-hidden="true"
-        >
-          <path 
-            fillRule="evenodd" 
-            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" 
-            clipRule="evenodd" 
-          />
-        </svg>
+        {isChanging ? (
+          <svg className="animate-spin h-4 w-4 ml-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        ) : (
+          <svg 
+            className="w-4 h-4 ml-1" 
+            xmlns="http://www.w3.org/2000/svg" 
+            viewBox="0 0 20 20" 
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path 
+              fillRule="evenodd" 
+              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" 
+              clipRule="evenodd" 
+            />
+          </svg>
+        )}
       </button>
       
-      {isOpen && (
+      {isOpen && !isChanging && (
         <div 
           className="fixed md:absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-md shadow-lg z-50 overflow-y-auto"
           style={{
@@ -104,15 +121,14 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
           
           <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
             {SUPPORTED_LANGUAGES.map((language) => (
-              <a 
+              <button 
                 key={language.code}
-                href={`?lang=${language.code}`}
+                type="button"
                 className={`flex items-center w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100 last:border-b-0
-                          ${language.code === currentLanguageCode ? 'bg-gray-50 font-medium' : ''}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleLanguageChange(language.code);
-                }}
+                          ${language.code === currentLanguageCode ? 'bg-gray-50 font-medium' : ''}
+                          ${selectedLang === language.code ? 'bg-teal-50' : ''}`}
+                onClick={() => handleLanguageChange(language)}
+                aria-current={language.code === currentLanguageCode ? 'true' : 'false'}
               >
                 <span className="text-xl mr-3" role="img" aria-label={language.name}>{language.flag}</span>
                 <div>
@@ -122,7 +138,15 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
                 {language.code === currentLanguageCode && (
                   <span className="ml-auto text-teal-500">✓</span>
                 )}
-              </a>
+                {selectedLang === language.code && language.code !== currentLanguageCode && (
+                  <span className="ml-auto">
+                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  </span>
+                )}
+              </button>
             ))}
           </div>
         </div>

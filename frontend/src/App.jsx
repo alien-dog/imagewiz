@@ -50,21 +50,38 @@ const ProtectedRoute = ({ children }) => {
 const AppContent = () => {
   const { i18n } = useTranslation();
   
-  // Check URL for language parameter on mount
+  // Check for language in localStorage and URL on mount
   useEffect(() => {
+    // Read localStorage directly to avoid cached values
+    const storedLang = localStorage.getItem('i18nextLng');
     const urlParams = new URLSearchParams(window.location.search);
     const langParam = urlParams.get('lang');
     
-    // If URL has a language parameter, use it
-    if (langParam && langParam !== i18n.language) {
-      console.log(`Found language parameter in URL: ${langParam}, changing language...`);
-      localStorage.setItem('i18nextLng', langParam);
-      i18n.changeLanguage(langParam);
+    // URL parameter takes precedence over localStorage
+    const targetLang = langParam || storedLang || 'en';
+    
+    console.log(`App initialization - storedLang: ${storedLang}, URL lang: ${langParam}, current i18n: ${i18n.language}`);
+    
+    // If we need to change language
+    if (targetLang && targetLang !== i18n.language) {
+      console.log(`Language mismatch detected, changing to: ${targetLang}`);
       
-      // Remove lang parameter from URL to avoid it sticking around
-      urlParams.delete('lang');
-      const newUrl = window.location.pathname + (urlParams.toString() ? `?${urlParams.toString()}` : '');
-      window.history.replaceState({}, '', newUrl);
+      // Update localStorage if needed
+      if (targetLang !== storedLang) {
+        localStorage.setItem('i18nextLng', targetLang);
+      }
+      
+      // Apply language change
+      i18n.changeLanguage(targetLang)
+        .then(() => console.log(`Successfully changed language to ${targetLang}`))
+        .catch(err => console.error(`Error changing language to ${targetLang}:`, err));
+      
+      // Clean up URL if it had a lang parameter
+      if (langParam) {
+        urlParams.delete('lang');
+        const newUrl = window.location.pathname + (urlParams.toString() ? `?${urlParams.toString()}` : '');
+        window.history.replaceState({}, '', newUrl);
+      }
     }
   }, []);
   

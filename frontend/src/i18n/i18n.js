@@ -38,9 +38,11 @@ import blogFR from './locales/fr/blog.json';
 import commonES from './locales/es/common.json';
 import blogES from './locales/es/blog.json';
 
-// Import fallback English translations for all other languages
-// We'll use dynamic i18next loading instead of static imports
-// This prevents the issue of having identical translations copied across languages
+// Import Japanese resources
+import commonJA from './locales/ja/common.json';
+
+// Import Arabic resources
+import commonAR from './locales/ar/common.json';
 
 // Create resources object with available translations - only include languages we have translations for
 const resources = {
@@ -63,6 +65,20 @@ const resources = {
     auth: authEN,
     pricing: pricingEN,
     blog: blogES,
+    cms: cmsEN
+  },
+  ja: {
+    common: commonJA,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogEN,
+    cms: cmsEN
+  },
+  ar: {
+    common: commonAR,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogEN,
     cms: cmsEN
   }
 };
