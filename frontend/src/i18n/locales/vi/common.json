@@ -1,147 +1,147 @@
 {
   "nav": {
-    "home": "Inicio",
-    "pricing": "Precios",
+    "home": "Trang chủ",
+    "pricing": "Giá cả",
     "blog": "Blog",
-    "dashboard": "Panel de Control",
-    "history": "Historial",
-    "login": "Iniciar Sesión",
-    "register": "Registrarse",
+    "dashboard": "Bảng điều khiển",
+    "history": "Lịch sử",
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
     "editor": "CMS",
-    "account": "Mi Cuenta",
-    "logout": "Cerrar Sesión"
+    "account": "Tài khoản",
+    "logout": "Đăng xuất"
   },
   "footer": {
-    "about": "Acerca de",
-    "contact": "Contacto",
-    "terms": "Términos de Servicio",
-    "privacy": "Política de Privacidad",
-    "copyright": "© 2025 iMagenWiz. Todos los derechos reservados."
+    "about": "Về chúng tôi",
+    "contact": "Liên hệ",
+    "terms": "Điều khoản sử dụng",
+    "privacy": "Chính sách bảo mật",
+    "copyright": "© 2025 iMagenWiz. Bảo lưu mọi quyền."
   },
   "common": {
-    "loading": "Cargando...",
-    "error": "Se ha producido un error",
-    "retry": "Reintentar",
-    "save": "Guardar",
-    "cancel": "Cancelar",
-    "delete": "Eliminar",
-    "edit": "Editar",
-    "view": "Ver",
-    "submit": "Enviar",
-    "back": "Atrás",
-    "next": "Siguiente",
-    "previous": "Anterior",
-    "credits": "Créditos",
-    "search": "Buscar",
-    "filterBy": "Filtrar por",
-    "sortBy": "Ordenar por",
-    "ascOrder": "Ascendente",
-    "descOrder": "Descendente",
-    "showMore": "Mostrar más",
-    "showLess": "Mostrar menos",
-    "all": "Todo",
-    "more": "Más",
-    "less": "Menos",
-    "select": "Seleccionar",
-    "selectAll": "Seleccionar todo",
-    "selectNone": "No seleccionar nada",
-    "noResults": "No se encontraron resultados",
-    "notFound": "No encontrado",
-    "required": "Obligatorio",
-    "optional": "Opcional",
-    "or": "o",
-    "and": "y",
-    "continue": "Continuar",
-    "language": "Idioma",
-    "learnMore": "Saber más",
+    "loading": "Đang tải...",
+    "error": "Đã xảy ra lỗi",
+    "retry": "Thử lại",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "edit": "Sửa",
+    "view": "Xem",
+    "submit": "Gửi",
+    "back": "Quay lại",
+    "next": "Tiếp theo",
+    "previous": "Trước đó",
+    "credits": "Tín dụng",
+    "search": "Tìm kiếm",
+    "filterBy": "Lọc theo",
+    "sortBy": "Sắp xếp theo",
+    "ascOrder": "Tăng dần",
+    "descOrder": "Giảm dần",
+    "showMore": "Hiển thị thêm",
+    "showLess": "Hiển thị ít hơn",
+    "all": "Tất cả",
+    "more": "Thêm",
+    "less": "Ít hơn",
+    "select": "Chọn",
+    "selectAll": "Chọn tất cả",
+    "selectNone": "Bỏ chọn tất cả",
+    "noResults": "Không tìm thấy kết quả",
+    "notFound": "Không tìm thấy",
+    "required": "Bắt buộc",
+    "optional": "Tùy chọn",
+    "or": "hoặc",
+    "and": "và",
+    "continue": "Tiếp tục",
+    "language": "Ngôn ngữ",
+    "learnMore": "Tìm hiểu thêm",
     "companyName": "iMagenWiz"
   },
   "home": {
     "hero": {
-      "title": "Elimina",
-      "titleHighlight": "Fondos",
-      "titleEnd": "en Segundos",
-      "subtitle": "Nuestra tecnología impulsada por IA hace que la eliminación de fondos sea rápida, fácil y precisa. Perfecto para comercio electrónico, marketing o proyectos personales.",
-      "getStarted": "Comenzar Gratis",
-      "secondaryCta": "Ver Precios",
-      "tag": "Nueva Tecnología de IA",
-      "trust": "Confiado por más de 10,000 usuarios en todo el mundo",
-      "imageCaption": "Procesamiento con IA en tiempo real"
+      "title": "Xóa phông",
+      "titleHighlight": "nền ảnh",
+      "titleEnd": "trong tích tắc",
+      "subtitle": "Công nghệ của chúng tôi được hỗ trợ bởi AI giúp việc xóa phông nền trở nên nhanh chóng, dễ dàng và chính xác. Hoàn hảo cho thương mại điện tử, tiếp thị hoặc dự án cá nhân.",
+      "getStarted": "Bắt đầu miễn phí",
+      "secondaryCta": "Xem giá",
+      "tag": "Công nghệ AI mới",
+      "trust": "Được tin dùng bởi hơn 10.000 người dùng trên toàn thế giới",
+      "imageCaption": "Xử lý AI thời gian thực"
     },
     "features": {
-      "title": "¿Por Qué Elegir",
-      "subtitle": "Nuestras tecnologías avanzadas de IA proporcionan resultados líderes en la industria para todas sus necesidades de edición de imágenes",
+      "title": "Tại sao lựa chọn iMagenWiz",
+      "subtitle": "Công nghệ AI tiên tiến của chúng tôi mang lại kết quả hàng đầu trong ngành cho mọi nhu cầu chỉnh sửa hình ảnh của bạn",
       "fast": {
-        "title": "Rápido como un Rayo",
-        "description": "Procese imágenes en segundos, no en minutos. Nuestra IA está optimizada para la velocidad sin sacrificar la calidad."
+        "title": "Siêu nhanh",
+        "description": "Xử lý hình ảnh trong vài giây, không phải vài phút. AI của chúng tôi được tối ưu hóa cho tốc độ mà không ảnh hưởng đến chất lượng."
       },
       "precise": {
-        "title": "Resultados Precisos",
-        "description": "Nuestra IA detecta con precisión bordes, cabello y detalles complejos que otras herramientas no detectan, incluso en imágenes complicadas."
+        "title": "Kết quả chính xác",
+        "description": "AI của chúng tôi phát hiện chính xác các cạnh, tóc và chi tiết phức tạp mà các công cụ khác bỏ lỡ, ngay cả trong những hình ảnh khó xử lý."
       },
       "easy": {
-        "title": "Fácil de Usar",
-        "description": "Simplemente suba su imagen y descargue el resultado. No se requieren conocimientos técnicos. Perfecto para cualquier nivel de habilidad."
+        "title": "Dễ sử dụng",
+        "description": "Chỉ cần tải lên hình ảnh và tải xuống kết quả. Không cần kiến thức kỹ thuật. Phù hợp với mọi trình độ."
       }
     },
     "stats": {
-      "accuracy": "Tasa de Precisión",
-      "time": "Tiempo Medio de Procesamiento",
-      "images": "Imágenes Procesadas Diariamente",
-      "languages": "Idiomas Admitidos"
+      "accuracy": "Tỷ lệ chính xác",
+      "time": "Thời gian xử lý trung bình",
+      "images": "Hình ảnh được xử lý mỗi ngày",
+      "languages": "Ngôn ngữ được hỗ trợ"
     },
     "howItWorks": {
-      "title": "Cómo",
-      "titleHighlight": "Funciona",
-      "subtitle": "Tres sencillos pasos para eliminar fondos de imágenes en segundos",
-      "tag": "PROCESO SIMPLE"
+      "title": "Cách thức",
+      "titleHighlight": "hoạt động",
+      "subtitle": "Ba bước đơn giản để xóa phông nền hình ảnh trong tích tắc",
+      "tag": "QUY TRÌNH ĐƠN GIẢN"
     },
     "steps": {
       "upload": {
-        "title": "Sube tu Imagen",
-        "description": "Sube cualquier imagen desde tu dispositivo a nuestra plataforma segura. Soportamos formatos JPG, PNG y WebP."
+        "title": "Tải lên hình ảnh",
+        "description": "Tải bất kỳ hình ảnh nào từ thiết bị của bạn lên nền tảng an toàn của chúng tôi. Chúng tôi hỗ trợ các định dạng JPG, PNG và WebP."
       },
       "process": {
-        "title": "Procesamiento con IA",
-        "description": "Nuestra IA avanzada detecta y elimina automáticamente el fondo en segundos con alta precisión."
+        "title": "Xử lý bằng AI",
+        "description": "AI tiên tiến của chúng tôi tự động phát hiện và loại bỏ nền trong vài giây với độ chính xác cao."
       },
       "download": {
-        "title": "Descarga el Resultado",
-        "description": "Descarga tu PNG transparente o elige un fondo personalizado. Posibilidades ilimitadas."
+        "title": "Tải xuống kết quả",
+        "description": "Tải xuống PNG trong suốt hoặc chọn nền tùy chỉnh. Vô vàn khả năng."
       }
     },
     "testimonial": {
-      "quote": "\"iMagenWiz ha revolucionado nuestro flujo de trabajo de fotografía de productos. Lo que solía tomar horas ahora toma segundos, ¡y los resultados son impecables!\"",
-      "author": "Sarah Johnson, Gerente de Comercio Electrónico"
+      "quote": "\"iMagenWiz đã cách mạng hóa quy trình chụp ảnh sản phẩm của chúng tôi. Những gì trước đây mất hàng giờ, giờ đây chỉ mất vài giây, và kết quả thật hoàn hảo!\"",
+      "author": "Sarah Johnson, Quản lý thương mại điện tử"
     },
     "cta": {
-      "title": "¿Listo para transformar tus imágenes?",
-      "subtitle": "Únete a miles de profesionales que confían en iMagenWiz para sus necesidades de procesamiento de imágenes. Comienza hoy y nota la diferencia.",
-      "getStarted": "Comenzar Gratis",
-      "viewPricing": "Ver Precios"
+      "title": "Sẵn sàng để chuyển đổi hình ảnh của bạn?",
+      "subtitle": "Tham gia cùng hàng nghìn chuyên gia tin tưởng iMagenWiz cho nhu cầu xử lý hình ảnh. Bắt đầu ngay hôm nay và trải nghiệm sự khác biệt.",
+      "getStarted": "Bắt đầu miễn phí",
+      "viewPricing": "Xem giá"
     },
     "trust": {
-      "secure": "Procesamiento Seguro",
-      "accuracy": "Precisión del 99,8%",
-      "cloud": "Procesamiento en la Nube",
-      "support": "Soporte 24/7"
+      "secure": "Xử lý an toàn",
+      "accuracy": "Độ chính xác 99,8%",
+      "cloud": "Xử lý đám mây",
+      "support": "Hỗ trợ 24/7"
     },
     "testimonials": {
-      "title": "Lo que dicen nuestros usuarios",
-      "viewAll": "Ver todos los testimonios"
+      "title": "Người dùng nói gì",
+      "viewAll": "Xem tất cả đánh giá"
     }
   },
   "errors": {
-    "required": "Este campo es obligatorio",
-    "invalidEmail": "Por favor ingrese una dirección de correo válida",
-    "minLength": "Debe tener al menos {{min}} caracteres",
-    "maxLength": "Debe tener como máximo {{max}} caracteres",
-    "passwordMismatch": "Las contraseñas no coinciden",
-    "invalidCredentials": "Correo o contraseña inválidos",
-    "serverError": "Error del servidor. Por favor intente más tarde.",
-    "networkError": "Error de red. Por favor verifique su conexión.",
-    "fileTooBig": "El archivo es demasiado grande. El tamaño máximo es {{size}}MB",
-    "fileTypeNotSupported": "Tipo de archivo no soportado. Por favor suba {{types}}",
-    "unexpectedError": "Se ha producido un error inesperado"
+    "required": "Trường này là bắt buộc",
+    "invalidEmail": "Vui lòng nhập địa chỉ email hợp lệ",
+    "minLength": "Phải có ít nhất {{min}} ký tự",
+    "maxLength": "Phải có nhiều nhất {{max}} ký tự",
+    "passwordMismatch": "Mật khẩu không khớp",
+    "invalidCredentials": "Email hoặc mật khẩu không hợp lệ",
+    "serverError": "Lỗi máy chủ. Vui lòng thử lại sau.",
+    "networkError": "Lỗi mạng. Vui lòng kiểm tra kết nối của bạn.",
+    "fileTooBig": "Tệp quá lớn. Kích thước tối đa là {{size}}MB",
+    "fileTypeNotSupported": "Loại tệp không được hỗ trợ. Vui lòng tải lên {{types}}",
+    "unexpectedError": "Đã xảy ra lỗi không mong muốn"
   }
 }

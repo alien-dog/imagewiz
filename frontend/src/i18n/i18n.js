@@ -50,6 +50,15 @@ import commonDE from './locales/de/common.json';
 // Import Russian resources
 import commonRU from './locales/ru/common.json';
 
+// Import Portuguese resources
+import commonPT from './locales/pt/common.json';
+
+// Import Korean resources
+import commonKO from './locales/ko/common.json';
+
+// Import Vietnamese resources
+import commonVI from './locales/vi/common.json';
+
 // Create resources object with available translations - only include languages we have translations for
 const resources = {
   en: {
@@ -96,6 +105,27 @@ const resources = {
   },
   ru: {
     common: commonRU,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogEN,
+    cms: cmsEN
+  },
+  pt: {
+    common: commonPT,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogEN,
+    cms: cmsEN
+  },
+  ko: {
+    common: commonKO,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogEN,
+    cms: cmsEN
+  },
+  vi: {
+    common: commonVI,
     auth: authEN,
     pricing: pricingEN,
     blog: blogEN,

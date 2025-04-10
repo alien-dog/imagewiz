@@ -1,147 +1,147 @@
 {
   "nav": {
-    "home": "Inicio",
-    "pricing": "Precios",
-    "blog": "Blog",
-    "dashboard": "Panel de Control",
-    "history": "Historial",
-    "login": "Iniciar Sesión",
-    "register": "Registrarse",
+    "home": "홈",
+    "pricing": "가격",
+    "blog": "블로그",
+    "dashboard": "대시보드",
+    "history": "기록",
+    "login": "로그인",
+    "register": "회원가입",
     "editor": "CMS",
-    "account": "Mi Cuenta",
-    "logout": "Cerrar Sesión"
+    "account": "내 계정",
+    "logout": "로그아웃"
   },
   "footer": {
-    "about": "Acerca de",
-    "contact": "Contacto",
-    "terms": "Términos de Servicio",
-    "privacy": "Política de Privacidad",
-    "copyright": "© 2025 iMagenWiz. Todos los derechos reservados."
+    "about": "회사 소개",
+    "contact": "연락처",
+    "terms": "이용약관",
+    "privacy": "개인정보 보호정책",
+    "copyright": "© 2025 iMagenWiz. 모든 권리 보유."
   },
   "common": {
-    "loading": "Cargando...",
-    "error": "Se ha producido un error",
-    "retry": "Reintentar",
-    "save": "Guardar",
-    "cancel": "Cancelar",
-    "delete": "Eliminar",
-    "edit": "Editar",
-    "view": "Ver",
-    "submit": "Enviar",
-    "back": "Atrás",
-    "next": "Siguiente",
-    "previous": "Anterior",
-    "credits": "Créditos",
-    "search": "Buscar",
-    "filterBy": "Filtrar por",
-    "sortBy": "Ordenar por",
-    "ascOrder": "Ascendente",
-    "descOrder": "Descendente",
-    "showMore": "Mostrar más",
-    "showLess": "Mostrar menos",
-    "all": "Todo",
-    "more": "Más",
-    "less": "Menos",
-    "select": "Seleccionar",
-    "selectAll": "Seleccionar todo",
-    "selectNone": "No seleccionar nada",
-    "noResults": "No se encontraron resultados",
-    "notFound": "No encontrado",
-    "required": "Obligatorio",
-    "optional": "Opcional",
-    "or": "o",
-    "and": "y",
-    "continue": "Continuar",
-    "language": "Idioma",
-    "learnMore": "Saber más",
+    "loading": "로딩 중...",
+    "error": "오류가 발생했습니다",
+    "retry": "다시 시도",
+    "save": "저장",
+    "cancel": "취소",
+    "delete": "삭제",
+    "edit": "편집",
+    "view": "보기",
+    "submit": "제출",
+    "back": "뒤로",
+    "next": "다음",
+    "previous": "이전",
+    "credits": "크레딧",
+    "search": "검색",
+    "filterBy": "필터",
+    "sortBy": "정렬",
+    "ascOrder": "오름차순",
+    "descOrder": "내림차순",
+    "showMore": "더 보기",
+    "showLess": "접기",
+    "all": "전체",
+    "more": "더 보기",
+    "less": "줄이기",
+    "select": "선택",
+    "selectAll": "전체 선택",
+    "selectNone": "선택 해제",
+    "noResults": "결과 없음",
+    "notFound": "찾을 수 없음",
+    "required": "필수",
+    "optional": "선택사항",
+    "or": "또는",
+    "and": "그리고",
+    "continue": "계속",
+    "language": "언어",
+    "learnMore": "자세히 알아보기",
     "companyName": "iMagenWiz"
   },
   "home": {
     "hero": {
-      "title": "Elimina",
-      "titleHighlight": "Fondos",
-      "titleEnd": "en Segundos",
-      "subtitle": "Nuestra tecnología impulsada por IA hace que la eliminación de fondos sea rápida, fácil y precisa. Perfecto para comercio electrónico, marketing o proyectos personales.",
-      "getStarted": "Comenzar Gratis",
-      "secondaryCta": "Ver Precios",
-      "tag": "Nueva Tecnología de IA",
-      "trust": "Confiado por más de 10,000 usuarios en todo el mundo",
-      "imageCaption": "Procesamiento con IA en tiempo real"
+      "title": "배경",
+      "titleHighlight": "제거를",
+      "titleEnd": "순식간에",
+      "subtitle": "AI 기반 기술로 배경 제거가 빠르고, 쉽고, 정확해집니다. 전자상거래, 마케팅 또는 개인 프로젝트에 완벽합니다.",
+      "getStarted": "무료로 시작하기",
+      "secondaryCta": "가격 보기",
+      "tag": "새로운 AI 기술",
+      "trust": "전 세계 10,000명 이상의 사용자가 신뢰",
+      "imageCaption": "실시간 AI 처리"
     },
     "features": {
-      "title": "¿Por Qué Elegir",
-      "subtitle": "Nuestras tecnologías avanzadas de IA proporcionan resultados líderes en la industria para todas sus necesidades de edición de imágenes",
+      "title": "iMagenWiz를 선택하는 이유",
+      "subtitle": "고급 AI 기술로 모든 이미지 편집 요구 사항에 대한 업계 최고의 결과를 제공합니다",
       "fast": {
-        "title": "Rápido como un Rayo",
-        "description": "Procese imágenes en segundos, no en minutos. Nuestra IA está optimizada para la velocidad sin sacrificar la calidad."
+        "title": "초고속 처리",
+        "description": "몇 분이 아닌 몇 초 만에 이미지를 처리합니다. 품질을 손상시키지 않으면서 속도에 최적화된 AI입니다."
       },
       "precise": {
-        "title": "Resultados Precisos",
-        "description": "Nuestra IA detecta con precisión bordes, cabello y detalles complejos que otras herramientas no detectan, incluso en imágenes complicadas."
+        "title": "정확한 결과",
+        "description": "AI가 복잡한 이미지에서도 다른 도구가 놓치는 가장자리, 머리카락, 복잡한 세부 사항을 정확하게 감지합니다."
       },
       "easy": {
-        "title": "Fácil de Usar",
-        "description": "Simplemente suba su imagen y descargue el resultado. No se requieren conocimientos técnicos. Perfecto para cualquier nivel de habilidad."
+        "title": "사용 편의성",
+        "description": "이미지를 업로드하고 결과를 다운로드하기만 하면 됩니다. 기술적 지식이 필요 없습니다. 모든 기술 수준에 적합합니다."
       }
     },
     "stats": {
-      "accuracy": "Tasa de Precisión",
-      "time": "Tiempo Medio de Procesamiento",
-      "images": "Imágenes Procesadas Diariamente",
-      "languages": "Idiomas Admitidos"
+      "accuracy": "정확도",
+      "time": "평균 처리 시간",
+      "images": "일일 처리 이미지",
+      "languages": "지원 언어"
     },
     "howItWorks": {
-      "title": "Cómo",
-      "titleHighlight": "Funciona",
-      "subtitle": "Tres sencillos pasos para eliminar fondos de imágenes en segundos",
-      "tag": "PROCESO SIMPLE"
+      "title": "작동",
+      "titleHighlight": "방식",
+      "subtitle": "이미지 배경을 순식간에 제거하는 세 가지 간단한 단계",
+      "tag": "간단한 프로세스"
     },
     "steps": {
       "upload": {
-        "title": "Sube tu Imagen",
-        "description": "Sube cualquier imagen desde tu dispositivo a nuestra plataforma segura. Soportamos formatos JPG, PNG y WebP."
+        "title": "이미지 업로드",
+        "description": "장치에서 안전한 플랫폼으로 이미지를 업로드하세요. JPG, PNG 및 WebP 형식을 지원합니다."
       },
       "process": {
-        "title": "Procesamiento con IA",
-        "description": "Nuestra IA avanzada detecta y elimina automáticamente el fondo en segundos con alta precisión."
+        "title": "AI 처리",
+        "description": "고급 AI가 고정밀도로 몇 초 안에 자동으로 배경을 감지하고 제거합니다."
       },
       "download": {
-        "title": "Descarga el Resultado",
-        "description": "Descarga tu PNG transparente o elige un fondo personalizado. Posibilidades ilimitadas."
+        "title": "결과 다운로드",
+        "description": "투명한 PNG를 다운로드하거나 맞춤 배경을 선택하세요. 무한한 가능성이 있습니다."
       }
     },
     "testimonial": {
-      "quote": "\"iMagenWiz ha revolucionado nuestro flujo de trabajo de fotografía de productos. Lo que solía tomar horas ahora toma segundos, ¡y los resultados son impecables!\"",
-      "author": "Sarah Johnson, Gerente de Comercio Electrónico"
+      "quote": "\"iMagenWiz는 우리의 제품 사진 작업 흐름을 혁신했습니다. 예전에는 몇 시간이 걸렸던 작업이 이제는 몇 초 만에 완료되고, 결과도 완벽합니다!\"",
+      "author": "Sarah Johnson, 이커머스 매니저"
     },
     "cta": {
-      "title": "¿Listo para transformar tus imágenes?",
-      "subtitle": "Únete a miles de profesionales que confían en iMagenWiz para sus necesidades de procesamiento de imágenes. Comienza hoy y nota la diferencia.",
-      "getStarted": "Comenzar Gratis",
-      "viewPricing": "Ver Precios"
+      "title": "이미지를 변환할 준비가 되셨나요?",
+      "subtitle": "이미지 처리 요구 사항에 iMagenWiz를 신뢰하는 수천 명의 전문가들과 함께하세요. 오늘 시작하고 차이를 경험하세요.",
+      "getStarted": "무료로 시작하기",
+      "viewPricing": "가격 보기"
     },
     "trust": {
-      "secure": "Procesamiento Seguro",
-      "accuracy": "Precisión del 99,8%",
-      "cloud": "Procesamiento en la Nube",
-      "support": "Soporte 24/7"
+      "secure": "안전한 처리",
+      "accuracy": "99.8% 정확도",
+      "cloud": "클라우드 처리",
+      "support": "24/7 지원"
     },
     "testimonials": {
-      "title": "Lo que dicen nuestros usuarios",
-      "viewAll": "Ver todos los testimonios"
+      "title": "사용자 후기",
+      "viewAll": "모든 리뷰 보기"
     }
   },
   "errors": {
-    "required": "Este campo es obligatorio",
-    "invalidEmail": "Por favor ingrese una dirección de correo válida",
-    "minLength": "Debe tener al menos {{min}} caracteres",
-    "maxLength": "Debe tener como máximo {{max}} caracteres",
-    "passwordMismatch": "Las contraseñas no coinciden",
-    "invalidCredentials": "Correo o contraseña inválidos",
-    "serverError": "Error del servidor. Por favor intente más tarde.",
-    "networkError": "Error de red. Por favor verifique su conexión.",
-    "fileTooBig": "El archivo es demasiado grande. El tamaño máximo es {{size}}MB",
-    "fileTypeNotSupported": "Tipo de archivo no soportado. Por favor suba {{types}}",
-    "unexpectedError": "Se ha producido un error inesperado"
+    "required": "이 필드는 필수입니다",
+    "invalidEmail": "유효한 이메일 주소를 입력하세요",
+    "minLength": "최소 {{min}}자 이상이어야 합니다",
+    "maxLength": "최대 {{max}}자 이하여야 합니다",
+    "passwordMismatch": "비밀번호가 일치하지 않습니다",
+    "invalidCredentials": "잘못된 이메일 또는 비밀번호",
+    "serverError": "서버 오류. 나중에 다시 시도해 주세요.",
+    "networkError": "네트워크 오류. 연결을 확인하세요.",
+    "fileTooBig": "파일이 너무 큽니다. 최대 크기는 {{size}}MB입니다",
+    "fileTypeNotSupported": "지원되지 않는 파일 유형입니다. {{types}}를 업로드하세요",
+    "unexpectedError": "예상치 못한 오류가 발생했습니다"
   }
 }

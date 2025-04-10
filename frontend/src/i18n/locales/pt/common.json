@@ -1,147 +1,147 @@
 {
   "nav": {
-    "home": "Inicio",
-    "pricing": "Precios",
+    "home": "Início",
+    "pricing": "Preços",
     "blog": "Blog",
-    "dashboard": "Panel de Control",
-    "history": "Historial",
-    "login": "Iniciar Sesión",
-    "register": "Registrarse",
+    "dashboard": "Painel",
+    "history": "Histórico",
+    "login": "Entrar",
+    "register": "Registrar",
     "editor": "CMS",
-    "account": "Mi Cuenta",
-    "logout": "Cerrar Sesión"
+    "account": "Minha Conta",
+    "logout": "Sair"
   },
   "footer": {
-    "about": "Acerca de",
-    "contact": "Contacto",
-    "terms": "Términos de Servicio",
-    "privacy": "Política de Privacidad",
-    "copyright": "© 2025 iMagenWiz. Todos los derechos reservados."
+    "about": "Sobre Nós",
+    "contact": "Contato",
+    "terms": "Termos de Uso",
+    "privacy": "Privacidade",
+    "copyright": "© 2025 iMagenWiz. Todos os direitos reservados."
   },
   "common": {
-    "loading": "Cargando...",
-    "error": "Se ha producido un error",
-    "retry": "Reintentar",
-    "save": "Guardar",
+    "loading": "Carregando...",
+    "error": "Ocorreu um erro",
+    "retry": "Tentar novamente",
+    "save": "Salvar",
     "cancel": "Cancelar",
-    "delete": "Eliminar",
+    "delete": "Excluir",
     "edit": "Editar",
-    "view": "Ver",
+    "view": "Visualizar",
     "submit": "Enviar",
-    "back": "Atrás",
-    "next": "Siguiente",
+    "back": "Voltar",
+    "next": "Próximo",
     "previous": "Anterior",
     "credits": "Créditos",
-    "search": "Buscar",
+    "search": "Pesquisar",
     "filterBy": "Filtrar por",
     "sortBy": "Ordenar por",
-    "ascOrder": "Ascendente",
-    "descOrder": "Descendente",
-    "showMore": "Mostrar más",
+    "ascOrder": "Crescente",
+    "descOrder": "Decrescente",
+    "showMore": "Mostrar mais",
     "showLess": "Mostrar menos",
-    "all": "Todo",
-    "more": "Más",
+    "all": "Todos",
+    "more": "Mais",
     "less": "Menos",
-    "select": "Seleccionar",
-    "selectAll": "Seleccionar todo",
-    "selectNone": "No seleccionar nada",
-    "noResults": "No se encontraron resultados",
-    "notFound": "No encontrado",
-    "required": "Obligatorio",
+    "select": "Selecionar",
+    "selectAll": "Selecionar todos",
+    "selectNone": "Desmarcar todos",
+    "noResults": "Nenhum resultado encontrado",
+    "notFound": "Não encontrado",
+    "required": "Obrigatório",
     "optional": "Opcional",
-    "or": "o",
-    "and": "y",
+    "or": "ou",
+    "and": "e",
     "continue": "Continuar",
     "language": "Idioma",
-    "learnMore": "Saber más",
+    "learnMore": "Saiba mais",
     "companyName": "iMagenWiz"
   },
   "home": {
     "hero": {
-      "title": "Elimina",
-      "titleHighlight": "Fondos",
-      "titleEnd": "en Segundos",
-      "subtitle": "Nuestra tecnología impulsada por IA hace que la eliminación de fondos sea rápida, fácil y precisa. Perfecto para comercio electrónico, marketing o proyectos personales.",
-      "getStarted": "Comenzar Gratis",
-      "secondaryCta": "Ver Precios",
-      "tag": "Nueva Tecnología de IA",
-      "trust": "Confiado por más de 10,000 usuarios en todo el mundo",
-      "imageCaption": "Procesamiento con IA en tiempo real"
+      "title": "Remova",
+      "titleHighlight": "fundos",
+      "titleEnd": "em segundos",
+      "subtitle": "Nossa tecnologia alimentada por IA torna a remoção de fundo rápida, fácil e precisa. Perfeito para e-commerce, marketing ou projetos pessoais.",
+      "getStarted": "Comece gratuitamente",
+      "secondaryCta": "Ver preços",
+      "tag": "Nova tecnologia de IA",
+      "trust": "Confiado por mais de 10.000 usuários em todo o mundo",
+      "imageCaption": "Processamento de IA em tempo real"
     },
     "features": {
-      "title": "¿Por Qué Elegir",
-      "subtitle": "Nuestras tecnologías avanzadas de IA proporcionan resultados líderes en la industria para todas sus necesidades de edición de imágenes",
+      "title": "Por que iMagenWiz",
+      "subtitle": "Nossas tecnologias avançadas de IA entregam resultados líderes do setor para todas as suas necessidades de edição de imagem",
       "fast": {
-        "title": "Rápido como un Rayo",
-        "description": "Procese imágenes en segundos, no en minutos. Nuestra IA está optimizada para la velocidad sin sacrificar la calidad."
+        "title": "Extremamente Rápido",
+        "description": "Processe imagens em segundos, não em minutos. Nossa IA é otimizada para velocidade sem comprometer a qualidade."
       },
       "precise": {
         "title": "Resultados Precisos",
-        "description": "Nuestra IA detecta con precisión bordes, cabello y detalles complejos que otras herramientas no detectan, incluso en imágenes complicadas."
+        "description": "Nossa IA detecta com precisão bordas, cabelos e detalhes complexos que outras ferramentas perdem, mesmo em imagens desafiadoras."
       },
       "easy": {
         "title": "Fácil de Usar",
-        "description": "Simplemente suba su imagen y descargue el resultado. No se requieren conocimientos técnicos. Perfecto para cualquier nivel de habilidad."
+        "description": "Basta carregar sua imagem e baixar o resultado. Nenhuma experiência técnica necessária. Perfeito para qualquer nível de habilidade."
       }
     },
     "stats": {
-      "accuracy": "Tasa de Precisión",
-      "time": "Tiempo Medio de Procesamiento",
-      "images": "Imágenes Procesadas Diariamente",
-      "languages": "Idiomas Admitidos"
+      "accuracy": "Taxa de precisão",
+      "time": "Tempo médio de processamento",
+      "images": "Imagens processadas diariamente",
+      "languages": "Idiomas suportados"
     },
     "howItWorks": {
-      "title": "Cómo",
-      "titleHighlight": "Funciona",
-      "subtitle": "Tres sencillos pasos para eliminar fondos de imágenes en segundos",
-      "tag": "PROCESO SIMPLE"
+      "title": "Como",
+      "titleHighlight": "funciona",
+      "subtitle": "Três etapas simples para remover fundos de imagens em segundos",
+      "tag": "PROCESSO SIMPLES"
     },
     "steps": {
       "upload": {
-        "title": "Sube tu Imagen",
-        "description": "Sube cualquier imagen desde tu dispositivo a nuestra plataforma segura. Soportamos formatos JPG, PNG y WebP."
+        "title": "Faça upload da imagem",
+        "description": "Carregue qualquer imagem do seu dispositivo para nossa plataforma segura. Suportamos formatos JPG, PNG e WebP."
       },
       "process": {
-        "title": "Procesamiento con IA",
-        "description": "Nuestra IA avanzada detecta y elimina automáticamente el fondo en segundos con alta precisión."
+        "title": "Processamento de IA",
+        "description": "Nossa IA avançada detecta e remove automaticamente o fundo em segundos com alta precisão."
       },
       "download": {
-        "title": "Descarga el Resultado",
-        "description": "Descarga tu PNG transparente o elige un fondo personalizado. Posibilidades ilimitadas."
+        "title": "Baixe o resultado",
+        "description": "Baixe seu PNG transparente ou escolha um fundo personalizado. Possibilidades ilimitadas."
       }
     },
     "testimonial": {
-      "quote": "\"iMagenWiz ha revolucionado nuestro flujo de trabajo de fotografía de productos. Lo que solía tomar horas ahora toma segundos, ¡y los resultados son impecables!\"",
-      "author": "Sarah Johnson, Gerente de Comercio Electrónico"
+      "quote": "\"iMagenWiz revolucionou nosso fluxo de trabalho de fotografia de produtos. O que antes levava horas, agora leva segundos, e os resultados são impecáveis!\"",
+      "author": "Sarah Johnson, Gerente de E-commerce"
     },
     "cta": {
-      "title": "¿Listo para transformar tus imágenes?",
-      "subtitle": "Únete a miles de profesionales que confían en iMagenWiz para sus necesidades de procesamiento de imágenes. Comienza hoy y nota la diferencia.",
-      "getStarted": "Comenzar Gratis",
-      "viewPricing": "Ver Precios"
+      "title": "Pronto para transformar suas imagens?",
+      "subtitle": "Junte-se a milhares de profissionais que confiam no iMagenWiz para suas necessidades de processamento de imagem. Comece hoje e experimente a diferença.",
+      "getStarted": "Comece gratuitamente",
+      "viewPricing": "Ver preços"
     },
     "trust": {
-      "secure": "Procesamiento Seguro",
-      "accuracy": "Precisión del 99,8%",
-      "cloud": "Procesamiento en la Nube",
-      "support": "Soporte 24/7"
+      "secure": "Processamento seguro",
+      "accuracy": "Precisão de 99,8%",
+      "cloud": "Processamento em nuvem",
+      "support": "Suporte 24/7"
     },
     "testimonials": {
-      "title": "Lo que dicen nuestros usuarios",
-      "viewAll": "Ver todos los testimonios"
+      "title": "O que nossos usuários dizem",
+      "viewAll": "Ver todas as avaliações"
     }
   },
   "errors": {
-    "required": "Este campo es obligatorio",
-    "invalidEmail": "Por favor ingrese una dirección de correo válida",
-    "minLength": "Debe tener al menos {{min}} caracteres",
-    "maxLength": "Debe tener como máximo {{max}} caracteres",
-    "passwordMismatch": "Las contraseñas no coinciden",
-    "invalidCredentials": "Correo o contraseña inválidos",
-    "serverError": "Error del servidor. Por favor intente más tarde.",
-    "networkError": "Error de red. Por favor verifique su conexión.",
-    "fileTooBig": "El archivo es demasiado grande. El tamaño máximo es {{size}}MB",
-    "fileTypeNotSupported": "Tipo de archivo no soportado. Por favor suba {{types}}",
-    "unexpectedError": "Se ha producido un error inesperado"
+    "required": "Este campo é obrigatório",
+    "invalidEmail": "Por favor, insira um endereço de e-mail válido",
+    "minLength": "Deve ter pelo menos {{min}} caracteres",
+    "maxLength": "Deve ter no máximo {{max}} caracteres",
+    "passwordMismatch": "As senhas não correspondem",
+    "invalidCredentials": "E-mail ou senha inválidos",
+    "serverError": "Erro do servidor. Por favor, tente novamente mais tarde.",
+    "networkError": "Erro de rede. Por favor, verifique sua conexão.",
+    "fileTooBig": "Arquivo muito grande. Tamanho máximo é {{size}}MB",
+    "fileTypeNotSupported": "Tipo de arquivo não suportado. Por favor, carregue {{types}}",
+    "unexpectedError": "Ocorreu um erro inesperado"
   }
 }
