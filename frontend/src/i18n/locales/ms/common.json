@@ -1,147 +1,147 @@
 {
   "nav": {
-    "home": "Inicio",
-    "pricing": "Precios",
+    "home": "Laman Utama",
+    "pricing": "Harga",
     "blog": "Blog",
-    "dashboard": "Panel de Control",
-    "history": "Historial",
-    "login": "Iniciar Sesión",
-    "register": "Registrarse",
+    "dashboard": "Papan Pemuka",
+    "history": "Sejarah",
+    "login": "Log Masuk",
+    "register": "Daftar",
     "editor": "CMS",
-    "account": "Mi Cuenta",
-    "logout": "Cerrar Sesión"
+    "account": "Akaun Saya",
+    "logout": "Log Keluar"
   },
   "footer": {
-    "about": "Acerca de",
-    "contact": "Contacto",
-    "terms": "Términos de Servicio",
-    "privacy": "Política de Privacidad",
-    "copyright": "© 2025 iMagenWiz. Todos los derechos reservados."
+    "about": "Tentang Kami",
+    "contact": "Hubungi Kami",
+    "terms": "Syarat Penggunaan",
+    "privacy": "Dasar Privasi",
+    "copyright": "© 2025 iMagenWiz. Hak Cipta Terpelihara."
   },
   "common": {
-    "loading": "Cargando...",
-    "error": "Se ha producido un error",
-    "retry": "Reintentar",
-    "save": "Guardar",
-    "cancel": "Cancelar",
-    "delete": "Eliminar",
-    "edit": "Editar",
-    "view": "Ver",
-    "submit": "Enviar",
-    "back": "Atrás",
-    "next": "Siguiente",
-    "previous": "Anterior",
-    "credits": "Créditos",
-    "search": "Buscar",
-    "filterBy": "Filtrar por",
-    "sortBy": "Ordenar por",
-    "ascOrder": "Ascendente",
-    "descOrder": "Descendente",
-    "showMore": "Mostrar más",
-    "showLess": "Mostrar menos",
-    "all": "Todo",
-    "more": "Más",
-    "less": "Menos",
-    "select": "Seleccionar",
-    "selectAll": "Seleccionar todo",
-    "selectNone": "No seleccionar nada",
-    "noResults": "No se encontraron resultados",
-    "notFound": "No encontrado",
-    "required": "Obligatorio",
-    "optional": "Opcional",
-    "or": "o",
-    "and": "y",
-    "continue": "Continuar",
-    "language": "Idioma",
-    "learnMore": "Saber más",
+    "loading": "Memuatkan...",
+    "error": "Ralat telah berlaku",
+    "retry": "Cuba lagi",
+    "save": "Simpan",
+    "cancel": "Batal",
+    "delete": "Padam",
+    "edit": "Edit",
+    "view": "Lihat",
+    "submit": "Hantar",
+    "back": "Kembali",
+    "next": "Seterusnya",
+    "previous": "Sebelumnya",
+    "credits": "Kredit",
+    "search": "Cari",
+    "filterBy": "Tapis mengikut",
+    "sortBy": "Susun mengikut",
+    "ascOrder": "Menaik",
+    "descOrder": "Menurun",
+    "showMore": "Tunjukkan lebih",
+    "showLess": "Tunjukkan kurang",
+    "all": "Semua",
+    "more": "Lagi",
+    "less": "Kurang",
+    "select": "Pilih",
+    "selectAll": "Pilih semua",
+    "selectNone": "Jangan pilih mana-mana",
+    "noResults": "Tiada hasil ditemui",
+    "notFound": "Tidak dijumpai",
+    "required": "Diperlukan",
+    "optional": "Pilihan",
+    "or": "atau",
+    "and": "dan",
+    "continue": "Teruskan",
+    "language": "Bahasa",
+    "learnMore": "Ketahui lebih lanjut",
     "companyName": "iMagenWiz"
   },
   "home": {
     "hero": {
-      "title": "Elimina",
-      "titleHighlight": "Fondos",
-      "titleEnd": "en Segundos",
-      "subtitle": "Nuestra tecnología impulsada por IA hace que la eliminación de fondos sea rápida, fácil y precisa. Perfecto para comercio electrónico, marketing o proyectos personales.",
-      "getStarted": "Comenzar Gratis",
-      "secondaryCta": "Ver Precios",
-      "tag": "Nueva Tecnología de IA",
-      "trust": "Confiado por más de 10,000 usuarios en todo el mundo",
-      "imageCaption": "Procesamiento con IA en tiempo real"
+      "title": "Buang",
+      "titleHighlight": "latar belakang",
+      "titleEnd": "dalam beberapa saat",
+      "subtitle": "Teknologi AI kami menjadikan penghapusan latar belakang cepat, mudah dan tepat. Sempurna untuk e-dagang, pemasaran atau projek peribadi.",
+      "getStarted": "Mula secara percuma",
+      "secondaryCta": "Lihat harga",
+      "tag": "Teknologi AI Baharu",
+      "trust": "Dipercayai oleh lebih 10,000 pengguna di seluruh dunia",
+      "imageCaption": "Pemprosesan AI masa nyata"
     },
     "features": {
-      "title": "¿Por Qué Elegir",
-      "subtitle": "Nuestras tecnologías avanzadas de IA proporcionan resultados líderes en la industria para todas sus necesidades de edición de imágenes",
+      "title": "Mengapa iMagenWiz",
+      "subtitle": "Teknologi AI termaju kami memberikan hasil terbaik dalam industri untuk semua keperluan penyuntingan imej anda",
       "fast": {
-        "title": "Rápido como un Rayo",
-        "description": "Procese imágenes en segundos, no en minutos. Nuestra IA está optimizada para la velocidad sin sacrificar la calidad."
+        "title": "Sangat Pantas",
+        "description": "Proses imej dalam beberapa saat, bukan minit. AI kami dioptimumkan untuk kelajuan tanpa menjejaskan kualiti."
       },
       "precise": {
-        "title": "Resultados Precisos",
-        "description": "Nuestra IA detecta con precisión bordes, cabello y detalles complejos que otras herramientas no detectan, incluso en imágenes complicadas."
+        "title": "Hasil Tepat",
+        "description": "AI kami mengesan pinggir, rambut dan butiran kompleks yang terlepas oleh alat lain dengan tepat, walaupun dalam imej yang mencabar."
       },
       "easy": {
-        "title": "Fácil de Usar",
-        "description": "Simplemente suba su imagen y descargue el resultado. No se requieren conocimientos técnicos. Perfecto para cualquier nivel de habilidad."
+        "title": "Mudah Digunakan",
+        "description": "Hanya muat naik imej anda dan muat turun hasilnya. Tiada kepakaran teknikal diperlukan. Sempurna untuk semua tahap kemahiran."
       }
     },
     "stats": {
-      "accuracy": "Tasa de Precisión",
-      "time": "Tiempo Medio de Procesamiento",
-      "images": "Imágenes Procesadas Diariamente",
-      "languages": "Idiomas Admitidos"
+      "accuracy": "Kadar ketepatan",
+      "time": "Masa pemprosesan purata",
+      "images": "Imej diproses setiap hari",
+      "languages": "Bahasa disokong"
     },
     "howItWorks": {
-      "title": "Cómo",
-      "titleHighlight": "Funciona",
-      "subtitle": "Tres sencillos pasos para eliminar fondos de imágenes en segundos",
-      "tag": "PROCESO SIMPLE"
+      "title": "Cara ia",
+      "titleHighlight": "berfungsi",
+      "subtitle": "Tiga langkah mudah untuk membuang latar belakang imej dalam beberapa saat",
+      "tag": "PROSES MUDAH"
     },
     "steps": {
       "upload": {
-        "title": "Sube tu Imagen",
-        "description": "Sube cualquier imagen desde tu dispositivo a nuestra plataforma segura. Soportamos formatos JPG, PNG y WebP."
+        "title": "Muat naik imej",
+        "description": "Muat naik mana-mana imej dari peranti anda ke platform selamat kami. Kami menyokong format JPG, PNG dan WebP."
       },
       "process": {
-        "title": "Procesamiento con IA",
-        "description": "Nuestra IA avanzada detecta y elimina automáticamente el fondo en segundos con alta precisión."
+        "title": "Pemprosesan AI",
+        "description": "AI termaju kami mengesan dan membuang latar belakang secara automatik dalam beberapa saat dengan ketepatan tinggi."
       },
       "download": {
-        "title": "Descarga el Resultado",
-        "description": "Descarga tu PNG transparente o elige un fondo personalizado. Posibilidades ilimitadas."
+        "title": "Muat turun hasil",
+        "description": "Muat turun PNG telus atau pilih latar belakang tersuai. Kemungkinan tanpa had."
       }
     },
     "testimonial": {
-      "quote": "\"iMagenWiz ha revolucionado nuestro flujo de trabajo de fotografía de productos. Lo que solía tomar horas ahora toma segundos, ¡y los resultados son impecables!\"",
-      "author": "Sarah Johnson, Gerente de Comercio Electrónico"
+      "quote": "\"iMagenWiz telah merevolusikan aliran kerja fotografi produk kami. Apa yang dahulunya mengambil masa berjam-jam, kini hanya mengambil masa beberapa saat, dan hasilnya sempurna!\"",
+      "author": "Sarah Johnson, Pengurus E-dagang"
     },
     "cta": {
-      "title": "¿Listo para transformar tus imágenes?",
-      "subtitle": "Únete a miles de profesionales que confían en iMagenWiz para sus necesidades de procesamiento de imágenes. Comienza hoy y nota la diferencia.",
-      "getStarted": "Comenzar Gratis",
-      "viewPricing": "Ver Precios"
+      "title": "Bersedia untuk mentransformasi imej anda?",
+      "subtitle": "Sertai ribuan profesional yang mempercayai iMagenWiz untuk keperluan pemprosesan imej mereka. Mulakan hari ini dan alami perbezaannya.",
+      "getStarted": "Mula secara percuma",
+      "viewPricing": "Lihat harga"
     },
     "trust": {
-      "secure": "Procesamiento Seguro",
-      "accuracy": "Precisión del 99,8%",
-      "cloud": "Procesamiento en la Nube",
-      "support": "Soporte 24/7"
+      "secure": "Pemprosesan selamat",
+      "accuracy": "Ketepatan 99.8%",
+      "cloud": "Pemprosesan awan",
+      "support": "Sokongan 24/7"
     },
     "testimonials": {
-      "title": "Lo que dicen nuestros usuarios",
-      "viewAll": "Ver todos los testimonios"
+      "title": "Apa kata pengguna kami",
+      "viewAll": "Lihat semua ulasan"
     }
   },
   "errors": {
-    "required": "Este campo es obligatorio",
-    "invalidEmail": "Por favor ingrese una dirección de correo válida",
-    "minLength": "Debe tener al menos {{min}} caracteres",
-    "maxLength": "Debe tener como máximo {{max}} caracteres",
-    "passwordMismatch": "Las contraseñas no coinciden",
-    "invalidCredentials": "Correo o contraseña inválidos",
-    "serverError": "Error del servidor. Por favor intente más tarde.",
-    "networkError": "Error de red. Por favor verifique su conexión.",
-    "fileTooBig": "El archivo es demasiado grande. El tamaño máximo es {{size}}MB",
-    "fileTypeNotSupported": "Tipo de archivo no soportado. Por favor suba {{types}}",
-    "unexpectedError": "Se ha producido un error inesperado"
+    "required": "Medan ini diperlukan",
+    "invalidEmail": "Sila masukkan alamat e-mel yang sah",
+    "minLength": "Mesti mempunyai sekurang-kurangnya {{min}} aksara",
+    "maxLength": "Mesti mempunyai tidak lebih daripada {{max}} aksara",
+    "passwordMismatch": "Kata laluan tidak sepadan",
+    "invalidCredentials": "E-mel atau kata laluan tidak sah",
+    "serverError": "Ralat pelayan. Sila cuba lagi kemudian.",
+    "networkError": "Ralat rangkaian. Sila semak sambungan anda.",
+    "fileTooBig": "Fail terlalu besar. Saiz maksimum ialah {{size}}MB",
+    "fileTypeNotSupported": "Jenis fail tidak disokong. Sila muat naik {{types}}",
+    "unexpectedError": "Ralat tidak dijangka telah berlaku"
   }
 }

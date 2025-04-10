@@ -1,147 +1,147 @@
 {
   "nav": {
-    "home": "Inicio",
-    "pricing": "Precios",
-    "blog": "Blog",
-    "dashboard": "Panel de Control",
-    "history": "Historial",
-    "login": "Iniciar Sesión",
-    "register": "Registrarse",
+    "home": "หน้าแรก",
+    "pricing": "ราคา",
+    "blog": "บล็อก",
+    "dashboard": "แดชบอร์ด",
+    "history": "ประวัติ",
+    "login": "เข้าสู่ระบบ",
+    "register": "ลงทะเบียน",
     "editor": "CMS",
-    "account": "Mi Cuenta",
-    "logout": "Cerrar Sesión"
+    "account": "บัญชีของฉัน",
+    "logout": "ออกจากระบบ"
   },
   "footer": {
-    "about": "Acerca de",
-    "contact": "Contacto",
-    "terms": "Términos de Servicio",
-    "privacy": "Política de Privacidad",
-    "copyright": "© 2025 iMagenWiz. Todos los derechos reservados."
+    "about": "เกี่ยวกับเรา",
+    "contact": "ติดต่อ",
+    "terms": "ข้อกำหนดการใช้งาน",
+    "privacy": "นโยบายความเป็นส่วนตัว",
+    "copyright": "© 2025 iMagenWiz สงวนลิขสิทธิ์ทั้งหมด"
   },
   "common": {
-    "loading": "Cargando...",
-    "error": "Se ha producido un error",
-    "retry": "Reintentar",
-    "save": "Guardar",
-    "cancel": "Cancelar",
-    "delete": "Eliminar",
-    "edit": "Editar",
-    "view": "Ver",
-    "submit": "Enviar",
-    "back": "Atrás",
-    "next": "Siguiente",
-    "previous": "Anterior",
-    "credits": "Créditos",
-    "search": "Buscar",
-    "filterBy": "Filtrar por",
-    "sortBy": "Ordenar por",
-    "ascOrder": "Ascendente",
-    "descOrder": "Descendente",
-    "showMore": "Mostrar más",
-    "showLess": "Mostrar menos",
-    "all": "Todo",
-    "more": "Más",
-    "less": "Menos",
-    "select": "Seleccionar",
-    "selectAll": "Seleccionar todo",
-    "selectNone": "No seleccionar nada",
-    "noResults": "No se encontraron resultados",
-    "notFound": "No encontrado",
-    "required": "Obligatorio",
-    "optional": "Opcional",
-    "or": "o",
-    "and": "y",
-    "continue": "Continuar",
-    "language": "Idioma",
-    "learnMore": "Saber más",
+    "loading": "กำลังโหลด...",
+    "error": "เกิดข้อผิดพลาด",
+    "retry": "ลองอีกครั้ง",
+    "save": "บันทึก",
+    "cancel": "ยกเลิก",
+    "delete": "ลบ",
+    "edit": "แก้ไข",
+    "view": "ดู",
+    "submit": "ส่ง",
+    "back": "กลับ",
+    "next": "ถัดไป",
+    "previous": "ก่อนหน้า",
+    "credits": "เครดิต",
+    "search": "ค้นหา",
+    "filterBy": "กรองตาม",
+    "sortBy": "เรียงตาม",
+    "ascOrder": "จากน้อยไปมาก",
+    "descOrder": "จากมากไปน้อย",
+    "showMore": "แสดงเพิ่ม",
+    "showLess": "แสดงน้อยลง",
+    "all": "ทั้งหมด",
+    "more": "เพิ่มเติม",
+    "less": "น้อยลง",
+    "select": "เลือก",
+    "selectAll": "เลือกทั้งหมด",
+    "selectNone": "ไม่เลือกสิ่งใด",
+    "noResults": "ไม่พบผลลัพธ์",
+    "notFound": "ไม่พบ",
+    "required": "จำเป็น",
+    "optional": "ไม่จำเป็น",
+    "or": "หรือ",
+    "and": "และ",
+    "continue": "ดำเนินการต่อ",
+    "language": "ภาษา",
+    "learnMore": "เรียนรู้เพิ่มเติม",
     "companyName": "iMagenWiz"
   },
   "home": {
     "hero": {
-      "title": "Elimina",
-      "titleHighlight": "Fondos",
-      "titleEnd": "en Segundos",
-      "subtitle": "Nuestra tecnología impulsada por IA hace que la eliminación de fondos sea rápida, fácil y precisa. Perfecto para comercio electrónico, marketing o proyectos personales.",
-      "getStarted": "Comenzar Gratis",
-      "secondaryCta": "Ver Precios",
-      "tag": "Nueva Tecnología de IA",
-      "trust": "Confiado por más de 10,000 usuarios en todo el mundo",
-      "imageCaption": "Procesamiento con IA en tiempo real"
+      "title": "ลบพื้นหลัง",
+      "titleHighlight": "ภาพ",
+      "titleEnd": "ในไม่กี่วินาที",
+      "subtitle": "เทคโนโลยี AI ของเราช่วยให้การลบพื้นหลังรวดเร็ว ง่าย และแม่นยำ เหมาะสำหรับอีคอมเมิร์ซ การตลาด หรือโปรเจ็กต์ส่วนตัว",
+      "getStarted": "เริ่มใช้ฟรี",
+      "secondaryCta": "ดูราคา",
+      "tag": "เทคโนโลยี AI ใหม่",
+      "trust": "ได้รับความไว้วางใจจากผู้ใช้มากกว่า 10,000 คนทั่วโลก",
+      "imageCaption": "การประมวลผล AI แบบเรียลไทม์"
     },
     "features": {
-      "title": "¿Por Qué Elegir",
-      "subtitle": "Nuestras tecnologías avanzadas de IA proporcionan resultados líderes en la industria para todas sus necesidades de edición de imágenes",
+      "title": "ทำไมต้อง iMagenWiz",
+      "subtitle": "เทคโนโลยี AI ขั้นสูงของเรามอบผลลัพธ์ที่ดีที่สุดในอุตสาหกรรมสำหรับความต้องการในการแก้ไขรูปภาพทุกรูปแบบ",
       "fast": {
-        "title": "Rápido como un Rayo",
-        "description": "Procese imágenes en segundos, no en minutos. Nuestra IA está optimizada para la velocidad sin sacrificar la calidad."
+        "title": "รวดเร็วทันใจ",
+        "description": "ประมวลผลภาพในเวลาเพียงไม่กี่วินาที ไม่ใช่นาที AI ของเราถูกออกแบบให้มีความเร็วสูงโดยไม่สูญเสียคุณภาพ"
       },
       "precise": {
-        "title": "Resultados Precisos",
-        "description": "Nuestra IA detecta con precisión bordes, cabello y detalles complejos que otras herramientas no detectan, incluso en imágenes complicadas."
+        "title": "ผลลัพธ์ที่แม่นยำ",
+        "description": "AI ของเราตรวจจับขอบ เส้นผม และรายละเอียดที่ซับซ้อนที่เครื่องมืออื่นมองข้ามได้อย่างแม่นยำ แม้ในภาพที่ท้าทาย"
       },
       "easy": {
-        "title": "Fácil de Usar",
-        "description": "Simplemente suba su imagen y descargue el resultado. No se requieren conocimientos técnicos. Perfecto para cualquier nivel de habilidad."
+        "title": "ใช้งานง่าย",
+        "description": "เพียงอัปโหลดภาพของคุณและดาวน์โหลดผลลัพธ์ ไม่จำเป็นต้องมีความรู้ทางเทคนิค เหมาะสำหรับทุกระดับทักษะ"
       }
     },
     "stats": {
-      "accuracy": "Tasa de Precisión",
-      "time": "Tiempo Medio de Procesamiento",
-      "images": "Imágenes Procesadas Diariamente",
-      "languages": "Idiomas Admitidos"
+      "accuracy": "อัตราความแม่นยำ",
+      "time": "เวลาประมวลผลเฉลี่ย",
+      "images": "ภาพที่ประมวลผลต่อวัน",
+      "languages": "ภาษาที่รองรับ"
     },
     "howItWorks": {
-      "title": "Cómo",
-      "titleHighlight": "Funciona",
-      "subtitle": "Tres sencillos pasos para eliminar fondos de imágenes en segundos",
-      "tag": "PROCESO SIMPLE"
+      "title": "วิธีการ",
+      "titleHighlight": "ทำงาน",
+      "subtitle": "สามขั้นตอนง่ายๆ ในการลบพื้นหลังภาพภายในไม่กี่วินาที",
+      "tag": "กระบวนการที่เรียบง่าย"
     },
     "steps": {
       "upload": {
-        "title": "Sube tu Imagen",
-        "description": "Sube cualquier imagen desde tu dispositivo a nuestra plataforma segura. Soportamos formatos JPG, PNG y WebP."
+        "title": "อัปโหลดภาพ",
+        "description": "อัปโหลดภาพใดก็ได้จากอุปกรณ์ของคุณไปยังแพลตฟอร์มที่ปลอดภัยของเรา เรารองรับรูปแบบ JPG, PNG และ WebP"
       },
       "process": {
-        "title": "Procesamiento con IA",
-        "description": "Nuestra IA avanzada detecta y elimina automáticamente el fondo en segundos con alta precisión."
+        "title": "ประมวลผลด้วย AI",
+        "description": "AI ขั้นสูงของเราตรวจจับและลบพื้นหลังโดยอัตโนมัติภายในไม่กี่วินาทีด้วยความแม่นยำสูง"
       },
       "download": {
-        "title": "Descarga el Resultado",
-        "description": "Descarga tu PNG transparente o elige un fondo personalizado. Posibilidades ilimitadas."
+        "title": "ดาวน์โหลดผลลัพธ์",
+        "description": "ดาวน์โหลด PNG แบบโปร่งใสหรือเลือกพื้นหลังที่กำหนดเอง ความเป็นไปได้ไม่มีที่สิ้นสุด"
       }
     },
     "testimonial": {
-      "quote": "\"iMagenWiz ha revolucionado nuestro flujo de trabajo de fotografía de productos. Lo que solía tomar horas ahora toma segundos, ¡y los resultados son impecables!\"",
-      "author": "Sarah Johnson, Gerente de Comercio Electrónico"
+      "quote": "\"iMagenWiz ปฏิวัติกระบวนการถ่ายภาพผลิตภัณฑ์ของเรา สิ่งที่เคยใช้เวลาหลายชั่วโมง ตอนนี้ใช้เวลาเพียงไม่กี่วินาที และผลลัพธ์ก็ไร้ที่ติ!\"",
+      "author": "Sarah Johnson, ผู้จัดการอีคอมเมิร์ซ"
     },
     "cta": {
-      "title": "¿Listo para transformar tus imágenes?",
-      "subtitle": "Únete a miles de profesionales que confían en iMagenWiz para sus necesidades de procesamiento de imágenes. Comienza hoy y nota la diferencia.",
-      "getStarted": "Comenzar Gratis",
-      "viewPricing": "Ver Precios"
+      "title": "พร้อมที่จะแปลงโฉมภาพของคุณหรือยัง?",
+      "subtitle": "เข้าร่วมกับมืออาชีพนับพันที่ไว้วางใจ iMagenWiz สำหรับความต้องการในการประมวลผลภาพ เริ่มต้นวันนี้และสัมผัสความแตกต่าง",
+      "getStarted": "เริ่มใช้ฟรี",
+      "viewPricing": "ดูราคา"
     },
     "trust": {
-      "secure": "Procesamiento Seguro",
-      "accuracy": "Precisión del 99,8%",
-      "cloud": "Procesamiento en la Nube",
-      "support": "Soporte 24/7"
+      "secure": "การประมวลผลที่ปลอดภัย",
+      "accuracy": "ความแม่นยำ 99.8%",
+      "cloud": "ประมวลผลบนคลาวด์",
+      "support": "การสนับสนุน 24/7"
     },
     "testimonials": {
-      "title": "Lo que dicen nuestros usuarios",
-      "viewAll": "Ver todos los testimonios"
+      "title": "ผู้ใช้งานของเราพูดอย่างไร",
+      "viewAll": "ดูรีวิวทั้งหมด"
     }
   },
   "errors": {
-    "required": "Este campo es obligatorio",
-    "invalidEmail": "Por favor ingrese una dirección de correo válida",
-    "minLength": "Debe tener al menos {{min}} caracteres",
-    "maxLength": "Debe tener como máximo {{max}} caracteres",
-    "passwordMismatch": "Las contraseñas no coinciden",
-    "invalidCredentials": "Correo o contraseña inválidos",
-    "serverError": "Error del servidor. Por favor intente más tarde.",
-    "networkError": "Error de red. Por favor verifique su conexión.",
-    "fileTooBig": "El archivo es demasiado grande. El tamaño máximo es {{size}}MB",
-    "fileTypeNotSupported": "Tipo de archivo no soportado. Por favor suba {{types}}",
-    "unexpectedError": "Se ha producido un error inesperado"
+    "required": "จำเป็นต้องกรอกช่องนี้",
+    "invalidEmail": "กรุณากรอกอีเมลที่ถูกต้อง",
+    "minLength": "ต้องมีอย่างน้อย {{min}} ตัวอักษร",
+    "maxLength": "ต้องมีไม่เกิน {{max}} ตัวอักษร",
+    "passwordMismatch": "รหัสผ่านไม่ตรงกัน",
+    "invalidCredentials": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+    "serverError": "เกิดข้อผิดพลาดจากเซิร์ฟเวอร์ กรุณาลองใหม่ภายหลัง",
+    "networkError": "เกิดข้อผิดพลาดเครือข่าย กรุณาตรวจสอบการเชื่อมต่อของคุณ",
+    "fileTooBig": "ไฟล์ใหญ่เกินไป ขนาดสูงสุดคือ {{size}}MB",
+    "fileTypeNotSupported": "ไม่รองรับประเภทไฟล์นี้ กรุณาอัปโหลด {{types}}",
+    "unexpectedError": "เกิดข้อผิดพลาดที่ไม่คาดคิด"
   }
 }
