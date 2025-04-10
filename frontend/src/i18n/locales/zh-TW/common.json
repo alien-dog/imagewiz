@@ -1,147 +1,147 @@
 {
   "nav": {
-    "home": "Inicio",
-    "pricing": "Precios",
-    "blog": "Blog",
-    "dashboard": "Panel de Control",
-    "history": "Historial",
-    "login": "Iniciar Sesión",
-    "register": "Registrarse",
+    "home": "首頁",
+    "pricing": "價格",
+    "blog": "部落格",
+    "dashboard": "儀表板",
+    "history": "歷史記錄",
+    "login": "登入",
+    "register": "註冊",
     "editor": "CMS",
-    "account": "Mi Cuenta",
-    "logout": "Cerrar Sesión"
+    "account": "我的帳戶",
+    "logout": "登出"
   },
   "footer": {
-    "about": "Acerca de",
-    "contact": "Contacto",
-    "terms": "Términos de Servicio",
-    "privacy": "Política de Privacidad",
-    "copyright": "© 2025 iMagenWiz. Todos los derechos reservados."
+    "about": "關於我們",
+    "contact": "聯絡我們",
+    "terms": "使用條款",
+    "privacy": "隱私政策",
+    "copyright": "© 2025 iMagenWiz. 版權所有。"
   },
   "common": {
-    "loading": "Cargando...",
-    "error": "Se ha producido un error",
-    "retry": "Reintentar",
-    "save": "Guardar",
-    "cancel": "Cancelar",
-    "delete": "Eliminar",
-    "edit": "Editar",
-    "view": "Ver",
-    "submit": "Enviar",
-    "back": "Atrás",
-    "next": "Siguiente",
-    "previous": "Anterior",
-    "credits": "Créditos",
-    "search": "Buscar",
-    "filterBy": "Filtrar por",
-    "sortBy": "Ordenar por",
-    "ascOrder": "Ascendente",
-    "descOrder": "Descendente",
-    "showMore": "Mostrar más",
-    "showLess": "Mostrar menos",
-    "all": "Todo",
-    "more": "Más",
-    "less": "Menos",
-    "select": "Seleccionar",
-    "selectAll": "Seleccionar todo",
-    "selectNone": "No seleccionar nada",
-    "noResults": "No se encontraron resultados",
-    "notFound": "No encontrado",
-    "required": "Obligatorio",
-    "optional": "Opcional",
-    "or": "o",
-    "and": "y",
-    "continue": "Continuar",
-    "language": "Idioma",
-    "learnMore": "Saber más",
+    "loading": "載入中...",
+    "error": "發生錯誤",
+    "retry": "重試",
+    "save": "儲存",
+    "cancel": "取消",
+    "delete": "刪除",
+    "edit": "編輯",
+    "view": "查看",
+    "submit": "提交",
+    "back": "返回",
+    "next": "下一步",
+    "previous": "上一步",
+    "credits": "點數",
+    "search": "搜尋",
+    "filterBy": "篩選依據",
+    "sortBy": "排序依據",
+    "ascOrder": "升序",
+    "descOrder": "降序",
+    "showMore": "顯示更多",
+    "showLess": "顯示更少",
+    "all": "全部",
+    "more": "更多",
+    "less": "更少",
+    "select": "選擇",
+    "selectAll": "全選",
+    "selectNone": "取消全選",
+    "noResults": "沒有結果",
+    "notFound": "未找到",
+    "required": "必填",
+    "optional": "選填",
+    "or": "或",
+    "and": "和",
+    "continue": "繼續",
+    "language": "語言",
+    "learnMore": "了解更多",
     "companyName": "iMagenWiz"
   },
   "home": {
     "hero": {
-      "title": "Elimina",
-      "titleHighlight": "Fondos",
-      "titleEnd": "en Segundos",
-      "subtitle": "Nuestra tecnología impulsada por IA hace que la eliminación de fondos sea rápida, fácil y precisa. Perfecto para comercio electrónico, marketing o proyectos personales.",
-      "getStarted": "Comenzar Gratis",
-      "secondaryCta": "Ver Precios",
-      "tag": "Nueva Tecnología de IA",
-      "trust": "Confiado por más de 10,000 usuarios en todo el mundo",
-      "imageCaption": "Procesamiento con IA en tiempo real"
+      "title": "在幾秒鐘內",
+      "titleHighlight": "移除背景",
+      "titleEnd": "",
+      "subtitle": "我們的人工智能技術使背景移除快速、簡單且精確。完美適用於電子商務、營銷或個人項目。",
+      "getStarted": "免費開始使用",
+      "secondaryCta": "查看價格",
+      "tag": "全新AI技術",
+      "trust": "全球超過10,000名用戶信任",
+      "imageCaption": "即時AI處理"
     },
     "features": {
-      "title": "¿Por Qué Elegir",
-      "subtitle": "Nuestras tecnologías avanzadas de IA proporcionan resultados líderes en la industria para todas sus necesidades de edición de imágenes",
+      "title": "為何選擇iMagenWiz",
+      "subtitle": "我們先進的AI技術為您的所有圖像編輯需求提供業界最佳結果",
       "fast": {
-        "title": "Rápido como un Rayo",
-        "description": "Procese imágenes en segundos, no en minutos. Nuestra IA está optimizada para la velocidad sin sacrificar la calidad."
+        "title": "超快速",
+        "description": "在幾秒鐘內處理圖像，而不是幾分鐘。我們的AI經過優化，提供速度而不犧牲質量。"
       },
       "precise": {
-        "title": "Resultados Precisos",
-        "description": "Nuestra IA detecta con precisión bordes, cabello y detalles complejos que otras herramientas no detectan, incluso en imágenes complicadas."
+        "title": "精確結果",
+        "description": "我們的AI能夠精確檢測其他工具會遺漏的邊緣、頭髮和複雜細節，即使是在具有挑戰性的圖像中。"
       },
       "easy": {
-        "title": "Fácil de Usar",
-        "description": "Simplemente suba su imagen y descargue el resultado. No se requieren conocimientos técnicos. Perfecto para cualquier nivel de habilidad."
+        "title": "易於使用",
+        "description": "只需上傳您的圖像並下載結果。無需技術專業知識。適合所有技能水平。"
       }
     },
     "stats": {
-      "accuracy": "Tasa de Precisión",
-      "time": "Tiempo Medio de Procesamiento",
-      "images": "Imágenes Procesadas Diariamente",
-      "languages": "Idiomas Admitidos"
+      "accuracy": "準確率",
+      "time": "平均處理時間",
+      "images": "每日處理圖像數",
+      "languages": "支援語言數"
     },
     "howItWorks": {
-      "title": "Cómo",
-      "titleHighlight": "Funciona",
-      "subtitle": "Tres sencillos pasos para eliminar fondos de imágenes en segundos",
-      "tag": "PROCESO SIMPLE"
+      "title": "使用",
+      "titleHighlight": "方法",
+      "subtitle": "三個簡單步驟，在幾秒鐘內移除圖像背景",
+      "tag": "簡單流程"
     },
     "steps": {
       "upload": {
-        "title": "Sube tu Imagen",
-        "description": "Sube cualquier imagen desde tu dispositivo a nuestra plataforma segura. Soportamos formatos JPG, PNG y WebP."
+        "title": "上傳圖像",
+        "description": "從您的設備上傳任何圖像到我們安全的平台。我們支援JPG、PNG和WebP格式。"
       },
       "process": {
-        "title": "Procesamiento con IA",
-        "description": "Nuestra IA avanzada detecta y elimina automáticamente el fondo en segundos con alta precisión."
+        "title": "AI處理",
+        "description": "我們先進的AI自動檢測並在幾秒鐘內以高精度移除背景。"
       },
       "download": {
-        "title": "Descarga el Resultado",
-        "description": "Descarga tu PNG transparente o elige un fondo personalizado. Posibilidades ilimitadas."
+        "title": "下載結果",
+        "description": "下載透明PNG或選擇自定義背景。可能性無窮無盡。"
       }
     },
     "testimonial": {
-      "quote": "\"iMagenWiz ha revolucionado nuestro flujo de trabajo de fotografía de productos. Lo que solía tomar horas ahora toma segundos, ¡y los resultados son impecables!\"",
-      "author": "Sarah Johnson, Gerente de Comercio Electrónico"
+      "quote": "\"iMagenWiz徹底革新了我們的產品攝影工作流程。以前需要幾小時的工作現在只需幾秒鐘，結果完美無瑕！\"",
+      "author": "Sarah Johnson，電子商務經理"
     },
     "cta": {
-      "title": "¿Listo para transformar tus imágenes?",
-      "subtitle": "Únete a miles de profesionales que confían en iMagenWiz para sus necesidades de procesamiento de imágenes. Comienza hoy y nota la diferencia.",
-      "getStarted": "Comenzar Gratis",
-      "viewPricing": "Ver Precios"
+      "title": "準備好改變您的圖像了嗎？",
+      "subtitle": "加入成千上萬信任iMagenWiz處理圖像編輯需求的專業人士。今天開始，體驗不同。",
+      "getStarted": "免費開始使用",
+      "viewPricing": "查看價格"
     },
     "trust": {
-      "secure": "Procesamiento Seguro",
-      "accuracy": "Precisión del 99,8%",
-      "cloud": "Procesamiento en la Nube",
-      "support": "Soporte 24/7"
+      "secure": "安全處理",
+      "accuracy": "99.8%準確率",
+      "cloud": "雲端處理",
+      "support": "24/7支援"
     },
     "testimonials": {
-      "title": "Lo que dicen nuestros usuarios",
-      "viewAll": "Ver todos los testimonios"
+      "title": "用戶評價",
+      "viewAll": "查看所有評論"
     }
   },
   "errors": {
-    "required": "Este campo es obligatorio",
-    "invalidEmail": "Por favor ingrese una dirección de correo válida",
-    "minLength": "Debe tener al menos {{min}} caracteres",
-    "maxLength": "Debe tener como máximo {{max}} caracteres",
-    "passwordMismatch": "Las contraseñas no coinciden",
-    "invalidCredentials": "Correo o contraseña inválidos",
-    "serverError": "Error del servidor. Por favor intente más tarde.",
-    "networkError": "Error de red. Por favor verifique su conexión.",
-    "fileTooBig": "El archivo es demasiado grande. El tamaño máximo es {{size}}MB",
-    "fileTypeNotSupported": "Tipo de archivo no soportado. Por favor suba {{types}}",
-    "unexpectedError": "Se ha producido un error inesperado"
+    "required": "此欄位為必填",
+    "invalidEmail": "請輸入有效的電子郵件地址",
+    "minLength": "必須至少包含{{min}}個字符",
+    "maxLength": "不能超過{{max}}個字符",
+    "passwordMismatch": "密碼不匹配",
+    "invalidCredentials": "無效的電子郵件或密碼",
+    "serverError": "伺服器錯誤。請稍後再試。",
+    "networkError": "網絡錯誤。請檢查您的連接。",
+    "fileTooBig": "檔案太大。最大大小為{{size}}MB",
+    "fileTypeNotSupported": "不支援的檔案類型。請上傳{{types}}",
+    "unexpectedError": "發生意外錯誤"
   }
 }

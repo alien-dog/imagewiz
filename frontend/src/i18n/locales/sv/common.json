@@ -1,147 +1,147 @@
 {
   "nav": {
-    "home": "Inicio",
-    "pricing": "Precios",
-    "blog": "Blog",
-    "dashboard": "Panel de Control",
-    "history": "Historial",
-    "login": "Iniciar Sesión",
-    "register": "Registrarse",
+    "home": "Hem",
+    "pricing": "Priser",
+    "blog": "Blogg",
+    "dashboard": "Kontrollpanel",
+    "history": "Historik",
+    "login": "Logga in",
+    "register": "Registrera",
     "editor": "CMS",
-    "account": "Mi Cuenta",
-    "logout": "Cerrar Sesión"
+    "account": "Mitt Konto",
+    "logout": "Logga ut"
   },
   "footer": {
-    "about": "Acerca de",
-    "contact": "Contacto",
-    "terms": "Términos de Servicio",
-    "privacy": "Política de Privacidad",
-    "copyright": "© 2025 iMagenWiz. Todos los derechos reservados."
+    "about": "Om Oss",
+    "contact": "Kontakt",
+    "terms": "Användarvillkor",
+    "privacy": "Integritetspolicy",
+    "copyright": "© 2025 iMagenWiz. Alla rättigheter förbehållna."
   },
   "common": {
-    "loading": "Cargando...",
-    "error": "Se ha producido un error",
-    "retry": "Reintentar",
-    "save": "Guardar",
-    "cancel": "Cancelar",
-    "delete": "Eliminar",
-    "edit": "Editar",
-    "view": "Ver",
-    "submit": "Enviar",
-    "back": "Atrás",
-    "next": "Siguiente",
-    "previous": "Anterior",
-    "credits": "Créditos",
-    "search": "Buscar",
-    "filterBy": "Filtrar por",
-    "sortBy": "Ordenar por",
-    "ascOrder": "Ascendente",
-    "descOrder": "Descendente",
-    "showMore": "Mostrar más",
-    "showLess": "Mostrar menos",
-    "all": "Todo",
-    "more": "Más",
-    "less": "Menos",
-    "select": "Seleccionar",
-    "selectAll": "Seleccionar todo",
-    "selectNone": "No seleccionar nada",
-    "noResults": "No se encontraron resultados",
-    "notFound": "No encontrado",
-    "required": "Obligatorio",
-    "optional": "Opcional",
-    "or": "o",
-    "and": "y",
-    "continue": "Continuar",
-    "language": "Idioma",
-    "learnMore": "Saber más",
+    "loading": "Laddar...",
+    "error": "Ett fel har uppstått",
+    "retry": "Försök igen",
+    "save": "Spara",
+    "cancel": "Avbryt",
+    "delete": "Radera",
+    "edit": "Redigera",
+    "view": "Visa",
+    "submit": "Skicka",
+    "back": "Tillbaka",
+    "next": "Nästa",
+    "previous": "Föregående",
+    "credits": "Krediter",
+    "search": "Sök",
+    "filterBy": "Filtrera efter",
+    "sortBy": "Sortera efter",
+    "ascOrder": "Stigande",
+    "descOrder": "Fallande",
+    "showMore": "Visa mer",
+    "showLess": "Visa mindre",
+    "all": "Alla",
+    "more": "Mer",
+    "less": "Mindre",
+    "select": "Välj",
+    "selectAll": "Välj alla",
+    "selectNone": "Välj ingen",
+    "noResults": "Inga resultat hittades",
+    "notFound": "Hittades inte",
+    "required": "Obligatorisk",
+    "optional": "Valfri",
+    "or": "eller",
+    "and": "och",
+    "continue": "Fortsätt",
+    "language": "Språk",
+    "learnMore": "Läs mer",
     "companyName": "iMagenWiz"
   },
   "home": {
     "hero": {
-      "title": "Elimina",
-      "titleHighlight": "Fondos",
-      "titleEnd": "en Segundos",
-      "subtitle": "Nuestra tecnología impulsada por IA hace que la eliminación de fondos sea rápida, fácil y precisa. Perfecto para comercio electrónico, marketing o proyectos personales.",
-      "getStarted": "Comenzar Gratis",
-      "secondaryCta": "Ver Precios",
-      "tag": "Nueva Tecnología de IA",
-      "trust": "Confiado por más de 10,000 usuarios en todo el mundo",
-      "imageCaption": "Procesamiento con IA en tiempo real"
+      "title": "Ta bort",
+      "titleHighlight": "bakgrunder",
+      "titleEnd": "på några sekunder",
+      "subtitle": "Vår AI-teknologi gör bakgrundsborttagning snabb, enkel och exakt. Perfekt för e-handel, marknadsföring eller personliga projekt.",
+      "getStarted": "Börja gratis",
+      "secondaryCta": "Se priser",
+      "tag": "NY AI-TEKNOLOGI",
+      "trust": "Betrodd av över 10 000 användare världen över",
+      "imageCaption": "AI-bearbetning i realtid"
     },
     "features": {
-      "title": "¿Por Qué Elegir",
-      "subtitle": "Nuestras tecnologías avanzadas de IA proporcionan resultados líderes en la industria para todas sus necesidades de edición de imágenes",
+      "title": "Varför iMagenWiz",
+      "subtitle": "Vår avancerade AI-teknologi levererar branschens bästa resultat för alla dina bildredigeringsbehov",
       "fast": {
-        "title": "Rápido como un Rayo",
-        "description": "Procese imágenes en segundos, no en minutos. Nuestra IA está optimizada para la velocidad sin sacrificar la calidad."
+        "title": "Blixtsnabb",
+        "description": "Bearbeta bilder på sekunder, inte minuter. Vår AI är optimerad för hastighet utan att kompromissa med kvaliteten."
       },
       "precise": {
-        "title": "Resultados Precisos",
-        "description": "Nuestra IA detecta con precisión bordes, cabello y detalles complejos que otras herramientas no detectan, incluso en imágenes complicadas."
+        "title": "Exakta Resultat",
+        "description": "Vår AI identifierar kanter, hår och komplexa detaljer som andra verktyg missar, även i utmanande bilder."
       },
       "easy": {
-        "title": "Fácil de Usar",
-        "description": "Simplemente suba su imagen y descargue el resultado. No se requieren conocimientos técnicos. Perfecto para cualquier nivel de habilidad."
+        "title": "Användarvänlig",
+        "description": "Ladda bara upp din bild och ladda ner resultatet. Ingen teknisk expertis krävs. Perfekt för alla kunskapsnivåer."
       }
     },
     "stats": {
-      "accuracy": "Tasa de Precisión",
-      "time": "Tiempo Medio de Procesamiento",
-      "images": "Imágenes Procesadas Diariamente",
-      "languages": "Idiomas Admitidos"
+      "accuracy": "Precisionsgrad",
+      "time": "Genomsnittlig bearbetningstid",
+      "images": "Bilder bearbetade per dag",
+      "languages": "Språk som stöds"
     },
     "howItWorks": {
-      "title": "Cómo",
-      "titleHighlight": "Funciona",
-      "subtitle": "Tres sencillos pasos para eliminar fondos de imágenes en segundos",
-      "tag": "PROCESO SIMPLE"
+      "title": "Hur det",
+      "titleHighlight": "fungerar",
+      "subtitle": "Tre enkla steg för att ta bort bakgrunden från bilder på sekunder",
+      "tag": "ENKEL PROCESS"
     },
     "steps": {
       "upload": {
-        "title": "Sube tu Imagen",
-        "description": "Sube cualquier imagen desde tu dispositivo a nuestra plataforma segura. Soportamos formatos JPG, PNG y WebP."
+        "title": "Ladda upp bild",
+        "description": "Ladda upp en bild från din enhet till vår säkra plattform. Vi stödjer formaten JPG, PNG och WebP."
       },
       "process": {
-        "title": "Procesamiento con IA",
-        "description": "Nuestra IA avanzada detecta y elimina automáticamente el fondo en segundos con alta precisión."
+        "title": "AI-bearbetning",
+        "description": "Vår avancerade AI identifierar och tar automatiskt bort bakgrunden på sekunder med hög precision."
       },
       "download": {
-        "title": "Descarga el Resultado",
-        "description": "Descarga tu PNG transparente o elige un fondo personalizado. Posibilidades ilimitadas."
+        "title": "Ladda ner resultat",
+        "description": "Ladda ner en transparent PNG eller välj en anpassad bakgrund. Möjligheterna är oändliga."
       }
     },
     "testimonial": {
-      "quote": "\"iMagenWiz ha revolucionado nuestro flujo de trabajo de fotografía de productos. Lo que solía tomar horas ahora toma segundos, ¡y los resultados son impecables!\"",
-      "author": "Sarah Johnson, Gerente de Comercio Electrónico"
+      "quote": "\"iMagenWiz har revolutionerat vårt produktfotograferingsarbetsflöde. Det som tidigare tog timmar tar nu bara sekunder, och resultaten är perfekta!\"",
+      "author": "Sarah Johnson, E-handelsansvarig"
     },
     "cta": {
-      "title": "¿Listo para transformar tus imágenes?",
-      "subtitle": "Únete a miles de profesionales que confían en iMagenWiz para sus necesidades de procesamiento de imágenes. Comienza hoy y nota la diferencia.",
-      "getStarted": "Comenzar Gratis",
-      "viewPricing": "Ver Precios"
+      "title": "Redo att transformera dina bilder?",
+      "subtitle": "Gå med tusentals proffs som litar på iMagenWiz för sina bildredigeringsbehov. Börja idag och upplev skillnaden.",
+      "getStarted": "Börja gratis",
+      "viewPricing": "Se priser"
     },
     "trust": {
-      "secure": "Procesamiento Seguro",
-      "accuracy": "Precisión del 99,8%",
-      "cloud": "Procesamiento en la Nube",
-      "support": "Soporte 24/7"
+      "secure": "Säker bearbetning",
+      "accuracy": "99.8% precision",
+      "cloud": "Molnbearbetning",
+      "support": "Support dygnet runt"
     },
     "testimonials": {
-      "title": "Lo que dicen nuestros usuarios",
-      "viewAll": "Ver todos los testimonios"
+      "title": "Vad våra användare säger",
+      "viewAll": "Se alla recensioner"
     }
   },
   "errors": {
-    "required": "Este campo es obligatorio",
-    "invalidEmail": "Por favor ingrese una dirección de correo válida",
-    "minLength": "Debe tener al menos {{min}} caracteres",
-    "maxLength": "Debe tener como máximo {{max}} caracteres",
-    "passwordMismatch": "Las contraseñas no coinciden",
-    "invalidCredentials": "Correo o contraseña inválidos",
-    "serverError": "Error del servidor. Por favor intente más tarde.",
-    "networkError": "Error de red. Por favor verifique su conexión.",
-    "fileTooBig": "El archivo es demasiado grande. El tamaño máximo es {{size}}MB",
-    "fileTypeNotSupported": "Tipo de archivo no soportado. Por favor suba {{types}}",
-    "unexpectedError": "Se ha producido un error inesperado"
+    "required": "Detta fält är obligatoriskt",
+    "invalidEmail": "Ange en giltig e-postadress",
+    "minLength": "Måste innehålla minst {{min}} tecken",
+    "maxLength": "Får inte innehålla mer än {{max}} tecken",
+    "passwordMismatch": "Lösenorden matchar inte",
+    "invalidCredentials": "Ogiltig e-post eller lösenord",
+    "serverError": "Serverfel. Försök igen senare.",
+    "networkError": "Nätverksfel. Kontrollera din anslutning.",
+    "fileTooBig": "Filen är för stor. Maximal storlek är {{size}}MB",
+    "fileTypeNotSupported": "Filtypen stöds inte. Ladda upp {{types}}",
+    "unexpectedError": "Ett oväntat fel har uppstått"
   }
 }

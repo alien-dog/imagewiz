@@ -1,147 +1,147 @@
 {
   "nav": {
-    "home": "Inicio",
-    "pricing": "Precios",
+    "home": "Home",
+    "pricing": "Prijzen",
     "blog": "Blog",
-    "dashboard": "Panel de Control",
-    "history": "Historial",
-    "login": "Iniciar Sesión",
-    "register": "Registrarse",
+    "dashboard": "Dashboard",
+    "history": "Geschiedenis",
+    "login": "Inloggen",
+    "register": "Registreren",
     "editor": "CMS",
-    "account": "Mi Cuenta",
-    "logout": "Cerrar Sesión"
+    "account": "Mijn Account",
+    "logout": "Uitloggen"
   },
   "footer": {
-    "about": "Acerca de",
-    "contact": "Contacto",
-    "terms": "Términos de Servicio",
-    "privacy": "Política de Privacidad",
-    "copyright": "© 2025 iMagenWiz. Todos los derechos reservados."
+    "about": "Over Ons",
+    "contact": "Contact",
+    "terms": "Algemene Voorwaarden",
+    "privacy": "Privacybeleid",
+    "copyright": "© 2025 iMagenWiz. Alle rechten voorbehouden."
   },
   "common": {
-    "loading": "Cargando...",
-    "error": "Se ha producido un error",
-    "retry": "Reintentar",
-    "save": "Guardar",
-    "cancel": "Cancelar",
-    "delete": "Eliminar",
-    "edit": "Editar",
-    "view": "Ver",
-    "submit": "Enviar",
-    "back": "Atrás",
-    "next": "Siguiente",
-    "previous": "Anterior",
-    "credits": "Créditos",
-    "search": "Buscar",
-    "filterBy": "Filtrar por",
-    "sortBy": "Ordenar por",
-    "ascOrder": "Ascendente",
-    "descOrder": "Descendente",
-    "showMore": "Mostrar más",
-    "showLess": "Mostrar menos",
-    "all": "Todo",
-    "more": "Más",
-    "less": "Menos",
-    "select": "Seleccionar",
-    "selectAll": "Seleccionar todo",
-    "selectNone": "No seleccionar nada",
-    "noResults": "No se encontraron resultados",
-    "notFound": "No encontrado",
-    "required": "Obligatorio",
-    "optional": "Opcional",
-    "or": "o",
-    "and": "y",
-    "continue": "Continuar",
-    "language": "Idioma",
-    "learnMore": "Saber más",
+    "loading": "Laden...",
+    "error": "Er is een fout opgetreden",
+    "retry": "Opnieuw proberen",
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "delete": "Verwijderen",
+    "edit": "Bewerken",
+    "view": "Bekijken",
+    "submit": "Versturen",
+    "back": "Terug",
+    "next": "Volgende",
+    "previous": "Vorige",
+    "credits": "Credits",
+    "search": "Zoeken",
+    "filterBy": "Filteren op",
+    "sortBy": "Sorteren op",
+    "ascOrder": "Oplopend",
+    "descOrder": "Aflopend",
+    "showMore": "Meer tonen",
+    "showLess": "Minder tonen",
+    "all": "Alles",
+    "more": "Meer",
+    "less": "Minder",
+    "select": "Selecteren",
+    "selectAll": "Alles selecteren",
+    "selectNone": "Niets selecteren",
+    "noResults": "Geen resultaten gevonden",
+    "notFound": "Niet gevonden",
+    "required": "Verplicht",
+    "optional": "Optioneel",
+    "or": "of",
+    "and": "en",
+    "continue": "Doorgaan",
+    "language": "Taal",
+    "learnMore": "Meer informatie",
     "companyName": "iMagenWiz"
   },
   "home": {
     "hero": {
-      "title": "Elimina",
-      "titleHighlight": "Fondos",
-      "titleEnd": "en Segundos",
-      "subtitle": "Nuestra tecnología impulsada por IA hace que la eliminación de fondos sea rápida, fácil y precisa. Perfecto para comercio electrónico, marketing o proyectos personales.",
-      "getStarted": "Comenzar Gratis",
-      "secondaryCta": "Ver Precios",
-      "tag": "Nueva Tecnología de IA",
-      "trust": "Confiado por más de 10,000 usuarios en todo el mundo",
-      "imageCaption": "Procesamiento con IA en tiempo real"
+      "title": "Verwijder",
+      "titleHighlight": "achtergronden",
+      "titleEnd": "in enkele seconden",
+      "subtitle": "Onze AI-technologie maakt het verwijderen van achtergronden snel, eenvoudig en nauwkeurig. Perfect voor e-commerce, marketing of persoonlijke projecten.",
+      "getStarted": "Gratis beginnen",
+      "secondaryCta": "Prijzen bekijken",
+      "tag": "NIEUWE AI-TECHNOLOGIE",
+      "trust": "Vertrouwd door meer dan 10.000 gebruikers wereldwijd",
+      "imageCaption": "AI-verwerking in realtime"
     },
     "features": {
-      "title": "¿Por Qué Elegir",
-      "subtitle": "Nuestras tecnologías avanzadas de IA proporcionan resultados líderes en la industria para todas sus necesidades de edición de imágenes",
+      "title": "Waarom iMagenWiz",
+      "subtitle": "Onze geavanceerde AI-technologie levert de beste resultaten in de industrie voor al uw beeldbewerkingsbehoeften",
       "fast": {
-        "title": "Rápido como un Rayo",
-        "description": "Procese imágenes en segundos, no en minutos. Nuestra IA está optimizada para la velocidad sin sacrificar la calidad."
+        "title": "Razendsnel",
+        "description": "Verwerk afbeeldingen in seconden, niet in minuten. Onze AI is geoptimaliseerd voor snelheid zonder in te leveren op kwaliteit."
       },
       "precise": {
-        "title": "Resultados Precisos",
-        "description": "Nuestra IA detecta con precisión bordes, cabello y detalles complejos que otras herramientas no detectan, incluso en imágenes complicadas."
+        "title": "Nauwkeurige Resultaten",
+        "description": "Onze AI detecteert randen, haar en complexe details die andere tools missen, zelfs in uitdagende afbeeldingen."
       },
       "easy": {
-        "title": "Fácil de Usar",
-        "description": "Simplemente suba su imagen y descargue el resultado. No se requieren conocimientos técnicos. Perfecto para cualquier nivel de habilidad."
+        "title": "Gebruiksvriendelijk",
+        "description": "Upload gewoon uw afbeelding en download het resultaat. Geen technische expertise nodig. Perfect voor alle vaardigheidsniveaus."
       }
     },
     "stats": {
-      "accuracy": "Tasa de Precisión",
-      "time": "Tiempo Medio de Procesamiento",
-      "images": "Imágenes Procesadas Diariamente",
-      "languages": "Idiomas Admitidos"
+      "accuracy": "Nauwkeurigheidspercentage",
+      "time": "Gemiddelde verwerkingstijd",
+      "images": "Afbeeldingen verwerkt per dag",
+      "languages": "Ondersteunde talen"
     },
     "howItWorks": {
-      "title": "Cómo",
-      "titleHighlight": "Funciona",
-      "subtitle": "Tres sencillos pasos para eliminar fondos de imágenes en segundos",
-      "tag": "PROCESO SIMPLE"
+      "title": "Hoe het",
+      "titleHighlight": "werkt",
+      "subtitle": "Drie eenvoudige stappen om de achtergrond van afbeeldingen in seconden te verwijderen",
+      "tag": "EENVOUDIG PROCES"
     },
     "steps": {
       "upload": {
-        "title": "Sube tu Imagen",
-        "description": "Sube cualquier imagen desde tu dispositivo a nuestra plataforma segura. Soportamos formatos JPG, PNG y WebP."
+        "title": "Upload afbeelding",
+        "description": "Upload een afbeelding vanaf uw apparaat naar ons beveiligde platform. We ondersteunen JPG, PNG en WebP formaten."
       },
       "process": {
-        "title": "Procesamiento con IA",
-        "description": "Nuestra IA avanzada detecta y elimina automáticamente el fondo en segundos con alta precisión."
+        "title": "AI-verwerking",
+        "description": "Onze geavanceerde AI detecteert en verwijdert automatisch de achtergrond in seconden met hoge nauwkeurigheid."
       },
       "download": {
-        "title": "Descarga el Resultado",
-        "description": "Descarga tu PNG transparente o elige un fondo personalizado. Posibilidades ilimitadas."
+        "title": "Download resultaat",
+        "description": "Download een transparante PNG of kies een aangepaste achtergrond. De mogelijkheden zijn eindeloos."
       }
     },
     "testimonial": {
-      "quote": "\"iMagenWiz ha revolucionado nuestro flujo de trabajo de fotografía de productos. Lo que solía tomar horas ahora toma segundos, ¡y los resultados son impecables!\"",
-      "author": "Sarah Johnson, Gerente de Comercio Electrónico"
+      "quote": "\"iMagenWiz heeft onze productfotografie-workflow gerevolutioneerd. Wat eerst uren duurde, duurt nu slechts seconden, en de resultaten zijn perfect!\"",
+      "author": "Sarah Johnson, E-commerce Manager"
     },
     "cta": {
-      "title": "¿Listo para transformar tus imágenes?",
-      "subtitle": "Únete a miles de profesionales que confían en iMagenWiz para sus necesidades de procesamiento de imágenes. Comienza hoy y nota la diferencia.",
-      "getStarted": "Comenzar Gratis",
-      "viewPricing": "Ver Precios"
+      "title": "Klaar om uw afbeeldingen te transformeren?",
+      "subtitle": "Doe mee met duizenden professionals die vertrouwen op iMagenWiz voor hun beeldbewerkingsbehoeften. Begin vandaag en ervaar het verschil.",
+      "getStarted": "Gratis beginnen",
+      "viewPricing": "Prijzen bekijken"
     },
     "trust": {
-      "secure": "Procesamiento Seguro",
-      "accuracy": "Precisión del 99,8%",
-      "cloud": "Procesamiento en la Nube",
-      "support": "Soporte 24/7"
+      "secure": "Veilige verwerking",
+      "accuracy": "99.8% nauwkeurigheid",
+      "cloud": "Cloud verwerking",
+      "support": "24/7 ondersteuning"
     },
     "testimonials": {
-      "title": "Lo que dicen nuestros usuarios",
-      "viewAll": "Ver todos los testimonios"
+      "title": "Wat onze gebruikers zeggen",
+      "viewAll": "Bekijk alle beoordelingen"
     }
   },
   "errors": {
-    "required": "Este campo es obligatorio",
-    "invalidEmail": "Por favor ingrese una dirección de correo válida",
-    "minLength": "Debe tener al menos {{min}} caracteres",
-    "maxLength": "Debe tener como máximo {{max}} caracteres",
-    "passwordMismatch": "Las contraseñas no coinciden",
-    "invalidCredentials": "Correo o contraseña inválidos",
-    "serverError": "Error del servidor. Por favor intente más tarde.",
-    "networkError": "Error de red. Por favor verifique su conexión.",
-    "fileTooBig": "El archivo es demasiado grande. El tamaño máximo es {{size}}MB",
-    "fileTypeNotSupported": "Tipo de archivo no soportado. Por favor suba {{types}}",
-    "unexpectedError": "Se ha producido un error inesperado"
+    "required": "Dit veld is verplicht",
+    "invalidEmail": "Voer een geldig e-mailadres in",
+    "minLength": "Moet minimaal {{min}} tekens bevatten",
+    "maxLength": "Mag maximaal {{max}} tekens bevatten",
+    "passwordMismatch": "Wachtwoorden komen niet overeen",
+    "invalidCredentials": "Ongeldige e-mail of wachtwoord",
+    "serverError": "Serverfout. Probeer het later opnieuw.",
+    "networkError": "Netwerkfout. Controleer uw verbinding.",
+    "fileTooBig": "Bestand is te groot. Maximale grootte is {{size}}MB",
+    "fileTypeNotSupported": "Bestandstype wordt niet ondersteund. Upload {{types}}",
+    "unexpectedError": "Er is een onverwachte fout opgetreden"
   }
 }

@@ -20,7 +20,7 @@ export const SUPPORTED_LANGUAGES = [
   { code: 'ms', name: 'Malaysian', nativeName: 'Bahasa Melayu', flag: '🇲🇾' },
   { code: 'nl', name: 'Dutch', nativeName: 'Nederlands', flag: '🇳🇱' },
   { code: 'sv', name: 'Swedish', nativeName: 'Svenska', flag: '🇸🇪' },
-  { code: 'zh-TW', name: 'Traditional Chinese', nativeName: '繁體中文', flag: '🇹🇼' }
+  { code: 'zh-TW', name: 'Traditional Chinese', nativeName: '繁體中文', flag: '🇨🇳' }
 ];
 
 // Import English resources (always available as fallback)
@@ -67,6 +67,15 @@ import commonID from './locales/id/common.json';
 
 // Import Malaysian resources
 import commonMS from './locales/ms/common.json';
+
+// Import Dutch resources
+import commonNL from './locales/nl/common.json';
+
+// Import Swedish resources
+import commonSV from './locales/sv/common.json';
+
+// Import Traditional Chinese resources
+import commonZHTW from './locales/zh-TW/common.json';
 
 // Create resources object with available translations - only include languages we have translations for
 const resources = {
@@ -156,6 +165,27 @@ const resources = {
   },
   ms: {
     common: commonMS,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogEN,
+    cms: cmsEN
+  },
+  nl: {
+    common: commonNL,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogEN,
+    cms: cmsEN
+  },
+  sv: {
+    common: commonSV,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogEN,
+    cms: cmsEN
+  },
+  "zh-TW": {
+    common: commonZHTW,
     auth: authEN,
     pricing: pricingEN,
     blog: blogEN,
