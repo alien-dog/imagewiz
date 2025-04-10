@@ -38,6 +38,58 @@ import blogFR from './locales/fr/blog.json';
 import commonES from './locales/es/common.json';
 import blogES from './locales/es/blog.json';
 
+// Import German resources
+import commonDE from './locales/de/common.json';
+import blogDE from './locales/de/blog.json';
+
+// Import Russian resources
+import commonRU from './locales/ru/common.json';
+import blogRU from './locales/ru/blog.json';
+
+// Import Portuguese resources
+import commonPT from './locales/pt/common.json';
+import blogPT from './locales/pt/blog.json';
+
+// Import Japanese resources
+import commonJA from './locales/ja/common.json';
+import blogJA from './locales/ja/blog.json';
+
+// Import Korean resources
+import commonKO from './locales/ko/common.json';
+import blogKO from './locales/ko/blog.json';
+
+// Import Arabic resources
+import commonAR from './locales/ar/common.json';
+import blogAR from './locales/ar/blog.json';
+
+// Import Vietnamese resources
+import commonVI from './locales/vi/common.json';
+import blogVI from './locales/vi/blog.json';
+
+// Import Thai resources
+import commonTH from './locales/th/common.json';
+import blogTH from './locales/th/blog.json';
+
+// Import Indonesian resources
+import commonID from './locales/id/common.json';
+import blogID from './locales/id/blog.json';
+
+// Import Malaysian resources
+import commonMS from './locales/ms/common.json';
+import blogMS from './locales/ms/blog.json';
+
+// Import Dutch resources
+import commonNL from './locales/nl/common.json';
+import blogNL from './locales/nl/blog.json';
+
+// Import Swedish resources
+import commonSV from './locales/sv/common.json';
+import blogSV from './locales/sv/blog.json';
+
+// Import Traditional Chinese resources
+import commonZH_TW from './locales/zh-TW/common.json';
+import blogZH_TW from './locales/zh-TW/blog.json';
+
 // Create resources object with available translations
 const resources = {
   en: {
@@ -49,65 +101,110 @@ const resources = {
   },
   fr: {
     common: commonFR,
-    auth: authEN,     // Fall back to English for missing translations
+    auth: authEN,
     pricing: pricingEN,
     blog: blogFR,
     cms: cmsEN
   },
   es: {
     common: commonES,
-    auth: authEN,     // Fall back to English for missing translations
+    auth: authEN,
     pricing: pricingEN,
     blog: blogES,
     cms: cmsEN
+  },
+  de: {
+    common: commonDE,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogDE,
+    cms: cmsEN
+  },
+  ru: {
+    common: commonRU,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogRU,
+    cms: cmsEN
+  },
+  pt: {
+    common: commonPT,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogPT,
+    cms: cmsEN
+  },
+  ja: {
+    common: commonJA,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogJA,
+    cms: cmsEN
+  },
+  ko: {
+    common: commonKO,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogKO,
+    cms: cmsEN
+  },
+  ar: {
+    common: commonAR,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogAR,
+    cms: cmsEN
+  },
+  vi: {
+    common: commonVI,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogVI,
+    cms: cmsEN
+  },
+  th: {
+    common: commonTH,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogTH,
+    cms: cmsEN
+  },
+  id: {
+    common: commonID,
+    auth: authEN,
+    pricing: pricingEN, 
+    blog: blogID,
+    cms: cmsEN
+  },
+  ms: {
+    common: commonMS,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogMS,
+    cms: cmsEN
+  },
+  nl: {
+    common: commonNL,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogNL,
+    cms: cmsEN
+  },
+  sv: {
+    common: commonSV,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogSV,
+    cms: cmsEN
+  },
+  "zh-TW": {
+    common: commonZH_TW,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogZH_TW,
+    cms: cmsEN
   }
 };
-
-// Add complete resources for all other languages to prevent loading failures
-// This imports all translations from English and Spanish as a baseline
-SUPPORTED_LANGUAGES.forEach(lang => {
-  if (!resources[lang.code]) {
-    resources[lang.code] = {
-      // For languages other than English, French and Spanish, use a mix of Spanish and English
-      // translations as a baseline. This ensures all keys are present and provides a starting
-      // point for future translations.
-      common: {
-        ...commonES, // Use Spanish as the base for common translations
-        // Essential navigation elements
-        "nav": {
-          "home": commonES.nav.home || "Home",
-          "dashboard": commonES.nav.dashboard || "Dashboard",
-          "pricing": commonES.nav.pricing || "Pricing",
-          "blog": commonES.nav.blog || "Blog",
-          "login": commonES.nav.login || "Login",
-          "register": commonES.nav.register || "Register",
-          "logout": commonES.nav.logout || "Logout",
-          "account": commonES.nav.account || "Account",
-          "editor": commonES.nav.editor || "CMS",
-          "history": commonES.nav.history || "History"
-        },
-        // Core UI elements that should be available in all languages
-        "common": {
-          ...commonES.common,
-          "loading": commonES.common.loading || "Loading...",
-          "error": commonES.common.error || "Error",
-          "save": commonES.common.save || "Save",
-          "cancel": commonES.common.cancel || "Cancel",
-          "delete": commonES.common.delete || "Delete",
-          "edit": commonES.common.edit || "Edit",
-          "language": commonES.common.language || "Language",
-          "learnMore": commonES.common.learnMore || "Learn more",
-          "credits": commonES.common.credits || "Credits"
-        }
-      },
-      // Use English for other namespaces as fallback
-      auth: authEN,
-      pricing: pricingEN,
-      blog: blogES, // Use Spanish blog translations as they're more likely to be understood across languages
-      cms: cmsEN
-    };
-  }
-});
 
 // Initialize i18next
 i18n

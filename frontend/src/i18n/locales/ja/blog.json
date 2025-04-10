@@ -1,0 +1,24 @@
+{
+  "title": "Blog",
+  "readingTime": "{{time}} min de lectura",
+  "publishedOn": "Publicado el {{date}}",
+  "lastUpdated": "Última actualización: {{date}}",
+  "author": "Autor",
+  "tags": "Etiquetas",
+  "relatedPosts": "Artículos relacionados",
+  "viewAllPosts": "Ver todos los artículos",
+  "noResults": "No se encontraron artículos",
+  "searchPlaceholder": "Buscar en el blog...",
+  "filter": {
+    "title": "Filtrar por",
+    "tag": "Etiqueta",
+    "author": "Autor",
+    "date": "Fecha"
+  },
+  "sort": {
+    "title": "Ordenar por",
+    "newest": "Más reciente",
+    "oldest": "Más antiguo",
+    "popular": "Popular"
+  }
+}
