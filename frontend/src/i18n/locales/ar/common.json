@@ -1,147 +1,147 @@
 {
   "nav": {
-    "home": "Inicio",
-    "pricing": "Precios",
-    "blog": "Blog",
-    "dashboard": "Panel de Control",
-    "history": "Historial",
-    "login": "Iniciar Sesión",
-    "register": "Registrarse",
-    "editor": "CMS",
-    "account": "Mi Cuenta",
-    "logout": "Cerrar Sesión"
+    "home": "الرئيسية",
+    "pricing": "الأسعار",
+    "blog": "المدونة",
+    "dashboard": "لوحة التحكم",
+    "history": "السجل",
+    "login": "تسجيل الدخول",
+    "register": "إنشاء حساب",
+    "editor": "إدارة المحتوى",
+    "account": "حسابي",
+    "logout": "تسجيل الخروج"
   },
   "footer": {
-    "about": "Acerca de",
-    "contact": "Contacto",
-    "terms": "Términos de Servicio",
-    "privacy": "Política de Privacidad",
-    "copyright": "© 2025 iMagenWiz. Todos los derechos reservados."
+    "about": "عن الشركة",
+    "contact": "اتصل بنا",
+    "terms": "شروط الاستخدام",
+    "privacy": "سياسة الخصوصية",
+    "copyright": "© 2025 iMagenWiz. جميع الحقوق محفوظة."
   },
   "common": {
-    "loading": "Cargando...",
-    "error": "Se ha producido un error",
-    "retry": "Reintentar",
-    "save": "Guardar",
-    "cancel": "Cancelar",
-    "delete": "Eliminar",
-    "edit": "Editar",
-    "view": "Ver",
-    "submit": "Enviar",
-    "back": "Atrás",
-    "next": "Siguiente",
-    "previous": "Anterior",
-    "credits": "Créditos",
-    "search": "Buscar",
-    "filterBy": "Filtrar por",
-    "sortBy": "Ordenar por",
-    "ascOrder": "Ascendente",
-    "descOrder": "Descendente",
-    "showMore": "Mostrar más",
-    "showLess": "Mostrar menos",
-    "all": "Todo",
-    "more": "Más",
-    "less": "Menos",
-    "select": "Seleccionar",
-    "selectAll": "Seleccionar todo",
-    "selectNone": "No seleccionar nada",
-    "noResults": "No se encontraron resultados",
-    "notFound": "No encontrado",
-    "required": "Obligatorio",
-    "optional": "Opcional",
-    "or": "o",
-    "and": "y",
-    "continue": "Continuar",
-    "language": "Idioma",
-    "learnMore": "Saber más",
+    "loading": "جاري التحميل...",
+    "error": "حدث خطأ",
+    "retry": "إعادة المحاولة",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "view": "عرض",
+    "submit": "إرسال",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "credits": "الرصيد",
+    "search": "بحث",
+    "filterBy": "تصفية حسب",
+    "sortBy": "ترتيب حسب",
+    "ascOrder": "تصاعدي",
+    "descOrder": "تنازلي",
+    "showMore": "عرض المزيد",
+    "showLess": "عرض أقل",
+    "all": "الكل",
+    "more": "المزيد",
+    "less": "أقل",
+    "select": "اختيار",
+    "selectAll": "اختيار الكل",
+    "selectNone": "إلغاء الاختيار",
+    "noResults": "لا توجد نتائج",
+    "notFound": "غير موجود",
+    "required": "مطلوب",
+    "optional": "اختياري",
+    "or": "أو",
+    "and": "و",
+    "continue": "متابعة",
+    "language": "اللغة",
+    "learnMore": "معرفة المزيد",
     "companyName": "iMagenWiz"
   },
   "home": {
     "hero": {
-      "title": "Elimina",
-      "titleHighlight": "Fondos",
-      "titleEnd": "en Segundos",
-      "subtitle": "Nuestra tecnología impulsada por IA hace que la eliminación de fondos sea rápida, fácil y precisa. Perfecto para comercio electrónico, marketing o proyectos personales.",
-      "getStarted": "Comenzar Gratis",
-      "secondaryCta": "Ver Precios",
-      "tag": "Nueva Tecnología de IA",
-      "trust": "Confiado por más de 10,000 usuarios en todo el mundo",
-      "imageCaption": "Procesamiento con IA en tiempo real"
+      "title": "قم بإزالة",
+      "titleHighlight": "الخلفيات",
+      "titleEnd": "في ثوانٍ",
+      "subtitle": "تقنية الذكاء الاصطناعي المتقدمة تجعل إزالة الخلفيات سريعة وسهلة ودقيقة. مثالية للتجارة الإلكترونية والتسويق والمشاريع الشخصية.",
+      "getStarted": "ابدأ مجانًا",
+      "secondaryCta": "عرض الأسعار",
+      "tag": "تقنية ذكاء اصطناعي جديدة",
+      "trust": "يثق بنا أكثر من 10,000 مستخدم حول العالم",
+      "imageCaption": "معالجة بالذكاء الاصطناعي في الوقت الفعلي"
     },
     "features": {
-      "title": "¿Por Qué Elegir",
-      "subtitle": "Nuestras tecnologías avanzadas de IA proporcionan resultados líderes en la industria para todas sus necesidades de edición de imágenes",
+      "title": "لماذا تختار",
+      "subtitle": "تقنيات الذكاء الاصطناعي المتقدمة لدينا توفر نتائج رائدة في الصناعة لجميع احتياجات تحرير الصور",
       "fast": {
-        "title": "Rápido como un Rayo",
-        "description": "Procese imágenes en segundos, no en minutos. Nuestra IA está optimizada para la velocidad sin sacrificar la calidad."
+        "title": "سريع كالبرق",
+        "description": "معالجة الصور في ثوانٍ وليس دقائق. تم تحسين الذكاء الاصطناعي لدينا للسرعة دون المساس بالجودة."
       },
       "precise": {
-        "title": "Resultados Precisos",
-        "description": "Nuestra IA detecta con precisión bordes, cabello y detalles complejos que otras herramientas no detectan, incluso en imágenes complicadas."
+        "title": "نتائج دقيقة",
+        "description": "يكتشف الذكاء الاصطناعي لدينا بدقة الحواف والشعر والتفاصيل المعقدة التي تفتقدها الأدوات الأخرى، حتى في الصور الصعبة."
       },
       "easy": {
-        "title": "Fácil de Usar",
-        "description": "Simplemente suba su imagen y descargue el resultado. No se requieren conocimientos técnicos. Perfecto para cualquier nivel de habilidad."
+        "title": "سهل الاستخدام",
+        "description": "ما عليك سوى تحميل الصورة وتنزيل النتيجة. لا تحتاج إلى خبرة تقنية. مناسب لجميع مستويات المهارة."
       }
     },
     "stats": {
-      "accuracy": "Tasa de Precisión",
-      "time": "Tiempo Medio de Procesamiento",
-      "images": "Imágenes Procesadas Diariamente",
-      "languages": "Idiomas Admitidos"
+      "accuracy": "معدل الدقة",
+      "time": "متوسط وقت المعالجة",
+      "images": "الصور المعالجة يوميًا",
+      "languages": "اللغات المدعومة"
     },
     "howItWorks": {
-      "title": "Cómo",
-      "titleHighlight": "Funciona",
-      "subtitle": "Tres sencillos pasos para eliminar fondos de imágenes en segundos",
-      "tag": "PROCESO SIMPLE"
+      "title": "كيف",
+      "titleHighlight": "يعمل",
+      "subtitle": "ثلاث خطوات بسيطة لإزالة خلفيات الصور في ثوانٍ",
+      "tag": "عملية بسيطة"
     },
     "steps": {
       "upload": {
-        "title": "Sube tu Imagen",
-        "description": "Sube cualquier imagen desde tu dispositivo a nuestra plataforma segura. Soportamos formatos JPG, PNG y WebP."
+        "title": "قم بتحميل الصورة",
+        "description": "قم بتحميل أي صورة من جهازك إلى منصتنا الآمنة. نحن ندعم تنسيقات JPG وPNG وWebP."
       },
       "process": {
-        "title": "Procesamiento con IA",
-        "description": "Nuestra IA avanzada detecta y elimina automáticamente el fondo en segundos con alta precisión."
+        "title": "معالجة الذكاء الاصطناعي",
+        "description": "يكتشف الذكاء الاصطناعي المتقدم لدينا ويزيل الخلفية تلقائيًا في ثوانٍ بدقة عالية."
       },
       "download": {
-        "title": "Descarga el Resultado",
-        "description": "Descarga tu PNG transparente o elige un fondo personalizado. Posibilidades ilimitadas."
+        "title": "تنزيل النتيجة",
+        "description": "قم بتنزيل صورة PNG شفافة أو اختر خلفية مخصصة. إمكانيات لا حصر لها."
       }
     },
     "testimonial": {
-      "quote": "\"iMagenWiz ha revolucionado nuestro flujo de trabajo de fotografía de productos. Lo que solía tomar horas ahora toma segundos, ¡y los resultados son impecables!\"",
-      "author": "Sarah Johnson, Gerente de Comercio Electrónico"
+      "quote": "\"لقد أحدث iMagenWiz ثورة في سير عمل تصوير المنتجات لدينا. ما كان يستغرق ساعات يستغرق الآن ثوانٍ، والنتائج لا تشوبها شائبة!\"",
+      "author": "سارة جونسون، مدير التجارة الإلكترونية"
     },
     "cta": {
-      "title": "¿Listo para transformar tus imágenes?",
-      "subtitle": "Únete a miles de profesionales que confían en iMagenWiz para sus necesidades de procesamiento de imágenes. Comienza hoy y nota la diferencia.",
-      "getStarted": "Comenzar Gratis",
-      "viewPricing": "Ver Precios"
+      "title": "هل أنت مستعد لتحويل صورك؟",
+      "subtitle": "انضم إلى آلاف المحترفين الذين يثقون بـ iMagenWiz لاحتياجات معالجة الصور. ابدأ اليوم ولاحظ الفرق.",
+      "getStarted": "ابدأ مجانًا",
+      "viewPricing": "عرض الأسعار"
     },
     "trust": {
-      "secure": "Procesamiento Seguro",
-      "accuracy": "Precisión del 99,8%",
-      "cloud": "Procesamiento en la Nube",
-      "support": "Soporte 24/7"
+      "secure": "معالجة آمنة",
+      "accuracy": "دقة 99.8%",
+      "cloud": "معالجة سحابية",
+      "support": "دعم على مدار الساعة"
     },
     "testimonials": {
-      "title": "Lo que dicen nuestros usuarios",
-      "viewAll": "Ver todos los testimonios"
+      "title": "ما يقوله مستخدمونا",
+      "viewAll": "عرض جميع التقييمات"
     }
   },
   "errors": {
-    "required": "Este campo es obligatorio",
-    "invalidEmail": "Por favor ingrese una dirección de correo válida",
-    "minLength": "Debe tener al menos {{min}} caracteres",
-    "maxLength": "Debe tener como máximo {{max}} caracteres",
-    "passwordMismatch": "Las contraseñas no coinciden",
-    "invalidCredentials": "Correo o contraseña inválidos",
-    "serverError": "Error del servidor. Por favor intente más tarde.",
-    "networkError": "Error de red. Por favor verifique su conexión.",
-    "fileTooBig": "El archivo es demasiado grande. El tamaño máximo es {{size}}MB",
-    "fileTypeNotSupported": "Tipo de archivo no soportado. Por favor suba {{types}}",
-    "unexpectedError": "Se ha producido un error inesperado"
+    "required": "هذا الحقل مطلوب",
+    "invalidEmail": "يرجى إدخال عنوان بريد إلكتروني صالح",
+    "minLength": "يجب أن يحتوي على {{min}} أحرف على الأقل",
+    "maxLength": "يجب أن يحتوي على {{max}} أحرف كحد أقصى",
+    "passwordMismatch": "كلمات المرور غير متطابقة",
+    "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صالحة",
+    "serverError": "خطأ في الخادم. يرجى المحاولة لاحقًا.",
+    "networkError": "خطأ في الشبكة. يرجى التحقق من اتصالك.",
+    "fileTooBig": "الملف كبير جدًا. الحجم الأقصى هو {{size}} ميجابايت",
+    "fileTypeNotSupported": "نوع الملف غير مدعوم. يرجى تحميل {{types}}",
+    "unexpectedError": "حدث خطأ غير متوقع"
   }
 }

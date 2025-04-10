@@ -1,147 +1,147 @@
 {
   "nav": {
-    "home": "Inicio",
-    "pricing": "Precios",
-    "blog": "Blog",
-    "dashboard": "Panel de Control",
-    "history": "Historial",
-    "login": "Iniciar Sesión",
-    "register": "Registrarse",
+    "home": "ホーム",
+    "pricing": "料金",
+    "blog": "ブログ",
+    "dashboard": "ダッシュボード",
+    "history": "履歴",
+    "login": "ログイン",
+    "register": "登録",
     "editor": "CMS",
-    "account": "Mi Cuenta",
-    "logout": "Cerrar Sesión"
+    "account": "アカウント",
+    "logout": "ログアウト"
   },
   "footer": {
-    "about": "Acerca de",
-    "contact": "Contacto",
-    "terms": "Términos de Servicio",
-    "privacy": "Política de Privacidad",
-    "copyright": "© 2025 iMagenWiz. Todos los derechos reservados."
+    "about": "会社概要",
+    "contact": "お問い合わせ",
+    "terms": "利用規約",
+    "privacy": "プライバシーポリシー",
+    "copyright": "© 2025 iMagenWiz. All rights reserved."
   },
   "common": {
-    "loading": "Cargando...",
-    "error": "Se ha producido un error",
-    "retry": "Reintentar",
-    "save": "Guardar",
-    "cancel": "Cancelar",
-    "delete": "Eliminar",
-    "edit": "Editar",
-    "view": "Ver",
-    "submit": "Enviar",
-    "back": "Atrás",
-    "next": "Siguiente",
-    "previous": "Anterior",
-    "credits": "Créditos",
-    "search": "Buscar",
-    "filterBy": "Filtrar por",
-    "sortBy": "Ordenar por",
-    "ascOrder": "Ascendente",
-    "descOrder": "Descendente",
-    "showMore": "Mostrar más",
-    "showLess": "Mostrar menos",
-    "all": "Todo",
-    "more": "Más",
-    "less": "Menos",
-    "select": "Seleccionar",
-    "selectAll": "Seleccionar todo",
-    "selectNone": "No seleccionar nada",
-    "noResults": "No se encontraron resultados",
-    "notFound": "No encontrado",
-    "required": "Obligatorio",
-    "optional": "Opcional",
-    "or": "o",
-    "and": "y",
-    "continue": "Continuar",
-    "language": "Idioma",
-    "learnMore": "Saber más",
+    "loading": "読み込み中...",
+    "error": "エラーが発生しました",
+    "retry": "再試行",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "edit": "編集",
+    "view": "表示",
+    "submit": "送信",
+    "back": "戻る",
+    "next": "次へ",
+    "previous": "前へ",
+    "credits": "クレジット",
+    "search": "検索",
+    "filterBy": "フィルター",
+    "sortBy": "並び替え",
+    "ascOrder": "昇順",
+    "descOrder": "降順",
+    "showMore": "もっと見る",
+    "showLess": "表示を減らす",
+    "all": "すべて",
+    "more": "もっと",
+    "less": "少なく",
+    "select": "選択",
+    "selectAll": "すべて選択",
+    "selectNone": "選択解除",
+    "noResults": "結果がありません",
+    "notFound": "見つかりません",
+    "required": "必須",
+    "optional": "任意",
+    "or": "または",
+    "and": "および",
+    "continue": "続ける",
+    "language": "言語",
+    "learnMore": "詳細を見る",
     "companyName": "iMagenWiz"
   },
   "home": {
     "hero": {
-      "title": "Elimina",
-      "titleHighlight": "Fondos",
-      "titleEnd": "en Segundos",
-      "subtitle": "Nuestra tecnología impulsada por IA hace que la eliminación de fondos sea rápida, fácil y precisa. Perfecto para comercio electrónico, marketing o proyectos personales.",
-      "getStarted": "Comenzar Gratis",
-      "secondaryCta": "Ver Precios",
-      "tag": "Nueva Tecnología de IA",
-      "trust": "Confiado por más de 10,000 usuarios en todo el mundo",
-      "imageCaption": "Procesamiento con IA en tiempo real"
+      "title": "数秒で",
+      "titleHighlight": "背景を削除",
+      "titleEnd": "しましょう",
+      "subtitle": "私たちのAI技術で、背景の削除が迅速、簡単、正確になります。eコマース、マーケティング、個人プロジェクトに最適です。",
+      "getStarted": "無料で始める",
+      "secondaryCta": "料金を見る",
+      "tag": "新しいAI技術",
+      "trust": "世界中で10,000人以上のユーザーに信頼されています",
+      "imageCaption": "リアルタイムAI処理"
     },
     "features": {
-      "title": "¿Por Qué Elegir",
-      "subtitle": "Nuestras tecnologías avanzadas de IA proporcionan resultados líderes en la industria para todas sus necesidades de edición de imágenes",
+      "title": "なぜiMagenWizを",
+      "subtitle": "当社の先進的なAI技術は、あらゆる画像編集ニーズに業界をリードする結果を提供します",
       "fast": {
-        "title": "Rápido como un Rayo",
-        "description": "Procese imágenes en segundos, no en minutos. Nuestra IA está optimizada para la velocidad sin sacrificar la calidad."
+        "title": "超高速処理",
+        "description": "数分ではなく数秒で画像を処理。品質を犠牲にすることなく速度を最適化したAIです。"
       },
       "precise": {
-        "title": "Resultados Precisos",
-        "description": "Nuestra IA detecta con precisión bordes, cabello y detalles complejos que otras herramientas no detectan, incluso en imágenes complicadas."
+        "title": "精密な結果",
+        "description": "当社のAIは、複雑な画像でも他のツールでは検出できないエッジ、髪の毛、複雑なディテールを正確に検出します。"
       },
       "easy": {
-        "title": "Fácil de Usar",
-        "description": "Simplemente suba su imagen y descargue el resultado. No se requieren conocimientos técnicos. Perfecto para cualquier nivel de habilidad."
+        "title": "使いやすさ",
+        "description": "画像をアップロードして結果をダウンロードするだけ。技術的な知識は必要ありません。あらゆるスキルレベルに最適です。"
       }
     },
     "stats": {
-      "accuracy": "Tasa de Precisión",
-      "time": "Tiempo Medio de Procesamiento",
-      "images": "Imágenes Procesadas Diariamente",
-      "languages": "Idiomas Admitidos"
+      "accuracy": "精度率",
+      "time": "平均処理時間",
+      "images": "1日の処理画像数",
+      "languages": "対応言語数"
     },
     "howItWorks": {
-      "title": "Cómo",
-      "titleHighlight": "Funciona",
-      "subtitle": "Tres sencillos pasos para eliminar fondos de imágenes en segundos",
-      "tag": "PROCESO SIMPLE"
+      "title": "使い方",
+      "titleHighlight": "ガイド",
+      "subtitle": "数秒で画像の背景を削除する3つの簡単なステップ",
+      "tag": "シンプルプロセス"
     },
     "steps": {
       "upload": {
-        "title": "Sube tu Imagen",
-        "description": "Sube cualquier imagen desde tu dispositivo a nuestra plataforma segura. Soportamos formatos JPG, PNG y WebP."
+        "title": "画像をアップロード",
+        "description": "デバイスからセキュアなプラットフォームに任意の画像をアップロードします。JPG、PNG、WebP形式に対応しています。"
       },
       "process": {
-        "title": "Procesamiento con IA",
-        "description": "Nuestra IA avanzada detecta y elimina automáticamente el fondo en segundos con alta precisión."
+        "title": "AI処理",
+        "description": "高度なAIが高精度で数秒で自動的に背景を検出して削除します。"
       },
       "download": {
-        "title": "Descarga el Resultado",
-        "description": "Descarga tu PNG transparente o elige un fondo personalizado. Posibilidades ilimitadas."
+        "title": "結果をダウンロード",
+        "description": "透過PNGをダウンロードするか、カスタム背景を選択します。可能性は無限大です。"
       }
     },
     "testimonial": {
-      "quote": "\"iMagenWiz ha revolucionado nuestro flujo de trabajo de fotografía de productos. Lo que solía tomar horas ahora toma segundos, ¡y los resultados son impecables!\"",
-      "author": "Sarah Johnson, Gerente de Comercio Electrónico"
+      "quote": "\"iMagenWizは製品写真のワークフローを一変させました。以前は何時間もかかっていたことが今では数秒で完了し、結果は完璧です！\"",
+      "author": "サラ・ジョンソン、Eコマースマネージャー"
     },
     "cta": {
-      "title": "¿Listo para transformar tus imágenes?",
-      "subtitle": "Únete a miles de profesionales que confían en iMagenWiz para sus necesidades de procesamiento de imágenes. Comienza hoy y nota la diferencia.",
-      "getStarted": "Comenzar Gratis",
-      "viewPricing": "Ver Precios"
+      "title": "画像を変換する準備はできましたか？",
+      "subtitle": "何千もの専門家がiMagenWizを画像処理ニーズに信頼しています。今日から始めて、その違いを実感してください。",
+      "getStarted": "無料で始める",
+      "viewPricing": "料金を見る"
     },
     "trust": {
-      "secure": "Procesamiento Seguro",
-      "accuracy": "Precisión del 99,8%",
-      "cloud": "Procesamiento en la Nube",
-      "support": "Soporte 24/7"
+      "secure": "安全な処理",
+      "accuracy": "99.8%の精度",
+      "cloud": "クラウド処理",
+      "support": "24時間サポート"
     },
     "testimonials": {
-      "title": "Lo que dicen nuestros usuarios",
-      "viewAll": "Ver todos los testimonios"
+      "title": "ユーザーの声",
+      "viewAll": "すべての評価を見る"
     }
   },
   "errors": {
-    "required": "Este campo es obligatorio",
-    "invalidEmail": "Por favor ingrese una dirección de correo válida",
-    "minLength": "Debe tener al menos {{min}} caracteres",
-    "maxLength": "Debe tener como máximo {{max}} caracteres",
-    "passwordMismatch": "Las contraseñas no coinciden",
-    "invalidCredentials": "Correo o contraseña inválidos",
-    "serverError": "Error del servidor. Por favor intente más tarde.",
-    "networkError": "Error de red. Por favor verifique su conexión.",
-    "fileTooBig": "El archivo es demasiado grande. El tamaño máximo es {{size}}MB",
-    "fileTypeNotSupported": "Tipo de archivo no soportado. Por favor suba {{types}}",
-    "unexpectedError": "Se ha producido un error inesperado"
+    "required": "このフィールドは必須です",
+    "invalidEmail": "有効なメールアドレスを入力してください",
+    "minLength": "{{min}}文字以上である必要があります",
+    "maxLength": "{{max}}文字以下である必要があります",
+    "passwordMismatch": "パスワードが一致しません",
+    "invalidCredentials": "メールアドレスまたはパスワードが無効です",
+    "serverError": "サーバーエラー。後でもう一度お試しください。",
+    "networkError": "ネットワークエラー。接続を確認してください。",
+    "fileTooBig": "ファイルが大きすぎます。最大サイズは{{size}}MBです",
+    "fileTypeNotSupported": "対応していないファイル形式です。{{types}}をアップロードしてください",
+    "unexpectedError": "予期しないエラーが発生しました"
   }
 }

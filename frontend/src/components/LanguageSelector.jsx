@@ -45,33 +45,29 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
     }
   }, [currentLanguageCode]);
 
-  const handleLanguageChange = async (languageCode) => {
-    try {
-      // Don't change if it's already the current language
-      if (languageCode === currentLanguageCode) {
-        setIsOpen(false);
-        return;
-      }
-      
-      console.log(`Changing language from ${currentLanguageCode} to ${languageCode}`);
-      
-      // Change the language
-      await changeLanguage(languageCode);
-      
-      // Force reload if translation data isn't fully loaded for this language
-      const hasTranslations = i18n.hasResourceBundle(languageCode, 'common');
-      if (!hasTranslations) {
-        // If we don't have the translations for this language, reload the page
-        console.log(`Translations for ${languageCode} not loaded, reloading page...`);
-        setTimeout(() => window.location.reload(), 100);
-      }
-      
+  const handleLanguageChange = (languageCode) => {
+    // Don't change if it's already the current language
+    if (languageCode === currentLanguageCode) {
       setIsOpen(false);
-    } catch (error) {
-      console.error('Failed to change language:', error);
-      // Fall back to reload as a last resort
-      window.location.reload();
+      return;
     }
+    
+    console.log(`Changing language from ${currentLanguageCode} to ${languageCode}`);
+    
+    // Set the language in localStorage
+    localStorage.setItem('i18nextLng', languageCode);
+    
+    // Update direction for RTL languages before reloading
+    if (isRTL(languageCode)) {
+      document.documentElement.dir = 'rtl';
+      document.body.classList.add('rtl');
+    } else {
+      document.documentElement.dir = 'ltr';
+      document.body.classList.remove('rtl');
+    }
+    
+    // Force a full page reload to ensure all translations are applied
+    window.location.reload();
   };
 
   return (
@@ -83,8 +79,9 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
                     ? 'border border-gray-300 hover:bg-gray-50' 
                     : 'bg-teal-500 text-white hover:bg-teal-600'}`}
         aria-label={`Change language (current: ${currentLanguage.name})`}
+        data-testid="language-selector-button"
       >
-        <span className="text-lg mr-1">{currentLanguage.flag}</span>
+        <span className="text-lg mr-1" role="img" aria-label={currentLanguage.name}>{currentLanguage.flag}</span>
         <span className="hidden md:inline">{currentLanguage.nativeName}</span>
         <svg 
           className="w-4 h-4 ml-1" 
@@ -109,6 +106,7 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
             left: window.innerWidth <= 768 ? '50%' : 'auto',
             transform: window.innerWidth <= 768 ? 'translateX(-50%)' : 'none'
           }}
+          data-testid="language-dropdown"
         >
           <div className="sticky top-0 bg-gray-100 px-4 py-2 font-medium text-sm border-b border-gray-200 z-10">
             {t('language.select', 'Select language')}
@@ -121,8 +119,10 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
                 className={`flex items-center w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100 last:border-b-0
                           ${language.code === currentLanguageCode ? 'bg-gray-50 font-medium' : ''}`}
                 onClick={() => handleLanguageChange(language.code)}
+                data-testid={`language-option-${language.code}`}
+                aria-current={language.code === currentLanguageCode ? 'true' : 'false'}
               >
-                <span className="text-xl mr-3">{language.flag}</span>
+                <span className="text-xl mr-3" role="img" aria-label={language.name}>{language.flag}</span>
                 <div>
                   <div className="font-medium">{language.nativeName}</div>
                   <div className="text-gray-500 text-xs">{language.name}</div>

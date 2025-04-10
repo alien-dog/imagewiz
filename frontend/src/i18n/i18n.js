@@ -38,59 +38,11 @@ import blogFR from './locales/fr/blog.json';
 import commonES from './locales/es/common.json';
 import blogES from './locales/es/blog.json';
 
-// Import German resources
-import commonDE from './locales/de/common.json';
-import blogDE from './locales/de/blog.json';
+// Import fallback English translations for all other languages
+// We'll use dynamic i18next loading instead of static imports
+// This prevents the issue of having identical translations copied across languages
 
-// Import Russian resources
-import commonRU from './locales/ru/common.json';
-import blogRU from './locales/ru/blog.json';
-
-// Import Portuguese resources
-import commonPT from './locales/pt/common.json';
-import blogPT from './locales/pt/blog.json';
-
-// Import Japanese resources
-import commonJA from './locales/ja/common.json';
-import blogJA from './locales/ja/blog.json';
-
-// Import Korean resources
-import commonKO from './locales/ko/common.json';
-import blogKO from './locales/ko/blog.json';
-
-// Import Arabic resources
-import commonAR from './locales/ar/common.json';
-import blogAR from './locales/ar/blog.json';
-
-// Import Vietnamese resources
-import commonVI from './locales/vi/common.json';
-import blogVI from './locales/vi/blog.json';
-
-// Import Thai resources
-import commonTH from './locales/th/common.json';
-import blogTH from './locales/th/blog.json';
-
-// Import Indonesian resources
-import commonID from './locales/id/common.json';
-import blogID from './locales/id/blog.json';
-
-// Import Malaysian resources
-import commonMS from './locales/ms/common.json';
-import blogMS from './locales/ms/blog.json';
-
-// Import Dutch resources
-import commonNL from './locales/nl/common.json';
-import blogNL from './locales/nl/blog.json';
-
-// Import Swedish resources
-import commonSV from './locales/sv/common.json';
-import blogSV from './locales/sv/blog.json';
-
-// Import Traditional Chinese resources
-import commonZH_TW from './locales/zh-TW/common.json';
-import blogZH_TW from './locales/zh-TW/blog.json';
-
-// Create resources object with available translations
+// Create resources object with available translations - only include languages we have translations for
 const resources = {
   en: {
     common: commonEN,
@@ -112,102 +64,26 @@ const resources = {
     pricing: pricingEN,
     blog: blogES,
     cms: cmsEN
-  },
-  de: {
-    common: commonDE,
-    auth: authEN,
-    pricing: pricingEN,
-    blog: blogDE,
-    cms: cmsEN
-  },
-  ru: {
-    common: commonRU,
-    auth: authEN,
-    pricing: pricingEN,
-    blog: blogRU,
-    cms: cmsEN
-  },
-  pt: {
-    common: commonPT,
-    auth: authEN,
-    pricing: pricingEN,
-    blog: blogPT,
-    cms: cmsEN
-  },
-  ja: {
-    common: commonJA,
-    auth: authEN,
-    pricing: pricingEN,
-    blog: blogJA,
-    cms: cmsEN
-  },
-  ko: {
-    common: commonKO,
-    auth: authEN,
-    pricing: pricingEN,
-    blog: blogKO,
-    cms: cmsEN
-  },
-  ar: {
-    common: commonAR,
-    auth: authEN,
-    pricing: pricingEN,
-    blog: blogAR,
-    cms: cmsEN
-  },
-  vi: {
-    common: commonVI,
-    auth: authEN,
-    pricing: pricingEN,
-    blog: blogVI,
-    cms: cmsEN
-  },
-  th: {
-    common: commonTH,
-    auth: authEN,
-    pricing: pricingEN,
-    blog: blogTH,
-    cms: cmsEN
-  },
-  id: {
-    common: commonID,
-    auth: authEN,
-    pricing: pricingEN, 
-    blog: blogID,
-    cms: cmsEN
-  },
-  ms: {
-    common: commonMS,
-    auth: authEN,
-    pricing: pricingEN,
-    blog: blogMS,
-    cms: cmsEN
-  },
-  nl: {
-    common: commonNL,
-    auth: authEN,
-    pricing: pricingEN,
-    blog: blogNL,
-    cms: cmsEN
-  },
-  sv: {
-    common: commonSV,
-    auth: authEN,
-    pricing: pricingEN,
-    blog: blogSV,
-    cms: cmsEN
-  },
-  "zh-TW": {
-    common: commonZH_TW,
-    auth: authEN,
-    pricing: pricingEN,
-    blog: blogZH_TW,
-    cms: cmsEN
   }
 };
 
+// Add English as fallback for all other languages
+SUPPORTED_LANGUAGES.forEach(lang => {
+  if (!resources[lang.code]) {
+    resources[lang.code] = {
+      common: commonEN,
+      auth: authEN,
+      pricing: pricingEN,
+      blog: blogEN,
+      cms: cmsEN
+    };
+  }
+});
+
 // Initialize i18next
 i18n
+  // Enable loading translations via HTTP for lazy loading
+  .use(Backend)
   // Detect user language
   .use(LanguageDetector)
   // Pass the i18n instance to react-i18next
@@ -223,6 +99,16 @@ i18n
     
     // Namespace configuration
     ns: ['common', 'auth', 'pricing', 'blog', 'cms', 'dashboard', 'editor'],
+    
+    // Enable HTTP loading (backend setup)
+    backend: {
+      // Path to load resources from
+      loadPath: '/locales/{{lng}}/{{ns}}.json',
+      // HTTP method for fetching resources
+      requestOptions: {
+        cache: 'no-cache'
+      }
+    },
     
     // Debugging in development mode
     debug: process.env.NODE_ENV === 'development',
