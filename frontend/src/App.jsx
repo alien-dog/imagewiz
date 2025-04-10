@@ -50,6 +50,24 @@ const ProtectedRoute = ({ children }) => {
 const AppContent = () => {
   const { i18n } = useTranslation();
   
+  // Check URL for language parameter on mount
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const langParam = urlParams.get('lang');
+    
+    // If URL has a language parameter, use it
+    if (langParam && langParam !== i18n.language) {
+      console.log(`Found language parameter in URL: ${langParam}, changing language...`);
+      localStorage.setItem('i18nextLng', langParam);
+      i18n.changeLanguage(langParam);
+      
+      // Remove lang parameter from URL to avoid it sticking around
+      urlParams.delete('lang');
+      const newUrl = window.location.pathname + (urlParams.toString() ? `?${urlParams.toString()}` : '');
+      window.history.replaceState({}, '', newUrl);
+    }
+  }, []);
+  
   // Set document language and direction on language change
   useEffect(() => {
     // Set the document language attribute

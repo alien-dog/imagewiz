@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SUPPORTED_LANGUAGES, changeLanguage, isRTL } from '../i18n/i18n';
+import { SUPPORTED_LANGUAGES, isRTL } from '../i18n/i18n';
 
 const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
   const { i18n, t } = useTranslation('common');
@@ -13,8 +13,6 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
     (lang) => lang.code === currentLanguageCode
   ) || SUPPORTED_LANGUAGES[0];
   
-  console.log('Current language:', currentLanguageCode, 'Direction:', isRTL(currentLanguageCode) ? 'RTL' : 'LTR');
-
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
@@ -33,7 +31,6 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
     // Set document direction based on current language
     const direction = isRTL(currentLanguageCode) ? 'rtl' : 'ltr';
     if (document.documentElement.dir !== direction) {
-      console.log(`Updating document direction to ${direction} based on language ${currentLanguageCode}`);
       document.documentElement.dir = direction;
       
       // Also update body class for consistent styling
@@ -46,28 +43,22 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
   }, [currentLanguageCode]);
 
   const handleLanguageChange = (languageCode) => {
-    // Don't change if it's already the current language
     if (languageCode === currentLanguageCode) {
       setIsOpen(false);
       return;
     }
     
-    console.log(`Changing language from ${currentLanguageCode} to ${languageCode}`);
+    // Direct implementation of language change using URL search param to avoid caching issues
+    const currentUrl = new URL(window.location.href);
     
-    // Set the language in localStorage
+    // Force language via URL parameter
+    currentUrl.searchParams.set('lang', languageCode);
+    
+    // Store in localStorage for persistence
     localStorage.setItem('i18nextLng', languageCode);
     
-    // Update direction for RTL languages before reloading
-    if (isRTL(languageCode)) {
-      document.documentElement.dir = 'rtl';
-      document.body.classList.add('rtl');
-    } else {
-      document.documentElement.dir = 'ltr';
-      document.body.classList.remove('rtl');
-    }
-    
-    // Force a full page reload to ensure all translations are applied
-    window.location.reload();
+    // Hard reload
+    window.location.href = currentUrl.toString();
   };
 
   return (
@@ -79,7 +70,6 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
                     ? 'border border-gray-300 hover:bg-gray-50' 
                     : 'bg-teal-500 text-white hover:bg-teal-600'}`}
         aria-label={`Change language (current: ${currentLanguage.name})`}
-        data-testid="language-selector-button"
       >
         <span className="text-lg mr-1" role="img" aria-label={currentLanguage.name}>{currentLanguage.flag}</span>
         <span className="hidden md:inline">{currentLanguage.nativeName}</span>
@@ -88,6 +78,7 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
           xmlns="http://www.w3.org/2000/svg" 
           viewBox="0 0 20 20" 
           fill="currentColor"
+          aria-hidden="true"
         >
           <path 
             fillRule="evenodd" 
@@ -106,21 +97,22 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
             left: window.innerWidth <= 768 ? '50%' : 'auto',
             transform: window.innerWidth <= 768 ? 'translateX(-50%)' : 'none'
           }}
-          data-testid="language-dropdown"
         >
           <div className="sticky top-0 bg-gray-100 px-4 py-2 font-medium text-sm border-b border-gray-200 z-10">
-            {t('language.select', 'Select language')}
+            {t('common.language', 'Select language')}
           </div>
           
           <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
             {SUPPORTED_LANGUAGES.map((language) => (
-              <button
+              <a 
                 key={language.code}
+                href={`?lang=${language.code}`}
                 className={`flex items-center w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100 last:border-b-0
                           ${language.code === currentLanguageCode ? 'bg-gray-50 font-medium' : ''}`}
-                onClick={() => handleLanguageChange(language.code)}
-                data-testid={`language-option-${language.code}`}
-                aria-current={language.code === currentLanguageCode ? 'true' : 'false'}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleLanguageChange(language.code);
+                }}
               >
                 <span className="text-xl mr-3" role="img" aria-label={language.name}>{language.flag}</span>
                 <div>
@@ -130,7 +122,7 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
                 {language.code === currentLanguageCode && (
                   <span className="ml-auto text-teal-500">✓</span>
                 )}
-              </button>
+              </a>
             ))}
           </div>
         </div>
