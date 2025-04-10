@@ -1,0 +1,148 @@
+{
+  "nav": {
+    "home": "Főoldal",
+    "pricing": "Árak",
+    "blog": "Blog",
+    "dashboard": "Vezérlőpult",
+    "history": "Előzmények",
+    "login": "Bejelentkezés",
+    "register": "Regisztráció",
+    "editor": "CMS",
+    "account": "Fiókom",
+    "logout": "Kijelentkezés"
+  },
+  "footer": {
+    "about": "Rólunk",
+    "contact": "Kapcsolat",
+    "terms": "Felhasználási feltételek",
+    "privacy": "Adatvédelem",
+    "copyright": "© 2025 iMagenWiz. Minden jog fenntartva.",
+    "quickLinks": "Gyors linkek"
+  },
+  "common": {
+    "loading": "Betöltés...",
+    "error": "Hiba történt",
+    "retry": "Újrapróbálás",
+    "save": "Mentés",
+    "cancel": "Mégsem",
+    "delete": "Törlés",
+    "edit": "Szerkesztés",
+    "view": "Megtekintés",
+    "submit": "Küldés",
+    "back": "Vissza",
+    "next": "Következő",
+    "previous": "Előző",
+    "credits": "Kreditek",
+    "search": "Keresés",
+    "filterBy": "Szűrés",
+    "sortBy": "Rendezés",
+    "ascOrder": "Növekvő",
+    "descOrder": "Csökkenő",
+    "showMore": "Több mutatása",
+    "showLess": "Kevesebb mutatása",
+    "all": "Összes",
+    "more": "Több",
+    "less": "Kevesebb",
+    "select": "Kiválasztás",
+    "selectAll": "Összes kiválasztása",
+    "selectNone": "Kiválasztás törlése",
+    "noResults": "Nincs találat",
+    "notFound": "Nem található",
+    "required": "Kötelező",
+    "optional": "Opcionális",
+    "or": "vagy",
+    "and": "és",
+    "continue": "Folytatás",
+    "language": "Nyelv",
+    "learnMore": "Tudjon meg többet",
+    "companyName": "iMagenWiz"
+  },
+  "home": {
+    "hero": {
+      "title": "Távolítsa el a",
+      "titleHighlight": "hátteret",
+      "titleEnd": "másodpercek alatt",
+      "subtitle": "AI technológiánk gyorssá, egyszerűvé és pontossá teszi a háttér eltávolítását. Tökéletes e-kereskedelemhez, marketinghez vagy személyes projektekhez.",
+      "getStarted": "Kezdje ingyen",
+      "secondaryCta": "Árak megtekintése",
+      "tag": "ÚJ AI TECHNOLÓGIA",
+      "trust": "Több mint 10 000 felhasználó bízik bennünk világszerte",
+      "imageCaption": "Valós idejű AI feldolgozás"
+    },
+    "features": {
+      "title": "Miért az iMagenWiz",
+      "subtitle": "Fejlett AI technológiánk a legjobb eredményeket nyújtja az iparágban minden képszerkesztési igényhez",
+      "fast": {
+        "title": "Villámgyors",
+        "description": "Képek feldolgozása percek helyett másodpercek alatt. AI-nk sebességre optimalizált a minőség feláldozása nélkül."
+      },
+      "precise": {
+        "title": "Pontos eredmények",
+        "description": "AI-nk érzékeli az éleket, hajat és komplex részleteket, amelyeket más eszközök kihagynak, még kihívást jelentő képeknél is."
+      },
+      "easy": {
+        "title": "Könnyen használható",
+        "description": "Csak töltse fel a képét és töltse le az eredményt. Nem igényel technikai szaktudást. Tökéletes minden képességi szinthez."
+      }
+    },
+    "stats": {
+      "accuracy": "Pontossági arány",
+      "time": "Átlagos feldolgozási idő",
+      "images": "Naponta feldolgozott képek",
+      "languages": "Támogatott nyelvek"
+    },
+    "howItWorks": {
+      "title": "Hogyan",
+      "titleHighlight": "működik",
+      "subtitle": "Három egyszerű lépés a képek hátterének eltávolításához másodpercek alatt",
+      "tag": "EGYSZERŰ FOLYAMAT"
+    },
+    "steps": {
+      "upload": {
+        "title": "Kép feltöltése",
+        "description": "Töltsön fel bármilyen képet eszközéről biztonságos platformunkra. Támogatjuk a JPG, PNG és WebP formátumokat."
+      },
+      "process": {
+        "title": "AI feldolgozás",
+        "description": "Fejlett AI-nk automatikusan észleli és eltávolítja a hátteret másodpercek alatt, magas pontossággal."
+      },
+      "download": {
+        "title": "Eredmény letöltése",
+        "description": "Töltsön le egy átlátszó PNG-t vagy válasszon egyedi hátteret. A lehetőségek végtelenek."
+      }
+    },
+    "testimonial": {
+      "quote": "\"Az iMagenWiz forradalmasította a termékfotózási munkafolyamatunkat. Ami korábban órákat vett igénybe, most csak másodperceket, és az eredmények tökéletesek!\"",
+      "author": "Sarah Johnson, E-kereskedelmi menedzser"
+    },
+    "cta": {
+      "title": "Készen áll képei átalakítására?",
+      "subtitle": "Csatlakozzon a szakemberek ezreihez, akik az iMagenWiz-re támaszkodnak képfeldolgozási igényeikhez. Kezdje el ma és tapasztalja meg a különbséget.",
+      "getStarted": "Kezdje ingyen",
+      "viewPricing": "Árak megtekintése"
+    },
+    "trust": {
+      "secure": "Biztonságos feldolgozás",
+      "accuracy": "99.8% pontosság",
+      "cloud": "Felhőalapú feldolgozás",
+      "support": "24/7 támogatás"
+    },
+    "testimonials": {
+      "title": "Mit mondanak felhasználóink",
+      "viewAll": "Összes értékelés megtekintése"
+    }
+  },
+  "errors": {
+    "required": "Ez a mező kötelező",
+    "invalidEmail": "Kérjük, adjon meg érvényes e-mail címet",
+    "minLength": "Legalább {{min}} karaktert kell tartalmaznia",
+    "maxLength": "Legfeljebb {{max}} karaktert tartalmazhat",
+    "passwordMismatch": "A jelszavak nem egyeznek",
+    "invalidCredentials": "Érvénytelen e-mail vagy jelszó",
+    "serverError": "Szerverhiba. Kérjük, próbálja újra később.",
+    "networkError": "Hálózati hiba. Ellenőrizze a kapcsolatát.",
+    "fileTooBig": "A fájl túl nagy. A maximális méret {{size}}MB",
+    "fileTypeNotSupported": "Nem támogatott fájltípus. Kérjük, töltsön fel {{types}}",
+    "unexpectedError": "Váratlan hiba történt"
+  }
+}

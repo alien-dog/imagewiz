@@ -1,0 +1,148 @@
+{
+  "nav": {
+    "home": "Hjem",
+    "pricing": "Priser",
+    "blog": "Blogg",
+    "dashboard": "Dashbord",
+    "history": "Historikk",
+    "login": "Logg inn",
+    "register": "Registrer",
+    "editor": "CMS",
+    "account": "Min konto",
+    "logout": "Logg ut"
+  },
+  "footer": {
+    "about": "Om oss",
+    "contact": "Kontakt",
+    "terms": "Vilkår for bruk",
+    "privacy": "Personvern",
+    "copyright": "© 2025 iMagenWiz. Alle rettigheter reservert.",
+    "quickLinks": "Hurtiglenker"
+  },
+  "common": {
+    "loading": "Laster...",
+    "error": "En feil har oppstått",
+    "retry": "Prøv igjen",
+    "save": "Lagre",
+    "cancel": "Avbryt",
+    "delete": "Slett",
+    "edit": "Rediger",
+    "view": "Vis",
+    "submit": "Send inn",
+    "back": "Tilbake",
+    "next": "Neste",
+    "previous": "Forrige",
+    "credits": "Kreditter",
+    "search": "Søk",
+    "filterBy": "Filtrer etter",
+    "sortBy": "Sorter etter",
+    "ascOrder": "Stigende",
+    "descOrder": "Synkende",
+    "showMore": "Vis mer",
+    "showLess": "Vis mindre",
+    "all": "Alle",
+    "more": "Mer",
+    "less": "Mindre",
+    "select": "Velg",
+    "selectAll": "Velg alle",
+    "selectNone": "Velg ingen",
+    "noResults": "Ingen resultater funnet",
+    "notFound": "Ikke funnet",
+    "required": "Påkrevd",
+    "optional": "Valgfritt",
+    "or": "eller",
+    "and": "og",
+    "continue": "Fortsett",
+    "language": "Språk",
+    "learnMore": "Lær mer",
+    "companyName": "iMagenWiz"
+  },
+  "home": {
+    "hero": {
+      "title": "Fjern",
+      "titleHighlight": "bakgrunner",
+      "titleEnd": "på sekunder",
+      "subtitle": "Vår AI-teknologi gjør fjerning av bakgrunn raskt, enkelt og nøyaktig. Perfekt for e-handel, markedsføring eller personlige prosjekter.",
+      "getStarted": "Start gratis",
+      "secondaryCta": "Se priser",
+      "tag": "NY AI-TEKNOLOGI",
+      "trust": "Betrodd av over 10 000 brukere verden over",
+      "imageCaption": "AI-behandling i sanntid"
+    },
+    "features": {
+      "title": "Hvorfor iMagenWiz",
+      "subtitle": "Vår avanserte AI-teknologi leverer bransjens beste resultater for alle dine bildebehandlingsbehov",
+      "fast": {
+        "title": "Lynrask",
+        "description": "Behandle bilder på sekunder, ikke minutter. Vår AI er optimalisert for hastighet uten å gå på bekostning av kvalitet."
+      },
+      "precise": {
+        "title": "Presise resultater",
+        "description": "Vår AI oppdager kanter, hår og komplekse detaljer som andre verktøy går glipp av, selv i utfordrende bilder."
+      },
+      "easy": {
+        "title": "Enkel å bruke",
+        "description": "Bare last opp bildet ditt og last ned resultatet. Ingen teknisk ekspertise nødvendig. Perfekt for alle ferdighetsnivåer."
+      }
+    },
+    "stats": {
+      "accuracy": "Nøyaktighetsgrad",
+      "time": "Gjennomsnittlig behandlingstid",
+      "images": "Bilder behandlet per dag",
+      "languages": "Støttede språk"
+    },
+    "howItWorks": {
+      "title": "Hvordan det",
+      "titleHighlight": "fungerer",
+      "subtitle": "Tre enkle trinn for å fjerne bakgrunnen fra bilder på sekunder",
+      "tag": "ENKEL PROSESS"
+    },
+    "steps": {
+      "upload": {
+        "title": "Last opp bilde",
+        "description": "Last opp et hvilket som helst bilde fra enheten din til vår sikre plattform. Vi støtter formatene JPG, PNG og WebP."
+      },
+      "process": {
+        "title": "AI-behandling",
+        "description": "Vår avanserte AI oppdager og fjerner automatisk bakgrunnen på sekunder med høy presisjon."
+      },
+      "download": {
+        "title": "Last ned resultat",
+        "description": "Last ned en transparent PNG eller velg en tilpasset bakgrunn. Mulighetene er uendelige."
+      }
+    },
+    "testimonial": {
+      "quote": "\"iMagenWiz har revolusjonert vår produktfotograferingsarbeidsflyt. Det som tidligere tok timer, tar nå bare sekunder, og resultatene er perfekte!\"",
+      "author": "Sarah Johnson, E-handelssjef"
+    },
+    "cta": {
+      "title": "Klar til å transformere bildene dine?",
+      "subtitle": "Bli med tusenvis av fagfolk som stoler på iMagenWiz for bildebehandlingsbehovene sine. Start i dag og opplev forskjellen.",
+      "getStarted": "Start gratis",
+      "viewPricing": "Se priser"
+    },
+    "trust": {
+      "secure": "Sikker behandling",
+      "accuracy": "99,8% nøyaktighet",
+      "cloud": "Skybehandling",
+      "support": "Støtte døgnet rundt"
+    },
+    "testimonials": {
+      "title": "Hva våre brukere sier",
+      "viewAll": "Se alle anmeldelser"
+    }
+  },
+  "errors": {
+    "required": "Dette feltet er påkrevd",
+    "invalidEmail": "Vennligst skriv inn en gyldig e-postadresse",
+    "minLength": "Må inneholde minst {{min}} tegn",
+    "maxLength": "Kan ikke inneholde mer enn {{max}} tegn",
+    "passwordMismatch": "Passordene samsvarer ikke",
+    "invalidCredentials": "Ugyldig e-post eller passord",
+    "serverError": "Serverfeil. Vennligst prøv igjen senere.",
+    "networkError": "Nettverksfeil. Sjekk tilkoblingen din.",
+    "fileTooBig": "Filen er for stor. Maksimal størrelse er {{size}}MB",
+    "fileTypeNotSupported": "Filtypen støttes ikke. Vennligst last opp {{types}}",
+    "unexpectedError": "En uventet feil oppstod"
+  }
+}

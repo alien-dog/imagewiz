@@ -1,0 +1,148 @@
+{
+  "nav": {
+    "home": "Strona główna",
+    "pricing": "Cennik",
+    "blog": "Blog",
+    "dashboard": "Panel",
+    "history": "Historia",
+    "login": "Logowanie",
+    "register": "Rejestracja",
+    "editor": "CMS",
+    "account": "Moje konto",
+    "logout": "Wyloguj"
+  },
+  "footer": {
+    "about": "O nas",
+    "contact": "Kontakt",
+    "terms": "Warunki korzystania",
+    "privacy": "Polityka prywatności",
+    "copyright": "© 2025 iMagenWiz. Wszelkie prawa zastrzeżone.",
+    "quickLinks": "Szybkie linki"
+  },
+  "common": {
+    "loading": "Ładowanie...",
+    "error": "Wystąpił błąd",
+    "retry": "Spróbuj ponownie",
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "delete": "Usuń",
+    "edit": "Edytuj",
+    "view": "Zobacz",
+    "submit": "Wyślij",
+    "back": "Wstecz",
+    "next": "Dalej",
+    "previous": "Poprzedni",
+    "credits": "Kredyty",
+    "search": "Szukaj",
+    "filterBy": "Filtruj według",
+    "sortBy": "Sortuj według",
+    "ascOrder": "Rosnąco",
+    "descOrder": "Malejąco",
+    "showMore": "Pokaż więcej",
+    "showLess": "Pokaż mniej",
+    "all": "Wszystkie",
+    "more": "Więcej",
+    "less": "Mniej",
+    "select": "Wybierz",
+    "selectAll": "Zaznacz wszystko",
+    "selectNone": "Odznacz wszystko",
+    "noResults": "Brak wyników",
+    "notFound": "Nie znaleziono",
+    "required": "Wymagane",
+    "optional": "Opcjonalne",
+    "or": "lub",
+    "and": "i",
+    "continue": "Kontynuuj",
+    "language": "Język",
+    "learnMore": "Dowiedz się więcej",
+    "companyName": "iMagenWiz"
+  },
+  "home": {
+    "hero": {
+      "title": "Usuń",
+      "titleHighlight": "tło",
+      "titleEnd": "w kilka sekund",
+      "subtitle": "Nasza technologia AI sprawia, że usuwanie tła jest szybkie, łatwe i dokładne. Idealne do e-commerce, marketingu lub projektów osobistych.",
+      "getStarted": "Zacznij za darmo",
+      "secondaryCta": "Zobacz cennik",
+      "tag": "NOWA TECHNOLOGIA AI",
+      "trust": "Zaufało nam ponad 10 000 użytkowników na całym świecie",
+      "imageCaption": "Przetwarzanie AI w czasie rzeczywistym"
+    },
+    "features": {
+      "title": "Dlaczego iMagenWiz",
+      "subtitle": "Nasza zaawansowana technologia AI zapewnia najlepsze w branży wyniki dla wszystkich potrzeb edycji obrazów",
+      "fast": {
+        "title": "Błyskawiczny",
+        "description": "Przetwarzaj obrazy w sekundy, nie minuty. Nasza AI jest zoptymalizowana pod kątem szybkości bez kompromisów w jakości."
+      },
+      "precise": {
+        "title": "Precyzyjne wyniki",
+        "description": "Nasza AI wykrywa krawędzie, włosy i złożone szczegóły, które inne narzędzia pomijają, nawet w wymagających obrazach."
+      },
+      "easy": {
+        "title": "Łatwy w użyciu",
+        "description": "Po prostu prześlij obraz i pobierz wynik. Nie wymaga wiedzy technicznej. Idealny dla wszystkich poziomów umiejętności."
+      }
+    },
+    "stats": {
+      "accuracy": "Współczynnik dokładności",
+      "time": "Średni czas przetwarzania",
+      "images": "Obrazy przetwarzane dziennie",
+      "languages": "Obsługiwane języki"
+    },
+    "howItWorks": {
+      "title": "Jak to",
+      "titleHighlight": "działa",
+      "subtitle": "Trzy proste kroki, aby usunąć tło z obrazów w kilka sekund",
+      "tag": "PROSTY PROCES"
+    },
+    "steps": {
+      "upload": {
+        "title": "Prześlij obraz",
+        "description": "Prześlij dowolny obraz z urządzenia na naszą bezpieczną platformę. Obsługujemy formaty JPG, PNG i WebP."
+      },
+      "process": {
+        "title": "Przetwarzanie AI",
+        "description": "Nasza zaawansowana AI automatycznie wykrywa i usuwa tło w kilka sekund z wysoką precyzją."
+      },
+      "download": {
+        "title": "Pobierz wynik",
+        "description": "Pobierz przezroczysty PNG lub wybierz niestandardowe tło. Możliwości są nieograniczone."
+      }
+    },
+    "testimonial": {
+      "quote": "\"iMagenWiz zrewolucjonizował nasz proces fotografii produktowej. To, co kiedyś zajmowało godziny, teraz zajmuje tylko sekundy, a wyniki są idealne!\"",
+      "author": "Sarah Johnson, Manager E-commerce"
+    },
+    "cta": {
+      "title": "Gotowy, aby przekształcić swoje obrazy?",
+      "subtitle": "Dołącz do tysięcy profesjonalistów, którzy polegają na iMagenWiz w kwestii przetwarzania obrazów. Zacznij dzisiaj i doświadcz różnicy.",
+      "getStarted": "Zacznij za darmo",
+      "viewPricing": "Zobacz cennik"
+    },
+    "trust": {
+      "secure": "Bezpieczne przetwarzanie",
+      "accuracy": "99.8% dokładności",
+      "cloud": "Przetwarzanie w chmurze",
+      "support": "Wsparcie 24/7"
+    },
+    "testimonials": {
+      "title": "Co mówią nasi użytkownicy",
+      "viewAll": "Zobacz wszystkie opinie"
+    }
+  },
+  "errors": {
+    "required": "To pole jest wymagane",
+    "invalidEmail": "Wprowadź poprawny adres e-mail",
+    "minLength": "Musi zawierać co najmniej {{min}} znaków",
+    "maxLength": "Może zawierać maksymalnie {{max}} znaków",
+    "passwordMismatch": "Hasła nie pasują do siebie",
+    "invalidCredentials": "Nieprawidłowy e-mail lub hasło",
+    "serverError": "Błąd serwera. Spróbuj ponownie później.",
+    "networkError": "Błąd sieci. Sprawdź swoje połączenie.",
+    "fileTooBig": "Plik jest za duży. Maksymalny rozmiar to {{size}}MB",
+    "fileTypeNotSupported": "Nieobsługiwany typ pliku. Prześlij {{types}}",
+    "unexpectedError": "Wystąpił nieoczekiwany błąd"
+  }
+}

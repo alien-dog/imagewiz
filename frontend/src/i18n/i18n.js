@@ -20,7 +20,13 @@ export const SUPPORTED_LANGUAGES = [
   { code: 'ms', name: 'Malaysian', nativeName: 'Bahasa Melayu', flag: '🇲🇾' },
   { code: 'nl', name: 'Dutch', nativeName: 'Nederlands', flag: '🇳🇱' },
   { code: 'sv', name: 'Swedish', nativeName: 'Svenska', flag: '🇸🇪' },
-  { code: 'zh-TW', name: 'Traditional Chinese', nativeName: '繁體中文', flag: '🇨🇳' }
+  { code: 'zh-TW', name: 'Traditional Chinese', nativeName: '繁體中文', flag: '🇨🇳' },
+  { code: 'it', name: 'Italian', nativeName: 'Italiano', flag: '🇮🇹' },
+  { code: 'tr', name: 'Turkish', nativeName: 'Türkçe', flag: '🇹🇷' },
+  { code: 'hu', name: 'Hungarian', nativeName: 'Magyar', flag: '🇭🇺' },
+  { code: 'pl', name: 'Polish', nativeName: 'Polski', flag: '🇵🇱' },
+  { code: 'no', name: 'Norwegian', nativeName: 'Norsk', flag: '🇳🇴' },
+  { code: 'el', name: 'Greek', nativeName: 'Ελληνικά', flag: '🇬🇷' }
 ];
 
 // Import English resources (always available as fallback)
@@ -76,6 +82,24 @@ import commonSV from './locales/sv/common.json';
 
 // Import Traditional Chinese resources
 import commonZHTW from './locales/zh-TW/common.json';
+
+// Import Italian resources
+import commonIT from './locales/it/common.json';
+
+// Import Turkish resources
+import commonTR from './locales/tr/common.json';
+
+// Import Hungarian resources
+import commonHU from './locales/hu/common.json';
+
+// Import Polish resources
+import commonPL from './locales/pl/common.json';
+
+// Import Norwegian resources
+import commonNO from './locales/no/common.json';
+
+// Import Greek resources
+import commonEL from './locales/el/common.json';
 
 // Create resources object with available translations - only include languages we have translations for
 const resources = {

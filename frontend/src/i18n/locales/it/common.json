@@ -1,0 +1,148 @@
+{
+  "nav": {
+    "home": "Home",
+    "pricing": "Prezzi",
+    "blog": "Blog",
+    "dashboard": "Dashboard",
+    "history": "Cronologia",
+    "login": "Accedi",
+    "register": "Registrati",
+    "editor": "CMS",
+    "account": "Il Mio Account",
+    "logout": "Esci"
+  },
+  "footer": {
+    "about": "Chi Siamo",
+    "contact": "Contatti",
+    "terms": "Termini di Servizio",
+    "privacy": "Privacy",
+    "copyright": "© 2025 iMagenWiz. Tutti i diritti riservati.",
+    "quickLinks": "Link Rapidi"
+  },
+  "common": {
+    "loading": "Caricamento...",
+    "error": "Si è verificato un errore",
+    "retry": "Riprova",
+    "save": "Salva",
+    "cancel": "Annulla",
+    "delete": "Elimina",
+    "edit": "Modifica",
+    "view": "Visualizza",
+    "submit": "Invia",
+    "back": "Indietro",
+    "next": "Avanti",
+    "previous": "Precedente",
+    "credits": "Crediti",
+    "search": "Cerca",
+    "filterBy": "Filtra per",
+    "sortBy": "Ordina per",
+    "ascOrder": "Crescente",
+    "descOrder": "Decrescente",
+    "showMore": "Mostra di più",
+    "showLess": "Mostra meno",
+    "all": "Tutti",
+    "more": "Più",
+    "less": "Meno",
+    "select": "Seleziona",
+    "selectAll": "Seleziona tutto",
+    "selectNone": "Deseleziona tutto",
+    "noResults": "Nessun risultato trovato",
+    "notFound": "Non trovato",
+    "required": "Obbligatorio",
+    "optional": "Opzionale",
+    "or": "o",
+    "and": "e",
+    "continue": "Continua",
+    "language": "Lingua",
+    "learnMore": "Scopri di più",
+    "companyName": "iMagenWiz"
+  },
+  "home": {
+    "hero": {
+      "title": "Rimuovi",
+      "titleHighlight": "sfondi",
+      "titleEnd": "in pochi secondi",
+      "subtitle": "La nostra tecnologia AI rende la rimozione dello sfondo veloce, semplice e precisa. Perfetto per e-commerce, marketing o progetti personali.",
+      "getStarted": "Inizia gratis",
+      "secondaryCta": "Vedi i prezzi",
+      "tag": "NUOVA TECNOLOGIA AI",
+      "trust": "Utilizzato da oltre 10.000 utenti in tutto il mondo",
+      "imageCaption": "Elaborazione AI in tempo reale"
+    },
+    "features": {
+      "title": "Perché iMagenWiz",
+      "subtitle": "La nostra tecnologia AI avanzata offre i migliori risultati del settore per tutte le tue esigenze di modifica delle immagini",
+      "fast": {
+        "title": "Velocissimo",
+        "description": "Elabora immagini in secondi, non minuti. La nostra AI è ottimizzata per la velocità senza compromettere la qualità."
+      },
+      "precise": {
+        "title": "Risultati Precisi",
+        "description": "La nostra AI rileva bordi, capelli e dettagli complessi che altri strumenti non riescono a catturare, anche in immagini difficili."
+      },
+      "easy": {
+        "title": "Facile da Usare",
+        "description": "Basta caricare l'immagine e scaricare il risultato. Non serve esperienza tecnica. Perfetto per tutti i livelli di competenza."
+      }
+    },
+    "stats": {
+      "accuracy": "Tasso di precisione",
+      "time": "Tempo medio di elaborazione",
+      "images": "Immagini elaborate al giorno",
+      "languages": "Lingue supportate"
+    },
+    "howItWorks": {
+      "title": "Come",
+      "titleHighlight": "funziona",
+      "subtitle": "Tre semplici passaggi per rimuovere lo sfondo dalle immagini in pochi secondi",
+      "tag": "PROCESSO SEMPLICE"
+    },
+    "steps": {
+      "upload": {
+        "title": "Carica un'immagine",
+        "description": "Carica qualsiasi immagine dal tuo dispositivo sulla nostra piattaforma sicura. Supportiamo formati JPG, PNG e WebP."
+      },
+      "process": {
+        "title": "Elaborazione AI",
+        "description": "La nostra AI avanzata rileva e rimuove automaticamente lo sfondo in pochi secondi con alta precisione."
+      },
+      "download": {
+        "title": "Scarica il risultato",
+        "description": "Scarica un PNG trasparente o scegli uno sfondo personalizzato. Le possibilità sono infinite."
+      }
+    },
+    "testimonial": {
+      "quote": "\"iMagenWiz ha rivoluzionato il nostro flusso di lavoro per la fotografia di prodotti. Ciò che prima richiedeva ore ora richiede solo secondi, e i risultati sono perfetti!\"",
+      "author": "Sarah Johnson, E-commerce Manager"
+    },
+    "cta": {
+      "title": "Pronto a trasformare le tue immagini?",
+      "subtitle": "Unisciti a migliaia di professionisti che si affidano a iMagenWiz per le loro esigenze di elaborazione delle immagini. Inizia oggi e sperimenta la differenza.",
+      "getStarted": "Inizia gratis",
+      "viewPricing": "Vedi i prezzi"
+    },
+    "trust": {
+      "secure": "Elaborazione sicura",
+      "accuracy": "Precisione del 99.8%",
+      "cloud": "Elaborazione cloud",
+      "support": "Supporto 24/7"
+    },
+    "testimonials": {
+      "title": "Cosa dicono i nostri utenti",
+      "viewAll": "Vedi tutte le recensioni"
+    }
+  },
+  "errors": {
+    "required": "Questo campo è obbligatorio",
+    "invalidEmail": "Inserisci un indirizzo email valido",
+    "minLength": "Deve contenere almeno {{min}} caratteri",
+    "maxLength": "Deve contenere al massimo {{max}} caratteri",
+    "passwordMismatch": "Le password non corrispondono",
+    "invalidCredentials": "Email o password non validi",
+    "serverError": "Errore del server. Riprova più tardi.",
+    "networkError": "Errore di rete. Controlla la tua connessione.",
+    "fileTooBig": "Il file è troppo grande. La dimensione massima è {{size}}MB",
+    "fileTypeNotSupported": "Tipo di file non supportato. Carica {{types}}",
+    "unexpectedError": "Si è verificato un errore imprevisto"
+  }
+}
