@@ -1,147 +1,147 @@
 {
   "nav": {
-    "home": "Inicio",
-    "pricing": "Precios",
+    "home": "Startseite",
+    "pricing": "Preise",
     "blog": "Blog",
-    "dashboard": "Panel de Control",
-    "history": "Historial",
-    "login": "Iniciar Sesión",
-    "register": "Registrarse",
+    "dashboard": "Dashboard",
+    "history": "Verlauf",
+    "login": "Anmelden",
+    "register": "Registrieren",
     "editor": "CMS",
-    "account": "Mi Cuenta",
-    "logout": "Cerrar Sesión"
+    "account": "Mein Konto",
+    "logout": "Abmelden"
   },
   "footer": {
-    "about": "Acerca de",
-    "contact": "Contacto",
-    "terms": "Términos de Servicio",
-    "privacy": "Política de Privacidad",
-    "copyright": "© 2025 iMagenWiz. Todos los derechos reservados."
+    "about": "Über uns",
+    "contact": "Kontakt",
+    "terms": "Nutzungsbedingungen",
+    "privacy": "Datenschutz",
+    "copyright": "© 2025 iMagenWiz. Alle Rechte vorbehalten."
   },
   "common": {
-    "loading": "Cargando...",
-    "error": "Se ha producido un error",
-    "retry": "Reintentar",
-    "save": "Guardar",
-    "cancel": "Cancelar",
-    "delete": "Eliminar",
-    "edit": "Editar",
-    "view": "Ver",
-    "submit": "Enviar",
-    "back": "Atrás",
-    "next": "Siguiente",
-    "previous": "Anterior",
-    "credits": "Créditos",
-    "search": "Buscar",
-    "filterBy": "Filtrar por",
-    "sortBy": "Ordenar por",
-    "ascOrder": "Ascendente",
-    "descOrder": "Descendente",
-    "showMore": "Mostrar más",
-    "showLess": "Mostrar menos",
-    "all": "Todo",
-    "more": "Más",
-    "less": "Menos",
-    "select": "Seleccionar",
-    "selectAll": "Seleccionar todo",
-    "selectNone": "No seleccionar nada",
-    "noResults": "No se encontraron resultados",
-    "notFound": "No encontrado",
-    "required": "Obligatorio",
-    "optional": "Opcional",
-    "or": "o",
-    "and": "y",
-    "continue": "Continuar",
-    "language": "Idioma",
-    "learnMore": "Saber más",
+    "loading": "Wird geladen...",
+    "error": "Ein Fehler ist aufgetreten",
+    "retry": "Wiederholen",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "view": "Ansehen",
+    "submit": "Absenden",
+    "back": "Zurück",
+    "next": "Weiter",
+    "previous": "Zurück",
+    "credits": "Guthaben",
+    "search": "Suchen",
+    "filterBy": "Filtern nach",
+    "sortBy": "Sortieren nach",
+    "ascOrder": "Aufsteigend",
+    "descOrder": "Absteigend",
+    "showMore": "Mehr anzeigen",
+    "showLess": "Weniger anzeigen",
+    "all": "Alle",
+    "more": "Mehr",
+    "less": "Weniger",
+    "select": "Auswählen",
+    "selectAll": "Alle auswählen",
+    "selectNone": "Keine auswählen",
+    "noResults": "Keine Ergebnisse gefunden",
+    "notFound": "Nicht gefunden",
+    "required": "Erforderlich",
+    "optional": "Optional",
+    "or": "oder",
+    "and": "und",
+    "continue": "Fortfahren",
+    "language": "Sprache",
+    "learnMore": "Mehr erfahren",
     "companyName": "iMagenWiz"
   },
   "home": {
     "hero": {
-      "title": "Elimina",
-      "titleHighlight": "Fondos",
-      "titleEnd": "en Segundos",
-      "subtitle": "Nuestra tecnología impulsada por IA hace que la eliminación de fondos sea rápida, fácil y precisa. Perfecto para comercio electrónico, marketing o proyectos personales.",
-      "getStarted": "Comenzar Gratis",
-      "secondaryCta": "Ver Precios",
-      "tag": "Nueva Tecnología de IA",
-      "trust": "Confiado por más de 10,000 usuarios en todo el mundo",
-      "imageCaption": "Procesamiento con IA en tiempo real"
+      "title": "Hintergründe",
+      "titleHighlight": "Entfernen",
+      "titleEnd": "in Sekunden",
+      "subtitle": "Unsere KI-gestützte Technologie macht die Hintergrundentfernung schnell, einfach und präzise. Perfekt für E-Commerce, Marketing oder persönliche Projekte.",
+      "getStarted": "Kostenlos starten",
+      "secondaryCta": "Preise anzeigen",
+      "tag": "Neue KI-Technologie",
+      "trust": "Vertraut von über 10.000 Nutzern weltweit",
+      "imageCaption": "KI-Verarbeitung in Echtzeit"
     },
     "features": {
-      "title": "¿Por Qué Elegir",
-      "subtitle": "Nuestras tecnologías avanzadas de IA proporcionan resultados líderes en la industria para todas sus necesidades de edición de imágenes",
+      "title": "Warum iMagenWiz",
+      "subtitle": "Unsere fortschrittlichen KI-Technologien liefern branchenführende Ergebnisse für alle Ihre Bildbearbeitungsbedürfnisse",
       "fast": {
-        "title": "Rápido como un Rayo",
-        "description": "Procese imágenes en segundos, no en minutos. Nuestra IA está optimizada para la velocidad sin sacrificar la calidad."
+        "title": "Blitzschnell",
+        "description": "Verarbeiten Sie Bilder in Sekunden, nicht in Minuten. Unsere KI ist für Geschwindigkeit optimiert, ohne die Qualität zu beeinträchtigen."
       },
       "precise": {
-        "title": "Resultados Precisos",
-        "description": "Nuestra IA detecta con precisión bordes, cabello y detalles complejos que otras herramientas no detectan, incluso en imágenes complicadas."
+        "title": "Präzise Ergebnisse",
+        "description": "Unsere KI erkennt präzise Kanten, Haare und komplexe Details, die andere Tools übersehen, selbst in anspruchsvollen Bildern."
       },
       "easy": {
-        "title": "Fácil de Usar",
-        "description": "Simplemente suba su imagen y descargue el resultado. No se requieren conocimientos técnicos. Perfecto para cualquier nivel de habilidad."
+        "title": "Einfach zu bedienen",
+        "description": "Laden Sie einfach Ihr Bild hoch und laden Sie das Ergebnis herunter. Keine technische Expertise erforderlich. Perfekt für jedes Qualifikationsniveau."
       }
     },
     "stats": {
-      "accuracy": "Tasa de Precisión",
-      "time": "Tiempo Medio de Procesamiento",
-      "images": "Imágenes Procesadas Diariamente",
-      "languages": "Idiomas Admitidos"
+      "accuracy": "Genauigkeitsrate",
+      "time": "Durchschnittliche Verarbeitungszeit",
+      "images": "Täglich verarbeitete Bilder",
+      "languages": "Unterstützte Sprachen"
     },
     "howItWorks": {
-      "title": "Cómo",
-      "titleHighlight": "Funciona",
-      "subtitle": "Tres sencillos pasos para eliminar fondos de imágenes en segundos",
-      "tag": "PROCESO SIMPLE"
+      "title": "Wie es",
+      "titleHighlight": "funktioniert",
+      "subtitle": "Drei einfache Schritte, um Bildhintergründe in Sekunden zu entfernen",
+      "tag": "EINFACHER PROZESS"
     },
     "steps": {
       "upload": {
-        "title": "Sube tu Imagen",
-        "description": "Sube cualquier imagen desde tu dispositivo a nuestra plataforma segura. Soportamos formatos JPG, PNG y WebP."
+        "title": "Bild hochladen",
+        "description": "Laden Sie ein beliebiges Bild von Ihrem Gerät auf unsere sichere Plattform hoch. Wir unterstützen JPG-, PNG- und WebP-Formate."
       },
       "process": {
-        "title": "Procesamiento con IA",
-        "description": "Nuestra IA avanzada detecta y elimina automáticamente el fondo en segundos con alta precisión."
+        "title": "KI-Verarbeitung",
+        "description": "Unsere fortschrittliche KI erkennt und entfernt automatisch den Hintergrund in Sekunden mit hoher Präzision."
       },
       "download": {
-        "title": "Descarga el Resultado",
-        "description": "Descarga tu PNG transparente o elige un fondo personalizado. Posibilidades ilimitadas."
+        "title": "Ergebnis herunterladen",
+        "description": "Laden Sie Ihr transparentes PNG herunter oder wählen Sie einen benutzerdefinierten Hintergrund. Unbegrenzte Möglichkeiten."
       }
     },
     "testimonial": {
-      "quote": "\"iMagenWiz ha revolucionado nuestro flujo de trabajo de fotografía de productos. Lo que solía tomar horas ahora toma segundos, ¡y los resultados son impecables!\"",
-      "author": "Sarah Johnson, Gerente de Comercio Electrónico"
+      "quote": "\"iMagenWiz hat unseren Produktfotografie-Workflow revolutioniert. Was früher Stunden dauerte, dauert jetzt Sekunden, und die Ergebnisse sind makellos!\"",
+      "author": "Sarah Johnson, E-Commerce-Managerin"
     },
     "cta": {
-      "title": "¿Listo para transformar tus imágenes?",
-      "subtitle": "Únete a miles de profesionales que confían en iMagenWiz para sus necesidades de procesamiento de imágenes. Comienza hoy y nota la diferencia.",
-      "getStarted": "Comenzar Gratis",
-      "viewPricing": "Ver Precios"
+      "title": "Bereit, Ihre Bilder zu transformieren?",
+      "subtitle": "Schließen Sie sich Tausenden von Profis an, die iMagenWiz für ihre Bildverarbeitungsanforderungen vertrauen. Starten Sie noch heute und erleben Sie den Unterschied.",
+      "getStarted": "Kostenlos starten",
+      "viewPricing": "Preise anzeigen"
     },
     "trust": {
-      "secure": "Procesamiento Seguro",
-      "accuracy": "Precisión del 99,8%",
-      "cloud": "Procesamiento en la Nube",
-      "support": "Soporte 24/7"
+      "secure": "Sichere Verarbeitung",
+      "accuracy": "99,8% Genauigkeit",
+      "cloud": "Cloud-Verarbeitung",
+      "support": "24/7 Support"
     },
     "testimonials": {
-      "title": "Lo que dicen nuestros usuarios",
-      "viewAll": "Ver todos los testimonios"
+      "title": "Was unsere Nutzer sagen",
+      "viewAll": "Alle Bewertungen ansehen"
     }
   },
   "errors": {
-    "required": "Este campo es obligatorio",
-    "invalidEmail": "Por favor ingrese una dirección de correo válida",
-    "minLength": "Debe tener al menos {{min}} caracteres",
-    "maxLength": "Debe tener como máximo {{max}} caracteres",
-    "passwordMismatch": "Las contraseñas no coinciden",
-    "invalidCredentials": "Correo o contraseña inválidos",
-    "serverError": "Error del servidor. Por favor intente más tarde.",
-    "networkError": "Error de red. Por favor verifique su conexión.",
-    "fileTooBig": "El archivo es demasiado grande. El tamaño máximo es {{size}}MB",
-    "fileTypeNotSupported": "Tipo de archivo no soportado. Por favor suba {{types}}",
-    "unexpectedError": "Se ha producido un error inesperado"
+    "required": "Dieses Feld ist erforderlich",
+    "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+    "minLength": "Muss mindestens {{min}} Zeichen lang sein",
+    "maxLength": "Darf höchstens {{max}} Zeichen lang sein",
+    "passwordMismatch": "Passwörter stimmen nicht überein",
+    "invalidCredentials": "Ungültige E-Mail oder Passwort",
+    "serverError": "Serverfehler. Bitte versuchen Sie es später erneut.",
+    "networkError": "Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung.",
+    "fileTooBig": "Datei ist zu groß. Maximale Größe beträgt {{size}}MB",
+    "fileTypeNotSupported": "Dateityp wird nicht unterstützt. Bitte laden Sie {{types}} hoch",
+    "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten"
   }
 }

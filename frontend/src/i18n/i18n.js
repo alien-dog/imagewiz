@@ -44,6 +44,12 @@ import commonJA from './locales/ja/common.json';
 // Import Arabic resources
 import commonAR from './locales/ar/common.json';
 
+// Import German resources
+import commonDE from './locales/de/common.json';
+
+// Import Russian resources
+import commonRU from './locales/ru/common.json';
+
 // Create resources object with available translations - only include languages we have translations for
 const resources = {
   en: {
@@ -76,6 +82,20 @@ const resources = {
   },
   ar: {
     common: commonAR,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogEN,
+    cms: cmsEN
+  },
+  de: {
+    common: commonDE,
+    auth: authEN,
+    pricing: pricingEN,
+    blog: blogEN,
+    cms: cmsEN
+  },
+  ru: {
+    common: commonRU,
     auth: authEN,
     pricing: pricingEN,
     blog: blogEN,

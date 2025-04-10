@@ -1,147 +1,147 @@
 {
   "nav": {
-    "home": "Inicio",
-    "pricing": "Precios",
-    "blog": "Blog",
-    "dashboard": "Panel de Control",
-    "history": "Historial",
-    "login": "Iniciar Sesión",
-    "register": "Registrarse",
+    "home": "Главная",
+    "pricing": "Цены",
+    "blog": "Блог",
+    "dashboard": "Панель управления",
+    "history": "История",
+    "login": "Вход",
+    "register": "Регистрация",
     "editor": "CMS",
-    "account": "Mi Cuenta",
-    "logout": "Cerrar Sesión"
+    "account": "Аккаунт",
+    "logout": "Выход"
   },
   "footer": {
-    "about": "Acerca de",
-    "contact": "Contacto",
-    "terms": "Términos de Servicio",
-    "privacy": "Política de Privacidad",
-    "copyright": "© 2025 iMagenWiz. Todos los derechos reservados."
+    "about": "О нас",
+    "contact": "Контакты",
+    "terms": "Условия использования",
+    "privacy": "Политика конфиденциальности",
+    "copyright": "© 2025 iMagenWiz. Все права защищены."
   },
   "common": {
-    "loading": "Cargando...",
-    "error": "Se ha producido un error",
-    "retry": "Reintentar",
-    "save": "Guardar",
-    "cancel": "Cancelar",
-    "delete": "Eliminar",
-    "edit": "Editar",
-    "view": "Ver",
-    "submit": "Enviar",
-    "back": "Atrás",
-    "next": "Siguiente",
-    "previous": "Anterior",
-    "credits": "Créditos",
-    "search": "Buscar",
-    "filterBy": "Filtrar por",
-    "sortBy": "Ordenar por",
-    "ascOrder": "Ascendente",
-    "descOrder": "Descendente",
-    "showMore": "Mostrar más",
-    "showLess": "Mostrar menos",
-    "all": "Todo",
-    "more": "Más",
-    "less": "Menos",
-    "select": "Seleccionar",
-    "selectAll": "Seleccionar todo",
-    "selectNone": "No seleccionar nada",
-    "noResults": "No se encontraron resultados",
-    "notFound": "No encontrado",
-    "required": "Obligatorio",
-    "optional": "Opcional",
-    "or": "o",
-    "and": "y",
-    "continue": "Continuar",
-    "language": "Idioma",
-    "learnMore": "Saber más",
+    "loading": "Загрузка...",
+    "error": "Произошла ошибка",
+    "retry": "Повторить",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "view": "Просмотр",
+    "submit": "Отправить",
+    "back": "Назад",
+    "next": "Далее",
+    "previous": "Предыдущий",
+    "credits": "Кредиты",
+    "search": "Поиск",
+    "filterBy": "Фильтровать по",
+    "sortBy": "Сортировать по",
+    "ascOrder": "По возрастанию",
+    "descOrder": "По убыванию",
+    "showMore": "Показать больше",
+    "showLess": "Показать меньше",
+    "all": "Все",
+    "more": "Больше",
+    "less": "Меньше",
+    "select": "Выбрать",
+    "selectAll": "Выбрать все",
+    "selectNone": "Отменить выбор",
+    "noResults": "Нет результатов",
+    "notFound": "Не найдено",
+    "required": "Обязательно",
+    "optional": "Необязательно",
+    "or": "или",
+    "and": "и",
+    "continue": "Продолжить",
+    "language": "Язык",
+    "learnMore": "Узнать больше",
     "companyName": "iMagenWiz"
   },
   "home": {
     "hero": {
-      "title": "Elimina",
-      "titleHighlight": "Fondos",
-      "titleEnd": "en Segundos",
-      "subtitle": "Nuestra tecnología impulsada por IA hace que la eliminación de fondos sea rápida, fácil y precisa. Perfecto para comercio electrónico, marketing o proyectos personales.",
-      "getStarted": "Comenzar Gratis",
-      "secondaryCta": "Ver Precios",
-      "tag": "Nueva Tecnología de IA",
-      "trust": "Confiado por más de 10,000 usuarios en todo el mundo",
-      "imageCaption": "Procesamiento con IA en tiempo real"
+      "title": "Удаление",
+      "titleHighlight": "фона",
+      "titleEnd": "за секунды",
+      "subtitle": "Наша технология на базе ИИ делает удаление фона быстрым, простым и точным. Идеально для электронной коммерции, маркетинга или личных проектов.",
+      "getStarted": "Начать бесплатно",
+      "secondaryCta": "Посмотреть цены",
+      "tag": "Новая технология ИИ",
+      "trust": "Нам доверяют более 10 000 пользователей по всему миру",
+      "imageCaption": "Обработка ИИ в реальном времени"
     },
     "features": {
-      "title": "¿Por Qué Elegir",
-      "subtitle": "Nuestras tecnologías avanzadas de IA proporcionan resultados líderes en la industria para todas sus necesidades de edición de imágenes",
+      "title": "Почему выбирают",
+      "subtitle": "Наши передовые технологии ИИ обеспечивают лучшие в отрасли результаты для всех ваших потребностей в редактировании изображений",
       "fast": {
-        "title": "Rápido como un Rayo",
-        "description": "Procese imágenes en segundos, no en minutos. Nuestra IA está optimizada para la velocidad sin sacrificar la calidad."
+        "title": "Молниеносная скорость",
+        "description": "Обработка изображений за секунды, а не минуты. Наш ИИ оптимизирован для скорости без ущерба для качества."
       },
       "precise": {
-        "title": "Resultados Precisos",
-        "description": "Nuestra IA detecta con precisión bordes, cabello y detalles complejos que otras herramientas no detectan, incluso en imágenes complicadas."
+        "title": "Точные результаты",
+        "description": "Наш ИИ точно определяет края, волосы и сложные детали, которые упускают другие инструменты, даже на сложных изображениях."
       },
       "easy": {
-        "title": "Fácil de Usar",
-        "description": "Simplemente suba su imagen y descargue el resultado. No se requieren conocimientos técnicos. Perfecto para cualquier nivel de habilidad."
+        "title": "Простота использования",
+        "description": "Просто загрузите изображение и скачайте результат. Не требуется технической экспертизы. Идеально для любого уровня навыков."
       }
     },
     "stats": {
-      "accuracy": "Tasa de Precisión",
-      "time": "Tiempo Medio de Procesamiento",
-      "images": "Imágenes Procesadas Diariamente",
-      "languages": "Idiomas Admitidos"
+      "accuracy": "Уровень точности",
+      "time": "Среднее время обработки",
+      "images": "Ежедневно обработанных изображений",
+      "languages": "Поддерживаемых языков"
     },
     "howItWorks": {
-      "title": "Cómo",
-      "titleHighlight": "Funciona",
-      "subtitle": "Tres sencillos pasos para eliminar fondos de imágenes en segundos",
-      "tag": "PROCESO SIMPLE"
+      "title": "Как это",
+      "titleHighlight": "работает",
+      "subtitle": "Три простых шага для удаления фона с изображений за секунды",
+      "tag": "ПРОСТОЙ ПРОЦЕСС"
     },
     "steps": {
       "upload": {
-        "title": "Sube tu Imagen",
-        "description": "Sube cualquier imagen desde tu dispositivo a nuestra plataforma segura. Soportamos formatos JPG, PNG y WebP."
+        "title": "Загрузите изображение",
+        "description": "Загрузите любое изображение с вашего устройства на нашу безопасную платформу. Мы поддерживаем форматы JPG, PNG и WebP."
       },
       "process": {
-        "title": "Procesamiento con IA",
-        "description": "Nuestra IA avanzada detecta y elimina automáticamente el fondo en segundos con alta precisión."
+        "title": "Обработка ИИ",
+        "description": "Наш передовой ИИ автоматически обнаруживает и удаляет фон за секунды с высокой точностью."
       },
       "download": {
-        "title": "Descarga el Resultado",
-        "description": "Descarga tu PNG transparente o elige un fondo personalizado. Posibilidades ilimitadas."
+        "title": "Скачайте результат",
+        "description": "Скачайте прозрачный PNG или выберите пользовательский фон. Безграничные возможности."
       }
     },
     "testimonial": {
-      "quote": "\"iMagenWiz ha revolucionado nuestro flujo de trabajo de fotografía de productos. Lo que solía tomar horas ahora toma segundos, ¡y los resultados son impecables!\"",
-      "author": "Sarah Johnson, Gerente de Comercio Electrónico"
+      "quote": "\"iMagenWiz революционизировал наш рабочий процесс фотографии продуктов. То, что раньше занимало часы, теперь занимает секунды, и результаты безупречны!\"",
+      "author": "Сара Джонсон, менеджер электронной коммерции"
     },
     "cta": {
-      "title": "¿Listo para transformar tus imágenes?",
-      "subtitle": "Únete a miles de profesionales que confían en iMagenWiz para sus necesidades de procesamiento de imágenes. Comienza hoy y nota la diferencia.",
-      "getStarted": "Comenzar Gratis",
-      "viewPricing": "Ver Precios"
+      "title": "Готовы трансформировать ваши изображения?",
+      "subtitle": "Присоединяйтесь к тысячам профессионалов, которые доверяют iMagenWiz для своих потребностей в обработке изображений. Начните сегодня и заметьте разницу.",
+      "getStarted": "Начать бесплатно",
+      "viewPricing": "Посмотреть цены"
     },
     "trust": {
-      "secure": "Procesamiento Seguro",
-      "accuracy": "Precisión del 99,8%",
-      "cloud": "Procesamiento en la Nube",
-      "support": "Soporte 24/7"
+      "secure": "Безопасная обработка",
+      "accuracy": "Точность 99,8%",
+      "cloud": "Облачная обработка",
+      "support": "Поддержка 24/7"
     },
     "testimonials": {
-      "title": "Lo que dicen nuestros usuarios",
-      "viewAll": "Ver todos los testimonios"
+      "title": "Что говорят наши пользователи",
+      "viewAll": "Посмотреть все отзывы"
     }
   },
   "errors": {
-    "required": "Este campo es obligatorio",
-    "invalidEmail": "Por favor ingrese una dirección de correo válida",
-    "minLength": "Debe tener al menos {{min}} caracteres",
-    "maxLength": "Debe tener como máximo {{max}} caracteres",
-    "passwordMismatch": "Las contraseñas no coinciden",
-    "invalidCredentials": "Correo o contraseña inválidos",
-    "serverError": "Error del servidor. Por favor intente más tarde.",
-    "networkError": "Error de red. Por favor verifique su conexión.",
-    "fileTooBig": "El archivo es demasiado grande. El tamaño máximo es {{size}}MB",
-    "fileTypeNotSupported": "Tipo de archivo no soportado. Por favor suba {{types}}",
-    "unexpectedError": "Se ha producido un error inesperado"
+    "required": "Это поле обязательно",
+    "invalidEmail": "Пожалуйста, введите действительный адрес электронной почты",
+    "minLength": "Должно быть не менее {{min}} символов",
+    "maxLength": "Должно быть не более {{max}} символов",
+    "passwordMismatch": "Пароли не совпадают",
+    "invalidCredentials": "Неверный email или пароль",
+    "serverError": "Ошибка сервера. Пожалуйста, попробуйте позже.",
+    "networkError": "Ошибка сети. Пожалуйста, проверьте подключение.",
+    "fileTooBig": "Файл слишком большой. Максимальный размер {{size}}MB",
+    "fileTypeNotSupported": "Тип файла не поддерживается. Пожалуйста, загрузите {{types}}",
+    "unexpectedError": "Произошла непредвиденная ошибка"
   }
 }
