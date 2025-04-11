@@ -230,6 +230,22 @@ export const autoTranslatePost = async (postId, options = {}) => {
   }
 };
 
+// Auto-translate all posts from English to all other languages
+export const autoTranslateAllPosts = async (options = {}) => {
+  try {
+    console.log('Starting auto-translation for all posts');
+    const response = await axios.post(`${API_URL}/posts/auto-translate-all`, options, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error in auto-translating all posts:', error);
+    return handleError(error);
+  }
+};
+
 // Media
 export const uploadMedia = async (postId, formData) => {
   try {

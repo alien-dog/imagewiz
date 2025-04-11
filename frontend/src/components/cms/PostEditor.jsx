@@ -490,14 +490,49 @@ const PostEditor = () => {
         // Update existing post
         await updatePost(id, postData);
         setSuccess('Post updated successfully!');
+        
+        // Auto-translate if this is an English post that was just updated
+        if (formData.language_code === 'en') {
+          try {
+            console.log('Triggering auto-translation after English post update');
+            // Trigger auto-translation for this post
+            const translationResult = await autoTranslatePost(id);
+            console.log('Auto-translation result:', translationResult);
+            
+            // Update success message to include translation info
+            const successful = translationResult.translations?.successful?.length || 0;
+            setSuccess(`Post updated successfully! Auto-translated to ${successful} languages.`);
+          } catch (translationError) {
+            console.error('Error auto-translating post:', translationError);
+            // Don't override the main success message with a translation error
+          }
+        }
       } else {
         // Create new post
         const response = await createPost(postData);
         setSuccess('Post created successfully!');
         
         // Redirect to edit page if we just created a new post
-        if (response.post && response.post.id) {
-          navigate(`/cms/posts/${response.post.id}/edit`);
+        const newPostId = response.id || (response.post && response.post.id);
+        if (newPostId) {
+          // Auto-translate if this is an English post
+          if (formData.language_code === 'en') {
+            try {
+              console.log('Triggering auto-translation for new English post');
+              // Trigger auto-translation for this post
+              const translationResult = await autoTranslatePost(newPostId);
+              console.log('Auto-translation result:', translationResult);
+              
+              // Update success message to include translation info
+              const successful = translationResult.translations?.successful?.length || 0;
+              setSuccess(`Post created successfully! Auto-translated to ${successful} languages.`);
+            } catch (translationError) {
+              console.error('Error auto-translating new post:', translationError);
+              // Don't override the main success message with a translation error
+            }
+          }
+          
+          navigate(`/cms/posts/${newPostId}/edit`);
         }
       }
       

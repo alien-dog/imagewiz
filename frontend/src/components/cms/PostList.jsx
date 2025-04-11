@@ -11,7 +11,7 @@ import {
   CheckCircle2,
   Plus
 } from 'lucide-react';
-import { getPosts, deletePost, getLanguages } from '../../lib/cms-service';
+import { getPosts, deletePost, getLanguages, autoTranslateAllPosts } from '../../lib/cms-service';
 
 const PostList = () => {
   const navigate = useNavigate();
