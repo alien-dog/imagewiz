@@ -9,7 +9,8 @@ import {
   Tag as TagIcon,
   AlertCircle,
   CheckCircle2,
-  Trash2
+  Trash2,
+  Languages
 } from 'lucide-react';
 import { 
   getPost, 
@@ -19,7 +20,8 @@ import {
   getLanguages, 
   uploadMedia,
   getPostMedia,
-  deleteTranslation
+  deleteTranslation,
+  autoTranslatePost
 } from '../../lib/cms-service';
 
 // Improved WYSIWYG editor component with better text direction handling

@@ -200,6 +200,19 @@ export const deleteTranslation = async (postId, languageCode) => {
   }
 };
 
+export const autoTranslatePost = async (postId, options = {}) => {
+  try {
+    const response = await axios.post(`${API_URL}/posts/${postId}/auto-translate`, options, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    return response.data;
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
 // Media
 export const uploadMedia = async (postId, formData) => {
   try {
