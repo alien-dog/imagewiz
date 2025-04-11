@@ -123,6 +123,16 @@ def create_app():
                 app.logger.info("Database migration for users table credits column completed successfully")
             else:
                 app.logger.warning("Database migration for users table credits column failed, payment verification may fail")
+            
+            # Run auto-translation fields migration for CMS
+            from .utils.migrate_auto_translation import run_migration as migrate_auto_translation
+            
+            # Execute the migration to add auto-translation fields
+            auto_translation_result = migrate_auto_translation()
+            if auto_translation_result:
+                app.logger.info("Database migration for CMS auto-translation fields completed successfully")
+            else:
+                app.logger.warning("Database migration for CMS auto-translation fields failed, auto-translation may not work properly")
                 
         except Exception as e:
             app.logger.error(f"Error running database migrations: {e}")
