@@ -100,6 +100,12 @@ class PostTranslation(db.Model):
     meta_description = db.Column(db.String(255))
     meta_keywords = db.Column(db.String(255))
     
+    # Track if this is auto-translated content
+    is_auto_translated = db.Column(db.Boolean, default=False)
+    
+    # Track the last update timestamp
+    last_updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
     # Add unique constraint to ensure one translation per language for each post
     __table_args__ = (db.UniqueConstraint('post_id', 'language_code', name='uix_post_language'),)
     
@@ -113,7 +119,9 @@ class PostTranslation(db.Model):
             'content': self.content,
             'meta_title': self.meta_title,
             'meta_description': self.meta_description,
-            'meta_keywords': self.meta_keywords
+            'meta_keywords': self.meta_keywords,
+            'is_auto_translated': self.is_auto_translated,
+            'last_updated_at': self.last_updated_at.isoformat() if self.last_updated_at else None
         }
 
 class PostMedia(db.Model):
