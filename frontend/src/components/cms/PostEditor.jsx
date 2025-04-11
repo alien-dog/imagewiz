@@ -533,6 +533,55 @@ const PostEditor = () => {
     }
   };
   
+  const handleAutoTranslate = async (forceTranslate = false) => {
+    if (!id) {
+      setError('You must save the post before you can auto-translate it.');
+      return;
+    }
+    
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // Check if we have English content available
+      const hasEnglishTranslation = 
+        formData.language_code === 'en' || 
+        translations.some(t => t.language_code === 'en');
+      
+      if (!hasEnglishTranslation) {
+        setError('English content is required for auto-translation. Please add English content first.');
+        setIsLoading(false);
+        return;
+      }
+      
+      // Call the auto-translate endpoint
+      const response = await autoTranslatePost(id, { force_translate: forceTranslate });
+      
+      // Refresh the post data to get updated translations
+      const postData = await getPost(id);
+      if (postData.translations) {
+        setTranslations(postData.translations);
+      }
+      
+      // Display success message with statistics
+      const successCount = response.translations?.successful?.length || 0;
+      const skippedCount = response.translations?.skipped?.length || 0;
+      const failedCount = response.translations?.failed?.length || 0;
+      
+      setSuccess(`Auto-translation completed: ${successCount} translated, ${skippedCount} skipped, ${failedCount} failed.`);
+      
+      // Clear success message after 5 seconds
+      setTimeout(() => {
+        setSuccess(null);
+      }, 5000);
+    } catch (err) {
+      console.error('Error auto-translating post:', err);
+      setError('Failed to auto-translate post. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
   const setFeaturedImage = (url) => {
     console.log('Setting featured image via function to:', url);
     const updatedFormData = {
@@ -728,7 +777,32 @@ const PostEditor = () => {
             {/* Translations */}
             {id && translations.length > 0 && (
               <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-medium text-gray-700 mb-3">Translations</h3>
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="font-medium text-gray-700">Translations</h3>
+                  <button
+                    type="button"
+                    className="flex items-center text-xs bg-teal-50 text-teal-700 px-2 py-1 rounded hover:bg-teal-100"
+                    onClick={() => handleAutoTranslate(false)}
+                    disabled={isLoading}
+                  >
+                    <Languages className="h-3 w-3 mr-1" />
+                    Auto-Translate
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 mb-3">
+                  Auto-translate will create or update translations in all available languages based on the English content.
+                  Only translations that haven't been manually edited will be updated.
+                </p>
+                <div className="flex mb-3">
+                  <button
+                    type="button"
+                    className="text-xs text-gray-600 hover:text-teal-700 underline"
+                    onClick={() => handleAutoTranslate(true)}
+                    disabled={isLoading}
+                  >
+                    Force refresh all translations
+                  </button>
+                </div>
                 <ul className="space-y-2">
                   {translations.map((translation) => (
                     <li key={translation.language_code} className="flex justify-between items-center">
