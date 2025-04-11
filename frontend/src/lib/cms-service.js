@@ -23,9 +23,12 @@ const handleError = (error) => {
 // Languages
 export const getLanguages = async () => {
   try {
+    console.log('Fetching languages from API...');
     const response = await axios.get(`${API_URL}/languages`);
+    console.log('Languages API response:', response.data);
     return response.data;
   } catch (error) {
+    console.error('Error fetching languages:', error);
     return handleError(error);
   }
 };
@@ -121,9 +124,23 @@ export const deleteTag = async (id) => {
 // Blog Posts
 export const getPosts = async (filters = {}) => {
   try {
+    console.log('Fetching posts with filters:', filters);
     const response = await axios.get(`${API_URL}/posts`, { params: filters });
+    console.log('Posts API response:', response.data);
+    
+    if (response.data && typeof response.data === 'object') {
+      if (Array.isArray(response.data)) {
+        console.log('Response is an array with', response.data.length, 'items');
+      } else if (response.data.posts) {
+        console.log('Response has posts property with', response.data.posts.length, 'items');
+      } else {
+        console.log('Response structure:', Object.keys(response.data));
+      }
+    }
+    
     return response.data;
   } catch (error) {
+    console.error('Error fetching posts:', error);
     return handleError(error);
   }
 };

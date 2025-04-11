@@ -54,9 +54,15 @@ const PostList = () => {
         .filter(([_, value]) => value !== '')
         .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
       
+      console.log('Fetching posts with filters:', activeFilters);
       const data = await getPosts(activeFilters);
+      console.log('API response for posts:', data);
+      
       // API returns either an array directly or an object with posts property
-      setPosts(Array.isArray(data) ? data : (data.posts || []));
+      const processedData = Array.isArray(data) ? data : (data.posts || []);
+      console.log('Processed posts data:', processedData);
+      
+      setPosts(processedData);
       setError(null);
     } catch (err) {
       console.error('Error fetching posts:', err);
@@ -177,10 +183,11 @@ const PostList = () => {
                 onChange={(e) => setFilters({...filters, language: e.target.value})}
               >
                 <option value="">All Languages</option>
-                <option value="en">English</option>
-                <option value="es">Spanish</option>
-                <option value="fr">French</option>
-                {/* Add more languages as needed */}
+                {languages.map(lang => (
+                  <option key={lang.code} value={lang.code}>
+                    {lang.name}
+                  </option>
+                ))}
               </select>
             </div>
             
