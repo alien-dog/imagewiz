@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SUPPORTED_LANGUAGES, isRTL } from '../i18n/i18n';
 
@@ -7,7 +7,9 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isChanging, setIsChanging] = useState(false);
   const [selectedLang, setSelectedLang] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const dropdownRef = useRef(null);
+  const searchInputRef = useRef(null);
   
   // Enhanced language detection with fallback
   const currentLanguageCode = i18n.language || localStorage.getItem('i18nextLng') || 'en';
@@ -15,16 +17,63 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
     (lang) => lang.code === currentLanguageCode
   ) || SUPPORTED_LANGUAGES[0];
   
+  // Get browser language for prioritizing the order
+  const getBrowserLanguage = () => {
+    if (typeof window === 'undefined') return 'en';
+    const browserLang = navigator.language || navigator.userLanguage || 'en';
+    return browserLang.split('-')[0];
+  };
+  
+  // Ordered languages - browser language first, then alphabetically
+  const orderedLanguages = useMemo(() => {
+    const browserLang = getBrowserLanguage();
+    
+    return [...SUPPORTED_LANGUAGES].sort((a, b) => {
+      // First, check if either language matches the browser language
+      const aMatchesBrowser = a.code === browserLang || a.code.startsWith(browserLang + '-');
+      const bMatchesBrowser = b.code === browserLang || b.code.startsWith(browserLang + '-');
+      
+      if (aMatchesBrowser && !bMatchesBrowser) return -1;
+      if (!aMatchesBrowser && bMatchesBrowser) return 1;
+      
+      // Then sort alphabetically by native name
+      return a.nativeName.localeCompare(b.nativeName);
+    });
+  }, []);
+  
+  // Filtered languages based on search term
+  const filteredLanguages = useMemo(() => {
+    if (!searchTerm.trim()) return orderedLanguages;
+    
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    return orderedLanguages.filter(
+      lang => 
+        lang.name.toLowerCase().includes(lowerSearchTerm) ||
+        lang.nativeName.toLowerCase().includes(lowerSearchTerm) ||
+        lang.code.toLowerCase().includes(lowerSearchTerm)
+    );
+  }, [orderedLanguages, searchTerm]);
+  
   // Debug logging
   useEffect(() => {
     console.log(`LanguageSelector - Current language: ${currentLanguageCode}`, currentLanguage);
   }, [currentLanguageCode]);
+  
+  // Focus search input when dropdown opens
+  useEffect(() => {
+    if (isOpen && searchInputRef.current) {
+      setTimeout(() => {
+        searchInputRef.current.focus();
+      }, 100);
+    }
+  }, [isOpen]);
   
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
+        setSearchTerm('');
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
@@ -52,6 +101,7 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
   const handleLanguageChange = (language) => {
     if (language.code === currentLanguageCode) {
       setIsOpen(false);
+      setSearchTerm('');
       return;
     }
     
@@ -67,6 +117,10 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
       // Force reload with the new language
       window.location.reload();
     }, 300);
+  };
+  
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
   };
 
   return (
@@ -107,7 +161,7 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
       
       {isOpen && !isChanging && (
         <div 
-          className="fixed md:absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-md shadow-lg z-50 overflow-y-auto"
+          className="fixed md:absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-md shadow-lg z-50 overflow-hidden"
           style={{
             maxHeight: 'calc(100vh - 150px)', 
             top: '100%',
@@ -115,39 +169,70 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
             transform: window.innerWidth <= 768 ? 'translateX(-50%)' : 'none'
           }}
         >
-          <div className="sticky top-0 bg-gray-100 px-4 py-2 font-medium text-sm border-b border-gray-200 z-10">
-            {t('common.language', 'Select language')}
+          <div className="sticky top-0 bg-gray-100 p-2 z-10 border-b border-gray-200">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg className="h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <input
+                type="text"
+                ref={searchInputRef}
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
+                placeholder={t('common.searchLanguages', 'Search languages')}
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
+              {searchTerm && (
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setSearchTerm('')}
+                >
+                  <svg className="h-4 w-4 text-gray-400 hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
           </div>
           
-          <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
-            {SUPPORTED_LANGUAGES.map((language) => (
-              <button 
-                key={language.code}
-                type="button"
-                className={`flex items-center w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100 last:border-b-0
-                          ${language.code === currentLanguageCode ? 'bg-gray-50 font-medium' : ''}
-                          ${selectedLang === language.code ? 'bg-teal-50' : ''}`}
-                onClick={() => handleLanguageChange(language)}
-                aria-current={language.code === currentLanguageCode ? 'true' : 'false'}
-              >
-                <span className="text-xl mr-3" role="img" aria-label={language.name}>{language.flag}</span>
-                <div>
-                  <div className="font-medium">{language.nativeName}</div>
-                  <div className="text-gray-500 text-xs">{language.name}</div>
-                </div>
-                {language.code === currentLanguageCode && (
-                  <span className="ml-auto text-teal-500">✓</span>
-                )}
-                {selectedLang === language.code && language.code !== currentLanguageCode && (
-                  <span className="ml-auto">
-                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                  </span>
-                )}
-              </button>
-            ))}
+          <div className="max-h-[calc(100vh-210px)] overflow-y-auto">
+            {filteredLanguages.length === 0 ? (
+              <div className="px-4 py-3 text-sm text-gray-500 text-center">
+                {t('common.noResults', 'No languages found')}
+              </div>
+            ) : (
+              filteredLanguages.map((language) => (
+                <button 
+                  key={language.code}
+                  type="button"
+                  className={`flex items-center w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100 last:border-b-0
+                            ${language.code === currentLanguageCode ? 'bg-gray-50 font-medium' : ''}
+                            ${selectedLang === language.code ? 'bg-teal-50' : ''}`}
+                  onClick={() => handleLanguageChange(language)}
+                  aria-current={language.code === currentLanguageCode ? 'true' : 'false'}
+                >
+                  <span className="text-xl mr-3" role="img" aria-label={language.name}>{language.flag}</span>
+                  <div>
+                    <div className="font-medium">{language.nativeName}</div>
+                    <div className="text-gray-500 text-xs">{language.name}</div>
+                  </div>
+                  {language.code === currentLanguageCode && (
+                    <span className="ml-auto text-teal-500">✓</span>
+                  )}
+                  {selectedLang === language.code && language.code !== currentLanguageCode && (
+                    <span className="ml-auto">
+                      <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                    </span>
+                  )}
+                </button>
+              ))
+            )}
           </div>
         </div>
       )}
