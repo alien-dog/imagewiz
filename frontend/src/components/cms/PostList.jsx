@@ -9,7 +9,9 @@ import {
   RefreshCw, 
   AlertCircle, 
   CheckCircle2,
-  Plus
+  Plus,
+  Languages,
+  Loader2
 } from 'lucide-react';
 import { getPosts, deletePost, getLanguages, autoTranslateAllPosts } from '../../lib/cms-service';
 
@@ -27,6 +29,7 @@ const PostList = () => {
   });
   const [showConfirmDelete, setShowConfirmDelete] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
+  const [isTranslating, setIsTranslating] = useState(false);
 
   // Load languages on component mount
   useEffect(() => {
@@ -93,6 +96,45 @@ const PostList = () => {
       setError('Failed to delete post. Please try again.');
     }
   };
+  
+  const handleAutoTranslateAll = async (forceTranslate = false) => {
+    if (posts.length === 0) {
+      setError('No posts available for translation');
+      return;
+    }
+    
+    setIsTranslating(true);
+    setError(null);
+    
+    try {
+      // Call the auto-translate-all API endpoint
+      const response = await autoTranslateAllPosts({ force_translate: forceTranslate });
+      console.log('Auto-translate all response:', response);
+      
+      // Refresh posts to get the updated data
+      await fetchPosts();
+      
+      // Display a detailed success message with statistics
+      const totalPosts = response.results?.total_posts || 0;
+      const successfulPosts = response.results?.successfully_translated_posts || 0;
+      const translatedLangs = response.results?.translated_languages || 0;
+      const skippedLangs = response.results?.skipped_languages || 0;
+      
+      setSuccessMessage(
+        `Auto-translation completed: ${successfulPosts}/${totalPosts} posts translated to ${translatedLangs} languages. ${skippedLangs} translations skipped.`
+      );
+      
+      // Clear success message after a longer period (this is a more significant operation)
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 8000);
+    } catch (err) {
+      console.error('Error auto-translating all posts:', err);
+      setError(`Failed to auto-translate posts: ${err.message || 'Unknown error'}`);
+    } finally {
+      setIsTranslating(false);
+    }
+  };
 
   const filteredPosts = posts.filter(post => {
     // Search in post slug
@@ -136,15 +178,45 @@ const PostList = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-800">Posts</h1>
-        <button
-          className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded flex items-center"
-          onClick={() => navigate('/cms/posts/new')}
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          New Post
-        </button>
+        <div className="flex space-x-3">
+          <button
+            className="bg-teal-50 text-teal-700 hover:bg-teal-100 px-4 py-2 rounded flex items-center border border-teal-200"
+            onClick={() => handleAutoTranslateAll(false)}
+            disabled={isTranslating}
+          >
+            {isTranslating ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Translating...
+              </>
+            ) : (
+              <>
+                <Languages className="h-4 w-4 mr-2" />
+                Auto-Translate All Posts
+              </>
+            )}
+          </button>
+          <button
+            className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded flex items-center"
+            onClick={() => navigate('/cms/posts/new')}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            New Post
+          </button>
+        </div>
       </div>
 
+      {/* Auto-translate options */}
+      {isTranslating && (
+        <div className="bg-blue-50 text-blue-700 px-4 py-3 rounded flex items-center">
+          <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+          <div>
+            <p className="font-medium">Auto-translating posts to all languages...</p>
+            <p className="text-sm mt-1">This may take a minute. Please don't leave this page until it's complete.</p>
+          </div>
+        </div>
+      )}
+      
       {/* Search and Filter Bar */}
       <div className="bg-gray-50 p-4 rounded-lg">
         <form onSubmit={handleSearch} className="flex flex-wrap gap-4">
@@ -198,6 +270,17 @@ const PostList = () => {
             >
               <RefreshCw className="h-5 w-5" />
             </button>
+            
+            {!isTranslating && (
+              <button
+                type="button"
+                className="text-xs text-teal-600 hover:text-teal-800 underline flex items-center"
+                onClick={() => handleAutoTranslateAll(true)}
+              >
+                <Languages className="h-3 w-3 mr-1" />
+                Force refresh all translations
+              </button>
+            )}
           </div>
         </form>
       </div>
