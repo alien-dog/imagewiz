@@ -11,11 +11,12 @@ import {
   CheckCircle2,
   Plus
 } from 'lucide-react';
-import { getPosts, deletePost } from '../../lib/cms-service';
+import { getPosts, deletePost, getLanguages } from '../../lib/cms-service';
 
 const PostList = () => {
   const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
+  const [languages, setLanguages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -26,6 +27,20 @@ const PostList = () => {
   });
   const [showConfirmDelete, setShowConfirmDelete] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
+
+  // Load languages on component mount
+  useEffect(() => {
+    const fetchLanguages = async () => {
+      try {
+        const languagesData = await getLanguages();
+        setLanguages(Array.isArray(languagesData) ? languagesData : []);
+      } catch (err) {
+        console.error('Error fetching languages:', err);
+      }
+    };
+    
+    fetchLanguages();
+  }, []);
 
   // Load posts on component mount and when filters change
   useEffect(() => {
@@ -40,7 +55,8 @@ const PostList = () => {
         .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
       
       const data = await getPosts(activeFilters);
-      setPosts(data.posts || []);
+      // API returns either an array directly or an object with posts property
+      setPosts(Array.isArray(data) ? data : (data.posts || []));
       setError(null);
     } catch (err) {
       console.error('Error fetching posts:', err);
@@ -72,10 +88,28 @@ const PostList = () => {
     }
   };
 
-  const filteredPosts = posts.filter(post => 
-    post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    post.slug.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredPosts = posts.filter(post => {
+    // Search in post slug
+    if (post.slug.toLowerCase().includes(searchTerm.toLowerCase())) {
+      return true;
+    }
+    
+    // Search in translations if they exist
+    // First try the 'translation' property (single translation)
+    if (post.translation && post.translation.title &&
+        post.translation.title.toLowerCase().includes(searchTerm.toLowerCase())) {
+      return true;
+    }
+    
+    // Then try the 'translations' array (multiple translations)
+    if (post.translations && post.translations.length > 0) {
+      return post.translations.some(translation => 
+        translation.title.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    return false;
+  });
 
   // Status badge component
   const StatusBadge = ({ status }) => {
@@ -204,13 +238,21 @@ const PostList = () => {
               {filteredPosts.map((post) => (
                 <tr key={post.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{post.title}</div>
+                    <div className="text-sm font-medium text-gray-900">
+                      {post.translation ? post.translation.title : 
+                       (post.translations && post.translations.length > 0 ? 
+                        post.translations[0].title : 'Untitled')}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-500">{post.slug}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">{post.language_code}</div>
+                    <div className="text-sm text-gray-500">
+                      {post.translation ? post.translation.language_code : 
+                       (post.translations && post.translations.length > 0 ? 
+                        post.translations[0].language_code : '-')}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <StatusBadge status={post.status} />
