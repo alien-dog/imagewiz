@@ -195,35 +195,25 @@ const PostList = () => {
   const processedPosts = useMemo(() => {
     // If a specific language is selected, return the original posts
     if (filters.language) {
+      console.log('Using language filter, not expanding posts');
       return posts;
     }
+    
+    console.log('ALL languages selected - expanding posts with translations');
     
     // For "All Languages", we need to expand the post translations
     // so each translation becomes a separate row in the table
     const expandedPosts = [];
     
     posts.forEach(post => {
-      // Always include the original post
-      expandedPosts.push(post);
+      console.log(`Processing post ${post.id}, has translations:`, !!post.translations);
       
-      // For posts with multiple translations, create a new post object for each translation
-      if (post.translations && post.translations.length > 0) {
-        // Skip the first translation if it's the same as the default one shown on the post
-        const translationsToAdd = post.translations.filter((trans, index) => {
-          // If there's a single translation property, don't duplicate it
-          if (post.translation && post.translation.language_code === trans.language_code) {
-            return false;
-          }
-          // If it's the first translation and it's already shown on the post, skip it
-          if (index === 0 && trans.language_code === 
-              (post.translation?.language_code || post.translations[0]?.language_code)) {
-            return false;
-          }
-          return true;
-        });
+      if (post.translations) {
+        console.log(`Post ${post.id} has ${post.translations.length} translations`);
         
-        // Add each additional translation as a "virtual" post row
-        translationsToAdd.forEach(translation => {
+        // Instead of adding the original post, add one row for each translation
+        post.translations.forEach(translation => {
+          // Create a new virtual post for each translation
           const virtualPost = {
             ...post,
             // Set this translation as the primary one for display
@@ -233,11 +223,18 @@ const PostList = () => {
             // Use a compound ID to make it unique
             virtualId: `${post.id}-${translation.language_code}`
           };
+          
+          console.log(`Adding virtual post for language: ${translation.language_code}, title: ${translation.title.substring(0, 20)}...`);
           expandedPosts.push(virtualPost);
         });
+      } else {
+        // If no translations array, just add the original post
+        console.log(`Post ${post.id} has no translations array, adding as-is`);
+        expandedPosts.push(post);
       }
     });
     
+    console.log(`Expanded ${posts.length} original posts into ${expandedPosts.length} rows with all translations`);
     return expandedPosts;
   }, [posts, filters.language]);
 
