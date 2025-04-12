@@ -234,6 +234,79 @@ export const getPosts = async (filters = {}) => {
   }
 };
 
+/**
+ * Expand post translations into virtual posts for display in the CMS
+ * This takes posts with translations and creates virtual post objects for each translation
+ */
+export const expandPostTranslations = (posts) => {
+  if (!posts || !Array.isArray(posts)) {
+    console.error('Cannot expand translations: posts is not an array', posts);
+    return [];
+  }
+
+  console.log(`Expanding ${posts.length} posts with their translations`);
+  const expandedPosts = [];
+  
+  // Process each post
+  posts.forEach(post => {
+    // Track languages we've seen for this post to avoid duplicates
+    const seenLanguages = new Set();
+    
+    // First, handle the main post object which might have a translation property
+    if (post.translation) {
+      // If the post has a primary translation, add it first
+      const primaryLanguage = post.translation.language_code;
+      seenLanguages.add(primaryLanguage);
+      
+      expandedPosts.push({
+        ...post,
+        // Already has post.translation set
+      });
+      
+      console.log(`Added post ${post.id} with primary language ${primaryLanguage}`);
+    } else if (post.translations && post.translations.length > 0) {
+      // If no primary translation but has translations array, use first as primary
+      const firstTranslation = post.translations[0];
+      seenLanguages.add(firstTranslation.language_code);
+      
+      expandedPosts.push({
+        ...post,
+        translation: firstTranslation,
+      });
+      
+      console.log(`Added post ${post.id} with first translation language ${firstTranslation.language_code}`);
+    } else {
+      // No translations at all, just add the post as is
+      expandedPosts.push(post);
+      console.log(`Added post ${post.id} with no translations`);
+    }
+    
+    // Now process any additional translations
+    if (post.translations && post.translations.length > 0) {
+      // Skip translations we've already added
+      post.translations.forEach(translation => {
+        if (!seenLanguages.has(translation.language_code)) {
+          seenLanguages.add(translation.language_code);
+          
+          // Create a virtual post for this translation
+          const virtualPost = {
+            ...post,
+            translation: translation, // Override with this translation
+            isVirtualTranslation: true,
+            virtualId: `${post.id}-${translation.language_code}`
+          };
+          
+          expandedPosts.push(virtualPost);
+          console.log(`Added virtual post ${virtualPost.virtualId} for language ${translation.language_code}`);
+        }
+      });
+    }
+  });
+  
+  console.log(`Expanded ${posts.length} posts into ${expandedPosts.length} rows`);
+  return expandedPosts;
+};
+
 export const getPost = async (id, language = null) => {
   try {
     const params = language ? { language } : {};

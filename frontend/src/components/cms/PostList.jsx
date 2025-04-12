@@ -14,7 +14,14 @@ import {
   Loader2,
   Flag
 } from 'lucide-react';
-import { getPosts, deletePost, getLanguages, autoTranslateAllPosts, forceTranslateEsFr } from '../../lib/cms-service';
+import { 
+  getPosts, 
+  deletePost, 
+  getLanguages, 
+  autoTranslateAllPosts, 
+  forceTranslateEsFr,
+  expandPostTranslations 
+} from '../../lib/cms-service';
 
 const PostList = () => {
   const navigate = useNavigate();
@@ -201,40 +208,11 @@ const PostList = () => {
     
     console.log('ALL languages selected - expanding posts with translations');
     
-    // For "All Languages", we need to expand the post translations
-    // so each translation becomes a separate row in the table
-    const expandedPosts = [];
-    
-    posts.forEach(post => {
-      console.log(`Processing post ${post.id}, has translations:`, !!post.translations);
-      
-      if (post.translations) {
-        console.log(`Post ${post.id} has ${post.translations.length} translations`);
-        
-        // Instead of adding the original post, add one row for each translation
-        post.translations.forEach(translation => {
-          // Create a new virtual post for each translation
-          const virtualPost = {
-            ...post,
-            // Set this translation as the primary one for display
-            translation: translation,
-            // Flag that this is a virtual post for a translation
-            isVirtualTranslation: true,
-            // Use a compound ID to make it unique
-            virtualId: `${post.id}-${translation.language_code}`
-          };
-          
-          console.log(`Adding virtual post for language: ${translation.language_code}, title: ${translation.title.substring(0, 20)}...`);
-          expandedPosts.push(virtualPost);
-        });
-      } else {
-        // If no translations array, just add the original post
-        console.log(`Post ${post.id} has no translations array, adding as-is`);
-        expandedPosts.push(post);
-      }
-    });
-    
+    // Use our expandPostTranslations utility for "All Languages" view
+    // This creates a virtual post for each language translation
+    const expandedPosts = expandPostTranslations(posts);
     console.log(`Expanded ${posts.length} original posts into ${expandedPosts.length} rows with all translations`);
+    
     return expandedPosts;
   }, [posts, filters.language]);
 
