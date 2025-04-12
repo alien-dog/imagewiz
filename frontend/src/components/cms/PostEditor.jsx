@@ -36,9 +36,17 @@ const RichTextEditor = ({ value, onChange, languageCode }) => {
     const editor = editorRef.current;
     if (!editor) return;
     
+    console.log('RichTextEditor value update:', { value, currentHTML: editor.innerHTML });
+    
     // Only update content if it's different to avoid losing cursor position
     if (editor.innerHTML !== value) {
-      editor.innerHTML = value || '';
+      // Check if the value is truly empty but editor has content
+      if (!value && editor.innerHTML) {
+        console.log('Value is empty but editor has content, preserving editor content');
+      } else {
+        console.log('Updating editor content with value');
+        editor.innerHTML = value || '';
+      }
     }
     
     // Apply text direction directly to the HTML element
@@ -250,7 +258,10 @@ const PostEditor = () => {
           const postData = await getPost(id);
           const mediaData = await getPostMedia(id);
           
+          console.log('Fetched post data:', postData);
+          
           if (postData.post) {
+            console.log('Setting form data with content:', postData.post.content);
             // Set the main form data from the post
             setFormData({
               title: postData.post.title || '',

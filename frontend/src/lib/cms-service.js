@@ -149,6 +149,7 @@ export const getPost = async (id, language = null) => {
   try {
     const params = language ? { language } : {};
     const response = await axios.get(`${API_URL}/posts/${id}`, { params });
+    console.log('API response for getPost:', response.data);
     return response.data;
   } catch (error) {
     return handleError(error);
