@@ -690,7 +690,7 @@ const PostEditor = () => {
   
   const handleAutoTranslate = async (forceTranslate = false) => {
     if (!id) {
-      setError('You must save the post before you can auto-translate it.');
+      setError('You must save the post before it can be auto-translated to all languages. Please save first.');
       return;
     }
     
@@ -731,7 +731,7 @@ const PostEditor = () => {
       }, 5000);
     } catch (err) {
       console.error('Error auto-translating post:', err);
-      setError('Failed to auto-translate post. Please try again.');
+      setError(`Failed to auto-translate: ${err.message || 'Unknown error'}`);
     } finally {
       setIsLoading(false);
     }
@@ -961,6 +961,25 @@ const PostEditor = () => {
                 <p className="text-xs text-gray-500 mt-1">
                   Changing language will load content for that language if available
                 </p>
+                
+                {/* Auto-translate button for new drafts */}
+                {!id && formData.language_code === 'en' && (
+                  <div className="mt-3 p-2 border border-teal-100 bg-teal-50 rounded">
+                    <p className="text-xs text-teal-800 mb-2">
+                      <strong>Creating content in English?</strong> Make sure to save your post first, 
+                      then you can auto-translate it to all 21 other languages with one click.
+                    </p>
+                    <button
+                      type="button"
+                      className="w-full flex justify-center items-center text-xs bg-teal-100 text-teal-700 px-2 py-2 rounded hover:bg-teal-200 border border-teal-200"
+                      onClick={handleSubmit}
+                      disabled={isLoading || isSaving}
+                    >
+                      <Save className="h-3 w-3 mr-1" />
+                      Save first, then auto-translate
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
             
