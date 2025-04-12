@@ -239,6 +239,23 @@ const PostList = () => {
             )}
           </button>
           <button
+            className="bg-blue-50 text-blue-700 hover:bg-blue-100 px-4 py-2 rounded flex items-center border border-blue-200"
+            onClick={handleForceTranslateEsFr}
+            disabled={isTranslating}
+          >
+            {isTranslating ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Translating...
+              </>
+            ) : (
+              <>
+                <Flag className="h-4 w-4 mr-2" />
+                Force ES/FR Only
+              </>
+            )}
+          </button>
+          <button
             className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded flex items-center"
             onClick={() => navigate('/cms/posts/new')}
           >
