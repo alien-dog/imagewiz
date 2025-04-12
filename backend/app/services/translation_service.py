@@ -17,7 +17,7 @@ class TranslationService:
         """Initialize the translation service with DeepSeek API"""
         self.api_key = os.environ.get('DEEPSEEK_API_KEY') or os.environ.get('OPENAI_API_KEY')
         self.api_base_url = "https://api.deepseek.com/v1"
-        self.model = "deepseek-chat"  # DeepSeek Chat model
+        self.model = "deepseek-chat"  # Using DeepSeek Chat model
         
         if self.api_key:
             logger.info("DeepSeek API settings initialized successfully")
