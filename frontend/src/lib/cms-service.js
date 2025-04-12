@@ -313,13 +313,32 @@ export const deleteTranslation = async (postId, languageCode) => {
 
 export const autoTranslatePost = async (postId, options = {}) => {
   try {
-    const response = await axios.post(`${API_URL}/posts/${postId}/auto-translate`, options, {
+    // Ensure we're using the correct URL with full /api prefix
+    const fullApiUrl = `/api/cms/posts/${postId}/auto-translate`;
+    
+    // Get the token using our helper
+    const token = getAuthToken();
+    console.log('Auto-translate post - Token available:', !!token);
+    console.log('Correct API URL for auto-translate:', fullApiUrl);
+    
+    if (!token) {
+      throw new Error('Authentication required. Please log in again.');
+    }
+    
+    const response = await axios.post(fullApiUrl, options, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
       }
     });
     return response.data;
   } catch (error) {
+    console.error('Error in auto-translate:', error);
+    if (error.response) {
+      console.error('Response error data:', error.response.data);
+      console.error('Response status:', error.response.status);
+    }
     return handleError(error);
   }
 };
@@ -328,14 +347,33 @@ export const autoTranslatePost = async (postId, options = {}) => {
 export const autoTranslateAllPosts = async (options = {}) => {
   try {
     console.log('Starting auto-translation for all posts');
-    const response = await axios.post(`${API_URL}/posts/auto-translate-all`, options, {
+    
+    // Ensure we're using the correct URL with full /api prefix
+    const fullApiUrl = `/api/cms/posts/auto-translate-all`;
+    
+    // Get the token using our helper
+    const token = getAuthToken();
+    console.log('Auto-translate all posts - Token available:', !!token);
+    console.log('Correct API URL for auto-translate-all:', fullApiUrl);
+    
+    if (!token) {
+      throw new Error('Authentication required. Please log in again.');
+    }
+    
+    const response = await axios.post(fullApiUrl, options, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
       }
     });
     return response.data;
   } catch (error) {
     console.error('Error in auto-translating all posts:', error);
+    if (error.response) {
+      console.error('Response error data:', error.response.data);
+      console.error('Response status:', error.response.status);
+    }
     return handleError(error);
   }
 };
@@ -344,14 +382,33 @@ export const autoTranslateAllPosts = async (options = {}) => {
 export const forceTranslateEsFr = async () => {
   try {
     console.log('Starting force translation to Spanish and French');
-    const response = await axios.post(`${API_URL}/posts/force-translate-es-fr`, {}, {
+    
+    // Ensure we're using the correct URL with full /api prefix
+    const fullApiUrl = `/api/cms/posts/force-translate-es-fr`;
+    
+    // Get the token using our helper
+    const token = getAuthToken();
+    console.log('Force translate ES/FR - Token available:', !!token);
+    console.log('Correct API URL for force-translate-es-fr:', fullApiUrl);
+    
+    if (!token) {
+      throw new Error('Authentication required. Please log in again.');
+    }
+    
+    const response = await axios.post(fullApiUrl, {}, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
       }
     });
     return response.data;
   } catch (error) {
     console.error('Error in force-translating to Spanish/French:', error);
+    if (error.response) {
+      console.error('Response error data:', error.response.data);
+      console.error('Response status:', error.response.status);
+    }
     return handleError(error);
   }
 };
