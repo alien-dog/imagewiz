@@ -224,7 +224,15 @@ const PostEditor = () => {
           getTags()
         ]);
         
-        setLanguages(languagesData.languages || []);
+        console.log('Loaded languages data:', languagesData);
+        
+        // Filter to only active languages
+        const activeLanguages = Array.isArray(languagesData) 
+          ? languagesData.filter(lang => lang.is_active)
+          : (languagesData.languages || []).filter(lang => lang.is_active);
+        
+        console.log('Filtered to active languages:', activeLanguages.length);
+        setLanguages(activeLanguages);
         setTags(tagsData.tags || []);
         
         // If we're editing an existing post, fetch it
