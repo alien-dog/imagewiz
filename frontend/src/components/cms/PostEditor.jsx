@@ -1200,13 +1200,13 @@ const PostEditor = () => {
                             // Add a second error handler
                             e.target.onerror = () => {
                               console.error('All attempts failed, using placeholder');
-                              e.target.src = '/images/placeholder-image.jpg';
+                              e.target.src = '/images/placeholder-image.svg';
                               e.target.alt = 'Image not found';
                               e.target.onerror = null; // Prevent infinite loop
                             };
                           } catch (err) {
                             console.error('Error handling image path:', err);
-                            e.target.src = '/images/placeholder-image.jpg';
+                            e.target.src = '/images/placeholder-image.svg';
                           }
                         } else {
                           // Try prefixing with API path
@@ -1217,13 +1217,13 @@ const PostEditor = () => {
                             // Add a second error handler
                             e.target.onerror = () => {
                               console.error('Second attempt failed, using placeholder');
-                              e.target.src = '/images/placeholder-image.jpg';
+                              e.target.src = '/images/placeholder-image.svg';
                               e.target.alt = 'Image not found';
                               e.target.onerror = null; // Prevent infinite loop
                             };
                           } catch (err) {
                             console.error('Error handling image path:', err);
-                            e.target.src = '/images/placeholder-image.jpg';
+                            e.target.src = '/images/placeholder-image.svg';
                           }
                         }
                       }}
@@ -1385,7 +1385,7 @@ const PostEditor = () => {
                             // Try different URL patterns
                             if (item.file_path.startsWith('/api/')) {
                               // The path is already absolute, try showing it directly
-                              e.target.src = `/images/placeholder-image.jpg`;
+                              e.target.src = `/images/placeholder-image.svg`;
                               console.log('Set placeholder image');
                             } else {
                               // Try prefixing with API path
@@ -1394,7 +1394,7 @@ const PostEditor = () => {
                               // Add a second error handler for the new src
                               e.target.onerror = () => {
                                 console.error('Second attempt failed, using placeholder');
-                                e.target.src = '/images/placeholder-image.jpg';
+                                e.target.src = '/images/placeholder-image.svg';
                                 e.target.alt = 'Image not found';
                                 e.target.onerror = null; // Prevent infinite loop
                               };
