@@ -1,17 +1,30 @@
 """
 Script to add all languages to the CMS
+
+This script directly connects to the PostgreSQL database to add or update
+language records for the iMagenWiz CMS.
 """
 import sys
 import os
 import logging
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+import psycopg2
+import json
+from dotenv import load_dotenv
 
-sys.path.insert(0, os.getcwd())
+# Load environment variables
+load_dotenv()
 
-from backend.app import create_app
-from backend.app.models.cms import Language
-from backend.app import db
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Get database connection info from environment
+DB_USER = os.environ.get('PGUSER')
+DB_PASSWORD = os.environ.get('PGPASSWORD')
+DB_HOST = os.environ.get('PGHOST')
+DB_PORT = os.environ.get('PGPORT')
+DB_NAME = os.environ.get('PGDATABASE')
+DATABASE_URL = os.environ.get('DATABASE_URL')
 
 LANGUAGES = [
     {"code": "en", "name": "English", "is_default": True, "is_active": True},
@@ -48,41 +61,75 @@ LANGUAGES = [
 ]
 
 def add_languages():
-    """Add languages to the database"""
-    app = create_app()
-    with app.app_context():
-        print("Adding languages to the CMS database...")
+    """Add languages to the database using direct SQL queries"""
+    print("Adding languages to the CMS database...")
+    
+    # Connect directly to the database
+    try:
+        conn = None
+        if DATABASE_URL:
+            conn = psycopg2.connect(DATABASE_URL)
+            print(f"Connected to database using DATABASE_URL")
+        else:
+            conn = psycopg2.connect(
+                host=DB_HOST,
+                database=DB_NAME,
+                user=DB_USER,
+                password=DB_PASSWORD,
+                port=DB_PORT
+            )
+            print(f"Connected to database using individual credentials")
         
-        existing_languages = {lang.code: lang for lang in Language.query.all()}
+        # Create a cursor
+        cur = conn.cursor()
+        
+        # First get existing languages
+        cur.execute("SELECT code, name, is_default, is_active FROM cms_languages")
+        rows = cur.fetchall()
+        
+        existing_languages = {row[0]: row for row in rows}
         print(f"Found {len(existing_languages)} existing languages: {', '.join(existing_languages.keys())}")
         
         added_count = 0
         updated_count = 0
         
+        # Process each language
         for lang_data in LANGUAGES:
             code = lang_data["code"]
+            name = lang_data["name"]
+            is_default = lang_data["is_default"]
+            is_active = lang_data["is_active"]
+            
             if code in existing_languages:
                 # Update existing language
-                lang = existing_languages[code]
-                lang.name = lang_data["name"]
-                lang.is_default = lang_data["is_default"]
-                lang.is_active = lang_data["is_active"]
+                cur.execute(
+                    "UPDATE cms_languages SET name = %s, is_default = %s, is_active = %s WHERE code = %s",
+                    (name, is_default, is_active, code)
+                )
                 updated_count += 1
-                print(f"Updated language: {code} - {lang_data['name']}")
+                print(f"Updated language: {code} - {name}")
             else:
                 # Add new language
-                lang = Language(
-                    code=code,
-                    name=lang_data["name"],
-                    is_default=lang_data["is_default"],
-                    is_active=lang_data["is_active"]
+                cur.execute(
+                    "INSERT INTO cms_languages (code, name, is_default, is_active) VALUES (%s, %s, %s, %s)",
+                    (code, name, is_default, is_active)
                 )
-                db.session.add(lang)
                 added_count += 1
-                print(f"Added language: {code} - {lang_data['name']}")
+                print(f"Added language: {code} - {name}")
         
-        db.session.commit()
+        # Commit the transaction
+        conn.commit()
         print(f"Languages successfully added/updated: {added_count} added, {updated_count} updated")
+        
+    except Exception as e:
+        print(f"ERROR: {e}")
+        if conn:
+            conn.rollback()
+    finally:
+        if conn:
+            if cur:
+                cur.close()
+            conn.close()
 
 if __name__ == "__main__":
     add_languages()
