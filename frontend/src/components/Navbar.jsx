@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import LanguageSelector from './LanguageSelector';
+import MobileLanguageSelector from './MobileLanguageSelector';
 
 const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth();
