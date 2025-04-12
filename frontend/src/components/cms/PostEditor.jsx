@@ -1066,10 +1066,29 @@ const PostEditor = () => {
                       if (e.target.value) {
                         const tagId = parseInt(e.target.value);
                         if (!formData.tag_ids.includes(tagId)) {
+                          // First update the form data
+                          const updatedTags = [...formData.tag_ids, tagId];
                           setFormData({
                             ...formData,
-                            tag_ids: [...formData.tag_ids, tagId]
+                            tag_ids: updatedTags
                           });
+                          
+                          // Then synchronize the hidden select element for compatibility
+                          const hiddenSelect = document.getElementById('tag_ids');
+                          if (hiddenSelect) {
+                            // Clear all selections first
+                            Array.from(hiddenSelect.options).forEach(option => {
+                              option.selected = false;
+                            });
+                            
+                            // Then set the new selections
+                            updatedTags.forEach(id => {
+                              const option = Array.from(hiddenSelect.options).find(opt => parseInt(opt.value) === id);
+                              if (option) option.selected = true;
+                            });
+                          }
+                          
+                          console.log('Added tag:', tagId, 'Updated tags:', updatedTags);
                         }
                         e.target.value = ''; // Reset the select after selection
                       }
@@ -1165,10 +1184,48 @@ const PostEditor = () => {
                       src={formData.featured_image} 
                       alt="Featured" 
                       className="w-full h-40 object-cover rounded border border-gray-300" 
+                      onLoad={() => console.log('Featured image loaded successfully:', formData.featured_image)}
                       onError={(e) => {
-                        console.error('Image failed to load:', formData.featured_image);
-                        e.target.src = '/images/placeholder-image.jpg';
-                        e.target.alt = 'Image not found';
+                        console.error('Featured image failed to load, trying alternate paths:', formData.featured_image);
+                        
+                        // Try different URL patterns
+                        if (formData.featured_image.startsWith('/api/')) {
+                          // The path is already absolute
+                          try {
+                            // Try without the /api prefix
+                            const alternativePath = formData.featured_image.replace('/api', '');
+                            e.target.src = alternativePath;
+                            console.log('Trying without /api prefix:', alternativePath);
+                            
+                            // Add a second error handler
+                            e.target.onerror = () => {
+                              console.error('All attempts failed, using placeholder');
+                              e.target.src = '/images/placeholder-image.jpg';
+                              e.target.alt = 'Image not found';
+                              e.target.onerror = null; // Prevent infinite loop
+                            };
+                          } catch (err) {
+                            console.error('Error handling image path:', err);
+                            e.target.src = '/images/placeholder-image.jpg';
+                          }
+                        } else {
+                          // Try prefixing with API path
+                          try {
+                            e.target.src = `/api${formData.featured_image}`;
+                            console.log('Trying with /api prefix:', `/api${formData.featured_image}`);
+                            
+                            // Add a second error handler
+                            e.target.onerror = () => {
+                              console.error('Second attempt failed, using placeholder');
+                              e.target.src = '/images/placeholder-image.jpg';
+                              e.target.alt = 'Image not found';
+                              e.target.onerror = null; // Prevent infinite loop
+                            };
+                          } catch (err) {
+                            console.error('Error handling image path:', err);
+                            e.target.src = '/images/placeholder-image.jpg';
+                          }
+                        }
                       }}
                     />
                     <div className="absolute top-2 right-2 bg-black bg-opacity-50 rounded-full p-1">
@@ -1322,10 +1379,26 @@ const PostEditor = () => {
                           src={item.url || item.file_path} 
                           alt={item.alt_text || 'Media'} 
                           className="absolute inset-0 w-full h-full object-cover" 
+                          onLoad={() => console.log('Image loaded successfully:', item.file_path)}
                           onError={(e) => {
-                            console.error('Image failed to load:', item.file_path);
-                            e.target.src = '/images/placeholder-image.jpg';
-                            e.target.alt = 'Image not found';
+                            console.error('Image failed to load, trying absolute path:', item.file_path);
+                            // Try different URL patterns
+                            if (item.file_path.startsWith('/api/')) {
+                              // The path is already absolute, try showing it directly
+                              e.target.src = `/images/placeholder-image.jpg`;
+                              console.log('Set placeholder image');
+                            } else {
+                              // Try prefixing with API path
+                              e.target.src = `/api${item.file_path}`;
+                              console.log('Trying with /api prefix:', `/api${item.file_path}`);
+                              // Add a second error handler for the new src
+                              e.target.onerror = () => {
+                                console.error('Second attempt failed, using placeholder');
+                                e.target.src = '/images/placeholder-image.jpg';
+                                e.target.alt = 'Image not found';
+                                e.target.onerror = null; // Prevent infinite loop
+                              };
+                            }
                           }}
                         />
                       </div>
