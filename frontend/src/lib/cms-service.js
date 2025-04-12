@@ -206,12 +206,20 @@ export const deleteTag = async (id) => {
 export const getPosts = async (filters = {}) => {
   try {
     console.log('Fetching posts with filters:', filters);
-    const response = await axios.get(`${API_URL}/posts`, { params: filters });
+    
+    // Ensure we're using the correct URL with full /api prefix
+    const fullApiUrl = `/api/cms/posts`;
+    
+    const response = await axios.get(fullApiUrl, { params: filters });
     console.log('Posts API response:', response.data);
     
     if (response.data && typeof response.data === 'object') {
       if (Array.isArray(response.data)) {
         console.log('Response is an array with', response.data.length, 'items');
+        console.log('Sample first post language data:', 
+          response.data[0]?.translations?.length > 0 ? 
+          `Has ${response.data[0].translations.length} translations` : 
+          'No translations');
       } else if (response.data.posts) {
         console.log('Response has posts property with', response.data.posts.length, 'items');
       } else {
@@ -229,7 +237,10 @@ export const getPosts = async (filters = {}) => {
 export const getPost = async (id, language = null) => {
   try {
     const params = language ? { language } : {};
-    const response = await axios.get(`${API_URL}/posts/${id}`, { params });
+    // Ensure we're using the correct URL with full /api prefix
+    const fullApiUrl = `/api/cms/posts/${id}`;
+    
+    const response = await axios.get(fullApiUrl, { params });
     
     // Enhanced debug logging
     console.log('API response for getPost:', response.data);
@@ -252,7 +263,10 @@ export const getPost = async (id, language = null) => {
 export const getPostBySlug = async (slug, language = null) => {
   try {
     const params = language ? { language } : {};
-    const response = await axios.get(`${API_URL}/posts/by-slug/${slug}`, { params });
+    // Ensure we're using the correct URL with full /api prefix
+    const fullApiUrl = `/api/cms/posts/by-slug/${slug}`;
+    
+    const response = await axios.get(fullApiUrl, { params });
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -261,52 +275,106 @@ export const getPostBySlug = async (slug, language = null) => {
 
 export const createPost = async (postData) => {
   try {
-    const response = await axios.post(`${API_URL}/posts`, postData, {
+    // Ensure we're using the correct URL with full /api prefix
+    const fullApiUrl = `/api/cms/posts`;
+    
+    // Get the token using our helper
+    const token = getAuthToken();
+    console.log('Create post - Token available:', !!token);
+    
+    if (!token) {
+      throw new Error('Authentication required. Please log in again.');
+    }
+    
+    const response = await axios.post(fullApiUrl, postData, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
       }
     });
     return response.data;
   } catch (error) {
+    console.error('Error creating post:', error);
     return handleError(error);
   }
 };
 
 export const updatePost = async (id, postData) => {
   try {
-    const response = await axios.put(`${API_URL}/posts/${id}`, postData, {
+    // Ensure we're using the correct URL with full /api prefix
+    const fullApiUrl = `/api/cms/posts/${id}`;
+    
+    // Get the token using our helper
+    const token = getAuthToken();
+    console.log('Update post - Token available:', !!token);
+    
+    if (!token) {
+      throw new Error('Authentication required. Please log in again.');
+    }
+    
+    const response = await axios.put(fullApiUrl, postData, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
       }
     });
     return response.data;
   } catch (error) {
+    console.error('Error updating post:', error);
     return handleError(error);
   }
 };
 
 export const deletePost = async (id) => {
   try {
-    const response = await axios.delete(`${API_URL}/posts/${id}`, {
+    // Ensure we're using the correct URL with full /api prefix
+    const fullApiUrl = `/api/cms/posts/${id}`;
+    
+    // Get the token using our helper
+    const token = getAuthToken();
+    console.log('Delete post - Token available:', !!token);
+    
+    if (!token) {
+      throw new Error('Authentication required. Please log in again.');
+    }
+    
+    const response = await axios.delete(fullApiUrl, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
       }
     });
     return response.data;
   } catch (error) {
+    console.error('Error deleting post:', error);
     return handleError(error);
   }
 };
 
 export const deleteTranslation = async (postId, languageCode) => {
   try {
-    const response = await axios.delete(`${API_URL}/posts/${postId}/translations/${languageCode}`, {
+    // Ensure we're using the correct URL with full /api prefix
+    const fullApiUrl = `/api/cms/posts/${postId}/translations/${languageCode}`;
+    
+    // Get the token using our helper
+    const token = getAuthToken();
+    console.log('Delete translation - Token available:', !!token);
+    
+    if (!token) {
+      throw new Error('Authentication required. Please log in again.');
+    }
+    
+    const response = await axios.delete(fullApiUrl, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
       }
     });
     return response.data;
   } catch (error) {
+    console.error('Error deleting translation:', error);
     return handleError(error);
   }
 };
