@@ -149,7 +149,19 @@ export const getPost = async (id, language = null) => {
   try {
     const params = language ? { language } : {};
     const response = await axios.get(`${API_URL}/posts/${id}`, { params });
+    
+    // Enhanced debug logging
     console.log('API response for getPost:', response.data);
+    console.log('Full response structure:', JSON.stringify(response.data, null, 2));
+    
+    if (response.data) {
+      if (response.data.translation) {
+        console.log('Direct translation available:', response.data.translation);
+      } else if (response.data.translations) {
+        console.log('Multiple translations available:', response.data.translations.length);
+      }
+    }
+    
     return response.data;
   } catch (error) {
     return handleError(error);
