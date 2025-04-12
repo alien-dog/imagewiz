@@ -44,7 +44,15 @@ const PostList = () => {
     const fetchLanguages = async () => {
       try {
         const languagesData = await getLanguages();
-        setLanguages(Array.isArray(languagesData) ? languagesData : []);
+        console.log('CMS languages response:', languagesData);
+        console.log('Number of languages returned:', Array.isArray(languagesData) ? languagesData.length : 0);
+        
+        // Only use active languages
+        const activeLanguages = Array.isArray(languagesData) ? 
+          languagesData.filter(lang => lang.is_active) : [];
+        console.log('Number of active languages:', activeLanguages.length);
+        
+        setLanguages(activeLanguages);
       } catch (err) {
         console.error('Error fetching languages:', err);
       }
