@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Edit, 
@@ -65,6 +65,19 @@ const PostList = () => {
       // API returns either an array directly or an object with posts property
       const processedData = Array.isArray(data) ? data : (data.posts || []);
       console.log('Processed posts data:', processedData);
+      
+      // Log more detailed information about the posts and their translations
+      if (processedData.length > 0) {
+        console.log('First post translations:', 
+          processedData[0].translations 
+            ? `${processedData[0].translations.length} translations` 
+            : 'No translations array');
+            
+        console.log('Available languages in first post:', 
+          processedData[0].translations 
+            ? processedData[0].translations.map(t => t.language_code).join(', ') 
+            : 'None');
+      }
       
       setPosts(processedData);
       setError(null);
@@ -178,7 +191,59 @@ const PostList = () => {
     }
   };
 
-  const filteredPosts = posts.filter(post => {
+  // Process posts to expand all translations when "All Languages" is selected
+  const processedPosts = useMemo(() => {
+    // If a specific language is selected, return the original posts
+    if (filters.language) {
+      return posts;
+    }
+    
+    // For "All Languages", we need to expand the post translations
+    // so each translation becomes a separate row in the table
+    const expandedPosts = [];
+    
+    posts.forEach(post => {
+      // Always include the original post
+      expandedPosts.push(post);
+      
+      // For posts with multiple translations, create a new post object for each translation
+      if (post.translations && post.translations.length > 0) {
+        // Skip the first translation if it's the same as the default one shown on the post
+        const translationsToAdd = post.translations.filter((trans, index) => {
+          // If there's a single translation property, don't duplicate it
+          if (post.translation && post.translation.language_code === trans.language_code) {
+            return false;
+          }
+          // If it's the first translation and it's already shown on the post, skip it
+          if (index === 0 && trans.language_code === 
+              (post.translation?.language_code || post.translations[0]?.language_code)) {
+            return false;
+          }
+          return true;
+        });
+        
+        // Add each additional translation as a "virtual" post row
+        translationsToAdd.forEach(translation => {
+          const virtualPost = {
+            ...post,
+            // Set this translation as the primary one for display
+            translation: translation,
+            // Flag that this is a virtual post for a translation
+            isVirtualTranslation: true,
+            // Use a compound ID to make it unique
+            virtualId: `${post.id}-${translation.language_code}`
+          };
+          expandedPosts.push(virtualPost);
+        });
+      }
+    });
+    
+    return expandedPosts;
+  }, [posts, filters.language]);
+
+  const filteredPosts = processedPosts.filter(post => {
+    if (!searchTerm) return true;
+    
     // Search in post slug
     if (post.slug.toLowerCase().includes(searchTerm.toLowerCase())) {
       return true;
@@ -192,7 +257,7 @@ const PostList = () => {
     }
     
     // Then try the 'translations' array (multiple translations)
-    if (post.translations && post.translations.length > 0) {
+    if (!post.isVirtualTranslation && post.translations && post.translations.length > 0) {
       return post.translations.some(translation => 
         translation.title.toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -395,7 +460,7 @@ const PostList = () => {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {filteredPosts.map((post) => (
-                <tr key={post.id} className="hover:bg-gray-50">
+                <tr key={post.isVirtualTranslation ? post.virtualId : post.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
                       {post.translation ? post.translation.title : 
