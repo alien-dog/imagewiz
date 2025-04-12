@@ -255,55 +255,44 @@ const PostEditor = () => {
         
         // If we're editing an existing post, fetch it
         if (id) {
-          // Fetch the post with language=en to get a specific translation (prevents empty content)
-          const postData = await getPost(id, 'en');
-          const mediaData = await getPostMedia(id);
-          
-          console.log('Fetched post data:', postData);
-          
-          // API can return data in multiple formats:
-          // 1. Direct response: { id, slug, ... translation: {...} }
-          // 2. Nested post: { post: { id, slug, ... }, translation: {...} }
-          console.log('Received postData:', JSON.stringify(postData, null, 2));
+          try {
+            // Fetch the post with language=en to get a specific translation (prevents empty content)
+            const postData = await getPost(id, 'en');
+            const mediaData = await getPostMedia(id);
             
-          // First determine if we're dealing with a direct or nested response
-          const postObject = postData.post || postData;
-          
-          // Initialize form data with post details
-          let translationData = {};
-          
-          // Check for translation data - it could be in different formats based on the API response
-          if (postData.translation) {
-            // Single translation format (when language param was specified)
-            console.log('Using single translation data:', postData.translation);
-            translationData = postData.translation;
-          } else if (postData.translations && postData.translations.length > 0) {
-            // Multiple translations format - use the first one as default
-            console.log('Using first of multiple translations:', postData.translations[0]);
-            translationData = postData.translations[0];
-          } else if (postObject.translation) {
-            // Translation directly in the post object
-            console.log('Using translation from post object:', postObject.translation);
-            translationData = postObject.translation;
-          } else if (postObject.translations && postObject.translations.length > 0) {
-            // Multiple translations in the post object - use the first one
-            console.log('Using first translation from post object:', postObject.translations[0]);
-            translationData = postObject.translations[0];
-          }
-          
-          // If we have no translation data after checking all possible locations, log an error
-          if (!translationData || Object.keys(translationData).length === 0) {
-            console.error('No translation data found in API response:', postData);
-            setError('Could not find any translation data in the response');
-            return; // Prevent further processing
-          }
+            console.log('Fetched post data:', postData);
+            
+            // API can return data in multiple formats - handle both direct and nested responses
+            const postObject = postData.post || postData;
+            
+            // Initialize form data with post details
+            let translationData = {};
+            
+            // Check for translation data in various formats
+            if (postData.translation) {
+              console.log('Using single translation data:', postData.translation);
+              translationData = postData.translation;
+            } else if (postData.translations && postData.translations.length > 0) {
+              console.log('Using first of multiple translations:', postData.translations[0]);
+              translationData = postData.translations[0];
+            } else if (postObject.translation) {
+              console.log('Using translation from post object:', postObject.translation);
+              translationData = postObject.translation;
+            } else if (postObject.translations && postObject.translations.length > 0) {
+              console.log('Using first translation from post object:', postObject.translations[0]);
+              translationData = postObject.translations[0];
+            }
+            
+            // If no translation data was found, show an error
+            if (!translationData || Object.keys(translationData).length === 0) {
+              console.error('No translation data found in API response:', postData);
+              setError('Could not find any translation data in the response');
+              return;
+            }
             
             console.log('Setting form data with content:', translationData.content);
             
-            // Now we're ready to set the form data with our translation data
-            console.log('Setting form data with post object:', postObject);
-            console.log('Setting form data with content:', translationData.content);
-            
+            // Set form data with the post object and translation data
             setFormData({
               title: translationData.title || '',
               slug: postObject.slug || '',
@@ -317,7 +306,7 @@ const PostEditor = () => {
               tag_ids: (postObject.tags || []).map(tag => tag.id)
             });
             
-            // Set available translations - using same postObject pattern
+            // Set translations
             if (postData.translations) {
               console.log('Setting translations from direct response:', postData.translations);
               setTranslations(postData.translations);
@@ -329,13 +318,14 @@ const PostEditor = () => {
               setTranslations([]);
             }
             
-            // Also set the media if available
-            if (mediaData.media) {
+            // Set media
+            if (mediaData && mediaData.media) {
               setMedia(mediaData.media);
             }
+          } catch (postError) {
+            console.error('Error fetching post data:', postError);
+            setError('Failed to load post data. Please try again.');
           }
-          
-          /* Media is already handled earlier */
         }
       } catch (err) {
         console.error('Error fetching data:', err);
@@ -397,15 +387,30 @@ const PostEditor = () => {
           // If no local translation found, try to fetch it
           getPost(id, value)
             .then(postData => {
-              if (postData && postData.translation) {
-                console.log('Fetched translation data:', postData.translation);
+              console.log('Fetched translation data for language change:', postData);
+              
+              // Handle different API response formats
+              const postObject = postData.post || postData;
+              let translationData = null;
+              
+              // Check for translation data in various formats
+              if (postData.translation) {
+                console.log('Found direct translation data:', postData.translation);
+                translationData = postData.translation;
+              } else if (postObject.translation) {
+                console.log('Found nested translation data:', postObject.translation);
+                translationData = postObject.translation;
+              }
+              
+              if (translationData) {
+                console.log('Using translation data:', translationData);
                 setFormData({
                   ...formData,
                   language_code: value,
-                  title: postData.translation.title || '',
-                  content: postData.translation.content || '',
-                  meta_title: postData.translation.meta_title || '',
-                  meta_description: postData.translation.meta_description || ''
+                  title: translationData.title || '',
+                  content: translationData.content || '',
+                  meta_title: translationData.meta_title || '',
+                  meta_description: translationData.meta_description || ''
                 });
               } else {
                 // If no translation exists, just change the language but keep fields empty
