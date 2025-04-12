@@ -145,7 +145,7 @@ def delete_language(code):
 def get_tags():
     """Get all tags"""
     tags = Tag.query.all()
-    return jsonify([tag.to_dict() for tag in tags]), 200
+    return jsonify({"tags": [tag.to_dict() for tag in tags]}), 200
 
 @bp.route('/tags', methods=['POST'])
 @jwt_required()
@@ -180,7 +180,8 @@ def add_tag():
     # Create new tag
     new_tag = Tag(
         name=data['name'],
-        slug=slug
+        slug=slug,
+        description=data.get('description', '')
     )
     
     db.session.add(new_tag)
@@ -208,6 +209,8 @@ def update_tag(tag_id):
         tag.name = data['name']
     if 'slug' in data:
         tag.slug = data['slug']
+    if 'description' in data:
+        tag.description = data['description']
     
     db.session.commit()
     

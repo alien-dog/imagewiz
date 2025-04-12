@@ -160,13 +160,15 @@ class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False, unique=True)
     slug = db.Column(db.String(50), nullable=False, unique=True)
+    description = db.Column(db.String(255))
     
     def to_dict(self):
         """Convert tag to dictionary for API responses"""
         return {
             'id': self.id,
             'name': self.name,
-            'slug': self.slug
+            'slug': self.slug,
+            'description': self.description
         }
 
 class Language(db.Model):
