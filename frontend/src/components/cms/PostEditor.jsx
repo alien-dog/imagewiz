@@ -255,7 +255,8 @@ const PostEditor = () => {
         
         // If we're editing an existing post, fetch it
         if (id) {
-          const postData = await getPost(id);
+          // Fetch the post with language=en to get a specific translation (prevents empty content)
+          const postData = await getPost(id, 'en');
           const mediaData = await getPostMedia(id);
           
           console.log('Fetched post data:', postData);
@@ -352,11 +353,69 @@ const PostEditor = () => {
     
     // Special handling for language_code changes
     if (name === 'language_code') {
-      // When changing language, update the form with the new language
-      setFormData({
-        ...formData,
-        language_code: value
-      });
+      // When changing language in edit mode, fetch that language's content
+      if (id) {
+        console.log(`Language changed to ${value}, fetching translation`);
+        
+        // Find existing translation in our loaded translations
+        const existingTranslation = translations.find(t => t.language_code === value);
+        
+        if (existingTranslation) {
+          console.log('Found existing translation, updating form:', existingTranslation);
+          // Update form with the translation data
+          setFormData({
+            ...formData,
+            language_code: value,
+            title: existingTranslation.title || '',
+            content: existingTranslation.content || '',
+            meta_title: existingTranslation.meta_title || '',
+            meta_description: existingTranslation.meta_description || ''
+          });
+        } else {
+          console.log('No existing translation found, fetching from API');
+          // If no local translation found, try to fetch it
+          getPost(id, value)
+            .then(postData => {
+              if (postData && postData.translation) {
+                console.log('Fetched translation data:', postData.translation);
+                setFormData({
+                  ...formData,
+                  language_code: value,
+                  title: postData.translation.title || '',
+                  content: postData.translation.content || '',
+                  meta_title: postData.translation.meta_title || '',
+                  meta_description: postData.translation.meta_description || ''
+                });
+              } else {
+                // If no translation exists, just change the language but keep fields empty
+                console.log('No translation found for language', value);
+                setFormData({
+                  ...formData,
+                  language_code: value,
+                  title: '',
+                  content: '',
+                  meta_title: '',
+                  meta_description: ''
+                });
+              }
+            })
+            .catch(err => {
+              console.error('Error fetching translation:', err);
+              // On error, still update the language but show a notification
+              setFormData({
+                ...formData,
+                language_code: value
+              });
+              setError(`Failed to load ${value} translation. Please try again.`);
+            });
+        }
+      } else {
+        // For new posts, just change the language code
+        setFormData({
+          ...formData,
+          language_code: value
+        });
+      }
       
       // Apply a slight delay to allow React to update the DOM before resetting direction
       setTimeout(() => {
