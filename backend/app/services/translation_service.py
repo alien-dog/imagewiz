@@ -120,7 +120,8 @@ class TranslationService:
             response = requests.post(
                 f"{self.api_base_url}/chat/completions", 
                 headers=headers,
-                json=data
+                json=data,
+                timeout=45  # Increase timeout for translation
             )
             
             if response.status_code != 200:
@@ -128,6 +129,7 @@ class TranslationService:
                 return None
                 
             response_data = response.json()
+            logger.info(f"DeepSeek API response received successfully")
             
             # Extract the translated content from the response
             translated_content = response_data["choices"][0]["message"]["content"].strip()

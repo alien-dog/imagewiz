@@ -594,49 +594,168 @@ def force_translate_es_fr_endpoint():
 @jwt_required()
 def auto_translate_all_posts():
     """Auto-translate all posts with English content to all languages"""
-    # Check admin access
-    user = check_admin_access()
-    if not user:
-        return jsonify({"error": "Admin access required"}), 403
-    
-    # Check if translation service is available
-    if not translation_service.is_available():
-        return jsonify({"error": "Translation service is not available"}), 503
-    
-    # Get all active languages
-    all_languages = Language.query.filter_by(is_active=True).all()
-    
-    # Get all published posts that have English translations
-    posts = Post.query.join(PostTranslation).filter(
-        PostTranslation.language_code == 'en'
-    ).all()
-    
-    current_app.logger.info(f"Found {len(posts)} posts with English content to translate")
-    
-    results = {
-        'total_posts': len(posts),
-        'successfully_translated_posts': 0,
-        'failed_posts': 0,
-        'skipped_languages': 0,
-        'translated_languages': 0,
-        'details': []
-    }
-    
-    # Process each post
-    for post in posts:
-        post_result = {
-            'post_id': post.id,
-            'post_slug': post.slug,
-            'successful_languages': [],
-            'failed_languages': [],
-            'skipped_languages': []
-        }
+    try:
+        # Check admin access
+        user = check_admin_access()
+        if not user:
+            return jsonify({"error": "Admin access required"}), 403
         
-        # Get English translation
+        # Check if translation service is available
+        if not translation_service.is_available():
+            current_app.logger.error("Translation service is not available - DEEPSEEK_API_KEY may be missing or invalid")
+            return jsonify({"error": "Translation service is not available. Please check your DEEPSEEK_API_KEY."}), 503
+        
+        # Get all active languages
+        all_languages = Language.query.filter_by(is_active=True).all()
+        current_app.logger.info(f"Found {len(all_languages)} active languages for translation")
+        
+        # Get all published posts that have English translations
+        posts = Post.query.join(PostTranslation).filter(
+            PostTranslation.language_code == 'en'
+        ).all()
+        
+        current_app.logger.info(f"Found {len(posts)} posts with English content to translate")
+        
+        results = {
+            'total_posts': len(posts),
+            'successfully_translated_posts': 0,
+            'failed_posts': 0,
+            'skipped_languages': 0,
+            'translated_languages': 0,
+            'details': []
+        }
+    
+        # Process each post
+        for post in posts:
+            post_result = {
+                'post_id': post.id,
+                'post_slug': post.slug,
+                'successful_languages': [],
+                'failed_languages': [],
+                'skipped_languages': []
+            }
+            
+            # Get English translation
+            english_translation = next((t for t in post.translations if t.language_code == 'en'), None)
+            if not english_translation:
+                current_app.logger.warning(f"Post {post.id} has no English translation despite query filter")
+                continue
+                
+            # Prepare English translation data
+            english_translation_data = {
+                'title': english_translation.title,
+                'content': english_translation.content,
+                'meta_title': english_translation.meta_title,
+                'meta_description': english_translation.meta_description,
+                'meta_keywords': english_translation.meta_keywords
+            }
+            
+            # Get translation force setting
+            data = request.get_json() or {}
+            force_translate = data.get('force_translate', False)
+            
+            # Translate to each language
+            for language in all_languages:
+                if language.code == 'en':  # Skip English
+                    continue
+                    
+                # Check if translation exists
+                existing_translation = next((t for t in post.translations if t.language_code == language.code), None)
+                
+                # Skip if translation exists and is manually edited (unless forced)
+                if existing_translation and not existing_translation.is_auto_translated and not force_translate:
+                    post_result['skipped_languages'].append(language.code)
+                    results['skipped_languages'] += 1
+                    continue
+                    
+                # Perform translation
+                current_app.logger.info(f"Translating post {post.id} to {language.code}")
+                translated_data = translation_service.translate_post_fields(
+                    english_translation_data, 
+                    from_lang_code='en', 
+                    to_lang_code=language.code
+                )
+                
+                if translated_data:
+                    # Update if translation exists, create if not
+                    if existing_translation:
+                        existing_translation.title = translated_data.get('title', existing_translation.title)
+                        existing_translation.content = translated_data.get('content', existing_translation.content)
+                        existing_translation.meta_title = translated_data.get('meta_title', existing_translation.meta_title)
+                        existing_translation.meta_description = translated_data.get('meta_description', existing_translation.meta_description)
+                        existing_translation.meta_keywords = translated_data.get('meta_keywords', existing_translation.meta_keywords)
+                        existing_translation.is_auto_translated = True
+                    else:
+                        # Create new translation
+                        new_translation = PostTranslation(
+                            post_id=post.id,
+                            language_code=language.code,
+                            title=translated_data.get('title', ''),
+                            content=translated_data.get('content', ''),
+                            meta_title=translated_data.get('meta_title', ''),
+                            meta_description=translated_data.get('meta_description', ''),
+                            meta_keywords=translated_data.get('meta_keywords', ''),
+                            is_auto_translated=True
+                        )
+                        db.session.add(new_translation)
+                    
+                    post_result['successful_languages'].append(language.code)
+                    results['translated_languages'] += 1
+                else:
+                    post_result['failed_languages'].append(language.code)
+                    results['failed_posts'] += 1
+                    
+            # Add this post's results to the overall results
+            if len(post_result['successful_languages']) > 0:
+                results['successfully_translated_posts'] += 1
+                
+            results['details'].append(post_result)
+        
+        # Commit all changes at once
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Auto-translation of all posts completed',
+            'results': results
+        }), 200
+    
+    except Exception as e:
+        current_app.logger.error(f"Error in auto-translate-all posts: {str(e)}")
+        
+        # Try to rollback if needed
+        try:
+            db.session.rollback()
+        except:
+            pass
+            
+        return jsonify({
+            'error': 'Failed to auto-translate posts',
+            'message': str(e)
+        }), 500
+    
+@bp.route('/posts/<int:post_id>/auto-translate', methods=['POST'])
+@jwt_required()
+def auto_translate_post(post_id):
+    """Trigger auto-translation for a post based on its English content"""
+    try:
+        # Check admin access
+        user = check_admin_access()
+        if not user:
+            return jsonify({"error": "Admin access required"}), 403
+        
+        post = Post.query.get(post_id)
+        if not post:
+            return jsonify({"error": "Post not found"}), 404
+        
+        # Check if translation service is available
+        if not translation_service.is_available():
+            current_app.logger.error("Translation service is not available - DEEPSEEK_API_KEY may be missing or invalid")
+            return jsonify({"error": "Translation service is not available. Please check your DEEPSEEK_API_KEY."}), 503
+        
+        # Check if English translation exists
         english_translation = next((t for t in post.translations if t.language_code == 'en'), None)
         if not english_translation:
-            current_app.logger.warning(f"Post {post.id} has no English translation despite query filter")
-            continue
+            return jsonify({"error": "English translation not found. Auto-translation requires English content as the source."}), 400
             
         # Prepare English translation data
         english_translation_data = {
@@ -647,26 +766,36 @@ def auto_translate_all_posts():
             'meta_keywords': english_translation.meta_keywords
         }
         
-        # Get translation force setting
-        data = request.get_json() or {}
-        force_translate = data.get('force_translate', False)
+        # Get all active languages
+        all_languages = Language.query.filter_by(is_active=True).all()
+        current_app.logger.info(f"Found {len(all_languages)} active languages for translation")
         
-        # Translate to each language
+        # Track translation results
+        results = {
+            'successful': [],
+            'failed': [],
+            'skipped': []
+        }
+        
         for language in all_languages:
-            if language.code == 'en':  # Skip English
+            # Skip English as it's the source language
+            if language.code == 'en':
                 continue
+                
+            # Get optional parameters
+            data = request.get_json() or {}
+            force_translate = data.get('force_translate', False)
                 
             # Check if translation exists
             existing_translation = next((t for t in post.translations if t.language_code == language.code), None)
             
-            # Skip if translation exists and is manually edited (unless forced)
+            # Skip if translation exists and is manually edited, unless force_translate is true
             if existing_translation and not existing_translation.is_auto_translated and not force_translate:
-                post_result['skipped_languages'].append(language.code)
-                results['skipped_languages'] += 1
+                results['skipped'].append(language.code)
                 continue
                 
-            # Perform translation
-            current_app.logger.info(f"Translating post {post.id} to {language.code}")
+            # Perform the translation
+            current_app.logger.info(f"Auto-translating post {post_id} to {language.code}")
             translated_data = translation_service.translate_post_fields(
                 english_translation_data, 
                 from_lang_code='en', 
@@ -674,8 +803,8 @@ def auto_translate_all_posts():
             )
             
             if translated_data:
-                # Update if translation exists, create if not
                 if existing_translation:
+                    # Update existing translation
                     existing_translation.title = translated_data.get('title', existing_translation.title)
                     existing_translation.content = translated_data.get('content', existing_translation.content)
                     existing_translation.meta_title = translated_data.get('meta_title', existing_translation.meta_title)
@@ -685,7 +814,7 @@ def auto_translate_all_posts():
                 else:
                     # Create new translation
                     new_translation = PostTranslation(
-                        post_id=post.id,
+                        post_id=post_id,
                         language_code=language.code,
                         title=translated_data.get('title', ''),
                         content=translated_data.get('content', ''),
@@ -695,126 +824,31 @@ def auto_translate_all_posts():
                         is_auto_translated=True
                     )
                     db.session.add(new_translation)
-                
-                post_result['successful_languages'].append(language.code)
-                results['translated_languages'] += 1
+                    
+                results['successful'].append(language.code)
             else:
-                post_result['failed_languages'].append(language.code)
-                results['failed_posts'] += 1
-                
-        # Add this post's results to the overall results
-        if len(post_result['successful_languages']) > 0:
-            results['successfully_translated_posts'] += 1
-            
-        results['details'].append(post_result)
-    
-    # Commit all changes at once
-    db.session.commit()
-    
-    return jsonify({
-        'message': 'Auto-translation of all posts completed',
-        'results': results
-    }), 200
-    
-@bp.route('/posts/<int:post_id>/auto-translate', methods=['POST'])
-@jwt_required()
-def auto_translate_post(post_id):
-    """Trigger auto-translation for a post based on its English content"""
-    # Check admin access
-    user = check_admin_access()
-    if not user:
-        return jsonify({"error": "Admin access required"}), 403
-    
-    post = Post.query.get(post_id)
-    if not post:
-        return jsonify({"error": "Post not found"}), 404
-    
-    # Check if translation service is available
-    if not translation_service.is_available():
-        return jsonify({"error": "Translation service is not available"}), 503
-    
-    # Check if English translation exists
-    english_translation = next((t for t in post.translations if t.language_code == 'en'), None)
-    if not english_translation:
-        return jsonify({"error": "English translation not found. Auto-translation requires English content as the source."}), 400
+                results['failed'].append(language.code)
         
-    # Prepare English translation data
-    english_translation_data = {
-        'title': english_translation.title,
-        'content': english_translation.content,
-        'meta_title': english_translation.meta_title,
-        'meta_description': english_translation.meta_description,
-        'meta_keywords': english_translation.meta_keywords
-    }
-    
-    # Get all active languages
-    all_languages = Language.query.filter_by(is_active=True).all()
-    
-    # Track translation results
-    results = {
-        'successful': [],
-        'failed': [],
-        'skipped': []
-    }
-    
-    for language in all_languages:
-        # Skip English as it's the source language
-        if language.code == 'en':
-            continue
-            
-        # Get optional parameters
-        data = request.get_json() or {}
-        force_translate = data.get('force_translate', False)
-            
-        # Check if translation exists
-        existing_translation = next((t for t in post.translations if t.language_code == language.code), None)
+        db.session.commit()
         
-        # Skip if translation exists and is manually edited, unless force_translate is true
-        if existing_translation and not existing_translation.is_auto_translated and not force_translate:
-            results['skipped'].append(language.code)
-            continue
-            
-        # Perform the translation
-        current_app.logger.info(f"Auto-translating to {language.code}")
-        translated_data = translation_service.translate_post_fields(
-            english_translation_data, 
-            from_lang_code='en', 
-            to_lang_code=language.code
-        )
+        return jsonify({
+            'message': 'Auto-translation completed',
+            'translations': results
+        }), 200
         
-        if translated_data:
-            if existing_translation:
-                # Update existing translation
-                existing_translation.title = translated_data.get('title', existing_translation.title)
-                existing_translation.content = translated_data.get('content', existing_translation.content)
-                existing_translation.meta_title = translated_data.get('meta_title', existing_translation.meta_title)
-                existing_translation.meta_description = translated_data.get('meta_description', existing_translation.meta_description)
-                existing_translation.meta_keywords = translated_data.get('meta_keywords', existing_translation.meta_keywords)
-                existing_translation.is_auto_translated = True
-            else:
-                # Create new translation
-                new_translation = PostTranslation(
-                    post_id=post_id,
-                    language_code=language.code,
-                    title=translated_data.get('title', ''),
-                    content=translated_data.get('content', ''),
-                    meta_title=translated_data.get('meta_title', ''),
-                    meta_description=translated_data.get('meta_description', ''),
-                    meta_keywords=translated_data.get('meta_keywords', ''),
-                    is_auto_translated=True
-                )
-                db.session.add(new_translation)
-                
-            results['successful'].append(language.code)
-        else:
-            results['failed'].append(language.code)
-    
-    db.session.commit()
-    
-    return jsonify({
-        'message': 'Auto-translation completed',
-        'translations': results
-    }), 200
+    except Exception as e:
+        current_app.logger.error(f"Error in auto-translate post {post_id}: {str(e)}")
+        
+        # Try to rollback if needed
+        try:
+            db.session.rollback()
+        except:
+            pass
+            
+        return jsonify({
+            'error': 'Failed to auto-translate post',
+            'message': str(e)
+        }), 500
 
 # Media management
 @bp.route('/posts/<int:post_id>/media', methods=['POST'])
