@@ -208,11 +208,36 @@ const PostList = () => {
     
     console.log('ALL languages selected - expanding posts with translations');
     
-    // Use our expandPostTranslations utility for "All Languages" view
-    // This creates a virtual post for each language translation
-    const expandedPosts = expandPostTranslations(posts);
-    console.log(`Expanded ${posts.length} original posts into ${expandedPosts.length} rows with all translations`);
+    // Create a new array to hold all the expanded posts
+    const expandedPosts = [];
     
+    // For each post, directly create separate rows for each translation
+    posts.forEach(post => {
+      console.log(`Processing post ${post.id}, has translations:`, 
+                  post.translations ? post.translations.length : 0);
+      
+      // Only expand if the post has translations
+      if (post.translations && post.translations.length > 0) {
+        // Add one row for each translation
+        post.translations.forEach(translation => {
+          expandedPosts.push({
+            ...post,
+            translation: translation,
+            // Keep original translations reference
+            // Add marker for this virtual post
+            isVirtualTranslation: true,
+            virtualId: `${post.id}-${translation.language_code}`
+          });
+          console.log(`Added virtual post for post ${post.id}, language: ${translation.language_code}`);
+        });
+      } else {
+        // If no translations, just add the post as is
+        expandedPosts.push(post);
+        console.log(`Post ${post.id} has no translations, adding as-is`);
+      }
+    });
+    
+    console.log(`Expanded ${posts.length} posts into ${expandedPosts.length} rows`);
     return expandedPosts;
   }, [posts, filters.language]);
 
