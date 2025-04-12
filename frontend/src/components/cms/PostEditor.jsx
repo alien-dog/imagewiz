@@ -913,19 +913,54 @@ const PostEditor = () => {
                   <Globe className="h-4 w-4 mr-1" />
                   Language
                 </label>
-                <select
-                  id="language_code"
-                  name="language_code"
-                  value={formData.language_code}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
-                >
-                  {languages.map((lang) => (
-                    <option key={lang.code} value={lang.code}>
-                      {lang.name}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    id="language_code"
+                    name="language_code"
+                    value={formData.language_code}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 appearance-none"
+                  >
+                    {/* Show English first */}
+                    <option value="en">🇬🇧 English</option>
+                    <optgroup label="Other Languages">
+                      {languages
+                        .filter(lang => lang.code !== 'en')
+                        .sort((a, b) => a.name.localeCompare(b.name))
+                        .map((lang) => {
+                          // Choose flag based on language code
+                          let flag = '🌐';
+                          // Common language flags
+                          if (lang.code === 'es') flag = '🇪🇸';
+                          if (lang.code === 'fr') flag = '🇫🇷';
+                          if (lang.code === 'de') flag = '🇩🇪';
+                          if (lang.code === 'it') flag = '🇮🇹';
+                          if (lang.code === 'pt') flag = '🇵🇹';
+                          if (lang.code === 'ru') flag = '🇷🇺';
+                          if (lang.code === 'zh') flag = '🇨🇳';
+                          if (lang.code === 'ja') flag = '🇯🇵';
+                          if (lang.code === 'ar') flag = '🇸🇦';
+                          if (lang.code === 'hi') flag = '🇮🇳';
+                          if (lang.code === 'ko') flag = '🇰🇷';
+                          
+                          return (
+                            <option key={lang.code} value={lang.code}>
+                              {flag} {lang.name}
+                            </option>
+                          );
+                        })
+                      }
+                    </optgroup>
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                    </svg>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Changing language will load content for that language if available
+                </p>
               </div>
             </div>
             
@@ -992,14 +1027,80 @@ const PostEditor = () => {
                 <TagIcon className="h-4 w-4 mr-1" />
                 Tags
               </h3>
+              
+              <div className="mb-3">
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {formData.tag_ids.length > 0 ? (
+                    tags
+                      .filter(tag => formData.tag_ids.includes(tag.id))
+                      .map(tag => (
+                        <div key={tag.id} className="flex items-center bg-teal-100 px-3 py-1 rounded-full">
+                          <span className="text-teal-800 text-sm">{tag.name}</span>
+                          <button
+                            type="button"
+                            className="ml-2 text-teal-600 hover:text-teal-800"
+                            onClick={() => {
+                              const updatedTags = formData.tag_ids.filter(id => id !== tag.id);
+                              setFormData({
+                                ...formData,
+                                tag_ids: updatedTags
+                              });
+                            }}
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                            </svg>
+                          </button>
+                        </div>
+                      ))
+                  ) : (
+                    <div className="text-gray-500 text-sm">No tags selected</div>
+                  )}
+                </div>
+                
+                <div className="relative">
+                  <select
+                    id="tag_selector"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 text-gray-500"
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        const tagId = parseInt(e.target.value);
+                        if (!formData.tag_ids.includes(tagId)) {
+                          setFormData({
+                            ...formData,
+                            tag_ids: [...formData.tag_ids, tagId]
+                          });
+                        }
+                        e.target.value = ''; // Reset the select after selection
+                      }
+                    }}
+                    value=""
+                  >
+                    <option value="">+ Add a tag</option>
+                    {tags
+                      .filter(tag => !formData.tag_ids.includes(tag.id))
+                      .map((tag) => (
+                        <option key={tag.id} value={tag.id}>
+                          {tag.name}
+                        </option>
+                      ))}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Keep the original select for compatibility with handleTagChange */}
               <select
                 multiple
                 id="tag_ids"
                 name="tag_ids"
                 value={formData.tag_ids}
                 onChange={handleTagChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
-                size={Math.min(tags.length, 5)}
+                className="hidden"
               >
                 {tags.map((tag) => (
                   <option key={tag.id} value={tag.id}>
@@ -1007,9 +1108,6 @@ const PostEditor = () => {
                   </option>
                 ))}
               </select>
-              <p className="text-xs text-gray-500 mt-1">
-                Hold Ctrl/Cmd to select multiple tags
-              </p>
             </div>
             
             <div className="bg-gray-50 p-4 rounded-lg">
@@ -1062,22 +1160,35 @@ const PostEditor = () => {
               
               {formData.featured_image ? (
                 <div className="mb-3">
-                  <img 
-                    src={formData.featured_image} 
-                    alt="Featured" 
-                    className="w-full h-40 object-cover rounded border border-gray-300" 
-                  />
+                  <div className="relative">
+                    <img 
+                      src={formData.featured_image} 
+                      alt="Featured" 
+                      className="w-full h-40 object-cover rounded border border-gray-300" 
+                      onError={(e) => {
+                        console.error('Image failed to load:', formData.featured_image);
+                        e.target.src = '/images/placeholder-image.jpg';
+                        e.target.alt = 'Image not found';
+                      }}
+                    />
+                    <div className="absolute top-2 right-2 bg-black bg-opacity-50 rounded-full p-1">
+                      <span className="px-2 py-1 text-xs text-white font-semibold">Featured</span>
+                    </div>
+                  </div>
                   <div className="flex justify-between mt-2">
                     <button
                       type="button"
-                      className="text-sm text-red-600 hover:text-red-800"
+                      className="text-sm text-red-600 hover:text-red-800 flex items-center"
                       onClick={() => setFeaturedImage('')}
                     >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
                       Remove Image
                     </button>
                     <button
                       type="button"
-                      className="text-sm text-teal-600 hover:text-teal-800"
+                      className="text-sm text-teal-600 hover:text-teal-800 flex items-center"
                       onClick={() => {
                         // Scroll to media library
                         const mediaLibrary = document.getElementById('media-library');
@@ -1086,8 +1197,14 @@ const PostEditor = () => {
                         }
                       }}
                     >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z" />
+                      </svg>
                       Change Image
                     </button>
+                  </div>
+                  <div className="mt-2 text-xs text-gray-500 break-all">
+                    Image path: {formData.featured_image}
                   </div>
                 </div>
               ) : (
@@ -1101,61 +1218,141 @@ const PostEditor = () => {
                     }
                   }}
                 >
-                  <p className="text-gray-500 mb-2">No featured image selected</p>
-                  <button
-                    type="button"
-                    className="px-4 py-2 bg-teal-500 text-white rounded-md hover:bg-teal-600 transition-colors"
-                  >
-                    Select Image
-                  </button>
+                  <div className="flex flex-col items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <p className="text-gray-500 mb-2">No featured image selected</p>
+                    <button
+                      type="button"
+                      className="px-4 py-2 bg-teal-500 text-white rounded-md hover:bg-teal-600 transition-colors flex items-center"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+                      </svg>
+                      Select Image
+                    </button>
+                  </div>
                 </div>
               )}
               
-              <div>
-                <label htmlFor="media-upload" className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="relative">
+                <label htmlFor="media-upload" className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                  </svg>
                   Upload New Media
                 </label>
-                <input
-                  type="file"
-                  id="media-upload"
-                  accept="image/*"
-                  onChange={handleMediaUpload}
-                  className="w-full"
-                />
+                <div className="border-2 border-dashed border-gray-300 rounded-md p-4 bg-gray-50 hover:bg-gray-100 transition-colors">
+                  <input
+                    type="file"
+                    id="media-upload"
+                    accept="image/*"
+                    onChange={handleMediaUpload}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                  <div className="text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <p className="mt-1 text-sm text-gray-600">
+                      Drag and drop file here, or click to select file
+                    </p>
+                    <p className="mt-1 text-xs text-gray-500">
+                      PNG, JPG, GIF up to 5MB
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
             
             {/* Media Library - Always visible */}
             <div id="media-library" className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="font-medium text-gray-700 mb-3">Media Library</h3>
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="font-medium text-gray-700 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                  </svg>
+                  Media Library
+                </h3>
+                <button
+                  type="button"
+                  className="text-xs text-teal-600 hover:text-teal-800 flex items-center"
+                  onClick={() => {
+                    // Refresh media list
+                    if (id) {
+                      setIsLoading(true);
+                      getPostMedia(id)
+                        .then(mediaData => {
+                          if (mediaData && mediaData.media) {
+                            setMedia(mediaData.media);
+                          }
+                        })
+                        .catch(err => {
+                          console.error('Error refreshing media:', err);
+                          setError('Failed to refresh media library');
+                        })
+                        .finally(() => {
+                          setIsLoading(false);
+                        });
+                    }
+                  }}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+                  </svg>
+                  Refresh
+                </button>
+              </div>
+              
+              <p className="text-xs text-gray-600 mb-2">Click on an image to set it as the featured image</p>
+              
               {media.length > 0 ? (
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   {media.map((item) => (
                     <div 
                       key={item.id || item.file_path} 
                       className={`relative cursor-pointer border ${
-                        formData.featured_image === item.file_path ? 'border-teal-500' : 'border-gray-300'
-                      } rounded overflow-hidden group`}
+                        formData.featured_image === item.file_path ? 'border-teal-500 ring-2 ring-teal-300' : 'border-gray-300'
+                      } rounded overflow-hidden group transition-all duration-200 hover:shadow-md`}
                       onClick={() => setFeaturedImage(item.file_path)}
                     >
-                      <img 
-                        src={item.url || item.file_path} 
-                        alt={item.alt_text || 'Media'} 
-                        className="w-full h-20 object-cover" 
-                      />
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity flex items-center justify-center">
-                        {formData.featured_image === item.file_path && (
-                          <div className="bg-teal-500 text-white text-xs px-2 py-1 rounded-full">
-                            Featured
-                          </div>
-                        )}
+                      <div className="relative pb-[100%]">
+                        <img 
+                          src={item.url || item.file_path} 
+                          alt={item.alt_text || 'Media'} 
+                          className="absolute inset-0 w-full h-full object-cover" 
+                          onError={(e) => {
+                            console.error('Image failed to load:', item.file_path);
+                            e.target.src = '/images/placeholder-image.jpg';
+                            e.target.alt = 'Image not found';
+                          }}
+                        />
                       </div>
+                      <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-opacity"></div>
+                      {formData.featured_image === item.file_path && (
+                        <div className="absolute top-1 right-1 bg-teal-500 text-white text-xs p-1 rounded-full">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center mb-3">
-                  <p className="text-gray-500">No media uploaded yet. Upload an image using the field above.</p>
+                <div className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <p className="mt-2 text-gray-500">No media uploaded yet</p>
+                  <p className="text-sm text-gray-400">Upload an image using the field above</p>
+                </div>
+              )}
+              
+              {media.length > 0 && (
+                <div className="mt-3 text-xs text-gray-500 text-right">
+                  {media.length} image{media.length !== 1 ? 's' : ''} in library
                 </div>
               )}
             </div>
