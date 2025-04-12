@@ -264,6 +264,17 @@ wheels = [
 ]
 
 [[package]]
+name = "deepseek"
+version = "1.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "requests" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/04/7b/bede06edf1a25a6ab06553b15f6abf8e912848dfa5f68514720d3e388550/deepseek-1.0.0-py3-none-any.whl", hash = "sha256:ee4175bfcb7ac1154369dbd86a4d8bc1809f6fa20e3e7baa362544567197cb3f", size = 4542 },
+]
+
+[[package]]
 name = "distro"
 version = "1.9.0"
 source = { registry = "https://pypi.org/simple" }
@@ -827,6 +838,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "cryptography" },
+    { name = "deepseek" },
     { name = "flask" },
     { name = "flask-bcrypt" },
     { name = "flask-cors" },
@@ -848,6 +860,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "cryptography", specifier = ">=44.0.2" },
+    { name = "deepseek", specifier = ">=1.0.0" },
     { name = "flask", specifier = ">=3.1.0" },
     { name = "flask-bcrypt", specifier = ">=1.0.1" },
     { name = "flask-cors", specifier = ">=5.0.1" },

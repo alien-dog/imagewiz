@@ -4,29 +4,29 @@ Translation service for automatically translating content between languages
 import os
 import json
 import logging
-from openai import OpenAI
+import requests
 from flask import current_app
 from app.models.cms import Language
 
 logger = logging.getLogger('flask.app')
 
 class TranslationService:
-    """Service for translating content between languages using OpenAI"""
+    """Service for translating content between languages using DeepSeek API"""
     
     def __init__(self):
-        """Initialize the translation service with OpenAI client"""
-        self.api_key = os.environ.get('OPENAI_API_KEY')
-        self.client = None
-        self.model = "gpt-4o"  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024
+        """Initialize the translation service with DeepSeek API"""
+        self.api_key = os.environ.get('DEEPSEEK_API_KEY') or os.environ.get('OPENAI_API_KEY')
+        self.api_base_url = "https://api.deepseek.com/v1"
+        self.model = "deepseek-chat"  # DeepSeek Chat model
         
         if self.api_key:
-            self.client = OpenAI(api_key=self.api_key)
+            logger.info("DeepSeek API settings initialized successfully")
         else:
-            logger.warning("OPENAI_API_KEY not found in environment variables")
+            logger.warning("DEEPSEEK_API_KEY not found in environment variables")
     
     def is_available(self):
         """Check if the translation service is available"""
-        return self.client is not None
+        return self.api_key is not None
     
     def get_language_name(self, language_code):
         """Get the language name from code"""
@@ -75,7 +75,7 @@ class TranslationService:
             str: Translated content or original content if translation fails
         """
         if not self.is_available():
-            logger.error("Translation service not available. OPENAI_API_KEY missing.")
+            logger.error("Translation service not available. DEEPSEEK_API_KEY missing.")
             return None
         
         # Skip if source and target languages are the same
@@ -101,19 +101,36 @@ class TranslationService:
             
             Respond with just the translated content without any explanations or extra text."""
             
-            # Call OpenAI API for translation
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
+            # Call DeepSeek API for translation using requests
+            headers = {
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json"
+            }
+            
+            data = {
+                "model": self.model,
+                "messages": [
                     {"role": "system", "content": "You are an expert translator with deep knowledge of both languages."},
                     {"role": "user", "content": prompt}
                 ],
-                temperature=0.2,  # Lower temperature for more consistent translations
-                max_tokens=4000   # Adjust based on your content length
+                "temperature": 0.2,  # Lower temperature for more consistent translations
+                "max_tokens": 4000   # Adjust based on your content length
+            }
+            
+            response = requests.post(
+                f"{self.api_base_url}/chat/completions", 
+                headers=headers,
+                json=data
             )
             
+            if response.status_code != 200:
+                logger.error(f"DeepSeek API error: {response.status_code} - {response.text}")
+                return None
+                
+            response_data = response.json()
+            
             # Extract the translated content from the response
-            translated_content = response.choices[0].message.content.strip()
+            translated_content = response_data["choices"][0]["message"]["content"].strip()
             
             # Remove any markdown code block markers that might have been included
             translated_content = translated_content.replace('```', '')
@@ -138,7 +155,7 @@ class TranslationService:
             dict: Translated post data or None if translation fails
         """
         if not self.is_available():
-            logger.error("Translation service not available. OPENAI_API_KEY missing.")
+            logger.error("Translation service not available. DEEPSEEK_API_KEY missing.")
             return None
         
         try:
