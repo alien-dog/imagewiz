@@ -93,8 +93,8 @@ def force_translate_es_fr():
                     language_code='es',
                     title=spanish_title,
                     content=spanish_content,
-                    meta_title=f"Prácticas de procesamiento de imágenes para redes sociales - {english_translation.meta_title or ''}",
-                    meta_description=f"Aprende técnicas de optimización de imágenes para maximizar tu impacto en redes sociales - {english_translation.meta_description or ''}",
+                    meta_title=f"Prácticas de procesamiento de imágenes para redes sociales",
+                    meta_description=f"Aprende técnicas de optimización de imágenes para maximizar tu impacto en redes sociales",
                     meta_keywords=english_translation.meta_keywords or '',
                     is_auto_translated=True
                 )
@@ -131,8 +131,8 @@ def force_translate_es_fr():
                 
                 spanish_translation.title = spanish_title
                 spanish_translation.content = spanish_content
-                spanish_translation.meta_title = f"Prácticas de procesamiento de imágenes para redes sociales - {english_translation.meta_title or ''}"
-                spanish_translation.meta_description = f"Aprende técnicas de optimización de imágenes para maximizar tu impacto en redes sociales - {english_translation.meta_description or ''}"
+                spanish_translation.meta_title = "Prácticas de procesamiento de imágenes para redes sociales"
+                spanish_translation.meta_description = "Aprende técnicas de optimización de imágenes para maximizar tu impacto en redes sociales"
                 spanish_translation.meta_keywords = english_translation.meta_keywords or ''
                 spanish_translation.is_auto_translated = True
                 results['updated']['es'] += 1
@@ -175,8 +175,8 @@ def force_translate_es_fr():
                     language_code='fr',
                     title=french_title,
                     content=french_content,
-                    meta_title=f"Pratiques de traitement d'images pour les médias sociaux - {english_translation.meta_title or ''}",
-                    meta_description=f"Apprenez des techniques d'optimisation d'images pour maximiser votre impact sur les réseaux sociaux - {english_translation.meta_description or ''}",
+                    meta_title="Pratiques de traitement d'images pour les médias sociaux",
+                    meta_description="Apprenez des techniques d'optimisation d'images pour maximiser votre impact sur les réseaux sociaux",
                     meta_keywords=english_translation.meta_keywords or '',
                     is_auto_translated=True
                 )
@@ -213,8 +213,8 @@ def force_translate_es_fr():
                 
                 french_translation.title = french_title
                 french_translation.content = french_content
-                french_translation.meta_title = f"Pratiques de traitement d'images pour les médias sociaux - {english_translation.meta_title or ''}"
-                french_translation.meta_description = f"Apprenez des techniques d'optimisation d'images pour maximiser votre impact sur les réseaux sociaux - {english_translation.meta_description or ''}"
+                french_translation.meta_title = "Pratiques de traitement d'images pour les médias sociaux"
+                french_translation.meta_description = "Apprenez des techniques d'optimisation d'images pour maximiser votre impact sur les réseaux sociaux"
                 french_translation.meta_keywords = english_translation.meta_keywords or ''
                 french_translation.is_auto_translated = True
                 results['updated']['fr'] += 1
