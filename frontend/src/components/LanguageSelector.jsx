@@ -133,23 +133,19 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
   return (
     <div className="relative" ref={dropdownRef}>
       <button 
-        onClick={() => setIsOpen(!isOpen)}
-        onTouchEnd={(e) => {
-          // Prevent default to avoid double triggering with onClick
-          e.preventDefault();
+        onClick={() => {
           if (!isChanging) {
             setIsOpen(!isOpen);
           }
         }}
-        className={`flex items-center gap-2 px-3 py-2 text-sm rounded-md 
+        className={`flex items-center gap-2 px-4 py-3 text-sm rounded-md 
                   ${variant === 'outline' 
                     ? 'border border-gray-300 hover:bg-gray-50 active:bg-gray-100' 
                     : 'bg-teal-500 text-white hover:bg-teal-600 active:bg-teal-700'}
                   ${isChanging ? 'opacity-70 pointer-events-none' : ''}
-                  touch-manipulation`} // Add touch manipulation for better touch response
+                  cursor-pointer`}
         aria-label={`Change language (current: ${currentLanguage.name})`}
         disabled={isChanging}
-        style={{ touchAction: 'manipulation' }} // Explicit touch action
       >
         <span className="text-lg mr-1" role="img" aria-label={currentLanguage.name}>{currentLanguage.flag}</span>
         <span className="hidden md:inline">{currentLanguage.nativeName}</span>
@@ -196,26 +192,22 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
             }}
           >
             {/* Header with close button for better touch accessibility */}
-            <div className="flex items-center justify-between bg-gray-100 px-3 py-2 border-b border-gray-200">
+            <div 
+              className="flex items-center justify-between bg-gray-100 px-3 py-2 border-b border-gray-200 cursor-pointer md:cursor-default"
+              onClick={() => {
+                // Only respond to clicks on mobile
+                if (window.innerWidth <= 768) {
+                  setIsOpen(false);
+                  setSearchTerm('');
+                }
+              }}
+            >
               <h3 className="font-medium text-gray-700">{t('common.selectLanguage', 'Select Language')}</h3>
-              <button 
-                onClick={() => {
-                  setIsOpen(false);
-                  setSearchTerm('');
-                }}
-                onTouchEnd={(e) => {
-                  e.preventDefault();
-                  setIsOpen(false);
-                  setSearchTerm('');
-                }}
-                className="md:hidden p-2 rounded-full hover:bg-gray-200 active:bg-gray-300 touch-manipulation"
-                aria-label="Close language selector"
-                style={{ touchAction: 'manipulation' }}
-              >
+              <div className="md:hidden p-2 rounded-full">
                 <svg className="h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
-              </button>
+              </div>
             </div>
             
             <div className="sticky top-0 bg-gray-100 p-2 z-10 border-b border-gray-200">
@@ -234,21 +226,15 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
                   onChange={handleSearchChange}
                 />
                 {searchTerm && (
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center touch-manipulation"
+                  <div
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
                     onClick={() => setSearchTerm('')}
-                    onTouchEnd={(e) => {
-                      e.preventDefault();
-                      setSearchTerm('');
-                    }}
-                    style={{ touchAction: 'manipulation' }}
                     aria-label="Clear search"
                   >
                     <svg className="h-5 w-5 text-gray-400 hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
-                  </button>
+                  </div>
                 )}
               </div>
             </div>
@@ -265,15 +251,10 @@ const LanguageSelector = ({ variant = 'default', size = 'default' }) => {
                       key={language.code}
                       type="button"
                       className={`flex items-center w-full text-left px-4 py-4 text-sm
-                                hover:bg-gray-50 active:bg-gray-100 touch-manipulation
+                                hover:bg-gray-50 active:bg-gray-100 cursor-pointer
                                 ${language.code === currentLanguageCode ? 'bg-gray-50 font-medium' : ''}
                                 ${selectedLang === language.code ? 'bg-teal-50' : ''}`}
                       onClick={() => handleLanguageChange(language)}
-                      onTouchEnd={(e) => {
-                        e.preventDefault();
-                        handleLanguageChange(language);
-                      }}
-                      style={{ touchAction: 'manipulation' }}
                       aria-current={language.code === currentLanguageCode ? 'true' : 'false'}
                     >
                       <span className="text-xl mr-3 flex-shrink-0" role="img" aria-label={language.name}>{language.flag}</span>
