@@ -261,23 +261,54 @@ const PostEditor = () => {
           console.log('Fetched post data:', postData);
           
           if (postData.post) {
-            console.log('Setting form data with content:', postData.post.content);
-            // Set the main form data from the post
+            console.log('Fetched post data structure:', JSON.stringify(postData));
+            
+            // Initialize form data with post details
+            let translationData = {};
+            
+            // Check for translation data - it could be in different formats based on the API
+            if (postData.translation) {
+              // Single translation format (when language param was specified)
+              console.log('Using single translation data:', postData.translation);
+              translationData = postData.translation;
+            } else if (postData.translations && postData.translations.length > 0) {
+              // Multiple translations format - use the first one as default
+              console.log('Using first of multiple translations:', postData.translations[0]);
+              translationData = postData.translations[0];
+            } else if (postData.post.translation) {
+              // Nested translation format
+              console.log('Using nested translation data:', postData.post.translation);
+              translationData = postData.post.translation;
+            } else if (postData.post.translations && postData.post.translations.length > 0) {
+              // Nested multiple translations - use the first one
+              console.log('Using first of nested multiple translations:', postData.post.translations[0]);
+              translationData = postData.post.translations[0];
+            }
+            
+            console.log('Setting form data with content:', translationData.content);
+            
+            // Set the form data from the post and translation
             setFormData({
-              title: postData.post.title || '',
+              title: translationData.title || '',
               slug: postData.post.slug || '',
-              content: postData.post.content || '',
-              excerpt: postData.post.excerpt || '',
-              meta_title: postData.post.meta_title || '',
-              meta_description: postData.post.meta_description || '',
+              content: translationData.content || '',
+              excerpt: translationData.excerpt || '',
+              meta_title: translationData.meta_title || '',
+              meta_description: translationData.meta_description || '',
               featured_image: postData.post.featured_image || '',
               status: postData.post.status || 'draft',
-              language_code: postData.post.language_code || 'en',
+              language_code: translationData.language_code || 'en',
               tag_ids: (postData.post.tags || []).map(tag => tag.id)
             });
             
             // Set available translations
-            setTranslations(postData.translations || []);
+            if (postData.translations) {
+              setTranslations(postData.translations);
+            } else if (postData.post.translations) {
+              setTranslations(postData.post.translations);
+            } else {
+              setTranslations([]);
+            }
           }
           
           if (mediaData.media) {
