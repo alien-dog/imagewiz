@@ -84,13 +84,20 @@ export const getTags = async () => {
 
 export const addTag = async (tagData) => {
   try {
+    console.log('Adding tag with data:', tagData);
+    console.log('API URL:', `${API_URL}/tags`);
+    console.log('Token:', localStorage.getItem('token')?.substring(0, 10) + '...');
+    
     const response = await axios.post(`${API_URL}/tags`, tagData, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       }
     });
+    
+    console.log('Tag creation response:', response.data);
     return response.data;
   } catch (error) {
+    console.error('Error in addTag:', error.response || error);
     return handleError(error);
   }
 };

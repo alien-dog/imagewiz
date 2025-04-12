@@ -100,13 +100,20 @@ const TagManager = () => {
     setError(null);
     
     try {
+      console.log('Submitting tag form. Editing?', editingTag ? 'Yes' : 'No');
+      console.log('Form data:', formData);
+      
       if (editingTag) {
         // Update existing tag
-        await updateTag(editingTag, formData);
+        console.log('Updating tag with ID:', editingTag);
+        const result = await updateTag(editingTag, formData);
+        console.log('Update result:', result);
         setSuccess('Tag updated successfully!');
       } else {
         // Create new tag
-        await addTag(formData);
+        console.log('Creating new tag');
+        const result = await addTag(formData);
+        console.log('Creation result:', result);
         setSuccess('Tag created successfully!');
       }
       
