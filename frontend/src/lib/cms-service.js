@@ -2,8 +2,7 @@ import axios from 'axios';
 
 // Define the correct API URL path
 // Important: Always use the full path for API requests to avoid routing issues
-const API_URL = '/api/cms'; // This is only used as a prefix for some routes
-const FULL_API_URL = '/api/cms'; // This ensures we're using the correct full path
+const API_URL = '/api/cms'; // Use this consistently for all CMS API routes
 
 // Get authentication token from localStorage
 const getAuthToken = () => {
@@ -477,9 +476,8 @@ export const autoTranslateAllPosts = async (options = {}) => {
   try {
     console.log('Starting auto-translation for all posts');
     
-    // Ensure we're using the correct URL with full /api prefix
-    // Previous incorrect URL was missing /api prefix in the logs
-    const fullApiUrl = `${API_URL}/posts/auto-translate-all`;
+    // Use the explicit full API path to ensure consistency
+    const fullApiUrl = `/api/cms/posts/auto-translate-all`;
     
     // Get the token using our helper
     const token = getAuthToken();
@@ -513,8 +511,8 @@ export const forceTranslateEsFr = async () => {
   try {
     console.log('Starting force translation to Spanish and French');
     
-    // Ensure we're using the correct URL with API_URL variable
-    const fullApiUrl = `${API_URL}/posts/force-translate-es-fr`;
+    // Use the explicit full API path to ensure consistency
+    const fullApiUrl = `/api/cms/posts/force-translate-es-fr`;
     
     // Get the token using our helper
     const token = getAuthToken();
@@ -546,7 +544,7 @@ export const forceTranslateEsFr = async () => {
 // Media
 export const uploadMedia = async (postId, formData) => {
   try {
-    const response = await axios.post(`${API_URL}/posts/${postId}/media`, formData, {
+    const response = await axios.post(`/api/cms/posts/${postId}/media`, formData, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
         'Content-Type': 'multipart/form-data'
@@ -560,7 +558,7 @@ export const uploadMedia = async (postId, formData) => {
 
 export const getPostMedia = async (postId) => {
   try {
-    const response = await axios.get(`${API_URL}/posts/${postId}/media`);
+    const response = await axios.get(`/api/cms/posts/${postId}/media`);
     // The response format is { media: [...], message: "Media retrieved successfully" }
     // But we want to maintain backward compatibility with existing code
     return response.data && response.data.media ? 
@@ -573,7 +571,7 @@ export const getPostMedia = async (postId) => {
 
 export const updateMedia = async (mediaId, mediaData) => {
   try {
-    const response = await axios.put(`${API_URL}/media/${mediaId}`, mediaData, {
+    const response = await axios.put(`/api/cms/media/${mediaId}`, mediaData, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       }
@@ -586,7 +584,7 @@ export const updateMedia = async (mediaId, mediaData) => {
 
 export const deleteMedia = async (mediaId) => {
   try {
-    const response = await axios.delete(`${API_URL}/media/${mediaId}`, {
+    const response = await axios.delete(`/api/cms/media/${mediaId}`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       }
@@ -600,7 +598,7 @@ export const deleteMedia = async (mediaId) => {
 // Public Blog API
 export const getBlogPosts = async (params = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/blog`, { params });
+    const response = await axios.get(`/api/cms/blog`, { params });
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -610,7 +608,7 @@ export const getBlogPosts = async (params = {}) => {
 export const getBlogPostBySlug = async (slug, language = null) => {
   try {
     const params = language ? { language } : {};
-    const response = await axios.get(`${API_URL}/blog/${slug}`, { params });
+    const response = await axios.get(`/api/cms/blog/${slug}`, { params });
     return response.data;
   } catch (error) {
     return handleError(error);
