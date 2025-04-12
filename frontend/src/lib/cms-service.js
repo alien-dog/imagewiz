@@ -478,7 +478,8 @@ export const autoTranslateAllPosts = async (options = {}) => {
     console.log('Starting auto-translation for all posts');
     
     // Ensure we're using the correct URL with full /api prefix
-    const fullApiUrl = `/api/cms/posts/auto-translate-all`;
+    // Previous incorrect URL was missing /api prefix in the logs
+    const fullApiUrl = `${API_URL}/posts/auto-translate-all`;
     
     // Get the token using our helper
     const token = getAuthToken();
@@ -512,8 +513,8 @@ export const forceTranslateEsFr = async () => {
   try {
     console.log('Starting force translation to Spanish and French');
     
-    // Ensure we're using the correct URL with full /api prefix
-    const fullApiUrl = `/api/cms/posts/force-translate-es-fr`;
+    // Ensure we're using the correct URL with API_URL variable
+    const fullApiUrl = `${API_URL}/posts/force-translate-es-fr`;
     
     // Get the token using our helper
     const token = getAuthToken();
