@@ -1,5 +1,5 @@
 import os
-from flask import Flask, send_from_directory, jsonify, redirect, request
+from flask import Flask, send_from_directory, jsonify, redirect, request, Response
 from datetime import timedelta
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
@@ -184,6 +184,20 @@ def create_app():
         def serve_processed(filename):
             """Serve processed files"""
             return send_from_directory(os.path.abspath(app.config['PROCESSED_FOLDER']), filename)
+            
+        @app.route('/images/placeholder-image.svg')
+        @app.route('/api/images/placeholder-image.svg')
+        def serve_placeholder_image():
+            """Serve placeholder image SVG for missing images"""
+            app.logger.info("Serving placeholder SVG image")
+            placeholder_svg = '''<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="300" fill="#f0f0f0"/>
+  <text x="200" y="150" font-family="Arial, sans-serif" font-size="20" text-anchor="middle" fill="#888888">Image Not Found</text>
+  <path d="M200,100 L175,150 L225,150 Z" fill="#888888"/>
+  <rect x="175" y="150" width="50" height="50" fill="#888888"/>
+</svg>'''
+            return Response(placeholder_svg, mimetype='image/svg+xml')
             
         # API root route only - no more root route in Flask
         @app.route('/api')
