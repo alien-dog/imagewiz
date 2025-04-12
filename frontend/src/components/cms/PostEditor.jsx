@@ -260,7 +260,7 @@ const PostEditor = () => {
             const postData = await getPost(id, 'en');
             const mediaData = await getPostMedia(id);
             
-            console.log('Fetched post data:', postData);
+            console.log('DEBUG - Fetched post data:', JSON.stringify(postData, null, 2));
             
             // API can return data in multiple formats - handle both direct and nested responses
             const postObject = postData.post || postData;
@@ -290,13 +290,23 @@ const PostEditor = () => {
               return;
             }
             
-            console.log('Setting form data with content:', translationData.content);
+            console.log('CRITICAL DEBUG - Translation data found:', JSON.stringify(translationData, null, 2));
+            console.log('CRITICAL DEBUG - Content length:', translationData.content ? translationData.content.length : 0);
             
             // Set form data with the post object and translation data
+            // Process the content field to detect empty strings
+            const processedContent = translationData.content || '';
+            console.log('CONTENT FIELD:', {
+              raw: translationData.content,
+              processed: processedContent,
+              length: processedContent.length,
+              isEmpty: processedContent.trim() === ''
+            });
+            
             setFormData({
               title: translationData.title || '',
               slug: postObject.slug || '',
-              content: translationData.content || '',
+              content: processedContent,
               excerpt: translationData.excerpt || '',
               meta_title: translationData.meta_title || '',
               meta_description: translationData.meta_description || '',
@@ -403,12 +413,21 @@ const PostEditor = () => {
               }
               
               if (translationData) {
+                // Process content for debugging
+                const processedContent = translationData.content || '';
+                console.log('LANGUAGE CHANGE - CONTENT FIELD:', {
+                  raw: translationData.content,
+                  processed: processedContent,
+                  length: processedContent.length,
+                  isEmpty: processedContent.trim() === ''
+                });
+                
                 console.log('Using translation data:', translationData);
                 setFormData({
                   ...formData,
                   language_code: value,
                   title: translationData.title || '',
-                  content: translationData.content || '',
+                  content: processedContent,
                   meta_title: translationData.meta_title || '',
                   meta_description: translationData.meta_description || ''
                 });
