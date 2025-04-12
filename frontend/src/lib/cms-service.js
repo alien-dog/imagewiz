@@ -2,6 +2,11 @@ import axios from 'axios';
 
 const API_URL = '/api/cms';
 
+// Get authentication token from localStorage
+const getAuthToken = () => {
+  return localStorage.getItem('token');
+};
+
 // Helper function to handle API errors
 const handleError = (error) => {
   if (error.response) {
@@ -86,44 +91,97 @@ export const addTag = async (tagData) => {
   try {
     console.log('Adding tag with data:', tagData);
     console.log('API URL:', `${API_URL}/tags`);
-    console.log('Token:', localStorage.getItem('token')?.substring(0, 10) + '...');
+    
+    // Get the token using our helper
+    const token = getAuthToken();
+    console.log('Token available:', !!token, token ? `(${token.substring(0, 10)}...)` : '(none)');
+    
+    if (!token) {
+      console.error('No auth token available for tag creation');
+      throw new Error('Authentication required. Please log in again.');
+    }
+    
+    // Log full request details
+    console.log('Making tag creation request with:', {
+      url: `${API_URL}/tags`,
+      method: 'POST',
+      data: tagData,
+      authHeader: `Bearer ${token.substring(0, 10)}...`
+    });
     
     const response = await axios.post(`${API_URL}/tags`, tagData, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
       }
     });
     
     console.log('Tag creation response:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error in addTag:', error.response || error);
+    // Detailed error logging
+    console.error('Error in addTag:', error);
+    if (error.response) {
+      console.error('Response error data:', error.response.data);
+      console.error('Response status:', error.response.status);
+      console.error('Response headers:', error.response.headers);
+    }
     return handleError(error);
   }
 };
 
 export const updateTag = async (id, tagData) => {
   try {
+    // Get the token using our helper
+    const token = getAuthToken();
+    console.log('Token for update tag:', !!token);
+    
+    if (!token) {
+      throw new Error('Authentication required. Please log in again.');
+    }
+    
     const response = await axios.put(`${API_URL}/tags/${id}`, tagData, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
       }
     });
     return response.data;
   } catch (error) {
+    console.error('Error in updateTag:', error);
+    if (error.response) {
+      console.error('Response error data:', error.response.data);
+      console.error('Response status:', error.response.status);
+    }
     return handleError(error);
   }
 };
 
 export const deleteTag = async (id) => {
   try {
+    // Get the token using our helper
+    const token = getAuthToken();
+    console.log('Token for delete tag:', !!token);
+    
+    if (!token) {
+      throw new Error('Authentication required. Please log in again.');
+    }
+    
     const response = await axios.delete(`${API_URL}/tags/${id}`, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
       }
     });
     return response.data;
   } catch (error) {
+    console.error('Error in deleteTag:', error);
+    if (error.response) {
+      console.error('Response error data:', error.response.data);
+      console.error('Response status:', error.response.status);
+    }
     return handleError(error);
   }
 };

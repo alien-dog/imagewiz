@@ -127,7 +127,11 @@ const TagManager = () => {
       }, 3000);
     } catch (err) {
       console.error('Error saving tag:', err);
-      setError('Failed to save tag. Please try again.');
+      if (err.message.includes('Authentication required')) {
+        setError('Authentication failed. Please try logging out and logging back in.');
+      } else {
+        setError('Failed to save tag. Please try again: ' + err.message);
+      }
     } finally {
       setLoading(false);
     }
