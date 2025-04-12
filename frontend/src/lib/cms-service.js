@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_URL = '/api/cms';
+// Define the correct API URL path
+// Important: Always use the full path for API requests to avoid routing issues
+const API_URL = '/api/cms'; // This is only used as a prefix for some routes
+const FULL_API_URL = '/api/cms'; // This ensures we're using the correct full path
 
 // Get authentication token from localStorage
 const getAuthToken = () => {
@@ -89,8 +92,12 @@ export const getTags = async () => {
 
 export const addTag = async (tagData) => {
   try {
+    // Ensure we're using the correct URL with full /api prefix
+    const fullApiUrl = `/api/cms/tags`;
+    
     console.log('Adding tag with data:', tagData);
-    console.log('API URL:', `${API_URL}/tags`);
+    console.log('Correct API URL:', fullApiUrl);
+    console.log('Previously used API URL:', `${API_URL}/tags`);
     
     // Get the token using our helper
     const token = getAuthToken();
@@ -103,13 +110,14 @@ export const addTag = async (tagData) => {
     
     // Log full request details
     console.log('Making tag creation request with:', {
-      url: `${API_URL}/tags`,
+      url: fullApiUrl,
       method: 'POST',
       data: tagData,
       authHeader: `Bearer ${token.substring(0, 10)}...`
     });
     
-    const response = await axios.post(`${API_URL}/tags`, tagData, {
+    // Use the full URL path to avoid any route confusion
+    const response = await axios.post(fullApiUrl, tagData, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -133,15 +141,19 @@ export const addTag = async (tagData) => {
 
 export const updateTag = async (id, tagData) => {
   try {
+    // Ensure we're using the correct URL with full /api prefix
+    const fullApiUrl = `/api/cms/tags/${id}`;
+    
     // Get the token using our helper
     const token = getAuthToken();
     console.log('Token for update tag:', !!token);
+    console.log('Correct API URL for update:', fullApiUrl);
     
     if (!token) {
       throw new Error('Authentication required. Please log in again.');
     }
     
-    const response = await axios.put(`${API_URL}/tags/${id}`, tagData, {
+    const response = await axios.put(fullApiUrl, tagData, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -161,15 +173,19 @@ export const updateTag = async (id, tagData) => {
 
 export const deleteTag = async (id) => {
   try {
+    // Ensure we're using the correct URL with full /api prefix
+    const fullApiUrl = `/api/cms/tags/${id}`;
+    
     // Get the token using our helper
     const token = getAuthToken();
     console.log('Token for delete tag:', !!token);
+    console.log('Correct API URL for delete:', fullApiUrl);
     
     if (!token) {
       throw new Error('Authentication required. Please log in again.');
     }
     
-    const response = await axios.delete(`${API_URL}/tags/${id}`, {
+    const response = await axios.delete(fullApiUrl, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Accept': 'application/json'
