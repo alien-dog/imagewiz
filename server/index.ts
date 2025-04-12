@@ -870,6 +870,67 @@ app.delete('/api/cms/posts/:id/translations/:language_code', async (req, res) =>
   }
 });
 
+// Add auto-translate-all handler
+app.post('/api/cms/posts/auto-translate-all', async (req, res) => {
+  console.log('Manual proxy: Received CMS post auto-translate-all request');
+  try {
+    const url = `http://localhost:${FLASK_PORT}/api/cms/posts/auto-translate-all`;
+    console.log(`Forwarding to backend: ${url}`);
+    
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+      headers['Authorization'] = authHeader;
+    }
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(req.body)
+    });
+    
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (error) {
+    console.error('Manual proxy: Error forwarding CMS post auto-translate-all request', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Add single post auto-translate handler
+app.post('/api/cms/posts/:id/auto-translate', async (req, res) => {
+  console.log('Manual proxy: Received CMS post auto-translate request');
+  try {
+    const { id } = req.params;
+    const url = `http://localhost:${FLASK_PORT}/api/cms/posts/${id}/auto-translate`;
+    console.log(`Forwarding to backend: ${url}`);
+    
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+      headers['Authorization'] = authHeader;
+    }
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(req.body)
+    });
+    
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (error) {
+    console.error('Manual proxy: Error forwarding CMS post auto-translate request', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Add a manual proxy endpoint for order confirmation API
 app.get('/api/order-confirmation', async (req, res) => {
   console.log('✅ Manual proxy: Received order-confirmation API request');
