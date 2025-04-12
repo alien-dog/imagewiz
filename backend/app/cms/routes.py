@@ -614,19 +614,49 @@ def auto_translate_all_posts():
             current_app.logger.error("Translation service is not available - DEEPSEEK_API_KEY may be missing or invalid")
             return jsonify({"error": "Translation service is not available. Please check your DEEPSEEK_API_KEY."}), 503
         
+        # Get optional parameters from request
+        data = request.get_json() or {}
+        batch_size = data.get('batch_size', 3)  # Default to 3 posts at a time
+        languages_to_translate = data.get('languages', [])  # Default to all languages
+        post_ids_to_translate = data.get('post_ids', [])  # Default to all posts
+        force_translate = data.get('force_translate', False)  # Default to not overwriting manual translations
+        
         # Get all active languages
         all_languages = Language.query.filter_by(is_active=True).all()
         current_app.logger.info(f"Found {len(all_languages)} active languages for translation")
         
-        # Get all published posts that have English translations
-        posts = Post.query.join(PostTranslation).filter(
-            PostTranslation.language_code == 'en'
-        ).all()
+        # Filter languages if specified
+        if languages_to_translate:
+            filtered_languages = [lang for lang in all_languages if lang.code in languages_to_translate]
+            current_app.logger.info(f"Filtered to {len(filtered_languages)} specific languages: {', '.join([l.code for l in filtered_languages])}")
+        else:
+            filtered_languages = all_languages
         
+        # Make sure English is excluded from translation targets
+        filtered_languages = [lang for lang in filtered_languages if lang.code != 'en']
+        
+        # Get all published posts that have English translations
+        query = Post.query.join(PostTranslation).filter(
+            PostTranslation.language_code == 'en'
+        )
+        
+        # Filter posts by ID if specified
+        if post_ids_to_translate:
+            query = query.filter(Post.id.in_(post_ids_to_translate))
+            
+        posts = query.all()
         current_app.logger.info(f"Found {len(posts)} posts with English content to translate")
         
+        # Process only a batch of posts if batch_size is specified
+        posts_to_process = posts[:batch_size]
+        remaining_posts = len(posts) - len(posts_to_process)
+        
+        current_app.logger.info(f"Processing batch of {len(posts_to_process)} posts ({remaining_posts} remaining)")
+        
         results = {
-            'total_posts': len(posts),
+            'total_posts': len(posts_to_process),
+            'remaining_posts': remaining_posts,
+            'total_languages': len(filtered_languages),
             'successfully_translated_posts': 0,
             'failed_posts': 0,
             'skipped_languages': 0,
@@ -635,7 +665,7 @@ def auto_translate_all_posts():
         }
     
         # Process each post
-        for post in posts:
+        for post in posts_to_process:
             post_result = {
                 'post_id': post.id,
                 'post_slug': post.slug,

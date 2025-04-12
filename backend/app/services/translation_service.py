@@ -5,6 +5,8 @@ import os
 import json
 import logging
 import requests
+from urllib3.util import Retry
+from requests.adapters import HTTPAdapter
 from flask import current_app
 from app.models.cms import Language
 
@@ -133,16 +135,43 @@ class TranslationService:
                 "max_tokens": 4000   # Adjust based on your content length
             }
             
-            logger.debug(f"Making DeepSeek API call with timeout of 45 seconds")
+            logger.debug(f"Making DeepSeek API call with timeout of 120 seconds")
             
             logger.debug(f"DeepSeek API request payload: {json.dumps(data)}")
             
-            response = requests.post(
-                f"{self.api_base_url}/chat/completions", 
-                headers=headers,
-                json=data,
-                timeout=45  # Increase timeout for translation
+            # Create a requests session with increased timeouts and connection pooling
+            session = requests.Session()
+            adapter = HTTPAdapter(
+                pool_connections=10,
+                pool_maxsize=10,
+                max_retries=Retry(
+                    total=3,  # Total number of retries
+                    backoff_factor=1,  # Backoff factor between retries
+                    status_forcelist=[408, 429, 500, 502, 503, 504],  # Retry on these status codes
+                    allowed_methods=["POST"],  # Only retry on POST requests
+                )
             )
+            session.mount('https://', adapter)
+            
+            try:
+                response = session.post(
+                    f"{self.api_base_url}/chat/completions", 
+                    headers=headers,
+                    json=data,
+                    timeout=(30, 120)  # (Connect timeout, Read timeout) in seconds
+                )
+            except requests.exceptions.ReadTimeout:
+                logger.error("DeepSeek API read timeout - trying once more with extended timeout")
+                # One more attempt with even longer timeout
+                response = session.post(
+                    f"{self.api_base_url}/chat/completions", 
+                    headers=headers,
+                    json=data,
+                    timeout=(30, 180)  # Extended timeout for second attempt
+                )
+            finally:
+                # Always close the session
+                session.close()
             
             # Log the response status
             logger.debug(f"DeepSeek API response status: {response.status_code}")
