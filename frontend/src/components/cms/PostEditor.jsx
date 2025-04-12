@@ -24,199 +24,160 @@ import {
   autoTranslatePost
 } from '../../lib/cms-service';
 
-// Improved WYSIWYG editor component with better text direction handling
-const RichTextEditor = ({ value, onChange, languageCode }) => {
-  const editorContainerRef = useRef(null);
-  const editorRef = useRef(null);
+// Simplified HTML Editor component that is more reliable for displaying and editing content
+const SimpleHtmlEditor = ({ value, onChange, languageCode }) => {
   // Use expanded RTL check for all RTL languages
-  const isRTL = ['ar', 'he', 'ur', 'fa'].includes(languageCode)
+  const isRTL = ['ar', 'he', 'ur', 'fa'].includes(languageCode);
   
-  // Initial setup and value update
-  useEffect(() => {
-    const editor = editorRef.current;
-    if (!editor) return;
-    
-    console.log('RichTextEditor value update:', { 
-      value, 
-      currentHTML: editor.innerHTML,
-      valueIsNull: value === null,
-      valueIsUndefined: value === undefined,
-      valueIsEmpty: value === '',
-      valueLength: value ? value.length : 0,
-      valueStringified: JSON.stringify(value)
-    });
-    
-    // Make sure we have a non-null, non-undefined value to work with
-    const processedValue = value ?? ''; // Use nullish coalescing for null or undefined
-    
-    // Only update content if it's different to avoid losing cursor position
-    if (editor.innerHTML !== processedValue) {
-      console.log('Content needs updating, setting editor HTML to:', processedValue);
-      // Always set the content - we've processed it to handle null/undefined
-      editor.innerHTML = processedValue;
-      
-      // Force a reset of editors that appear to be empty
-      if (!processedValue && !editor.innerHTML) {
-        console.log('Both value and editor are empty, reinitializing');
-        editor.innerHTML = '<p><br></p>'; // Add an empty paragraph with linebreak as a starter
-      }
-    }
-    
-    // Apply text direction directly to the HTML element
-    resetDirection();
-    
-    // Reset cursor to end after content update if focused
-    if (document.activeElement === editor) {
-      const selection = window.getSelection();
-      const range = document.createRange();
-      range.selectNodeContents(editor);
-      range.collapse(false); // Collapse to end
-      selection.removeAllRanges();
-      selection.addRange(range);
-    }
-  }, [value, languageCode]);
+  // Show a warning if content appears to be empty
+  const contentIsEmpty = !value || value.trim() === '';
   
-  // Reset text direction whenever language changes
-  const resetDirection = () => {
-    if (!editorRef.current) return;
-    
-    // Clear any existing direction to avoid conflicts
-    editorRef.current.removeAttribute('style');
-    
-    // Apply new direction based on language
-    const dirStyle = isRTL ? 'rtl' : 'ltr';
-    const alignStyle = isRTL ? 'right' : 'left';
-    
-    // Set multiple direction attributes to ensure consistency
-    editorRef.current.dir = dirStyle;
-    editorRef.current.setAttribute('dir', dirStyle);
-    
-    // Force direction with inline styles (highest specificity)
-    Object.assign(editorRef.current.style, {
-      direction: dirStyle,
-      textAlign: alignStyle,
-      unicodeBidi: 'isolate', // Isolate bidirectional algorithm
-    });
-    
-    // Additional important override
-    editorRef.current.classList.remove(isRTL ? 'ltr-text' : 'rtl-text');
-    editorRef.current.classList.add(isRTL ? 'rtl-text' : 'ltr-text');
-  };
-  
-  // Apply formatting command
-  const applyFormatting = (command, value = null) => {
-    // Ensure editor has focus when applying formatting
-    if (editorRef.current) {
-      editorRef.current.focus();
-      document.execCommand(command, false, value || '');
-      
-      // Ensure text direction is maintained after formatting
-      resetDirection();
-      
-      // Update onChange with new content after formatting
-      onChange(editorRef.current.innerHTML);
-    }
-  };
-  
-  // Handle user input 
-  const handleInput = () => {
-    if (editorRef.current) {
-      onChange(editorRef.current.innerHTML);
-    }
-  };
-  
-  // Handle focus to ensure correct direction
-  const handleFocus = () => {
-    resetDirection();
-  };
-  
-  // Create link with proper handling
-  const createLink = () => {
-    const url = prompt('Enter link URL:');
-    if (url) {
-      applyFormatting('createLink', url);
-    }
-  };
-
-  // Use an extra wrapper with forced LTR for toolbar buttons
+  // Only show formatting toolbar if we actually have content
   return (
-    <div className="border border-gray-300 rounded-md overflow-hidden" ref={editorContainerRef}>
-      {/* Toolbar - always LTR regardless of content language */}
+    <div className="border border-gray-300 rounded-md overflow-hidden">
+      {/* Simple toolbar with basic formatting buttons */}
       <div className="bg-gray-100 p-2 border-b border-gray-300" style={{direction: 'ltr'}} dir="ltr">
-        <div className="flex space-x-2">
-          <button
-            type="button"
-            className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 font-bold"
-            onClick={() => applyFormatting('bold')}
-          >
-            B
-          </button>
-          <button
-            type="button"
-            className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 italic"
-            onClick={() => applyFormatting('italic')}
-          >
-            I
-          </button>
-          <button
-            type="button"
-            className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 underline"
-            onClick={() => applyFormatting('underline')}
-          >
-            U
-          </button>
-          <button
-            type="button"
-            className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50"
-            onClick={() => applyFormatting('insertUnorderedList')}
-          >
-            • List
-          </button>
-          <button
-            type="button"
-            className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50"
-            onClick={() => applyFormatting('insertOrderedList')}
-          >
-            1. List
-          </button>
-          <button
-            type="button"
-            className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50"
-            onClick={createLink}
-          >
-            Link
-          </button>
+        <div className="flex items-center justify-between">
+          <div className="flex space-x-2">
+            <button
+              type="button"
+              className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50"
+              onClick={() => {
+                const textarea = document.getElementById('content-textarea');
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const selection = textarea.value.substring(start, end);
+                const replacement = `<strong>${selection}</strong>`;
+                const newValue = textarea.value.substring(0, start) + replacement + textarea.value.substring(end);
+                onChange(newValue);
+                
+                // Set cursor position after the change
+                setTimeout(() => {
+                  textarea.focus();
+                  textarea.selectionStart = start + replacement.length;
+                  textarea.selectionEnd = start + replacement.length;
+                }, 0);
+              }}
+            >
+              <strong>B</strong>
+            </button>
+            <button
+              type="button"
+              className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50"
+              onClick={() => {
+                const textarea = document.getElementById('content-textarea');
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const selection = textarea.value.substring(start, end);
+                const replacement = `<em>${selection}</em>`;
+                const newValue = textarea.value.substring(0, start) + replacement + textarea.value.substring(end);
+                onChange(newValue);
+                
+                // Set cursor position after the change
+                setTimeout(() => {
+                  textarea.focus();
+                  textarea.selectionStart = start + replacement.length;
+                  textarea.selectionEnd = start + replacement.length;
+                }, 0);
+              }}
+            >
+              <em>I</em>
+            </button>
+            <button
+              type="button"
+              className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50"
+              onClick={() => {
+                const textarea = document.getElementById('content-textarea');
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const selection = textarea.value.substring(start, end);
+                const replacement = `<h2>${selection || 'Heading'}</h2>`;
+                const newValue = textarea.value.substring(0, start) + replacement + textarea.value.substring(end);
+                onChange(newValue);
+                
+                // Set cursor position after the change
+                setTimeout(() => {
+                  textarea.focus();
+                  textarea.selectionStart = start + replacement.length;
+                  textarea.selectionEnd = start + replacement.length;
+                }, 0);
+              }}
+            >
+              H2
+            </button>
+            <button
+              type="button"
+              className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50"
+              onClick={() => {
+                const textarea = document.getElementById('content-textarea');
+                const start = textarea.selectionStart;
+                const content = `<ul>\n  <li>List item 1</li>\n  <li>List item 2</li>\n</ul>`;
+                const newValue = textarea.value.substring(0, start) + content + textarea.value.substring(start);
+                onChange(newValue);
+                
+                // Set cursor position after the change
+                setTimeout(() => {
+                  textarea.focus();
+                  textarea.selectionStart = start + content.length;
+                  textarea.selectionEnd = start + content.length;
+                }, 0);
+              }}
+            >
+              List
+            </button>
+          </div>
+          
+          <div className="text-xs text-gray-500">
+            HTML formatting allowed
+          </div>
         </div>
       </div>
       
-      {/* Editor area with language-specific direction */}
-      <div
-        ref={editorRef}
-        contentEditable
-        className={`p-3 min-h-[300px] focus:outline-none editor-content ${isRTL ? 'rtl-text' : 'ltr-text'}`}
-        onInput={handleInput}
-        onFocus={handleFocus}
-        dir={isRTL ? "rtl" : "ltr"}
+      {/* Warning for empty content */}
+      {contentIsEmpty && (
+        <div className="bg-yellow-50 p-4 border-b border-yellow-200">
+          <p className="text-yellow-700 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+            Empty content detected. Please add some content or use Auto Translate.
+          </p>
+          <p className="text-sm text-yellow-600 ml-7 mt-1">
+            You may need to select another language to view existing translations.
+          </p>
+        </div>
+      )}
+      
+      {/* Simple textarea for editing HTML directly */}
+      <textarea
+        id="content-textarea"
+        value={value || ''}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full p-4 min-h-[400px] font-mono text-sm"
+        dir={isRTL ? 'rtl' : 'ltr'}
         style={{
           direction: isRTL ? 'rtl' : 'ltr',
           textAlign: isRTL ? 'right' : 'left',
-          unicodeBidi: 'isolate',
         }}
       />
       
-      {/* Hidden styles to ensure RTL/LTR works properly */}
-      <style jsx="true">{`
-        .ltr-text {
-          direction: ltr !important;
-          text-align: left !important;
-          unicode-bidi: isolate !important;
-        }
-        .rtl-text {
-          direction: rtl !important;
-          text-align: right !important;
-          unicode-bidi: isolate !important;
-        }
-      `}</style>
+      {/* Preview section */}
+      {!contentIsEmpty && (
+        <div className="border-t border-gray-300">
+          <div className="bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700">
+            Preview
+          </div>
+          <div 
+            className="p-4 prose max-w-none"
+            dir={isRTL ? 'rtl' : 'ltr'}
+            style={{
+              direction: isRTL ? 'rtl' : 'ltr',
+              textAlign: isRTL ? 'right' : 'left',
+            }}
+            dangerouslySetInnerHTML={{ __html: value || '' }}
+          />
+        </div>
+      )}
     </div>
   );
 };
@@ -898,7 +859,7 @@ const PostEditor = () => {
               <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
                 Content
               </label>
-              <RichTextEditor
+              <SimpleHtmlEditor
                 value={formData.content}
                 onChange={(value) => setFormData({ ...formData, content: value })}
                 languageCode={formData.language_code}
