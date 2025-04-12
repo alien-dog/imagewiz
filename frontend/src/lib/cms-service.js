@@ -246,6 +246,22 @@ export const autoTranslateAllPosts = async (options = {}) => {
   }
 };
 
+// Force translate all English posts to Spanish and French only
+export const forceTranslateEsFr = async () => {
+  try {
+    console.log('Starting force translation to Spanish and French');
+    const response = await axios.post(`${API_URL}/posts/force-translate-es-fr`, {}, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error in force-translating to Spanish/French:', error);
+    return handleError(error);
+  }
+};
+
 // Media
 export const uploadMedia = async (postId, formData) => {
   try {

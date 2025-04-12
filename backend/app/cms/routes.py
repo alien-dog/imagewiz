@@ -563,6 +563,30 @@ def delete_translation(post_id, language_code):
     
     return jsonify({"message": "Translation deleted successfully"}), 200
 
+@bp.route('/posts/force-translate-es-fr', methods=['POST'])
+@jwt_required()
+def force_translate_es_fr_endpoint():
+    """Force translate all posts to Spanish and French"""
+    # Check admin access
+    user = check_admin_access()
+    if not user:
+        return jsonify({"error": "Admin access required"}), 403
+        
+    # Import and run the force translation script
+    from app.cms.force_translate_es_fr import force_translate_es_fr
+    result = force_translate_es_fr()
+    
+    if result.get('success', False):
+        return jsonify({
+            "message": "Successfully translated posts to Spanish and French",
+            "results": result
+        }), 200
+    else:
+        return jsonify({
+            "error": "Failed to translate posts",
+            "details": result.get('error', 'Unknown error')
+        }), 500
+
 @bp.route('/posts/auto-translate-all', methods=['POST'])
 @jwt_required()
 def auto_translate_all_posts():
