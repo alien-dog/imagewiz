@@ -36,16 +36,29 @@ const RichTextEditor = ({ value, onChange, languageCode }) => {
     const editor = editorRef.current;
     if (!editor) return;
     
-    console.log('RichTextEditor value update:', { value, currentHTML: editor.innerHTML });
+    console.log('RichTextEditor value update:', { 
+      value, 
+      currentHTML: editor.innerHTML,
+      valueIsNull: value === null,
+      valueIsUndefined: value === undefined,
+      valueIsEmpty: value === '',
+      valueLength: value ? value.length : 0,
+      valueStringified: JSON.stringify(value)
+    });
+    
+    // Make sure we have a non-null, non-undefined value to work with
+    const processedValue = value ?? ''; // Use nullish coalescing for null or undefined
     
     // Only update content if it's different to avoid losing cursor position
-    if (editor.innerHTML !== value) {
-      // Check if the value is truly empty but editor has content
-      if (!value && editor.innerHTML) {
-        console.log('Value is empty but editor has content, preserving editor content');
-      } else {
-        console.log('Updating editor content with value');
-        editor.innerHTML = value || '';
+    if (editor.innerHTML !== processedValue) {
+      console.log('Content needs updating, setting editor HTML to:', processedValue);
+      // Always set the content - we've processed it to handle null/undefined
+      editor.innerHTML = processedValue;
+      
+      // Force a reset of editors that appear to be empty
+      if (!processedValue && !editor.innerHTML) {
+        console.log('Both value and editor are empty, reinitializing');
+        editor.innerHTML = '<p><br></p>'; // Add an empty paragraph with linebreak as a starter
       }
     }
     
