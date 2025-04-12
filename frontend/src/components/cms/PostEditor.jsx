@@ -261,60 +261,81 @@ const PostEditor = () => {
           
           console.log('Fetched post data:', postData);
           
-          if (postData.post) {
-            console.log('Fetched post data structure:', JSON.stringify(postData));
+          // API can return data in multiple formats:
+          // 1. Direct response: { id, slug, ... translation: {...} }
+          // 2. Nested post: { post: { id, slug, ... }, translation: {...} }
+          console.log('Received postData:', JSON.stringify(postData, null, 2));
             
-            // Initialize form data with post details
-            let translationData = {};
-            
-            // Check for translation data - it could be in different formats based on the API
-            if (postData.translation) {
-              // Single translation format (when language param was specified)
-              console.log('Using single translation data:', postData.translation);
-              translationData = postData.translation;
-            } else if (postData.translations && postData.translations.length > 0) {
-              // Multiple translations format - use the first one as default
-              console.log('Using first of multiple translations:', postData.translations[0]);
-              translationData = postData.translations[0];
-            } else if (postData.post.translation) {
-              // Nested translation format
-              console.log('Using nested translation data:', postData.post.translation);
-              translationData = postData.post.translation;
-            } else if (postData.post.translations && postData.post.translations.length > 0) {
-              // Nested multiple translations - use the first one
-              console.log('Using first of nested multiple translations:', postData.post.translations[0]);
-              translationData = postData.post.translations[0];
-            }
+          // First determine if we're dealing with a direct or nested response
+          const postObject = postData.post || postData;
+          
+          // Initialize form data with post details
+          let translationData = {};
+          
+          // Check for translation data - it could be in different formats based on the API response
+          if (postData.translation) {
+            // Single translation format (when language param was specified)
+            console.log('Using single translation data:', postData.translation);
+            translationData = postData.translation;
+          } else if (postData.translations && postData.translations.length > 0) {
+            // Multiple translations format - use the first one as default
+            console.log('Using first of multiple translations:', postData.translations[0]);
+            translationData = postData.translations[0];
+          } else if (postObject.translation) {
+            // Translation directly in the post object
+            console.log('Using translation from post object:', postObject.translation);
+            translationData = postObject.translation;
+          } else if (postObject.translations && postObject.translations.length > 0) {
+            // Multiple translations in the post object - use the first one
+            console.log('Using first translation from post object:', postObject.translations[0]);
+            translationData = postObject.translations[0];
+          }
+          
+          // If we have no translation data after checking all possible locations, log an error
+          if (!translationData || Object.keys(translationData).length === 0) {
+            console.error('No translation data found in API response:', postData);
+            setError('Could not find any translation data in the response');
+            return; // Prevent further processing
+          }
             
             console.log('Setting form data with content:', translationData.content);
             
-            // Set the form data from the post and translation
+            // Now we're ready to set the form data with our translation data
+            console.log('Setting form data with post object:', postObject);
+            console.log('Setting form data with content:', translationData.content);
+            
             setFormData({
               title: translationData.title || '',
-              slug: postData.post.slug || '',
+              slug: postObject.slug || '',
               content: translationData.content || '',
               excerpt: translationData.excerpt || '',
               meta_title: translationData.meta_title || '',
               meta_description: translationData.meta_description || '',
-              featured_image: postData.post.featured_image || '',
-              status: postData.post.status || 'draft',
+              featured_image: postObject.featured_image || '',
+              status: postObject.status || 'draft',
               language_code: translationData.language_code || 'en',
-              tag_ids: (postData.post.tags || []).map(tag => tag.id)
+              tag_ids: (postObject.tags || []).map(tag => tag.id)
             });
             
-            // Set available translations
+            // Set available translations - using same postObject pattern
             if (postData.translations) {
+              console.log('Setting translations from direct response:', postData.translations);
               setTranslations(postData.translations);
-            } else if (postData.post.translations) {
-              setTranslations(postData.post.translations);
+            } else if (postObject.translations) {
+              console.log('Setting translations from post object:', postObject.translations);
+              setTranslations(postObject.translations);
             } else {
+              console.log('No translations found, setting empty array');
               setTranslations([]);
+            }
+            
+            // Also set the media if available
+            if (mediaData.media) {
+              setMedia(mediaData.media);
             }
           }
           
-          if (mediaData.media) {
-            setMedia(mediaData.media);
-          }
+          /* Media is already handled earlier */
         }
       } catch (err) {
         console.error('Error fetching data:', err);
