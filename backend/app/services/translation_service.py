@@ -17,7 +17,14 @@ class TranslationService:
         """Initialize the translation service with DeepSeek API"""
         self.api_key = os.environ.get('DEEPSEEK_API_KEY') or os.environ.get('OPENAI_API_KEY')
         self.api_base_url = "https://api.deepseek.com/v1"
-        self.model = "deepseek-chat"  # Using DeepSeek Chat model
+        # DeepSeek API model name must be "deepseek-chat" 
+        # "deepseek-chat-v1" doesn't work (tested and confirmed Model Not Exist error)
+        self.model = "deepseek-chat"  # Using the correct DeepSeek Chat model name
+        
+        logger.info(f"Translation service initialized with DeepSeek API")
+        logger.debug(f"DeepSeek API URL: {self.api_base_url}")
+        logger.debug(f"DeepSeek model: {self.model}")
+        logger.debug(f"DeepSeek API key status: {'Configured' if self.api_key else 'Missing'}")
         
         if self.api_key:
             logger.info("DeepSeek API settings initialized successfully")
@@ -128,6 +135,8 @@ class TranslationService:
             
             logger.debug(f"Making DeepSeek API call with timeout of 45 seconds")
             
+            logger.debug(f"DeepSeek API request payload: {json.dumps(data)}")
+            
             response = requests.post(
                 f"{self.api_base_url}/chat/completions", 
                 headers=headers,
@@ -135,15 +144,38 @@ class TranslationService:
                 timeout=45  # Increase timeout for translation
             )
             
+            # Log the response status
+            logger.debug(f"DeepSeek API response status: {response.status_code}")
+            
             if response.status_code != 200:
                 logger.error(f"DeepSeek API error: {response.status_code} - {response.text}")
                 return None
-                
-            response_data = response.json()
-            logger.info(f"DeepSeek API response received successfully")
             
-            # Extract the translated content from the response
-            translated_content = response_data["choices"][0]["message"]["content"].strip()
+            # Verify response content
+            try:
+                response_data = response.json()
+                logger.debug(f"DeepSeek API raw response: {json.dumps(response_data)}")
+                logger.info(f"DeepSeek API response received successfully")
+                
+                # Verify expected response structure
+                if "choices" not in response_data or not response_data["choices"]:
+                    logger.error(f"DeepSeek API response missing 'choices' field: {json.dumps(response_data)}")
+                    return None
+                    
+                if "message" not in response_data["choices"][0]:
+                    logger.error(f"DeepSeek API response missing 'message' field: {json.dumps(response_data)}")
+                    return None
+                    
+                if "content" not in response_data["choices"][0]["message"]:
+                    logger.error(f"DeepSeek API response missing 'content' field: {json.dumps(response_data)}")
+                    return None
+                
+                # Extract the translated content from the response
+                translated_content = response_data["choices"][0]["message"]["content"].strip()
+                logger.debug(f"Raw translated content: {translated_content[:100]}...")
+            except Exception as e:
+                logger.error(f"Error parsing DeepSeek API response: {str(e)}")
+                return None
             
             # Remove any markdown code block markers that might have been included
             translated_content = translated_content.replace('```', '')
