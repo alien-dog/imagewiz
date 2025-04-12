@@ -32,7 +32,7 @@ const handleError = (error) => {
 export const getLanguages = async () => {
   try {
     console.log('Fetching languages from API...');
-    const response = await axios.get(`${API_URL}/languages`);
+    const response = await axios.get(`${API_URL}/languages?is_active=true`);
     console.log('Languages API response:', response.data);
     return response.data;
   } catch (error) {
