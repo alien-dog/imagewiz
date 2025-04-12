@@ -21,6 +21,7 @@ import {
   autoTranslateAllPosts, 
   forceTranslateEsFr
 } from '../../lib/cms-service';
+import { SUPPORTED_LANGUAGES } from '../../i18n/i18n';
 
 const PostList = () => {
   const navigate = useNavigate();
@@ -378,11 +379,15 @@ const PostList = () => {
                 onChange={(e) => setFilters({...filters, language: e.target.value})}
               >
                 <option value="">All Languages</option>
-                {languages.map(lang => (
-                  <option key={lang.code} value={lang.code}>
-                    {lang.name}
-                  </option>
-                ))}
+                {languages.map(lang => {
+                  // Find matching language from the website's language list for flags and native names
+                  const websiteLang = SUPPORTED_LANGUAGES.find(l => l.code === lang.code);
+                  return (
+                    <option key={lang.code} value={lang.code}>
+                      {websiteLang ? `${websiteLang.flag} ${websiteLang.nativeName}` : lang.name}
+                    </option>
+                  );
+                })}
               </select>
             </div>
             
