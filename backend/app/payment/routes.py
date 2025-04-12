@@ -7,33 +7,27 @@ from app.models.models import User, RechargeHistory
 from app import db
 from . import bp
 
-# Initialize Stripe with the API key
-stripe_api_key = os.environ.get('STRIPE_SECRET_KEY')
-if stripe_api_key:
-    print(f"DEBUG: Stripe API key is configured with key starting with: {stripe_api_key[:4]}...")
-    print(f"DEBUG: Key length: {len(stripe_api_key)} characters")
+def init_stripe():
+    """Initialize Stripe API when payment features are needed"""
+    stripe_api_key = os.environ.get('STRIPE_SECRET_KEY')
+    if not stripe_api_key:
+        print("ERROR: Stripe API key is NOT configured!")
+        return False
+        
+    # Set the key in the Stripe library
+    stripe.api_key = stripe_api_key
     
-    # Log whether this looks like a valid test key format
-    if stripe_api_key.startswith('sk_test_'):
-        print("DEBUG: Key appears to be a valid test key format (sk_test_)")
-    elif stripe_api_key.startswith('sk_live_'):
-        print("DEBUG: Key appears to be a LIVE key format - caution!")
-    else:
-        print("WARNING: Key format does not match expected Stripe key format (sk_test_ or sk_live_)")
-else:
-    print("ERROR: Stripe API key is NOT configured!")
+    try:
+        # Test connectivity
+        stripe.Account.retrieve()
+        print("Payment system initialized successfully")
+        return True
+    except Exception as e:
+        print(f"ERROR: Failed to initialize payment system: {str(e)}")
+        return False
 
-# Set the key in the Stripe library
-stripe.api_key = stripe_api_key
-print(f"DEBUG: Stripe API key set in library, API version: {stripe.api_version}")
-
-# Test Stripe connectivity immediately on startup
-try:
-    print("DEBUG: Testing Stripe API connectivity...")
-    stripe.Account.retrieve()
-    print("DEBUG: Successfully connected to Stripe API on startup")
-except Exception as e:
-    print(f"ERROR: Failed to connect to Stripe API: {str(e)}")
+# Initialize Stripe when this module is imported
+init_stripe()
 
 # Credit package options
 CREDIT_PACKAGES = [
