@@ -469,6 +469,107 @@ app.get('/api/cms/tags', async (req, res) => {
   }
 });
 
+// Add tag creation endpoint (POST)
+app.post('/api/cms/tags', async (req, res) => {
+  console.log('Manual proxy: Received CREATE CMS tag request');
+  try {
+    const url = `http://localhost:${FLASK_PORT}/api/cms/tags`;
+    console.log(`Forwarding to backend: ${url}`);
+    console.log('Request body:', JSON.stringify(req.body));
+    
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      console.log('Missing authorization header for tag creation');
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+    
+    headers['Authorization'] = authHeader;
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(req.body),
+    });
+    
+    const data = await response.json();
+    console.log('Tag creation response:', data);
+    res.status(response.status).json(data);
+  } catch (error) {
+    console.error('Manual proxy: Error forwarding CREATE CMS tag request', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Add tag update endpoint (PUT)
+app.put('/api/cms/tags/:id', async (req, res) => {
+  console.log('Manual proxy: Received UPDATE CMS tag request');
+  try {
+    const { id } = req.params;
+    const url = `http://localhost:${FLASK_PORT}/api/cms/tags/${id}`;
+    console.log(`Forwarding to backend: ${url}`);
+    console.log('Request body:', JSON.stringify(req.body));
+    
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+    
+    headers['Authorization'] = authHeader;
+    
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(req.body),
+    });
+    
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (error) {
+    console.error('Manual proxy: Error forwarding UPDATE CMS tag request', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Add tag deletion endpoint (DELETE)
+app.delete('/api/cms/tags/:id', async (req, res) => {
+  console.log('Manual proxy: Received DELETE CMS tag request');
+  try {
+    const { id } = req.params;
+    const url = `http://localhost:${FLASK_PORT}/api/cms/tags/${id}`;
+    console.log(`Forwarding to backend: ${url}`);
+    
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+    
+    headers['Authorization'] = authHeader;
+    
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers,
+    });
+    
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (error) {
+    console.error('Manual proxy: Error forwarding DELETE CMS tag request', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 app.get('/api/cms/languages', async (req, res) => {
   console.log('Manual proxy: Received CMS languages request');
   try {
