@@ -1059,55 +1059,72 @@ const PostEditor = () => {
                 </div>
                 
                 <div className="relative">
-                  <select
-                    id="tag_selector"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 text-gray-500"
-                    onChange={(e) => {
-                      if (e.target.value) {
-                        const tagId = parseInt(e.target.value);
-                        if (!formData.tag_ids.includes(tagId)) {
-                          // First update the form data
-                          const updatedTags = [...formData.tag_ids, tagId];
-                          setFormData({
-                            ...formData,
-                            tag_ids: updatedTags
-                          });
-                          
-                          // Then synchronize the hidden select element for compatibility
-                          const hiddenSelect = document.getElementById('tag_ids');
-                          if (hiddenSelect) {
-                            // Clear all selections first
-                            Array.from(hiddenSelect.options).forEach(option => {
-                              option.selected = false;
+                  <div className="flex items-center">
+                    <select
+                      id="tag_selector"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 text-gray-500 cursor-pointer appearance-none"
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          const tagId = parseInt(e.target.value);
+                          if (!formData.tag_ids.includes(tagId)) {
+                            // First update the form data
+                            const updatedTags = [...formData.tag_ids, tagId];
+                            setFormData({
+                              ...formData,
+                              tag_ids: updatedTags
                             });
                             
-                            // Then set the new selections
-                            updatedTags.forEach(id => {
-                              const option = Array.from(hiddenSelect.options).find(opt => parseInt(opt.value) === id);
-                              if (option) option.selected = true;
-                            });
+                            // Then synchronize the hidden select element for compatibility
+                            const hiddenSelect = document.getElementById('tag_ids');
+                            if (hiddenSelect) {
+                              // Clear all selections first
+                              Array.from(hiddenSelect.options).forEach(option => {
+                                option.selected = false;
+                              });
+                              
+                              // Then set the new selections
+                              updatedTags.forEach(id => {
+                                const option = Array.from(hiddenSelect.options).find(opt => parseInt(opt.value) === id);
+                                if (option) option.selected = true;
+                              });
+                            }
+                            
+                            console.log('Added tag:', tagId, 'Updated tags:', updatedTags);
                           }
-                          
-                          console.log('Added tag:', tagId, 'Updated tags:', updatedTags);
+                          e.target.value = ''; // Reset the select after selection
                         }
-                        e.target.value = ''; // Reset the select after selection
-                      }
-                    }}
-                    value=""
-                  >
-                    <option value="">+ Add a tag</option>
-                    {tags
-                      .filter(tag => !formData.tag_ids.includes(tag.id))
-                      .map((tag) => (
-                        <option key={tag.id} value={tag.id}>
-                          {tag.name}
-                        </option>
-                      ))}
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                    </svg>
+                      }}
+                      value=""
+                    >
+                      <option value="" disabled>Choose a tag to add</option>
+                      {tags
+                        .filter(tag => !formData.tag_ids.includes(tag.id))
+                        .map((tag) => (
+                          <option key={tag.id} value={tag.id}>
+                            {tag.name}
+                          </option>
+                        ))}
+                    </select>
+                    <button 
+                      type="button"
+                      className="ml-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                      onClick={() => {
+                        // Focus and show dropdown
+                        const tagSelector = document.getElementById('tag_selector');
+                        if (tagSelector) {
+                          tagSelector.focus();
+                          tagSelector.click();
+                        }
+                      }}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                      </svg>
+                      Add Tag
+                    </button>
+                  </div>
+                  <div className="mt-1 text-xs text-gray-500">
+                    Click to select from available tags
                   </div>
                 </div>
               </div>
@@ -1181,51 +1198,43 @@ const PostEditor = () => {
                 <div className="mb-3">
                   <div className="relative">
                     <img 
-                      src={formData.featured_image} 
+                      src={formData.featured_image.startsWith('/uploads/cms/') ? `/api${formData.featured_image}` : formData.featured_image} 
                       alt="Featured" 
                       className="w-full h-40 object-cover rounded border border-gray-300" 
                       onLoad={() => console.log('Featured image loaded successfully:', formData.featured_image)}
                       onError={(e) => {
                         console.error('Featured image failed to load, trying alternate paths:', formData.featured_image);
                         
-                        // Try different URL patterns
+                        // Try different combinations based on the path format
                         if (formData.featured_image.startsWith('/api/')) {
-                          // The path is already absolute
-                          try {
-                            // Try without the /api prefix
-                            const alternativePath = formData.featured_image.replace('/api', '');
-                            e.target.src = alternativePath;
-                            console.log('Trying without /api prefix:', alternativePath);
-                            
-                            // Add a second error handler
-                            e.target.onerror = () => {
-                              console.error('All attempts failed, using placeholder');
-                              e.target.src = '/images/placeholder-image.svg';
-                              e.target.alt = 'Image not found';
-                              e.target.onerror = null; // Prevent infinite loop
-                            };
-                          } catch (err) {
-                            console.error('Error handling image path:', err);
-                            e.target.src = '/images/placeholder-image.svg';
-                          }
+                          // Try without the /api prefix
+                          const withoutApi = formData.featured_image.replace('/api', '');
+                          e.target.src = withoutApi;
+                          console.log('Trying without /api prefix:', withoutApi);
+                        } else if (formData.featured_image.startsWith('/uploads/cms/')) {
+                          // Try with /api prefix
+                          e.target.src = `/api${formData.featured_image}`;
+                          console.log('Trying with /api prefix:', `/api${formData.featured_image}`);
+                        } else if (!formData.featured_image.startsWith('/')) {
+                          // Try adding a leading slash
+                          e.target.src = `/${formData.featured_image}`;
+                          console.log('Trying with leading slash:', `/${formData.featured_image}`);
                         } else {
-                          // Try prefixing with API path
-                          try {
-                            e.target.src = `/api${formData.featured_image}`;
-                            console.log('Trying with /api prefix:', `/api${formData.featured_image}`);
-                            
-                            // Add a second error handler
-                            e.target.onerror = () => {
-                              console.error('Second attempt failed, using placeholder');
-                              e.target.src = '/images/placeholder-image.svg';
-                              e.target.alt = 'Image not found';
-                              e.target.onerror = null; // Prevent infinite loop
-                            };
-                          } catch (err) {
-                            console.error('Error handling image path:', err);
-                            e.target.src = '/images/placeholder-image.svg';
+                          // Try direct API route to CMS uploads
+                          const filename = formData.featured_image.split('/').pop();
+                          if (filename) {
+                            e.target.src = `/api/uploads/cms/${filename}`;
+                            console.log('Trying direct CMS upload path:', `/api/uploads/cms/${filename}`);
                           }
                         }
+                        
+                        // Add a final error handler for fallback
+                        e.target.onerror = () => {
+                          console.error('All image load attempts failed, using placeholder');
+                          e.target.src = '/images/placeholder-image.svg';
+                          e.target.alt = 'Image not found';
+                          e.target.onerror = null; // Prevent infinite loop
+                        };
                       }}
                     />
                     <div className="absolute top-2 right-2 bg-black bg-opacity-50 rounded-full p-1">
@@ -1376,29 +1385,43 @@ const PostEditor = () => {
                     >
                       <div className="relative pb-[100%]">
                         <img 
-                          src={item.url || item.file_path} 
+                          src={item.url ? item.url : (item.file_path.startsWith('/uploads/cms/') ? `/api${item.file_path}` : item.file_path)}
                           alt={item.alt_text || 'Media'} 
                           className="absolute inset-0 w-full h-full object-cover" 
                           onLoad={() => console.log('Image loaded successfully:', item.file_path)}
                           onError={(e) => {
-                            console.error('Image failed to load, trying absolute path:', item.file_path);
-                            // Try different URL patterns
+                            console.error('Image failed to load, trying alternate paths:', item.file_path);
+                            
+                            // Try different combinations based on the path format
                             if (item.file_path.startsWith('/api/')) {
-                              // The path is already absolute, try showing it directly
-                              e.target.src = `/images/placeholder-image.svg`;
-                              console.log('Set placeholder image');
-                            } else {
-                              // Try prefixing with API path
+                              // Try without the /api prefix
+                              const withoutApi = item.file_path.replace('/api', '');
+                              e.target.src = withoutApi;
+                              console.log('Trying without /api prefix:', withoutApi);
+                            } else if (item.file_path.startsWith('/uploads/cms/')) {
+                              // Try with /api prefix
                               e.target.src = `/api${item.file_path}`;
                               console.log('Trying with /api prefix:', `/api${item.file_path}`);
-                              // Add a second error handler for the new src
-                              e.target.onerror = () => {
-                                console.error('Second attempt failed, using placeholder');
-                                e.target.src = '/images/placeholder-image.svg';
-                                e.target.alt = 'Image not found';
-                                e.target.onerror = null; // Prevent infinite loop
-                              };
+                            } else if (!item.file_path.startsWith('/')) {
+                              // Try adding a leading slash
+                              e.target.src = `/${item.file_path}`;
+                              console.log('Trying with leading slash:', `/${item.file_path}`);
+                            } else {
+                              // Try direct API route to CMS uploads
+                              const filename = item.file_path.split('/').pop();
+                              if (filename) {
+                                e.target.src = `/api/uploads/cms/${filename}`;
+                                console.log('Trying direct CMS upload path:', `/api/uploads/cms/${filename}`);
+                              }
                             }
+                            
+                            // Add a second error handler for the final fallback
+                            e.target.onerror = () => {
+                              console.error('All image load attempts failed, using placeholder');
+                              e.target.src = '/images/placeholder-image.svg';
+                              e.target.alt = 'Image not found';
+                              e.target.onerror = null; // Prevent infinite loop
+                            };
                           }}
                         />
                       </div>
