@@ -11,9 +11,10 @@ import {
   CheckCircle2,
   Plus,
   Languages,
-  Loader2
+  Loader2,
+  Flag
 } from 'lucide-react';
-import { getPosts, deletePost, getLanguages, autoTranslateAllPosts } from '../../lib/cms-service';
+import { getPosts, deletePost, getLanguages, autoTranslateAllPosts, forceTranslateEsFr } from '../../lib/cms-service';
 
 const PostList = () => {
   const navigate = useNavigate();
@@ -131,6 +132,47 @@ const PostList = () => {
     } catch (err) {
       console.error('Error auto-translating all posts:', err);
       setError(`Failed to auto-translate posts: ${err.message || 'Unknown error'}`);
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+  
+  const handleForceTranslateEsFr = async () => {
+    if (posts.length === 0) {
+      setError('No posts available for translation');
+      return;
+    }
+    
+    setIsTranslating(true);
+    setError(null);
+    
+    try {
+      // Call the force-translate-es-fr API endpoint
+      const response = await forceTranslateEsFr();
+      console.log('Force translate ES/FR response:', response);
+      
+      // Refresh posts to get the updated data
+      await fetchPosts();
+      
+      // Display a success message with statistics
+      const created = response.results?.created || {};
+      const updated = response.results?.updated || {};
+      const createdES = created.es || 0;
+      const createdFR = created.fr || 0;
+      const updatedES = updated.es || 0;
+      const updatedFR = updated.fr || 0;
+      
+      setSuccessMessage(
+        `Spanish/French translation completed: Created ${createdES + createdFR} and updated ${updatedES + updatedFR} translations.`
+      );
+      
+      // Clear success message after a period
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 8000);
+    } catch (err) {
+      console.error('Error translating to ES/FR:', err);
+      setError(`Failed to translate posts to Spanish/French: ${err.message || 'Unknown error'}`);
     } finally {
       setIsTranslating(false);
     }
@@ -272,14 +314,24 @@ const PostList = () => {
             </button>
             
             {!isTranslating && (
-              <button
-                type="button"
-                className="text-xs text-teal-600 hover:text-teal-800 underline flex items-center"
-                onClick={() => handleAutoTranslateAll(true)}
-              >
-                <Languages className="h-3 w-3 mr-1" />
-                Force refresh all translations
-              </button>
+              <div className="flex space-x-3">
+                <button
+                  type="button"
+                  className="text-xs text-teal-600 hover:text-teal-800 underline flex items-center"
+                  onClick={() => handleAutoTranslateAll(true)}
+                >
+                  <Languages className="h-3 w-3 mr-1" />
+                  Force refresh all translations
+                </button>
+                <button
+                  type="button"
+                  className="text-xs text-blue-600 hover:text-blue-800 underline flex items-center"
+                  onClick={handleForceTranslateEsFr}
+                >
+                  <Flag className="h-3 w-3 mr-1" />
+                  Force ES/FR translations only
+                </button>
+              </div>
             )}
           </div>
         </form>
