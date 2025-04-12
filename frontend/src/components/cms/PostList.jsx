@@ -19,8 +19,7 @@ import {
   deletePost, 
   getLanguages, 
   autoTranslateAllPosts, 
-  forceTranslateEsFr,
-  expandPostTranslations 
+  forceTranslateEsFr
 } from '../../lib/cms-service';
 
 const PostList = () => {
