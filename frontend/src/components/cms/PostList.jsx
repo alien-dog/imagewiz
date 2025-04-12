@@ -384,7 +384,10 @@ const PostList = () => {
                   const websiteLang = SUPPORTED_LANGUAGES.find(l => l.code === lang.code);
                   return (
                     <option key={lang.code} value={lang.code}>
-                      {websiteLang ? `${websiteLang.flag} ${websiteLang.nativeName}` : lang.name}
+                      {websiteLang ? 
+                        `${websiteLang.flag} ${websiteLang.nativeName || websiteLang.name}` : 
+                        (lang.flag ? `${lang.flag} ${lang.native_name || lang.name}` : lang.name)
+                      }
                     </option>
                   );
                 })}

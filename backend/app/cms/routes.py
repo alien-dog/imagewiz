@@ -37,7 +37,16 @@ def check_admin_access():
 @bp.route('/languages', methods=['GET'])
 def get_languages():
     """Get all supported languages"""
-    languages = Language.query.all()
+    # Filter by is_active if the parameter is provided
+    is_active = request.args.get('is_active')
+    
+    if is_active:
+        # Convert string parameter to boolean
+        is_active_bool = is_active.lower() == 'true'
+        languages = Language.query.filter_by(is_active=is_active_bool).all()
+    else:
+        languages = Language.query.all()
+        
     return jsonify([lang.to_dict() for lang in languages]), 200
 
 @bp.route('/languages', methods=['POST'])
