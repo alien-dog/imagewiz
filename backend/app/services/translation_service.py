@@ -88,6 +88,12 @@ class TranslationService:
             
             logger.info(f"Translating from {from_lang_name} to {to_lang_name}...")
             
+            # Verify DeepSeek API key
+            logger.debug(f"DeepSeek API key: {'configured' if self.api_key else 'missing'}")
+            if self.api_key:
+                logger.debug(f"DeepSeek API key length: {len(self.api_key)}")
+                logger.debug(f"DeepSeek API key first/last 4 chars: {self.api_key[:4]}...{self.api_key[-4:]}")
+            
             # Create a clear prompt for the LLM
             prompt = f"""Translate the following {from_lang_name} content into {to_lang_name}. 
             Preserve all HTML formatting, styles and structure. 
@@ -100,6 +106,9 @@ class TranslationService:
             ```
             
             Respond with just the translated content without any explanations or extra text."""
+            
+            logger.debug(f"DeepSeek API URL: {self.api_base_url}/chat/completions")
+            logger.debug(f"DeepSeek model: {self.model}")
             
             # Call DeepSeek API for translation using requests
             headers = {
@@ -116,6 +125,8 @@ class TranslationService:
                 "temperature": 0.2,  # Lower temperature for more consistent translations
                 "max_tokens": 4000   # Adjust based on your content length
             }
+            
+            logger.debug(f"Making DeepSeek API call with timeout of 45 seconds")
             
             response = requests.post(
                 f"{self.api_base_url}/chat/completions", 
