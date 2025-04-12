@@ -243,7 +243,7 @@ const Navbar = () => {
                   {t('nav.logout')}
                 </button>
                 <div className="pl-3 pr-4 py-2">
-                  <LanguageSelector />
+                  <MobileLanguageSelector />
                 </div>
               </div>
             ) : (
@@ -261,7 +261,7 @@ const Navbar = () => {
                   {t('nav.register')}
                 </Link>
                 <div className="pl-3 pr-4 py-2">
-                  <LanguageSelector />
+                  <MobileLanguageSelector />
                 </div>
               </div>
             )}
