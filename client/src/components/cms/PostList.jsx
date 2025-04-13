@@ -126,10 +126,52 @@ const PostList = () => {
 
   // Process posts to expand all translations when "All Languages" is selected
   const processedPosts = useMemo(() => {
-    // If a specific language is selected, return the original posts
+    // When language filter is applied, filter and format posts
     if (filters.language) {
       console.log('Using language filter, not expanding posts');
-      return posts;
+      
+      // Filter posts to only include those that actually have the requested translation
+      const filteredPosts = posts.filter(post => {
+        // First check if the post has a direct translation
+        if (post.translation && post.translation.language_code === filters.language) {
+          return true;
+        }
+        // If no direct translation, check if we can find one in the translations array
+        if (post.translations && post.translations.length > 0) {
+          return post.translations.some(t => t.language_code === filters.language);
+        }
+        return false;
+      });
+      
+      console.log(`Filtered ${posts.length} posts to ${filteredPosts.length} for language ${filters.language}`);
+      
+      // Now format the filtered posts properly for display
+      return filteredPosts.map(post => {
+        // Check if this post already has the correct translation set
+        if (post.translation && post.translation.language_code === filters.language) {
+          return post;
+        }
+        
+        // Otherwise, find the matching translation from the translations array
+        if (post.translations && post.translations.length > 0) {
+          const matchingTranslation = post.translations.find(
+            t => t.language_code === filters.language
+          );
+          
+          if (matchingTranslation) {
+            // Create a virtual post with this translation
+            return {
+              ...post,
+              translation: matchingTranslation,
+              isVirtualTranslation: true,
+              virtualId: `${post.id}-${matchingTranslation.language_code}`
+            };
+          }
+        }
+        
+        // Should never reach here due to our filtering above
+        return post;
+      });
     }
     
     console.log('ALL languages selected - expanding posts with translations');

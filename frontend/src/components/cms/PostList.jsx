@@ -131,10 +131,30 @@ const PostList = () => {
     if (filters.language) {
       console.log('Using language filter, not expanding posts');
       
-      // The backend should return posts that match the language,
-      // but we need to make sure they display properly
-      return posts.map(post => {
-        // Check if this post has a translation that matches the filter
+      // Filter posts to only include those that actually have the requested translation
+      // This is the critical fix for the language filtering issue
+      const filteredPosts = posts.filter(post => {
+        // First check if the post has a direct translation
+        if (post.translation && post.translation.language_code === filters.language) {
+          return true;
+        }
+        // If no direct translation, check if we can find one in the translations array
+        if (post.translations && post.translations.length > 0) {
+          return post.translations.some(t => t.language_code === filters.language);
+        }
+        return false;
+      });
+      
+      console.log(`Filtered ${posts.length} posts to ${filteredPosts.length} for language ${filters.language}`);
+      
+      // Now format the filtered posts properly for display
+      return filteredPosts.map(post => {
+        // Check if this post already has the correct translation set
+        if (post.translation && post.translation.language_code === filters.language) {
+          return post;
+        }
+        
+        // Otherwise, find the matching translation from the translations array
         if (post.translations && post.translations.length > 0) {
           const matchingTranslation = post.translations.find(
             t => t.language_code === filters.language
@@ -151,8 +171,7 @@ const PostList = () => {
           }
         }
         
-        // If this post is already in the target language or has no translations,
-        // return it as is
+        // Should never reach here due to our filtering above
         return post;
       });
     }
