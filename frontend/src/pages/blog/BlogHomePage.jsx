@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import i18n from '../../i18n/i18n';
 import Layout from '../../components/Layout';
 import { getTags } from '../../lib/cms-service';
 import BlogList from '../../components/blog/BlogList';
@@ -27,18 +28,39 @@ const BlogHomePage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showTagsDropdown, setShowTagsDropdown] = useState(false);
   const [postCount, setPostCount] = useState(0);
+  const [currentLanguage, setCurrentLanguage] = useState(i18n.language);
+  
+  // Function to load tags from API
+  const loadTags = useCallback(async () => {
+    try {
+      const response = await getTags();
+      setTags(response.tags || []);
+    } catch (error) {
+      console.error('Error loading tags:', error);
+    }
+  }, []);
+  
+  // Listen for language changes
+  useEffect(() => {
+    const handleLanguageChange = () => {
+      console.log("Blog: Language changed to", i18n.language);
+      setCurrentLanguage(i18n.language);
+      // When language changes, we might need to refresh data that's language-dependent
+      loadTags();
+    };
+    
+    // Listen for both i18next's internal events and our custom events
+    i18n.on('languageChanged', handleLanguageChange);
+    document.addEventListener('languageChanged', handleLanguageChange);
+    
+    return () => {
+      i18n.off('languageChanged', handleLanguageChange);
+      document.removeEventListener('languageChanged', handleLanguageChange);
+    };
+  }, [i18n, loadTags]);
   
   useEffect(() => {
     // Fetch tags for filtering
-    const loadTags = async () => {
-      try {
-        const response = await getTags();
-        setTags(response.tags || []);
-      } catch (error) {
-        console.error('Error loading tags:', error);
-      }
-    };
-    
     loadTags();
     
     // Parse URL parameters
@@ -48,7 +70,7 @@ const BlogHomePage = () => {
     
     if (tagParam) setSelectedTag(tagParam);
     if (searchParam) setSearchTerm(searchParam);
-  }, [location.search]);
+  }, [location.search, loadTags]);
   
   const handleTagSelect = (tagSlug) => {
     setSelectedTag(tagSlug);
@@ -109,10 +131,10 @@ const BlogHomePage = () => {
             {/* Decorative element */}
             <div className="absolute -top-4 -left-4 w-24 h-24 rounded-full bg-teal-400/30 blur-xl"></div>
             
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight tracking-tight drop-shadow-sm">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight tracking-tight drop-shadow-sm" key={`title-${currentLanguage}`}>
               {t('blog:title')}
             </h1>
-            <p className="text-xl md:text-2xl mb-10 text-white opacity-90 leading-relaxed">
+            <p className="text-xl md:text-2xl mb-10 text-white opacity-90 leading-relaxed" key={`desc-${currentLanguage}`}>
               {t('blog:description')}
             </p>
             
@@ -145,7 +167,7 @@ const BlogHomePage = () => {
         {/* Featured Topics Section */}
         <div className="mb-16">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+            <h2 className="text-2xl font-bold text-gray-900 flex items-center" key={`topics-${currentLanguage}`}>
               <TrendingUp className="w-6 h-6 mr-2 text-teal-500" />
               {t('blog:featuredTopics')}
             </h2>
