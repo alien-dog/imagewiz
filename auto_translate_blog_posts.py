@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'back
 # Import from backend app now that path is set
 from app import create_app, db
 from app.models.cms import Post, PostTranslation, Language
-from app.services.translation_service import TranslationService
+from app.services.translation_service import translation_service
 
 def auto_translate_all_blog_posts():
     """Auto-translate all blog posts to all supported languages"""
@@ -47,8 +47,8 @@ def auto_translate_all_blog_posts():
         
         print(f"Found {len(posts)} published posts to translate.")
         
-        # Initialize translation service
-        translation_service = TranslationService()
+        # Use the existing translation service singleton instance
+        # We imported it above as translation_service
         
         # Process each post
         for post in posts:

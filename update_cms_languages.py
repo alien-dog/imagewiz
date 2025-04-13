@@ -24,26 +24,26 @@ def update_cms_languages():
         
         # The supported languages in our application
         supported_languages = [
-            {"code": "en", "name": "English", "nativeName": "English", "flag": "🇬🇧", "active": True, "rtl": False},
-            {"code": "fr", "name": "French", "nativeName": "Français", "flag": "🇫🇷", "active": True, "rtl": False},
-            {"code": "es", "name": "Spanish", "nativeName": "Español", "flag": "🇪🇸", "active": True, "rtl": False},
-            {"code": "de", "name": "German", "nativeName": "Deutsch", "flag": "🇩🇪", "active": True, "rtl": False},
-            {"code": "ru", "name": "Russian", "nativeName": "Русский", "flag": "🇷🇺", "active": True, "rtl": False},
-            {"code": "pt", "name": "Portuguese", "nativeName": "Português", "flag": "🇵🇹", "active": True, "rtl": False},
-            {"code": "ja", "name": "Japanese", "nativeName": "日本語", "flag": "🇯🇵", "active": True, "rtl": False},
-            {"code": "ko", "name": "Korean", "nativeName": "한국어", "flag": "🇰🇷", "active": True, "rtl": False},
-            {"code": "ar", "name": "Arabic", "nativeName": "العربية", "flag": "🇸🇦", "active": True, "rtl": True},
-            {"code": "vi", "name": "Vietnamese", "nativeName": "Tiếng Việt", "flag": "🇻🇳", "active": True, "rtl": False},
-            {"code": "th", "name": "Thai", "nativeName": "ไทย", "flag": "🇹🇭", "active": True, "rtl": False},
-            {"code": "id", "name": "Indonesian", "nativeName": "Bahasa Indonesia", "flag": "🇮🇩", "active": True, "rtl": False},
-            {"code": "ms", "name": "Malaysian", "nativeName": "Bahasa Melayu", "flag": "🇲🇾", "active": True, "rtl": False},
-            {"code": "nl", "name": "Dutch", "nativeName": "Nederlands", "flag": "🇳🇱", "active": True, "rtl": False},
-            {"code": "sv", "name": "Swedish", "nativeName": "Svenska", "flag": "🇸🇪", "active": True, "rtl": False},
-            {"code": "zh-TW", "name": "Traditional Chinese", "nativeName": "繁體中文", "flag": "🇹🇼", "active": True, "rtl": False},
-            {"code": "it", "name": "Italian", "nativeName": "Italiano", "flag": "🇮🇹", "active": True, "rtl": False},
-            {"code": "tr", "name": "Turkish", "nativeName": "Türkçe", "flag": "🇹🇷", "active": True, "rtl": False},
-            {"code": "hu", "name": "Hungarian", "nativeName": "Magyar", "flag": "🇭🇺", "active": True, "rtl": False},
-            {"code": "pl", "name": "Polish", "nativeName": "Polski", "flag": "🇵🇱", "active": True, "rtl": False},
+            {"code": "en", "name": "English", "flag": "🇬🇧", "active": True, "rtl": False},
+            {"code": "fr", "name": "French", "flag": "🇫🇷", "active": True, "rtl": False},
+            {"code": "es", "name": "Spanish", "flag": "🇪🇸", "active": True, "rtl": False},
+            {"code": "de", "name": "German", "flag": "🇩🇪", "active": True, "rtl": False},
+            {"code": "ru", "name": "Russian", "flag": "🇷🇺", "active": True, "rtl": False},
+            {"code": "pt", "name": "Portuguese", "flag": "🇵🇹", "active": True, "rtl": False},
+            {"code": "ja", "name": "Japanese", "flag": "🇯🇵", "active": True, "rtl": False},
+            {"code": "ko", "name": "Korean", "flag": "🇰🇷", "active": True, "rtl": False},
+            {"code": "ar", "name": "Arabic", "flag": "🇸🇦", "active": True, "rtl": True},
+            {"code": "vi", "name": "Vietnamese", "flag": "🇻🇳", "active": True, "rtl": False},
+            {"code": "th", "name": "Thai", "flag": "🇹🇭", "active": True, "rtl": False},
+            {"code": "id", "name": "Indonesian", "flag": "🇮🇩", "active": True, "rtl": False},
+            {"code": "ms", "name": "Malaysian", "flag": "🇲🇾", "active": True, "rtl": False},
+            {"code": "nl", "name": "Dutch", "flag": "🇳🇱", "active": True, "rtl": False},
+            {"code": "sv", "name": "Swedish", "flag": "🇸🇪", "active": True, "rtl": False},
+            {"code": "zh-TW", "name": "Traditional Chinese", "flag": "🇹🇼", "active": True, "rtl": False},
+            {"code": "it", "name": "Italian", "flag": "🇮🇹", "active": True, "rtl": False},
+            {"code": "tr", "name": "Turkish", "flag": "🇹🇷", "active": True, "rtl": False},
+            {"code": "hu", "name": "Hungarian", "flag": "🇭🇺", "active": True, "rtl": False},
+            {"code": "pl", "name": "Polish", "flag": "🇵🇱", "active": True, "rtl": False},
         ]
         
         print(f"Processing {len(supported_languages)} supported languages...")
@@ -67,16 +67,14 @@ def update_cms_languages():
                     lang.name = lang_data["name"]
                     changed = True
                 
-                if lang.native_name != lang_data["nativeName"]:
-                    lang.native_name = lang_data["nativeName"]
-                    changed = True
-                    
-                if lang.flag != lang_data["flag"]:
-                    lang.flag = lang_data["flag"]
-                    changed = True
-                    
-                if lang.is_rtl != lang_data["rtl"]:
+                # Check if is_rtl and flag attributes exist in the model
+                # before trying to update them
+                if hasattr(lang, 'is_rtl') and lang.is_rtl != lang_data["rtl"]:
                     lang.is_rtl = lang_data["rtl"]
+                    changed = True
+                    
+                if hasattr(lang, 'flag') and lang.flag != lang_data["flag"]:
+                    lang.flag = lang_data["flag"]
                     changed = True
                     
                 if lang.is_active != lang_data["active"]:
@@ -91,14 +89,20 @@ def update_cms_languages():
                     unchanged += 1
             else:
                 # Create new language
+                # Only include attributes that exist in the Language model
                 new_lang = Language(
                     code=code,
                     name=lang_data["name"],
-                    native_name=lang_data["nativeName"],
-                    flag=lang_data["flag"],
-                    is_rtl=lang_data["rtl"],
                     is_active=lang_data["active"]
                 )
+                
+                # Add optional attributes if they exist in the model
+                if hasattr(Language, 'is_rtl'):
+                    new_lang.is_rtl = lang_data["rtl"]
+                    
+                if hasattr(Language, 'flag'):
+                    new_lang.flag = lang_data["flag"]
+                
                 db.session.add(new_lang)
                 print(f"➕ Added new language: {code} - {lang_data['name']}")
                 added += 1
