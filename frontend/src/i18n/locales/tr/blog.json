@@ -1,0 +1,107 @@
+{
+  "title": "Fotoğrafçılık ve Tasarım İpuçlarını Keşfedin",
+  "description": "İşletmeniz için yapay zeka destekli görüntü düzenleme, arka plan kaldırma teknikleri ve yaratıcı tasarım stratejileri hakkında bilgi edinin",
+  "searchPlaceholder": "Blog yazılarında ara...",
+  "featuredTopics": "Öne Çıkan Konular",
+  "viewAllTopics": "Tüm Konuları Görüntüle",
+  "allCategories": "Tüm Kategoriler",
+  "latestArticles": "En Son Makaleler",
+  "filteredArticles": "Filtrelenmiş Makaleler",
+  "searchResults": "Arama Sonuçları",
+  "category": "Kategori",
+  "searchTerm": "Arama Terimi",
+  "tagged": "Etiketli",
+  "articles": "Makaleler",
+  "header": {
+    "title": "Blog",
+    "subtitle": "En son haberler, ipuçları ve bilgiler",
+    "search": "Blog yazılarında ara"
+  },
+  "featuredPost": {
+    "label": "Öne Çıkan",
+    "readMore": "Devamını Oku"
+  },
+  "categories": {
+    "all": "Tüm Yazılar",
+    "tutorials": "Eğitimler",
+    "news": "Haberler",
+    "tips": "İpuçları ve Püf Noktaları",
+    "casestudies": "Vaka Çalışmaları",
+    "technology": "Teknoloji",
+    "design": "Tasarım"
+  },
+  "postInfo": {
+    "by": "Yazan",
+    "on": "tarihinde",
+    "readingTime": "{{time}} dk okuma",
+    "comments": "{{count}} Yorum",
+    "views": "{{count}} Görüntüleme",
+    "tags": "Etiketler:",
+    "lastUpdated": "Son güncelleme tarihi",
+    "role": "İçerik Yazarı"
+  },
+  "subscription": {
+    "title": "Bültenimize abone olun",
+    "description": "En son makaleleri ve haberleri doğrudan gelen kutunuzda alın",
+    "placeholder": "E-posta adresiniz",
+    "button": "Abone Ol",
+    "success": "Abone olduğunuz için teşekkürler!",
+    "error": "Bir hata oluştu. Lütfen tekrar deneyin."
+  },
+  "tableOfContents": {
+    "title": "İçindekiler"
+  },
+  "share": {
+    "title": "Bu makaleyi paylaş",
+    "twitter": "Twitter'da Paylaş",
+    "facebook": "Facebook'ta Paylaş",
+    "linkedin": "LinkedIn'de Paylaş",
+    "copyLink": "Bağlantıyı kopyala",
+    "linkCopied": "Bağlantı panoya kopyalandı!",
+    "facebook_short": "Facebook",
+    "twitter_short": "Twitter",
+    "linkedin_short": "LinkedIn",
+    "copyLink_short": "Bağlantıyı Kopyala"
+  },
+  "relatedPosts": {
+    "title": "İlgili Yazılar",
+    "empty": "İlgili yazı bulunamadı",
+    "backToAll": "Tüm Makalelere Dön",
+    "browseAll": "Tüm Makalelere Göz At"
+  },
+  "comments": {
+    "title": "Yorumlar",
+    "writeComment": "Bir yorum yazın",
+    "placeholder": "Düşüncelerinizi paylaşın...",
+    "submit": "Yorum Gönder",
+    "reply": "Yanıtla",
+    "edit": "Düzenle",
+    "delete": "Sil",
+    "noComments": "Henüz yorum yok. İlk yorum yapan siz olun!",
+    "loadMore": "Daha fazla yorum yükle",
+    "anonymous": "Anonim",
+    "loginToComment": "Yorum yapmak için lütfen giriş yapın"
+  },
+  "pagination": {
+    "previous": "Önceki",
+    "next": "Sonraki",
+    "page": "Sayfa {{current}} / {{total}}"
+  },
+  "notFound": {
+    "title": "Makale Bulunamadı",
+    "description": "Aradığınız blog yazısı mevcut değil veya kaldırılmış.",
+    "button": "Blog'a Dön"
+  },
+  "status": {
+    "notFound": "Makale Bulunamadı",
+    "notFoundDesc": "Aradığınız blog yazısı mevcut değil veya kaldırılmış.",
+    "error": "Makale Yüklenirken Hata Oluştu",
+    "errorDesc": "Blog yazısını yüklerken bir sorun oluştu. Lütfen daha sonra tekrar deneyin.",
+    "loading": "Makale yükleniyor..."
+  },
+  "author": {
+    "aboutTitle": "Yazar Hakkında",
+    "defaultName": "iMagenWiz Ekibi",
+    "bio": "iMagenWiz'de içerik yazarı. İşletmelerin daha iyi görsel sonuçlar elde etmesine yardımcı olmak için yapay zeka teknolojisi ve yaratıcı tasarımın kesişimini keşfetmeye tutku duyuyor."
+  }
+}

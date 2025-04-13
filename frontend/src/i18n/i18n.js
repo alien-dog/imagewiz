@@ -85,21 +85,27 @@ import commonZHTW from './locales/zh-TW/common.json';
 
 // Import Italian resources
 import commonIT from './locales/it/common.json';
+import blogIT from './locales/it/blog.json';
 
 // Import Turkish resources
 import commonTR from './locales/tr/common.json';
+import blogTR from './locales/tr/blog.json';
 
 // Import Hungarian resources
 import commonHU from './locales/hu/common.json';
+import blogHU from './locales/hu/blog.json';
 
 // Import Polish resources
 import commonPL from './locales/pl/common.json';
+import blogPL from './locales/pl/blog.json';
 
 // Import Norwegian resources
 import commonNO from './locales/no/common.json';
+import blogNO from './locales/no/blog.json';
 
 // Import Greek resources
 import commonEL from './locales/el/common.json';
+import blogEL from './locales/el/blog.json';
 
 // Create resources object with available translations - only include languages we have translations for
 const resources = {
@@ -219,42 +225,42 @@ const resources = {
     common: commonIT,
     auth: authEN,
     pricing: pricingEN,
-    blog: blogEN,
+    blog: blogIT,
     cms: cmsEN
   },
   "tr": {
     common: commonTR,
     auth: authEN,
     pricing: pricingEN,
-    blog: blogEN,
+    blog: blogTR,
     cms: cmsEN
   },
   "hu": {
     common: commonHU,
     auth: authEN,
     pricing: pricingEN,
-    blog: blogEN,
+    blog: blogHU,
     cms: cmsEN
   },
   "pl": {
     common: commonPL,
     auth: authEN,
     pricing: pricingEN,
-    blog: blogEN,
+    blog: blogPL,
     cms: cmsEN
   },
   "no": {
     common: commonNO,
     auth: authEN,
     pricing: pricingEN,
-    blog: blogEN,
+    blog: blogNO,
     cms: cmsEN
   },
   "el": {
     common: commonEL,
     auth: authEN,
     pricing: pricingEN,
-    blog: blogEN,
+    blog: blogEL,
     cms: cmsEN
   }
 };

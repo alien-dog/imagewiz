@@ -1,0 +1,107 @@
+{
+  "title": "Fedezze fel a Fotózási és Dizájn Tippeket",
+  "description": "Ismerje meg az AI-vezérelt képszerkesztést, háttéreltávolítási technikákat és kreatív dizájn stratégiákat vállalkozása számára",
+  "searchPlaceholder": "Keresés a blog bejegyzések között...",
+  "featuredTopics": "Kiemelt témák",
+  "viewAllTopics": "Összes téma megtekintése",
+  "allCategories": "Összes kategória",
+  "latestArticles": "Legfrissebb cikkek",
+  "filteredArticles": "Szűrt cikkek",
+  "searchResults": "Keresési eredmények",
+  "category": "Kategória",
+  "searchTerm": "Keresési kifejezés",
+  "tagged": "Címkézett",
+  "articles": "Cikkek",
+  "header": {
+    "title": "Blog",
+    "subtitle": "Legfrissebb hírek, tippek és betekintések",
+    "search": "Keresés a blog bejegyzések között"
+  },
+  "featuredPost": {
+    "label": "Kiemelt",
+    "readMore": "Tovább olvasom"
+  },
+  "categories": {
+    "all": "Minden bejegyzés",
+    "tutorials": "Útmutatók",
+    "news": "Hírek",
+    "tips": "Tippek és trükkök",
+    "casestudies": "Esettanulmányok",
+    "technology": "Technológia",
+    "design": "Dizájn"
+  },
+  "postInfo": {
+    "by": "Szerző:",
+    "on": "Dátum:",
+    "readingTime": "{{time}} perc olvasás",
+    "comments": "{{count}} hozzászólás",
+    "views": "{{count}} megtekintés",
+    "tags": "Címkék:",
+    "lastUpdated": "Utoljára frissítve:",
+    "role": "Tartalomíró"
+  },
+  "subscription": {
+    "title": "Iratkozzon fel hírlevelünkre",
+    "description": "Kapja meg a legfrissebb cikkeket és híreket közvetlenül a postaládájába",
+    "placeholder": "Az Ön e-mail címe",
+    "button": "Feliratkozás",
+    "success": "Köszönjük a feliratkozást!",
+    "error": "Hiba történt. Kérjük, próbálja újra."
+  },
+  "tableOfContents": {
+    "title": "Tartalomjegyzék"
+  },
+  "share": {
+    "title": "Ossza meg ezt a cikket",
+    "twitter": "Megosztás Twitteren",
+    "facebook": "Megosztás Facebookon",
+    "linkedin": "Megosztás LinkedInen",
+    "copyLink": "Link másolása",
+    "linkCopied": "Link a vágólapra másolva!",
+    "facebook_short": "Facebook",
+    "twitter_short": "Twitter",
+    "linkedin_short": "LinkedIn",
+    "copyLink_short": "Link másolása"
+  },
+  "relatedPosts": {
+    "title": "Kapcsolódó cikkek",
+    "empty": "Nem találhatók kapcsolódó cikkek",
+    "backToAll": "Vissza az összes cikkhez",
+    "browseAll": "Az összes cikk böngészése"
+  },
+  "comments": {
+    "title": "Hozzászólások",
+    "writeComment": "Írjon hozzászólást",
+    "placeholder": "Ossza meg gondolatait...",
+    "submit": "Hozzászólás küldése",
+    "reply": "Válasz",
+    "edit": "Szerkesztés",
+    "delete": "Törlés",
+    "noComments": "Még nincsenek hozzászólások. Legyen Ön az első, aki hozzászól!",
+    "loadMore": "További hozzászólások betöltése",
+    "anonymous": "Névtelen",
+    "loginToComment": "Kérjük, jelentkezzen be a hozzászóláshoz"
+  },
+  "pagination": {
+    "previous": "Előző",
+    "next": "Következő",
+    "page": "{{current}}. oldal / {{total}}"
+  },
+  "notFound": {
+    "title": "A cikk nem található",
+    "description": "A keresett blogbejegyzés nem létezik vagy eltávolították.",
+    "button": "Vissza a blogra"
+  },
+  "status": {
+    "notFound": "A cikk nem található",
+    "notFoundDesc": "A keresett blogbejegyzés nem létezik vagy eltávolították.",
+    "error": "Hiba a cikk betöltésekor",
+    "errorDesc": "Probléma merült fel a blogbejegyzés betöltésekor. Kérjük, próbálja újra később.",
+    "loading": "Cikk betöltése..."
+  },
+  "author": {
+    "aboutTitle": "A szerzőről",
+    "defaultName": "iMagenWiz csapat",
+    "bio": "Tartalomíró az iMagenWiz-nél. Szenvedélyesen kutatja az AI technológia és a kreatív dizájn kereszteződését, hogy segítsen a vállalkozásoknak jobb vizuális eredményeket elérni."
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "title": "Odkryj Porady Fotograficzne i Projektowe",
+  "description": "Poznaj edycję obrazów opartą na sztucznej inteligencji, techniki usuwania tła i kreatywne strategie projektowe dla swojej firmy",
+  "searchPlaceholder": "Szukaj wpisów na blogu...",
+  "featuredTopics": "Polecane Tematy",
+  "viewAllTopics": "Zobacz Wszystkie Tematy",
+  "allCategories": "Wszystkie Kategorie",
+  "latestArticles": "Najnowsze Artykuły",
+  "filteredArticles": "Filtrowane Artykuły",
+  "searchResults": "Wyniki Wyszukiwania",
+  "category": "Kategoria",
+  "searchTerm": "Fraza Wyszukiwania",
+  "tagged": "Oznaczone",
+  "articles": "Artykuły",
+  "header": {
+    "title": "Blog",
+    "subtitle": "Najnowsze wiadomości, porady i spostrzeżenia",
+    "search": "Szukaj wpisów na blogu"
+  },
+  "featuredPost": {
+    "label": "Polecane",
+    "readMore": "Czytaj Więcej"
+  },
+  "categories": {
+    "all": "Wszystkie Wpisy",
+    "tutorials": "Poradniki",
+    "news": "Aktualności",
+    "tips": "Porady i Triki",
+    "casestudies": "Studia Przypadków",
+    "technology": "Technologia",
+    "design": "Projektowanie"
+  },
+  "postInfo": {
+    "by": "Autor",
+    "on": "dnia",
+    "readingTime": "{{time}} min czytania",
+    "comments": "{{count}} Komentarzy",
+    "views": "{{count}} Wyświetleń",
+    "tags": "Tagi:",
+    "lastUpdated": "Ostatnia aktualizacja",
+    "role": "Twórca Treści"
+  },
+  "subscription": {
+    "title": "Zapisz się do naszego newslettera",
+    "description": "Otrzymuj najnowsze artykuły i wiadomości bezpośrednio w swojej skrzynce",
+    "placeholder": "Twój adres email",
+    "button": "Zapisz się",
+    "success": "Dziękujemy za subskrypcję!",
+    "error": "Wystąpił błąd. Spróbuj ponownie."
+  },
+  "tableOfContents": {
+    "title": "Spis Treści"
+  },
+  "share": {
+    "title": "Udostępnij ten artykuł",
+    "twitter": "Udostępnij na Twitterze",
+    "facebook": "Udostępnij na Facebooku",
+    "linkedin": "Udostępnij na LinkedIn",
+    "copyLink": "Kopiuj link",
+    "linkCopied": "Link skopiowany do schowka!",
+    "facebook_short": "Facebook",
+    "twitter_short": "Twitter",
+    "linkedin_short": "LinkedIn",
+    "copyLink_short": "Kopiuj Link"
+  },
+  "relatedPosts": {
+    "title": "Powiązane Artykuły",
+    "empty": "Nie znaleziono powiązanych artykułów",
+    "backToAll": "Powrót do Wszystkich Artykułów",
+    "browseAll": "Przeglądaj Wszystkie Artykuły"
+  },
+  "comments": {
+    "title": "Komentarze",
+    "writeComment": "Napisz komentarz",
+    "placeholder": "Podziel się swoimi przemyśleniami...",
+    "submit": "Opublikuj Komentarz",
+    "reply": "Odpowiedz",
+    "edit": "Edytuj",
+    "delete": "Usuń",
+    "noComments": "Brak komentarzy. Bądź pierwszy, który skomentuje!",
+    "loadMore": "Załaduj więcej komentarzy",
+    "anonymous": "Anonimowy",
+    "loginToComment": "Zaloguj się, aby skomentować"
+  },
+  "pagination": {
+    "previous": "Poprzedni",
+    "next": "Następny",
+    "page": "Strona {{current}} z {{total}}"
+  },
+  "notFound": {
+    "title": "Nie Znaleziono Artykułu",
+    "description": "Wpis na blogu, którego szukasz, nie istnieje lub został usunięty.",
+    "button": "Powrót do Bloga"
+  },
+  "status": {
+    "notFound": "Nie Znaleziono Artykułu",
+    "notFoundDesc": "Wpis na blogu, którego szukasz, nie istnieje lub został usunięty.",
+    "error": "Błąd Ładowania Artykułu",
+    "errorDesc": "Wystąpił problem podczas ładowania wpisu na blogu. Spróbuj ponownie później.",
+    "loading": "Ładowanie artykułu..."
+  },
+  "author": {
+    "aboutTitle": "O Autorze",
+    "defaultName": "Zespół iMagenWiz",
+    "bio": "Twórca treści w iMagenWiz. Pasjonat badania połączenia technologii AI i kreatywnego projektowania, aby pomóc firmom osiągać lepsze rezultaty wizualne."
+  }
+}

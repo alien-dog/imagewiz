@@ -1,0 +1,107 @@
+{
+  "title": "Oppdag Fototips og Designråd",
+  "description": "Lær om AI-drevet bilderedigering, teknikker for bakgrunnsfjernelse og kreative designstrategier for din bedrift",
+  "searchPlaceholder": "Søk i blogginnlegg...",
+  "featuredTopics": "Utvalgte Emner",
+  "viewAllTopics": "Se Alle Emner",
+  "allCategories": "Alle Kategorier",
+  "latestArticles": "Nyeste Artikler",
+  "filteredArticles": "Filtrerte Artikler",
+  "searchResults": "Søkeresultater",
+  "category": "Kategori",
+  "searchTerm": "Søkeord",
+  "tagged": "Merket",
+  "articles": "Artikler",
+  "header": {
+    "title": "Blogg",
+    "subtitle": "Siste nytt, tips og innsikt",
+    "search": "Søk i blogginnlegg"
+  },
+  "featuredPost": {
+    "label": "Utvalgt",
+    "readMore": "Les Mer"
+  },
+  "categories": {
+    "all": "Alle Innlegg",
+    "tutorials": "Veiledninger",
+    "news": "Nyheter",
+    "tips": "Tips & Triks",
+    "casestudies": "Casestudier",
+    "technology": "Teknologi",
+    "design": "Design"
+  },
+  "postInfo": {
+    "by": "Av",
+    "on": "den",
+    "readingTime": "{{time}} min lesing",
+    "comments": "{{count}} Kommentarer",
+    "views": "{{count}} Visninger",
+    "tags": "Emneord:",
+    "lastUpdated": "Sist oppdatert den",
+    "role": "Innholdsforfatter"
+  },
+  "subscription": {
+    "title": "Abonner på vårt nyhetsbrev",
+    "description": "Få de nyeste artiklene og nyhetene direkte i innboksen din",
+    "placeholder": "Din e-postadresse",
+    "button": "Abonner",
+    "success": "Takk for at du abonnerer!",
+    "error": "Det oppstod en feil. Vennligst prøv igjen."
+  },
+  "tableOfContents": {
+    "title": "Innholdsfortegnelse"
+  },
+  "share": {
+    "title": "Del denne artikkelen",
+    "twitter": "Del på Twitter",
+    "facebook": "Del på Facebook",
+    "linkedin": "Del på LinkedIn",
+    "copyLink": "Kopier lenke",
+    "linkCopied": "Lenke kopiert til utklippstavlen!",
+    "facebook_short": "Facebook",
+    "twitter_short": "Twitter",
+    "linkedin_short": "LinkedIn",
+    "copyLink_short": "Kopier Lenke"
+  },
+  "relatedPosts": {
+    "title": "Relaterte Artikler",
+    "empty": "Ingen relaterte artikler funnet",
+    "backToAll": "Tilbake til Alle Artikler",
+    "browseAll": "Bla Gjennom Alle Artikler"
+  },
+  "comments": {
+    "title": "Kommentarer",
+    "writeComment": "Skriv en kommentar",
+    "placeholder": "Del dine tanker...",
+    "submit": "Publiser Kommentar",
+    "reply": "Svar",
+    "edit": "Rediger",
+    "delete": "Slett",
+    "noComments": "Ingen kommentarer ennå. Vær den første til å kommentere!",
+    "loadMore": "Last inn flere kommentarer",
+    "anonymous": "Anonym",
+    "loginToComment": "Vennligst logg inn for å kommentere"
+  },
+  "pagination": {
+    "previous": "Forrige",
+    "next": "Neste",
+    "page": "Side {{current}} av {{total}}"
+  },
+  "notFound": {
+    "title": "Artikkel Ikke Funnet",
+    "description": "Blogginnlegget du leter etter finnes ikke eller har blitt fjernet.",
+    "button": "Tilbake til Bloggen"
+  },
+  "status": {
+    "notFound": "Artikkel Ikke Funnet",
+    "notFoundDesc": "Blogginnlegget du leter etter finnes ikke eller har blitt fjernet.",
+    "error": "Feil ved Lasting av Artikkel",
+    "errorDesc": "Det oppstod et problem ved lasting av blogginnlegget. Vennligst prøv igjen senere.",
+    "loading": "Laster artikkel..."
+  },
+  "author": {
+    "aboutTitle": "Om Forfatteren",
+    "defaultName": "iMagenWiz Team",
+    "bio": "Innholdsskribent hos iMagenWiz. Lidenskapelig opptatt av å utforske skjæringspunktet mellom AI-teknologi og kreativ design for å hjelpe bedrifter med å oppnå bedre visuelle resultater."
+  }
+}
