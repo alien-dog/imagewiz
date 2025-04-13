@@ -17,10 +17,7 @@ import {
 import { 
   getPosts, 
   deletePost, 
-  getLanguages, 
-  autoTranslateAllPosts, 
-  forceTranslateEsFr,
-  translateMissingLanguages
+  getLanguages
 } from '../../lib/cms-service';
 import { SUPPORTED_LANGUAGES } from '../../i18n/i18n';
 
@@ -124,125 +121,6 @@ const PostList = () => {
     } catch (err) {
       console.error('Error deleting post:', err);
       setError('Failed to delete post. Please try again.');
-    }
-  };
-  
-  const handleAutoTranslateAll = async (forceTranslate = false) => {
-    if (posts.length === 0) {
-      setError('No posts available for translation');
-      return;
-    }
-    
-    setIsTranslating(true);
-    setError(null);
-    
-    try {
-      // Call the auto-translate-all API endpoint
-      const response = await autoTranslateAllPosts({ force_translate: forceTranslate });
-      console.log('Auto-translate all response:', response);
-      
-      // Refresh posts to get the updated data
-      await fetchPosts();
-      
-      // Display a detailed success message with statistics
-      const totalPosts = response.results?.total_posts || 0;
-      const successfulPosts = response.results?.successfully_translated_posts || 0;
-      const translatedLangs = response.results?.translated_languages || 0;
-      const skippedLangs = response.results?.skipped_languages || 0;
-      
-      setSuccessMessage(
-        `Auto-translation completed: ${successfulPosts}/${totalPosts} posts translated to ${translatedLangs} languages. ${skippedLangs} translations skipped.`
-      );
-      
-      // Clear success message after a longer period (this is a more significant operation)
-      setTimeout(() => {
-        setSuccessMessage('');
-      }, 8000);
-    } catch (err) {
-      console.error('Error auto-translating all posts:', err);
-      setError(`Failed to auto-translate posts: ${err.message || 'Unknown error'}`);
-    } finally {
-      setIsTranslating(false);
-    }
-  };
-  
-  const handleTranslateMissingLanguages = async () => {
-    if (posts.length === 0) {
-      setError('No posts available for translation');
-      return;
-    }
-    
-    setIsTranslating(true);
-    setError(null);
-    
-    try {
-      // Call the translate missing languages API endpoint
-      const response = await translateMissingLanguages();
-      console.log('Translate missing languages response:', response);
-      
-      // Refresh posts to get the updated data
-      await fetchPosts();
-      
-      // Display a detailed success message with statistics
-      const totalPosts = response.results?.total_posts || 0;
-      const successfulPosts = response.results?.successfully_translated_posts || 0;
-      const translatedLangs = response.results?.translated_languages || 0;
-      const skippedLangs = response.results?.skipped_languages || 0;
-      
-      setSuccessMessage(
-        `Missing languages translation completed: ${successfulPosts}/${totalPosts} posts translated to ${translatedLangs} languages. ${skippedLangs} translations skipped.`
-      );
-      
-      // Clear success message after a longer period (this is a more significant operation)
-      setTimeout(() => {
-        setSuccessMessage('');
-      }, 8000);
-    } catch (err) {
-      console.error('Error translating missing languages:', err);
-      setError(`Failed to translate posts to missing languages: ${err.message || 'Unknown error'}`);
-    } finally {
-      setIsTranslating(false);
-    }
-  };
-
-  const handleForceTranslateEsFr = async () => {
-    if (posts.length === 0) {
-      setError('No posts available for translation');
-      return;
-    }
-    
-    setIsTranslating(true);
-    setError(null);
-    
-    try {
-      // Call the force-translate-es-fr API endpoint
-      const response = await forceTranslateEsFr();
-      console.log('Force translate ES/FR response:', response);
-      
-      // Refresh posts to get the updated data
-      await fetchPosts();
-      
-      // Display a success message with statistics
-      const created = response.results?.created || {};
-      const updated = response.results?.updated || {};
-      const createdES = created.es || 0;
-      const createdFR = created.fr || 0;
-      const updatedES = updated.es || 0;
-      const updatedFR = updated.fr || 0;
-      
-      setSuccessMessage(
-        `Spanish/French translation completed: Created ${createdES + createdFR} and updated ${updatedES + updatedFR} translations.`
-      );
-      
-      // Clear success message after a period
-      setTimeout(() => {
-        setSuccessMessage('');
-      }, 8000);
-    } catch (err) {
-      console.error('Error translating to ES/FR:', err);
-      setError(`Failed to translate posts to Spanish/French: ${err.message || 'Unknown error'}`);
-    } finally {
-      setIsTranslating(false);
     }
   };
 
