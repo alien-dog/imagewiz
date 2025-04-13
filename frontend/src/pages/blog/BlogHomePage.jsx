@@ -26,6 +26,7 @@ const BlogHomePage = () => {
   const [selectedTag, setSelectedTag] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [showTagsDropdown, setShowTagsDropdown] = useState(false);
+  const [postCount, setPostCount] = useState(0);
   
   useEffect(() => {
     // Fetch tags for filtering
@@ -109,10 +110,20 @@ const BlogHomePage = () => {
             <div className="absolute -top-4 -left-4 w-24 h-24 rounded-full bg-teal-400/30 blur-xl"></div>
             
             <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight tracking-tight drop-shadow-sm">
-              {t('blog:title')}
+              {t('blog:title').split(' ').map((word, index, array) => (
+                <React.Fragment key={index}>
+                  {word}
+                  {index < array.length - 1 && ' '}
+                </React.Fragment>
+              ))}
             </h1>
             <p className="text-xl md:text-2xl mb-10 text-white opacity-90 leading-relaxed">
-              {t('blog:description')}
+              {t('blog:description').split(' ').map((word, index, array) => (
+                <React.Fragment key={index}>
+                  {word}
+                  {index < array.length - 1 && ' '}
+                </React.Fragment>
+              ))}
             </p>
             
             <div className="flex flex-wrap gap-3 mb-8">
@@ -313,10 +324,27 @@ const BlogHomePage = () => {
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center">
                 <Bookmark className="w-6 h-6 mr-2.5 text-teal-500" />
                 {selectedTag 
-                  ? `${tags.find(t => t.slug === selectedTag)?.name || t('blog:tagged')} ${t('blog:articles')}` 
+                  ? (
+                    <>
+                      {tags.find(t => t.slug === selectedTag)?.name || t('blog:tagged')}
+                      {' '}
+                      {t('blog:articles')}
+                    </>
+                  ) 
                   : searchTerm 
-                    ? t('blog:searchResults') 
-                    : t('blog:latestArticles')}
+                    ? t('blog:searchResults').split(' ').map((word, index, array) => (
+                        <React.Fragment key={index}>
+                          {word}
+                          {index < array.length - 1 && ' '}
+                        </React.Fragment>
+                      ))
+                    : t('blog:latestArticles').split(' ').map((word, index, array) => (
+                        <React.Fragment key={index}>
+                          {word}
+                          {index < array.length - 1 && ' '}
+                        </React.Fragment>
+                      ))
+                  }
               </h2>
               <div className="mt-3 h-1 w-32 bg-teal-500 rounded"></div>
             </div>
@@ -325,8 +353,8 @@ const BlogHomePage = () => {
             {(selectedTag || searchTerm) && (
               <div className="bg-teal-50 text-teal-700 px-4 py-2 rounded-full text-sm font-medium border border-teal-100 shadow-sm">
                 {searchTerm 
-                  ? t('blog:searchResultCount', {count: '{{count}} results', count: 0}) 
-                  : t('blog:filteredCount', {count: '{{count}} articles', count: 0})}
+                  ? t('blog:searchResultCount', {count: '{{count}} results', count: postCount}) 
+                  : t('blog:filteredCount', {count: '{{count}} articles', count: postCount})}
               </div>
             )}
           </div>
