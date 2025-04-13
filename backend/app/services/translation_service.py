@@ -3,6 +3,8 @@ Translation service for automatically translating content between languages
 """
 import os
 import json
+import time
+import random
 import logging
 import requests
 from urllib3.util import Retry
@@ -142,33 +144,49 @@ class TranslationService:
             # Create a requests session with increased timeouts and connection pooling
             session = requests.Session()
             adapter = HTTPAdapter(
-                pool_connections=10,
-                pool_maxsize=10,
+                pool_connections=5,
+                pool_maxsize=5,
                 max_retries=Retry(
-                    total=3,  # Total number of retries
-                    backoff_factor=1,  # Backoff factor between retries
-                    status_forcelist=[408, 429, 500, 502, 503, 504],  # Retry on these status codes
-                    allowed_methods=["POST"],  # Only retry on POST requests
+                    total=5,  # Increased retries
+                    backoff_factor=2,  # More aggressive backoff
+                    status_forcelist=[408, 429, 500, 502, 503, 504],
+                    allowed_methods=["POST"],
+                    respect_retry_after_header=True
                 )
             )
             session.mount('https://', adapter)
             
-            try:
-                response = session.post(
-                    f"{self.api_base_url}/chat/completions", 
-                    headers=headers,
-                    json=data,
-                    timeout=(30, 120)  # (Connect timeout, Read timeout) in seconds
-                )
-            except requests.exceptions.ReadTimeout:
-                logger.error("DeepSeek API read timeout - trying once more with extended timeout")
-                # One more attempt with even longer timeout
-                response = session.post(
-                    f"{self.api_base_url}/chat/completions", 
-                    headers=headers,
-                    json=data,
-                    timeout=(30, 180)  # Extended timeout for second attempt
-                )
+            max_attempts = 3
+            attempt = 0
+            last_error = None
+            
+            while attempt < max_attempts:
+                try:
+                    timeout_multiplier = attempt + 1  # Increase timeout with each attempt
+                    response = session.post(
+                        f"{self.api_base_url}/chat/completions", 
+                        headers=headers,
+                        json=data,
+                        timeout=(60 * timeout_multiplier, 300 * timeout_multiplier)  # Increased timeouts
+                    )
+                    if response.status_code == 200:
+                        break
+                    attempt += 1
+                    if attempt < max_attempts:
+                        sleep_time = (2 ** attempt) + random.uniform(0, 1)  # Exponential backoff with jitter
+                        logger.warning(f"Attempt {attempt} failed, retrying in {sleep_time:.1f} seconds...")
+                        time.sleep(sleep_time)
+                except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError) as e:
+                    last_error = e
+                    attempt += 1
+                    if attempt < max_attempts:
+                        sleep_time = (2 ** attempt) + random.uniform(0, 1)
+                        logger.warning(f"Timeout on attempt {attempt}, retrying in {sleep_time:.1f} seconds...")
+                        time.sleep(sleep_time)
+                    
+            if attempt >= max_attempts:
+                logger.error(f"Failed after {max_attempts} attempts: {last_error}")
+                return None
             finally:
                 # Always close the session
                 session.close()
