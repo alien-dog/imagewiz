@@ -304,53 +304,63 @@ const BlogHomePage = () => {
           )}
         </div>
         
-        {/* Active Filter Display */}
-        {(selectedTag || searchTerm) && (
-          <div className="mb-6 bg-teal-50 rounded-lg p-4 border border-teal-100">
-            <h3 className="text-lg font-medium text-teal-800 mb-2">
-              {searchTerm ? t('blog:searchResults') : t('blog:filteredArticles')}
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {selectedTag && (
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-teal-100 text-teal-800">
-                  {t('blog:category')}: {tags.find(t => t.slug === selectedTag)?.name || selectedTag}
-                  <button 
-                    onClick={() => handleTagSelect('')}
-                    className="ml-1 text-teal-600 hover:text-teal-800"
-                  >
-                    ×
-                  </button>
-                </span>
-              )}
-              {searchTerm && (
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-teal-100 text-teal-800">
-                  {t('blog:searchTerm')}: "{searchTerm}"
-                  <button 
-                    onClick={() => {
-                      setSearchTerm('');
-                      updateQueryParams({ search: '' });
-                    }}
-                    className="ml-1 text-teal-600 hover:text-teal-800"
-                  >
-                    ×
-                  </button>
-                </span>
-              )}
-            </div>
-          </div>
-        )}
+
         
         {/* Article Heading */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-            <Bookmark className="w-6 h-6 mr-2 text-teal-500" />
-            {selectedTag 
-              ? `${tags.find(t => t.slug === selectedTag)?.name || t('blog:tagged')} ${t('blog:articles')}` 
-              : searchTerm 
-                ? t('blog:searchResults') 
-                : t('blog:latestArticles')}
-          </h2>
-          <div className="mt-2 h-1 w-24 bg-teal-500 rounded"></div>
+        <div className="mb-10 relative">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center">
+                <Bookmark className="w-6 h-6 mr-2.5 text-teal-500" />
+                {selectedTag 
+                  ? `${tags.find(t => t.slug === selectedTag)?.name || t('blog:tagged')} ${t('blog:articles')}` 
+                  : searchTerm 
+                    ? t('blog:searchResults') 
+                    : t('blog:latestArticles')}
+              </h2>
+              <div className="mt-3 h-1 w-32 bg-teal-500 rounded"></div>
+            </div>
+            
+            {/* Result count indicator only shows when we have filters */}
+            {(selectedTag || searchTerm) && (
+              <div className="bg-teal-50 text-teal-700 px-4 py-2 rounded-full text-sm font-medium border border-teal-100 shadow-sm">
+                {searchTerm 
+                  ? t('blog:searchResultCount', {count: '{{count}} results', count: 0}) 
+                  : t('blog:filteredCount', {count: '{{count}} articles', count: 0})}
+              </div>
+            )}
+          </div>
+          
+          {/* Decorative dots */}
+          <div className="absolute -right-4 -bottom-4 w-24 h-24 text-teal-200 opacity-20 hidden lg:block">
+            <svg viewBox="0 0 100 100" fill="currentColor">
+              <circle cx="10" cy="10" r="3" />
+              <circle cx="30" cy="10" r="3" />
+              <circle cx="50" cy="10" r="3" />
+              <circle cx="70" cy="10" r="3" />
+              <circle cx="90" cy="10" r="3" />
+              <circle cx="10" cy="30" r="3" />
+              <circle cx="30" cy="30" r="3" />
+              <circle cx="50" cy="30" r="3" />
+              <circle cx="70" cy="30" r="3" />
+              <circle cx="90" cy="30" r="3" />
+              <circle cx="10" cy="50" r="3" />
+              <circle cx="30" cy="50" r="3" />
+              <circle cx="50" cy="50" r="3" />
+              <circle cx="70" cy="50" r="3" />
+              <circle cx="90" cy="50" r="3" />
+              <circle cx="10" cy="70" r="3" />
+              <circle cx="30" cy="70" r="3" />
+              <circle cx="50" cy="70" r="3" />
+              <circle cx="70" cy="70" r="3" />
+              <circle cx="90" cy="70" r="3" />
+              <circle cx="10" cy="90" r="3" />
+              <circle cx="30" cy="90" r="3" />
+              <circle cx="50" cy="90" r="3" />
+              <circle cx="70" cy="90" r="3" />
+              <circle cx="90" cy="90" r="3" />
+            </svg>
+          </div>
         </div>
         
         {/* Blog Posts */}
