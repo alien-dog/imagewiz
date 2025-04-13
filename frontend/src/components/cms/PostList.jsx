@@ -126,10 +126,35 @@ const PostList = () => {
 
   // Process posts to expand all translations when "All Languages" is selected
   const processedPosts = useMemo(() => {
-    // If a specific language is selected, return the original posts
+    // When language filter is applied, the API already returns the correct posts
+    // We just need to format them correctly for display
     if (filters.language) {
       console.log('Using language filter, not expanding posts');
-      return posts;
+      
+      // The backend should return posts that match the language,
+      // but we need to make sure they display properly
+      return posts.map(post => {
+        // Check if this post has a translation that matches the filter
+        if (post.translations && post.translations.length > 0) {
+          const matchingTranslation = post.translations.find(
+            t => t.language_code === filters.language
+          );
+          
+          if (matchingTranslation) {
+            // Create a virtual post with this translation
+            return {
+              ...post,
+              translation: matchingTranslation,
+              isVirtualTranslation: true,
+              virtualId: `${post.id}-${matchingTranslation.language_code}`
+            };
+          }
+        }
+        
+        // If this post is already in the target language or has no translations,
+        // return it as is
+        return post;
+      });
     }
     
     console.log('ALL languages selected - expanding posts with translations');
@@ -168,34 +193,16 @@ const PostList = () => {
   }, [posts, filters.language]);
 
   const filteredPosts = processedPosts.filter(post => {
-    // First apply language filter
-    if (filters.language) {
-      // For virtual translations (expanded posts), check the language of the translation
-      if (post.isVirtualTranslation && post.translation) {
-        if (post.translation.language_code !== filters.language) {
-          return false;
-        }
-      } 
-      // For posts with a translations array, check if there's a matching translation
-      else if (post.translations && post.translations.length > 0) {
-        const hasMatchingTranslation = post.translations.some(
-          translation => translation.language_code === filters.language
-        );
-        if (!hasMatchingTranslation) {
-          return false;
-        }
-      }
-      // If no translations at all, filter out
-      else {
-        return false;
-      }
-    }
-    
-    // Then apply search filter
+    // Apply search filter if there is a search term
     if (!searchTerm) return true;
     
     // Search in post slug
-    if (post.slug.toLowerCase().includes(searchTerm.toLowerCase())) {
+    if (post.slug && post.slug.toLowerCase().includes(searchTerm.toLowerCase())) {
+      return true;
+    }
+    
+    // Search in main post title if it exists
+    if (post.title && post.title.toLowerCase().includes(searchTerm.toLowerCase())) {
       return true;
     }
     
