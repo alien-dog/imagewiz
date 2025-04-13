@@ -1053,7 +1053,12 @@ def get_blog_posts():
     # Apply language filter - Only show posts that have a translation in the requested language
     if language:
         current_app.logger.info(f"Filtering by language: {language}")
-        query = query.join(PostTranslation).filter(PostTranslation.language_code == language)
+        # Use an EXISTS subquery to ensure we get posts that have the requested language translation
+        trans_subquery = db.session.query(PostTranslation.id).filter(
+            PostTranslation.post_id == Post.id,
+            PostTranslation.language_code == language
+        ).exists()
+        query = query.filter(db.session.query(trans_subquery).scalar())
         
     # Apply tag filter
     if tag:
@@ -1088,11 +1093,9 @@ def get_blog_posts():
     for post in posts:
         post_dict = post.to_dict(include_translations=True, language=language)
         
-        # Only include posts that have a translation in the requested language
-        if language and 'translation' in post_dict:
-            result.append(post_dict)
-        elif not language:
-            result.append(post_dict)
+        # The post_dict will always have 'translation' for the requested language
+        # because our query is already filtering for posts with the right language
+        result.append(post_dict)
     
     # Calculate total pages
     total_pages = (total + per_page - 1) // per_page if total > 0 else 1
