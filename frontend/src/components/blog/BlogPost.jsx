@@ -66,7 +66,7 @@ const BlogPost = () => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString(currentLanguage || i18n.language || 'en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
@@ -74,14 +74,14 @@ const BlogPost = () => {
   };
 
   const formatReadTime = (content) => {
-    if (!content) return '5 min read';
+    if (!content) return t('postInfo.readingTime', '{{time}} min read', { time: 5 });
     
     // Average reading speed: 200 words per minute
     const plainText = content.replace(/<[^>]*>?/gm, '');
     const wordCount = plainText.split(/\s+/).length;
     const readTimeMinutes = Math.max(1, Math.ceil(wordCount / 200));
     
-    return `${readTimeMinutes} min read`;
+    return t('postInfo.readingTime', '{{time}} min read', { time: readTimeMinutes });
   };
 
   const handleShareClick = () => {
