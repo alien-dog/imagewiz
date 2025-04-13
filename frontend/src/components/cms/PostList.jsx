@@ -19,7 +19,8 @@ import {
   deletePost, 
   getLanguages, 
   autoTranslateAllPosts, 
-  forceTranslateEsFr
+  forceTranslateEsFr,
+  translateMissingLanguages
 } from '../../lib/cms-service';
 import { SUPPORTED_LANGUAGES } from '../../i18n/i18n';
 
@@ -165,6 +166,45 @@ const PostList = () => {
     }
   };
   
+  const handleTranslateMissingLanguages = async () => {
+    if (posts.length === 0) {
+      setError('No posts available for translation');
+      return;
+    }
+    
+    setIsTranslating(true);
+    setError(null);
+    
+    try {
+      // Call the translate missing languages API endpoint
+      const response = await translateMissingLanguages();
+      console.log('Translate missing languages response:', response);
+      
+      // Refresh posts to get the updated data
+      await fetchPosts();
+      
+      // Display a detailed success message with statistics
+      const totalPosts = response.results?.total_posts || 0;
+      const successfulPosts = response.results?.successfully_translated_posts || 0;
+      const translatedLangs = response.results?.translated_languages || 0;
+      const skippedLangs = response.results?.skipped_languages || 0;
+      
+      setSuccessMessage(
+        `Missing languages translation completed: ${successfulPosts}/${totalPosts} posts translated to ${translatedLangs} languages. ${skippedLangs} translations skipped.`
+      );
+      
+      // Clear success message after a longer period (this is a more significant operation)
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 8000);
+    } catch (err) {
+      console.error('Error translating missing languages:', err);
+      setError(`Failed to translate posts to missing languages: ${err.message || 'Unknown error'}`);
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
   const handleForceTranslateEsFr = async () => {
     if (posts.length === 0) {
       setError('No posts available for translation');
@@ -308,6 +348,23 @@ const PostList = () => {
               <>
                 <Languages className="h-4 w-4 mr-2" />
                 Auto-Translate All Posts
+              </>
+            )}
+          </button>
+          <button
+            className="bg-purple-50 text-purple-700 hover:bg-purple-100 px-4 py-2 rounded flex items-center border border-purple-200"
+            onClick={handleTranslateMissingLanguages}
+            disabled={isTranslating}
+          >
+            {isTranslating ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Translating...
+              </>
+            ) : (
+              <>
+                <Languages className="h-4 w-4 mr-2" />
+                Translate Missing Languages
               </>
             )}
           </button>

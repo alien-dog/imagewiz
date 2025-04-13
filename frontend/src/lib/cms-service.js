@@ -506,6 +506,53 @@ export const autoTranslateAllPosts = async (options = {}) => {
   }
 };
 
+// Translate English posts to all missing languages (all except EN, ES, FR)
+export const translateMissingLanguages = async () => {
+  try {
+    console.log('Starting translations for missing languages (excluding EN, ES, FR)');
+    
+    // Use the explicit full API path to ensure consistency
+    const fullApiUrl = `/api/cms/posts/auto-translate-all`;
+    
+    // Get the token using our helper
+    const token = getAuthToken();
+    console.log('Translate missing languages - Token available:', !!token);
+    
+    if (!token) {
+      throw new Error('Authentication required. Please log in again.');
+    }
+    
+    // Specify only the missing languages to translate
+    // This excludes EN (source), ES and FR (already translated)
+    const options = {
+      languages: [
+        'de', 'ar', 'el', 'hu', 'id', 'it', 'ja', 'ko', 'ms', 
+        'nl', 'no', 'pl', 'pt', 'ru', 'sv', 'th', 'tr', 'vi', 'zh-TW'
+      ],
+      batch_size: 2,  // Process 2 posts at a time to avoid timeouts
+      force_translate: true  // Force re-translation even if some already exist
+    };
+    
+    console.log(`Translating to missing languages: ${options.languages.join(', ')}`);
+    
+    const response = await axios.post(fullApiUrl, options, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error in translating missing languages:', error);
+    if (error.response) {
+      console.error('Response error data:', error.response.data);
+      console.error('Response status:', error.response.status);
+    }
+    return handleError(error);
+  }
+};
+
 // Force translate all English posts to Spanish and French only
 export const forceTranslateEsFr = async () => {
   try {
