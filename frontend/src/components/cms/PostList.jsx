@@ -479,6 +479,14 @@ const PostList = () => {
                 </button>
                 <button
                   type="button"
+                  className="text-xs text-purple-600 hover:text-purple-800 underline flex items-center"
+                  onClick={handleTranslateMissingLanguages}
+                >
+                  <Languages className="h-3 w-3 mr-1" />
+                  Translate missing languages only
+                </button>
+                <button
+                  type="button"
                   className="text-xs text-blue-600 hover:text-blue-800 underline flex items-center"
                   onClick={handleForceTranslateEsFr}
                 >
