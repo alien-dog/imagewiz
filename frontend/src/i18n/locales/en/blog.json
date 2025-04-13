@@ -1,4 +1,17 @@
 {
+  "title": "Discover Photography and Design Tips",
+  "description": "Learn about AI-powered image editing, background removal techniques, and creative design strategies for your business",
+  "searchPlaceholder": "Search blog posts...",
+  "featuredTopics": "Featured Topics",
+  "viewAllTopics": "View All Topics",
+  "allCategories": "All Categories",
+  "latestArticles": "Latest Articles",
+  "filteredArticles": "Filtered Articles",
+  "searchResults": "Search Results",
+  "category": "Category",
+  "searchTerm": "Search Term",
+  "tagged": "Tagged",
+  "articles": "Articles",
   "header": {
     "title": "Blog",
     "subtitle": "Latest news, tips, and insights",

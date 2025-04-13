@@ -153,11 +153,16 @@ const BlogHomePage = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Featured Topics Section */}
-        <div className="mb-12">
+        <div className="mb-16">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900 flex items-center">
               <TrendingUp className="w-6 h-6 mr-2 text-teal-500" />
-              {t('blog:featuredTopics')}
+              {t('blog:featuredTopics').split(' ').map((word, index, array) => (
+                <React.Fragment key={index}>
+                  {index === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word}
+                  {index < array.length - 1 && ' '}
+                </React.Fragment>
+              ))}
             </h2>
             {tags.length > 0 && (
               <button 
@@ -334,13 +339,13 @@ const BlogHomePage = () => {
                   : searchTerm 
                     ? t('blog:searchResults').split(' ').map((word, index, array) => (
                         <React.Fragment key={index}>
-                          {word}
+                          {index === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word}
                           {index < array.length - 1 && ' '}
                         </React.Fragment>
                       ))
                     : t('blog:latestArticles').split(' ').map((word, index, array) => (
                         <React.Fragment key={index}>
-                          {word}
+                          {index === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word}
                           {index < array.length - 1 && ' '}
                         </React.Fragment>
                       ))
