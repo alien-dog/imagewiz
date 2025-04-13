@@ -59,20 +59,15 @@ class Post(db.Model):
                 if translation:
                     logger.info(f"Found translation for language {language}")
                     result['translation'] = translation.to_dict()
+                    # Set a flag to indicate this is the requested language
+                    result['translation']['is_requested_language'] = True
                 else:
                     logger.info(f"No translation found for language {language}")
-                    # Get default language as fallback
-                    default_trans = next((t for t in self.translations if t.language_code == 'en'), None)
-                    if default_trans:
-                        logger.info(f"Using default English translation as fallback")
-                        result['translation'] = default_trans.to_dict()
-                    else:
-                        logger.info(f"No default English translation found either")
-                        # If no English translation, use first available
-                        if self.translations:
-                            first_trans = self.translations[0]
-                            logger.info(f"Using first available translation: {first_trans.language_code}")
-                            result['translation'] = first_trans.to_dict()
+                    # Don't set any fallback translation when a specific language is requested
+                    # but not found. This will allow the frontend to filter out posts without
+                    # the requested language translation.
+                    result['translation'] = None
+                    result['available_languages'] = [t.language_code for t in self.translations]
             else:
                 # Get all translations
                 logger.info(f"Including all {len(self.translations)} translations")
