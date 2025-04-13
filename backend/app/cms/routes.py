@@ -805,6 +805,11 @@ def auto_translate_post(post_id):
             'meta_keywords': english_translation.meta_keywords
         }
         
+        # Get optional parameters
+        data = request.get_json() or {}
+        force_translate = data.get('force_translate', False)
+        target_languages = data.get('target_languages', [])
+        
         # Get all active languages
         all_languages = Language.query.filter_by(is_active=True).all()
         current_app.logger.info(f"Found {len(all_languages)} active languages for translation")
@@ -821,9 +826,10 @@ def auto_translate_post(post_id):
             if language.code == 'en':
                 continue
                 
-            # Get optional parameters
-            data = request.get_json() or {}
-            force_translate = data.get('force_translate', False)
+            # Skip if not in target_languages list (when provided)
+            if target_languages and language.code not in target_languages:
+                current_app.logger.info(f"Skipping {language.code} - not in target languages list")
+                continue
                 
             # Check if translation exists
             existing_translation = next((t for t in post.translations if t.language_code == language.code), None)

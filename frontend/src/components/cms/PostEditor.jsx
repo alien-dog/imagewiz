@@ -200,6 +200,51 @@ const PostEditor = () => {
   // Helper function to check if a language is RTL
   const isRTL = (langCode) => ['ar', 'he', 'ur', 'fa'].includes(langCode);
   
+  // Function to handle translation with specific language selection
+  const handleTranslate = async (selectedLanguages) => {
+    if (!id) {
+      setError("You need to save the post first before translating");
+      return;
+    }
+    
+    setIsTranslating(true);
+    setError(null);
+    
+    try {
+      // Call API with selected languages
+      const response = await autoTranslatePost(id, { 
+        target_languages: selectedLanguages,
+        force_translate: true
+      });
+      
+      console.log('Translation response:', response);
+      
+      // Refresh post data to get updated translations
+      const updatedPostData = await getPost(id, formData.language_code);
+      
+      // Update translations in state
+      if (updatedPostData.translations) {
+        setTranslations(updatedPostData.translations);
+      } else if (updatedPostData.post && updatedPostData.post.translations) {
+        setTranslations(updatedPostData.post.translations);
+      }
+      
+      // Show success message
+      setSuccess(`Successfully translated to ${selectedLanguages.length} languages`);
+      
+      // Clear message after a few seconds
+      setTimeout(() => {
+        setSuccess(null);
+      }, 5000);
+    } catch (err) {
+      console.error('Error translating post:', err);
+      setError(`Translation failed: ${err.message || 'Unknown error'}`);
+    } finally {
+      setIsTranslating(false);
+      setIsTranslateModalOpen(false);
+    }
+  };
+  
   // Form state
   const [formData, setFormData] = useState({
     title: '',
