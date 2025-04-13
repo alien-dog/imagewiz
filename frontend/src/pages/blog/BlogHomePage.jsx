@@ -212,11 +212,13 @@ const BlogHomePage = () => {
                     className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-l-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent shadow-sm"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
+                    key={`search-input-${currentLanguage}`}
                   />
                 </div>
                 <button 
                   type="submit"
                   className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded-r-xl transition-colors shadow-sm font-medium"
+                  key={`search-btn-${currentLanguage}`}
                 >
                   {t('common:search')}
                 </button>
@@ -230,6 +232,7 @@ const BlogHomePage = () => {
                 <button
                   className="flex items-center justify-between px-4 py-3 border border-gray-200 rounded-xl bg-white text-gray-800 hover:border-teal-300 hover:shadow-sm transition-all min-w-[180px]"
                   onClick={() => setShowTagsDropdown(!showTagsDropdown)}
+                  key={`filter-button-${currentLanguage}`}
                 >
                   <div className="flex items-center">
                     <Filter className="h-5 w-5 mr-2 text-teal-500" />
@@ -241,11 +244,12 @@ const BlogHomePage = () => {
                 </button>
                 
                 {showTagsDropdown && (
-                  <div className="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                  <div className="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto" key={`dropdown-${currentLanguage}`}>
                     <div className="py-1">
                       <button
                         className={`w-full text-left px-4 py-2.5 hover:bg-gray-50 flex items-center ${!selectedTag ? 'bg-teal-50 text-teal-700 font-medium' : ''}`}
                         onClick={() => handleTagSelect('')}
+                        key={`all-categories-${currentLanguage}`}
                       >
                         <Library className="h-4 w-4 mr-2" />
                         {t('blog:allCategories')}
@@ -278,6 +282,7 @@ const BlogHomePage = () => {
                 <button
                   className="flex items-center text-teal-600 hover:text-teal-800 px-4 py-3 font-medium border border-transparent hover:border-teal-100 rounded-xl hover:bg-teal-50 transition-colors"
                   onClick={clearFilters}
+                  key={`clear-filters-${currentLanguage}`}
                 >
                   <X className="h-4 w-4 mr-2" />
                   {t('common:clearFilters')}
@@ -288,7 +293,7 @@ const BlogHomePage = () => {
           
           {/* Active Filters */}
           {(selectedTag || searchTerm) && (
-            <div className="mt-4 pt-4 border-t border-gray-100">
+            <div className="mt-4 pt-4 border-t border-gray-100" key={`active-filters-${currentLanguage}`}>
               <div className="flex flex-wrap gap-2 items-center">
                 <span className="text-sm text-gray-500 mr-1">
                   {t('blog:activeFilters')}:
@@ -333,7 +338,7 @@ const BlogHomePage = () => {
         <div className="mb-10 relative">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center" key={`articles-${currentLanguage}`}>
                 <Bookmark className="w-6 h-6 mr-2.5 text-teal-500" />
                 {selectedTag 
                   ? (
@@ -353,7 +358,10 @@ const BlogHomePage = () => {
             
             {/* Result count indicator only shows when we have filters */}
             {(selectedTag || searchTerm) && (
-              <div className="bg-teal-50 text-teal-700 px-4 py-2 rounded-full text-sm font-medium border border-teal-100 shadow-sm">
+              <div 
+                className="bg-teal-50 text-teal-700 px-4 py-2 rounded-full text-sm font-medium border border-teal-100 shadow-sm"
+                key={`result-count-${currentLanguage}`}
+              >
                 {searchTerm 
                   ? t('blog:searchResultCount', {count: '{{count}} results', count: postCount}) 
                   : t('blog:filteredCount', {count: '{{count}} articles', count: postCount})}
