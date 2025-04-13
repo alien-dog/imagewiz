@@ -42,24 +42,47 @@ app.use(paymentHandler);
 // Frontend static files
 app.use(express.static(frontendPath));
 
-// For any route not handled above, serve the main test page
+// For any route not handled above, serve the SPA index.html for client-side routing
 app.get('*', (req, res) => {
-  console.log(`📝 GET request to: ${req.url}`);
+  console.log(`🌐 Serving SPA route: ${req.url}`);
+  console.log(`  Full URL: ${req.url}`);
+  console.log(`  Original URL: ${req.originalUrl}`);
+  console.log(`  Query params: ${JSON.stringify(req.query)}`);
+
+  // Special handling for /blog and its subroutes to ensure React Router handles these
+  if (req.path.startsWith('/blog')) {
+    console.log(`🌟 Serving React app blog route`);
+    
+    // Special case for /blog/:slug - route should be handled by React Router
+    if (req.path.split('/').length > 2) {
+      console.log(`🌟 Serving React app blog subroute: ${req.path}`);
+    }
+    
+    // Serve the index.html for any blog route to allow React Router to handle routing
+    return res.sendFile(path.join(frontendPath, 'index.html'));
+  }
   
-  // Try to serve the test page
-  if (fs.existsSync(path.join(frontendPath, 'test-order-confirmation.html'))) {
-    res.sendFile(path.join(frontendPath, 'test-order-confirmation.html'));
-  } else if (fs.existsSync(path.join(process.cwd(), 'test-order-confirmation.html'))) {
-    res.sendFile(path.join(process.cwd(), 'test-order-confirmation.html'));
+  // Try to serve the index.html for client-side routing
+  if (fs.existsSync(path.join(frontendPath, 'index.html'))) {
+    res.sendFile(path.join(frontendPath, 'index.html'));
+  } else if (fs.existsSync(path.join(process.cwd(), 'index.html'))) {
+    res.sendFile(path.join(process.cwd(), 'index.html'));
   } else {
-    res.send(`
-      <html>
-        <body>
-          <h1>Test Server Running</h1>
-          <p>Please create a test-order-confirmation.html file in the root directory.</p>
-        </body>
-      </html>
-    `);
+    // Fallback to test-order-confirmation.html if index.html doesn't exist
+    if (fs.existsSync(path.join(frontendPath, 'test-order-confirmation.html'))) {
+      res.sendFile(path.join(frontendPath, 'test-order-confirmation.html'));
+    } else if (fs.existsSync(path.join(process.cwd(), 'test-order-confirmation.html'))) {
+      res.sendFile(path.join(process.cwd(), 'test-order-confirmation.html'));
+    } else {
+      res.send(`
+        <html>
+          <body>
+            <h1>iMagenWiz Server Running</h1>
+            <p>The server is running but no index.html was found in the frontend directory.</p>
+          </body>
+        </html>
+      `);
+    }
   }
 });
 
