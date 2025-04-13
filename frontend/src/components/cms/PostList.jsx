@@ -335,57 +335,6 @@ const PostList = () => {
         <h1 className="text-2xl font-bold text-gray-800">Posts</h1>
         <div className="flex space-x-3">
           <button
-            className="bg-teal-50 text-teal-700 hover:bg-teal-100 px-4 py-2 rounded flex items-center border border-teal-200"
-            onClick={() => handleAutoTranslateAll(false)}
-            disabled={isTranslating}
-          >
-            {isTranslating ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Translating...
-              </>
-            ) : (
-              <>
-                <Languages className="h-4 w-4 mr-2" />
-                Auto-Translate All Posts
-              </>
-            )}
-          </button>
-          <button
-            className="bg-purple-50 text-purple-700 hover:bg-purple-100 px-4 py-2 rounded flex items-center border border-purple-200"
-            onClick={handleTranslateMissingLanguages}
-            disabled={isTranslating}
-          >
-            {isTranslating ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Translating...
-              </>
-            ) : (
-              <>
-                <Languages className="h-4 w-4 mr-2" />
-                Translate Missing Languages
-              </>
-            )}
-          </button>
-          <button
-            className="bg-blue-50 text-blue-700 hover:bg-blue-100 px-4 py-2 rounded flex items-center border border-blue-200"
-            onClick={handleForceTranslateEsFr}
-            disabled={isTranslating}
-          >
-            {isTranslating ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Translating...
-              </>
-            ) : (
-              <>
-                <Flag className="h-4 w-4 mr-2" />
-                Force ES/FR Only
-              </>
-            )}
-          </button>
-          <button
             className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded flex items-center"
             onClick={() => navigate('/cms/posts/new')}
           >
@@ -467,34 +416,7 @@ const PostList = () => {
               <RefreshCw className="h-5 w-5" />
             </button>
             
-            {!isTranslating && (
-              <div className="flex space-x-3">
-                <button
-                  type="button"
-                  className="text-xs text-teal-600 hover:text-teal-800 underline flex items-center"
-                  onClick={() => handleAutoTranslateAll(true)}
-                >
-                  <Languages className="h-3 w-3 mr-1" />
-                  Force refresh all translations
-                </button>
-                <button
-                  type="button"
-                  className="text-xs text-purple-600 hover:text-purple-800 underline flex items-center"
-                  onClick={handleTranslateMissingLanguages}
-                >
-                  <Languages className="h-3 w-3 mr-1" />
-                  Translate missing languages only
-                </button>
-                <button
-                  type="button"
-                  className="text-xs text-blue-600 hover:text-blue-800 underline flex items-center"
-                  onClick={handleForceTranslateEsFr}
-                >
-                  <Flag className="h-3 w-3 mr-1" />
-                  Force ES/FR translations only
-                </button>
-              </div>
-            )}
+            {/* Translation buttons removed as requested */}
           </div>
         </form>
       </div>

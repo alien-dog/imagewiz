@@ -23,6 +23,7 @@ import {
   deleteTranslation,
   autoTranslatePost
 } from '../../lib/cms-service';
+import TranslationModal from './TranslationModal';
 
 // Simplified HTML Editor component that is more reliable for displaying and editing content
 const SimpleHtmlEditor = ({ value, onChange, languageCode }) => {
@@ -193,6 +194,8 @@ const PostEditor = () => {
   const [tags, setTags] = useState([]);
   const [media, setMedia] = useState([]);
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [isTranslateModalOpen, setIsTranslateModalOpen] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
   
   // Helper function to check if a language is RTL
   const isRTL = (langCode) => ['ar', 'he', 'ur', 'fa'].includes(langCode);
