@@ -1068,32 +1068,13 @@ const PostEditor = () => {
             {/* Translations */}
             {id && translations.length > 0 && (
               <div className="bg-gray-50 p-4 rounded-lg">
-                <div className="flex justify-between items-center mb-3">
+                <div className="mb-3">
                   <h3 className="font-medium text-gray-700">Translations</h3>
-                  <button
-                    type="button"
-                    className="flex items-center text-xs bg-teal-50 text-teal-700 px-2 py-1 rounded hover:bg-teal-100"
-                    onClick={() => handleAutoTranslate(false)}
-                    disabled={isLoading}
-                  >
-                    <Languages className="h-3 w-3 mr-1" />
-                    Auto-Translate
-                  </button>
                 </div>
                 <p className="text-xs text-gray-500 mb-3">
-                  Auto-translate will create or update translations in all available languages based on the English content.
-                  Only translations that haven't been manually edited will be updated.
+                  Use the Translate button in the header to translate content to specific languages.
+                  This will process translations based on the English content.
                 </p>
-                <div className="flex mb-3">
-                  <button
-                    type="button"
-                    className="text-xs text-gray-600 hover:text-teal-700 underline"
-                    onClick={() => handleAutoTranslate(true)}
-                    disabled={isLoading}
-                  >
-                    Force refresh all translations
-                  </button>
-                </div>
                 <ul className="space-y-2">
                   {translations.map((translation) => (
                     <li key={translation.language_code} className="flex justify-between items-center">
