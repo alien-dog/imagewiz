@@ -32,6 +32,11 @@ const BlogPost = () => {
   const [showShareTooltip, setShowShareTooltip] = useState(false);
   const [estimatedReadTime, setEstimatedReadTime] = useState('');
 
+  // Update currentLanguage when the app language changes
+  useEffect(() => {
+    setCurrentLanguage(i18n.language);
+  }, [i18n.language]);
+
   useEffect(() => {
     if (slug) {
       fetchPost(currentLanguage);

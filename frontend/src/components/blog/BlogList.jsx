@@ -5,7 +5,10 @@ import { getBlogPosts } from '../../lib/cms-service';
 import { useTranslation } from 'react-i18next';
 import BlogImage from './BlogImage';
 
-const BlogList = ({ language = 'en', tag = '', search = '', limit = 6, onPostCountChange }) => {
+const BlogList = ({ language, tag = '', search = '', limit = 6, onPostCountChange }) => {
+  // Use the current i18n language if not explicitly provided
+  const { i18n } = useTranslation();
+  const currentLanguage = language || i18n.language || 'en';
   const navigate = useNavigate();
   const { t } = useTranslation(['blog', 'common']);
   const [posts, setPosts] = useState([]);
@@ -18,7 +21,7 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6, onPostCou
 
   useEffect(() => {
     fetchPosts();
-  }, [language, tag, search, currentPage, limit]);
+  }, [currentLanguage, tag, search, currentPage, limit]);
   
   // Notify parent component of the post count
   useEffect(() => {
@@ -31,7 +34,7 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6, onPostCou
     setLoading(true);
     try {
       const params = {
-        language,
+        language: currentLanguage,
         page: currentPage,
         limit,
       };
@@ -82,7 +85,7 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6, onPostCou
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString(language || i18n.language || 'en-US', {
+    return date.toLocaleDateString(currentLanguage || 'en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
