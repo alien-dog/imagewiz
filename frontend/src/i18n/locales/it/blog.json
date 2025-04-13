@@ -1,0 +1,107 @@
+{
+  "title": "Scopri Consigli su Fotografia e Design",
+  "description": "Impara le tecniche di modifica delle immagini potenziate dall'AI, le tecniche di rimozione dello sfondo e le strategie creative di design per la tua attività",
+  "searchPlaceholder": "Cerca articoli del blog...",
+  "featuredTopics": "Argomenti in Evidenza",
+  "viewAllTopics": "Visualizza Tutti gli Argomenti",
+  "allCategories": "Tutte le Categorie",
+  "latestArticles": "Ultimi Articoli",
+  "filteredArticles": "Articoli Filtrati",
+  "searchResults": "Risultati della Ricerca",
+  "category": "Categoria",
+  "searchTerm": "Termine di Ricerca",
+  "tagged": "Etichettato",
+  "articles": "Articoli",
+  "header": {
+    "title": "Blog",
+    "subtitle": "Ultime notizie, consigli e approfondimenti",
+    "search": "Cerca articoli del blog"
+  },
+  "featuredPost": {
+    "label": "In Evidenza",
+    "readMore": "Leggi di Più"
+  },
+  "categories": {
+    "all": "Tutti i Post",
+    "tutorials": "Tutorial",
+    "news": "Notizie",
+    "tips": "Consigli e Trucchi",
+    "casestudies": "Casi Studio",
+    "technology": "Tecnologia",
+    "design": "Design"
+  },
+  "postInfo": {
+    "by": "Di",
+    "on": "il",
+    "readingTime": "{{time}} min di lettura",
+    "comments": "{{count}} Commenti",
+    "views": "{{count}} Visualizzazioni",
+    "tags": "Tag:",
+    "lastUpdated": "Ultimo aggiornamento il",
+    "role": "Autore di Contenuti"
+  },
+  "subscription": {
+    "title": "Iscriviti alla nostra newsletter",
+    "description": "Ricevi gli ultimi articoli e notizie direttamente nella tua casella di posta",
+    "placeholder": "Il tuo indirizzo email",
+    "button": "Iscriviti",
+    "success": "Grazie per l'iscrizione!",
+    "error": "Si è verificato un errore. Riprova."
+  },
+  "tableOfContents": {
+    "title": "Indice dei Contenuti"
+  },
+  "share": {
+    "title": "Condividi questo articolo",
+    "twitter": "Condividi su Twitter",
+    "facebook": "Condividi su Facebook",
+    "linkedin": "Condividi su LinkedIn",
+    "copyLink": "Copia link",
+    "linkCopied": "Link copiato negli appunti!",
+    "facebook_short": "Facebook",
+    "twitter_short": "Twitter",
+    "linkedin_short": "LinkedIn",
+    "copyLink_short": "Copia Link"
+  },
+  "relatedPosts": {
+    "title": "Articoli Correlati",
+    "empty": "Nessun articolo correlato trovato",
+    "backToAll": "Torna a Tutti gli Articoli",
+    "browseAll": "Sfoglia Tutti gli Articoli"
+  },
+  "comments": {
+    "title": "Commenti",
+    "writeComment": "Scrivi un commento",
+    "placeholder": "Condividi i tuoi pensieri...",
+    "submit": "Pubblica Commento",
+    "reply": "Rispondi",
+    "edit": "Modifica",
+    "delete": "Elimina",
+    "noComments": "Ancora nessun commento. Sii il primo a commentare!",
+    "loadMore": "Carica altri commenti",
+    "anonymous": "Anonimo",
+    "loginToComment": "Accedi per commentare"
+  },
+  "pagination": {
+    "previous": "Precedente",
+    "next": "Successivo",
+    "page": "Pagina {{current}} di {{total}}"
+  },
+  "notFound": {
+    "title": "Articolo Non Trovato",
+    "description": "L'articolo che stai cercando non esiste o è stato rimosso.",
+    "button": "Torna al Blog"
+  },
+  "status": {
+    "notFound": "Articolo Non Trovato",
+    "notFoundDesc": "L'articolo che stai cercando non esiste o è stato rimosso.",
+    "error": "Errore nel Caricamento dell'Articolo",
+    "errorDesc": "C'è stato un problema nel caricare l'articolo. Riprova più tardi.",
+    "loading": "Caricamento articolo..."
+  },
+  "author": {
+    "aboutTitle": "Informazioni sull'Autore",
+    "defaultName": "Team iMagenWiz",
+    "bio": "Autore di contenuti presso iMagenWiz. Appassionato di esplorare l'intersezione tra tecnologia AI e design creativo per aiutare le aziende a ottenere migliori risultati visivi."
+  }
+}
