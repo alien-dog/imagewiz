@@ -5,7 +5,7 @@ import { getBlogPosts } from '../../lib/cms-service';
 import { useTranslation } from 'react-i18next';
 import BlogImage from './BlogImage';
 
-const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
+const BlogList = ({ language = 'en', tag = '', search = '', limit = 6, onPostCountChange }) => {
   const navigate = useNavigate();
   const { t } = useTranslation(['blog', 'common']);
   const [posts, setPosts] = useState([]);
@@ -14,10 +14,18 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [featuredPost, setFeaturedPost] = useState(null);
+  const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
     fetchPosts();
   }, [language, tag, search, currentPage, limit]);
+  
+  // Notify parent component of the post count
+  useEffect(() => {
+    if (typeof onPostCountChange === 'function') {
+      onPostCountChange(totalCount);
+    }
+  }, [totalCount, onPostCountChange]);
 
   const fetchPosts = async () => {
     setLoading(true);
@@ -62,6 +70,7 @@ const BlogList = ({ language = 'en', tag = '', search = '', limit = 6 }) => {
       }
       
       setTotalPages(response.total_pages || 1);
+      setTotalCount(response.total || postsWithTranslation.length);
       setError(null);
     } catch (err) {
       console.error('Error fetching blog posts:', err);

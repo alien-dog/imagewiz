@@ -392,7 +392,13 @@ const BlogHomePage = () => {
         </div>
         
         {/* Blog Posts */}
-        <BlogList language={i18n.language} tag={selectedTag} limit={9} />
+        <BlogList 
+          language={i18n.language} 
+          tag={selectedTag} 
+          search={searchTerm}
+          limit={9} 
+          onPostCountChange={setPostCount}
+        />
       </div>
     </Layout>
   );
