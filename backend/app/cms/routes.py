@@ -1053,12 +1053,15 @@ def get_blog_posts():
     # Apply language filter - Only show posts that have a translation in the requested language
     if language:
         current_app.logger.info(f"Filtering by language: {language}")
-        # Use an EXISTS subquery to ensure we get posts that have the requested language translation
-        trans_subquery = db.session.query(PostTranslation.id).filter(
-            PostTranslation.post_id == Post.id,
+        # Create a subquery to find posts with the requested language
+        subquery = db.session.query(PostTranslation.post_id).filter(
             PostTranslation.language_code == language
-        ).exists()
-        query = query.filter(db.session.query(trans_subquery).scalar())
+        ).subquery()
+        
+        # Use this subquery to filter the main posts query
+        query = query.filter(Post.id.in_(subquery))
+        
+        current_app.logger.info(f"SQL query after language filter: {str(query)}")
         
     # Apply tag filter
     if tag:
@@ -1180,9 +1183,12 @@ def get_blog_post_by_slug(slug):
         
         # Filter by language if specified
         if language:
-            related_posts_query = related_posts_query.join(PostTranslation).filter(
+            # Use subquery to find posts with the requested language
+            lang_subquery = db.session.query(PostTranslation.post_id).filter(
                 PostTranslation.language_code == language
-            )
+            ).subquery()
+            
+            related_posts_query = related_posts_query.filter(Post.id.in_(lang_subquery))
             
         # Continue building the query
         related_posts_query = (
@@ -1204,9 +1210,12 @@ def get_blog_post_by_slug(slug):
         
         # Filter by language if specified
         if language:
-            related_posts_query = related_posts_query.join(PostTranslation).filter(
+            # Use subquery to find posts with the requested language
+            lang_subquery = db.session.query(PostTranslation.post_id).filter(
                 PostTranslation.language_code == language
-            )
+            ).subquery()
+            
+            related_posts_query = related_posts_query.filter(Post.id.in_(lang_subquery))
             
         # Continue building the query
         related_posts_query = (
