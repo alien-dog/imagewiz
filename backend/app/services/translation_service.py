@@ -159,34 +159,36 @@ class TranslationService:
             max_attempts = 3
             attempt = 0
             last_error = None
+            response = None
             
-            while attempt < max_attempts:
-                try:
-                    timeout_multiplier = attempt + 1  # Increase timeout with each attempt
-                    response = session.post(
-                        f"{self.api_base_url}/chat/completions", 
-                        headers=headers,
-                        json=data,
-                        timeout=(60 * timeout_multiplier, 300 * timeout_multiplier)  # Increased timeouts
-                    )
-                    if response.status_code == 200:
-                        break
-                    attempt += 1
-                    if attempt < max_attempts:
-                        sleep_time = (2 ** attempt) + random.uniform(0, 1)  # Exponential backoff with jitter
-                        logger.warning(f"Attempt {attempt} failed, retrying in {sleep_time:.1f} seconds...")
-                        time.sleep(sleep_time)
-                except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError) as e:
-                    last_error = e
-                    attempt += 1
-                    if attempt < max_attempts:
-                        sleep_time = (2 ** attempt) + random.uniform(0, 1)
-                        logger.warning(f"Timeout on attempt {attempt}, retrying in {sleep_time:.1f} seconds...")
-                        time.sleep(sleep_time)
-                    
-            if attempt >= max_attempts:
-                logger.error(f"Failed after {max_attempts} attempts: {last_error}")
-                return None
+            try:
+                while attempt < max_attempts:
+                    try:
+                        timeout_multiplier = attempt + 1  # Increase timeout with each attempt
+                        response = session.post(
+                            f"{self.api_base_url}/chat/completions", 
+                            headers=headers,
+                            json=data,
+                            timeout=(60 * timeout_multiplier, 300 * timeout_multiplier)  # Increased timeouts
+                        )
+                        if response.status_code == 200:
+                            break
+                        attempt += 1
+                        if attempt < max_attempts:
+                            sleep_time = (2 ** attempt) + random.uniform(0, 1)  # Exponential backoff with jitter
+                            logger.warning(f"Attempt {attempt} failed, retrying in {sleep_time:.1f} seconds...")
+                            time.sleep(sleep_time)
+                    except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError) as e:
+                        last_error = e
+                        attempt += 1
+                        if attempt < max_attempts:
+                            sleep_time = (2 ** attempt) + random.uniform(0, 1)
+                            logger.warning(f"Timeout on attempt {attempt}, retrying in {sleep_time:.1f} seconds...")
+                            time.sleep(sleep_time)
+                        
+                if attempt >= max_attempts:
+                    logger.error(f"Failed after {max_attempts} attempts: {last_error}")
+                    return None
             finally:
                 # Always close the session
                 session.close()
