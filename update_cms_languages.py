@@ -1,141 +1,123 @@
 """
 Script to update CMS languages to match exactly with the website's supported languages
 """
-import sys
+
 import os
-import logging
-import psycopg2
+import sys
+from flask import Flask
 import json
-from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
+# Add backend directory to system path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'backend')))
 
-# Setup logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Get database connection info from environment
-DB_USER = os.environ.get('PGUSER')
-DB_PASSWORD = os.environ.get('PGPASSWORD')
-DB_HOST = os.environ.get('PGHOST')
-DB_PORT = os.environ.get('PGPORT')
-DB_NAME = os.environ.get('PGDATABASE')
-DATABASE_URL = os.environ.get('DATABASE_URL')
-
-# Languages from frontend/src/i18n/i18n.js
-WEBSITE_LANGUAGES = [
-  { "code": "en", "name": "English", "nativeName": "English", "flag": "🇬🇧", "is_default": True, "is_active": True },
-  { "code": "fr", "name": "French", "nativeName": "Français", "flag": "🇫🇷", "is_default": False, "is_active": True },
-  { "code": "es", "name": "Spanish", "nativeName": "Español", "flag": "🇪🇸", "is_default": False, "is_active": True },
-  { "code": "de", "name": "German", "nativeName": "Deutsch", "flag": "🇩🇪", "is_default": False, "is_active": True },
-  { "code": "ru", "name": "Russian", "nativeName": "Русский", "flag": "🇷🇺", "is_default": False, "is_active": True },
-  { "code": "pt", "name": "Portuguese", "nativeName": "Português", "flag": "🇵🇹", "is_default": False, "is_active": True },
-  { "code": "ja", "name": "Japanese", "nativeName": "日本語", "flag": "🇯🇵", "is_default": False, "is_active": True },
-  { "code": "ko", "name": "Korean", "nativeName": "한국어", "flag": "🇰🇷", "is_default": False, "is_active": True },
-  { "code": "ar", "name": "Arabic", "nativeName": "العربية", "flag": "🇸🇦", "is_default": False, "is_active": True },
-  { "code": "vi", "name": "Vietnamese", "nativeName": "Tiếng Việt", "flag": "🇻🇳", "is_default": False, "is_active": True },
-  { "code": "th", "name": "Thai", "nativeName": "ไทย", "flag": "🇹🇭", "is_default": False, "is_active": True },
-  { "code": "id", "name": "Indonesian", "nativeName": "Bahasa Indonesia", "flag": "🇮🇩", "is_default": False, "is_active": True },
-  { "code": "ms", "name": "Malaysian", "nativeName": "Bahasa Melayu", "flag": "🇲🇾", "is_default": False, "is_active": True },
-  { "code": "nl", "name": "Dutch", "nativeName": "Nederlands", "flag": "🇳🇱", "is_default": False, "is_active": True },
-  { "code": "sv", "name": "Swedish", "nativeName": "Svenska", "flag": "🇸🇪", "is_default": False, "is_active": True },
-  { "code": "zh-TW", "name": "Traditional Chinese", "nativeName": "繁體中文", "flag": "🇨🇳", "is_default": False, "is_active": True },
-  { "code": "it", "name": "Italian", "nativeName": "Italiano", "flag": "🇮🇹", "is_default": False, "is_active": True },
-  { "code": "tr", "name": "Turkish", "nativeName": "Türkçe", "flag": "🇹🇷", "is_default": False, "is_active": True },
-  { "code": "hu", "name": "Hungarian", "nativeName": "Magyar", "flag": "🇭🇺", "is_default": False, "is_active": True },
-  { "code": "pl", "name": "Polish", "nativeName": "Polski", "flag": "🇵🇱", "is_default": False, "is_active": True },
-  { "code": "no", "name": "Norwegian", "nativeName": "Norsk", "flag": "🇳🇴", "is_default": False, "is_active": True },
-  { "code": "el", "name": "Greek", "nativeName": "Ελληνικά", "flag": "🇬🇷", "is_default": False, "is_active": True }
-]
+# Import from backend app now that path is set
+from app import create_app, db
+from app.models.cms import Language
 
 def update_cms_languages():
     """Update languages in the database to match website's supported languages"""
-    print("Updating CMS languages to match website's supported languages...")
+    # Create Flask app with proper context
+    app = create_app()
     
-    conn = None
-    cur = None
-    
-    try:
-        # Connect directly to the database
-        if DATABASE_URL:
-            conn = psycopg2.connect(DATABASE_URL)
-            print(f"Connected to database using DATABASE_URL")
-        else:
-            conn = psycopg2.connect(
-                host=DB_HOST,
-                database=DB_NAME,
-                user=DB_USER,
-                password=DB_PASSWORD,
-                port=DB_PORT
-            )
-            print(f"Connected to database using individual credentials")
+    with app.app_context():
+        print("Starting CMS language update process...")
         
-        # Create a cursor
-        cur = conn.cursor()
+        # The supported languages in our application
+        supported_languages = [
+            {"code": "en", "name": "English", "nativeName": "English", "flag": "🇬🇧", "active": True, "rtl": False},
+            {"code": "fr", "name": "French", "nativeName": "Français", "flag": "🇫🇷", "active": True, "rtl": False},
+            {"code": "es", "name": "Spanish", "nativeName": "Español", "flag": "🇪🇸", "active": True, "rtl": False},
+            {"code": "de", "name": "German", "nativeName": "Deutsch", "flag": "🇩🇪", "active": True, "rtl": False},
+            {"code": "ru", "name": "Russian", "nativeName": "Русский", "flag": "🇷🇺", "active": True, "rtl": False},
+            {"code": "pt", "name": "Portuguese", "nativeName": "Português", "flag": "🇵🇹", "active": True, "rtl": False},
+            {"code": "ja", "name": "Japanese", "nativeName": "日本語", "flag": "🇯🇵", "active": True, "rtl": False},
+            {"code": "ko", "name": "Korean", "nativeName": "한국어", "flag": "🇰🇷", "active": True, "rtl": False},
+            {"code": "ar", "name": "Arabic", "nativeName": "العربية", "flag": "🇸🇦", "active": True, "rtl": True},
+            {"code": "vi", "name": "Vietnamese", "nativeName": "Tiếng Việt", "flag": "🇻🇳", "active": True, "rtl": False},
+            {"code": "th", "name": "Thai", "nativeName": "ไทย", "flag": "🇹🇭", "active": True, "rtl": False},
+            {"code": "id", "name": "Indonesian", "nativeName": "Bahasa Indonesia", "flag": "🇮🇩", "active": True, "rtl": False},
+            {"code": "ms", "name": "Malaysian", "nativeName": "Bahasa Melayu", "flag": "🇲🇾", "active": True, "rtl": False},
+            {"code": "nl", "name": "Dutch", "nativeName": "Nederlands", "flag": "🇳🇱", "active": True, "rtl": False},
+            {"code": "sv", "name": "Swedish", "nativeName": "Svenska", "flag": "🇸🇪", "active": True, "rtl": False},
+            {"code": "zh-TW", "name": "Traditional Chinese", "nativeName": "繁體中文", "flag": "🇹🇼", "active": True, "rtl": False},
+            {"code": "it", "name": "Italian", "nativeName": "Italiano", "flag": "🇮🇹", "active": True, "rtl": False},
+            {"code": "tr", "name": "Turkish", "nativeName": "Türkçe", "flag": "🇹🇷", "active": True, "rtl": False},
+            {"code": "hu", "name": "Hungarian", "nativeName": "Magyar", "flag": "🇭🇺", "active": True, "rtl": False},
+            {"code": "pl", "name": "Polish", "nativeName": "Polski", "flag": "🇵🇱", "active": True, "rtl": False},
+        ]
         
-        # First get all current languages
-        cur.execute("SELECT code, name, is_default, is_active FROM cms_languages")
-        rows = cur.fetchall()
+        print(f"Processing {len(supported_languages)} supported languages...")
         
-        all_languages = {row[0]: row for row in rows}
-        print(f"Found {len(all_languages)} languages in the database")
+        # Track changes
+        added = 0
+        updated = 0
+        unchanged = 0
         
-        # Get list of website language codes
-        website_lang_codes = [lang["code"] for lang in WEBSITE_LANGUAGES]
-        print(f"Website has {len(website_lang_codes)} supported languages")
-        
-        # First, deactivate languages that are not in the website's supported languages
-        deactivated_count = 0
-        for code, lang in all_languages.items():
-            if code not in website_lang_codes:
-                cur.execute(
-                    "UPDATE cms_languages SET is_active = FALSE WHERE code = %s",
-                    (code,)
-                )
-                deactivated_count += 1
-                print(f"Deactivated language: {code} - {lang[1]}")
-                
-        # Now update or add languages from the website
-        updated_count = 0
-        added_count = 0
-        
-        for lang_data in WEBSITE_LANGUAGES:
+        # Update or create each supported language
+        for lang_data in supported_languages:
             code = lang_data["code"]
-            name = lang_data["name"]
-            is_default = lang_data["is_default"]
-            is_active = lang_data["is_active"]
             
-            if code in all_languages:
-                # Update existing language to ensure it's active and has the right name
-                cur.execute(
-                    "UPDATE cms_languages SET name = %s, is_default = %s, is_active = %s WHERE code = %s",
-                    (name, is_default, is_active, code)
-                )
-                updated_count += 1
-                print(f"Updated language: {code} - {name}")
+            # Check if language exists
+            lang = Language.query.get(code)
+            
+            if lang:
+                # Update existing language
+                changed = False
+                if lang.name != lang_data["name"]:
+                    lang.name = lang_data["name"]
+                    changed = True
+                
+                if lang.native_name != lang_data["nativeName"]:
+                    lang.native_name = lang_data["nativeName"]
+                    changed = True
+                    
+                if lang.flag != lang_data["flag"]:
+                    lang.flag = lang_data["flag"]
+                    changed = True
+                    
+                if lang.is_rtl != lang_data["rtl"]:
+                    lang.is_rtl = lang_data["rtl"]
+                    changed = True
+                    
+                if lang.is_active != lang_data["active"]:
+                    lang.is_active = lang_data["active"]
+                    changed = True
+                
+                if changed:
+                    print(f"✏️ Updated language: {code} - {lang_data['name']}")
+                    updated += 1
+                else:
+                    print(f"✓ Language already up-to-date: {code} - {lang_data['name']}")
+                    unchanged += 1
             else:
-                # Add new language
-                cur.execute(
-                    "INSERT INTO cms_languages (code, name, is_default, is_active) VALUES (%s, %s, %s, %s)",
-                    (code, name, is_default, is_active)
+                # Create new language
+                new_lang = Language(
+                    code=code,
+                    name=lang_data["name"],
+                    native_name=lang_data["nativeName"],
+                    flag=lang_data["flag"],
+                    is_rtl=lang_data["rtl"],
+                    is_active=lang_data["active"]
                 )
-                added_count += 1
-                print(f"Added language: {code} - {name}")
+                db.session.add(new_lang)
+                print(f"➕ Added new language: {code} - {lang_data['name']}")
+                added += 1
         
-        # Commit the transaction
-        conn.commit()
-        print(f"Languages updated successfully: {updated_count} updated, {added_count} added, {deactivated_count} deactivated")
+        # Commit all changes
+        try:
+            db.session.commit()
+            print("\nLanguage update completed successfully!")
+            print(f"Summary:")
+            print(f"  Added: {added}")
+            print(f"  Updated: {updated}")
+            print(f"  Unchanged: {unchanged}")
+            print(f"  Total: {added + updated + unchanged}")
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error committing changes: {str(e)}")
+            return False
         
-    except Exception as e:
-        print(f"ERROR: {e}")
-        if conn:
-            conn.rollback()
-    finally:
-        if cur:
-            cur.close()
-        if conn:
-            conn.close()
+        return True
 
 if __name__ == "__main__":
     update_cms_languages()

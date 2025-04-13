@@ -14,16 +14,14 @@ import os
 import sys
 from datetime import datetime
 from flask import Flask
-from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
 
-# Add the parent directory to sys.path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '.')))
+# Add backend directory to system path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'backend')))
 
-# Import from the backend application
-from backend.app import create_app
-from backend.app.models import db, Post, PostTranslation, Language
-from backend.app.services.translation_service import TranslationService
+# Import from backend app now that path is set
+from app import create_app, db
+from app.models.cms import Post, PostTranslation, Language
+from app.services.translation_service import TranslationService
 
 def auto_translate_all_blog_posts():
     """Auto-translate all blog posts to all supported languages"""
