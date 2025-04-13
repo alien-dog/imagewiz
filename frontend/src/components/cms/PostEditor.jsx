@@ -831,28 +831,54 @@ const PostEditor = () => {
             {id ? 'Edit Post' : 'Create New Post'}
           </h1>
         </div>
-        <button
-          type="button"
-          className={`flex items-center px-4 py-2 rounded ${
-            isSaving
-              ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-teal-500 hover:bg-teal-600 text-white'
-          }`}
-          onClick={handleSubmit}
-          disabled={isSaving}
-        >
-          {isSaving ? (
-            <>
-              <div className="animate-spin mr-2 h-4 w-4 border-2 border-t-transparent border-white rounded-full"></div>
-              Saving...
-            </>
-          ) : (
-            <>
-              <Save className="h-4 w-4 mr-2" />
-              Save Post
-            </>
+        <div className="flex space-x-2">
+          {/* Only show translate button if post exists and has English content */}
+          {id && formData.language_code === 'en' && (
+            <button
+              type="button"
+              className={`flex items-center px-4 py-2 rounded border border-teal-500 text-teal-600 hover:bg-teal-50 ${
+                isTranslating ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+              onClick={() => setIsTranslateModalOpen(true)}
+              disabled={isTranslating || isSaving}
+            >
+              {isTranslating ? (
+                <>
+                  <div className="animate-spin mr-2 h-4 w-4 border-2 border-t-transparent border-teal-600 rounded-full"></div>
+                  Translating...
+                </>
+              ) : (
+                <>
+                  <Languages className="h-4 w-4 mr-2" />
+                  Translate
+                </>
+              )}
+            </button>
           )}
-        </button>
+          
+          <button
+            type="button"
+            className={`flex items-center px-4 py-2 rounded ${
+              isSaving
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-teal-500 hover:bg-teal-600 text-white'
+            }`}
+            onClick={handleSubmit}
+            disabled={isSaving}
+          >
+            {isSaving ? (
+              <>
+                <div className="animate-spin mr-2 h-4 w-4 border-2 border-t-transparent border-white rounded-full"></div>
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="h-4 w-4 mr-2" />
+                Save Post
+              </>
+            )}
+          </button>
+        </div>
       </div>
       
       {/* Error and Success Messages */}
@@ -1556,6 +1582,15 @@ const PostEditor = () => {
           </div>
         </div>
       )}
+      
+      {/* Translation Modal */}
+      <TranslationModal
+        isOpen={isTranslateModalOpen}
+        onClose={() => setIsTranslateModalOpen(false)}
+        languages={languages}
+        onTranslate={handleTranslate}
+        isLoading={isTranslating}
+      />
     </div>
   );
 };
