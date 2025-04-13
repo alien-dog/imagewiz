@@ -110,20 +110,10 @@ const BlogHomePage = () => {
             <div className="absolute -top-4 -left-4 w-24 h-24 rounded-full bg-teal-400/30 blur-xl"></div>
             
             <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight tracking-tight drop-shadow-sm">
-              {t('blog:title').split(' ').map((word, index, array) => (
-                <React.Fragment key={index}>
-                  {word}
-                  {index < array.length - 1 && ' '}
-                </React.Fragment>
-              ))}
+              {t('blog:title')}
             </h1>
             <p className="text-xl md:text-2xl mb-10 text-white opacity-90 leading-relaxed">
-              {t('blog:description').split(' ').map((word, index, array) => (
-                <React.Fragment key={index}>
-                  {word}
-                  {index < array.length - 1 && ' '}
-                </React.Fragment>
-              ))}
+              {t('blog:description')}
             </p>
             
             <div className="flex flex-wrap gap-3 mb-8">
