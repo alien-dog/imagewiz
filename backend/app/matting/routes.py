@@ -148,3 +148,17 @@ def get_matting_detail(id):
         return jsonify({"error": "Matting history not found or not authorized"}), 404
     
     return jsonify(history.to_dict()), 200
+from threading import Lock
+from queue import Queue
+import time
+
+request_queue = Queue(maxsize=10)
+queue_lock = Lock()
+
+def process_queue():
+    while True:
+        if not request_queue.empty():
+            with queue_lock:
+                request = request_queue.get()
+                # Process request
+                time.sleep(1)  # Rate limiting
