@@ -168,6 +168,30 @@ const PostList = () => {
   }, [posts, filters.language]);
 
   const filteredPosts = processedPosts.filter(post => {
+    // First apply language filter
+    if (filters.language) {
+      // For virtual translations (expanded posts), check the language of the translation
+      if (post.isVirtualTranslation && post.translation) {
+        if (post.translation.language_code !== filters.language) {
+          return false;
+        }
+      } 
+      // For posts with a translations array, check if there's a matching translation
+      else if (post.translations && post.translations.length > 0) {
+        const hasMatchingTranslation = post.translations.some(
+          translation => translation.language_code === filters.language
+        );
+        if (!hasMatchingTranslation) {
+          return false;
+        }
+      }
+      // If no translations at all, filter out
+      else {
+        return false;
+      }
+    }
+    
+    // Then apply search filter
     if (!searchTerm) return true;
     
     // Search in post slug
