@@ -1,24 +1,25 @@
 {
-  "title": "Blog",
-  "readingTime": "{{time}} min de lectura",
-  "publishedOn": "Publicado el {{date}}",
-  "lastUpdated": "Última actualización: {{date}}",
-  "author": "Autor",
-  "tags": "Etiquetas",
-  "relatedPosts": "Artículos relacionados",
-  "viewAllPosts": "Ver todos los artículos",
-  "noResults": "No se encontraron artículos",
-  "searchPlaceholder": "Buscar en el blog...",
+  "title": "사진 및 디자인 팁 발견하기",
+  "description": "AI 기반 이미지 편집, 배경 제거 기술 및 비즈니스를 위한 창의적인 디자인 전략에 대해 알아보세요",
+  "readingTime": "읽는 시간 {{time}}분",
+  "publishedOn": "{{date}}에 게시됨",
+  "lastUpdated": "마지막 업데이트: {{date}}",
+  "author": "작성자",
+  "tags": "태그",
+  "relatedPosts": "관련 게시물",
+  "viewAllPosts": "모든 게시물 보기",
+  "noResults": "게시물을 찾을 수 없습니다",
+  "searchPlaceholder": "블로그 검색...",
   "filter": {
-    "title": "Filtrar por",
-    "tag": "Etiqueta",
-    "author": "Autor",
-    "date": "Fecha"
+    "title": "필터링 기준",
+    "tag": "태그",
+    "author": "작성자",
+    "date": "날짜"
   },
   "sort": {
-    "title": "Ordenar por",
-    "newest": "Más reciente",
-    "oldest": "Más antiguo",
-    "popular": "Popular"
+    "title": "정렬 기준",
+    "newest": "최신순",
+    "oldest": "오래된순",
+    "popular": "인기순"
   }
 }

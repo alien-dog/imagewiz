@@ -2,24 +2,24 @@
   "title": "Descubra Dicas de Fotografia e Design",
   "description": "Aprenda sobre edição de imagens com IA, técnicas de remoção de fundo e estratégias de design criativo para o seu negócio",
   "readingTime": "{{time}} min de leitura",
-  "publishedOn": "Publicado el {{date}}",
-  "lastUpdated": "Última actualización: {{date}}",
+  "publishedOn": "Publicado em {{date}}",
+  "lastUpdated": "Última atualização: {{date}}",
   "author": "Autor",
-  "tags": "Etiquetas",
-  "relatedPosts": "Artículos relacionados",
-  "viewAllPosts": "Ver todos los artículos",
-  "noResults": "No se encontraron artículos",
-  "searchPlaceholder": "Buscar en el blog...",
+  "tags": "Tags",
+  "relatedPosts": "Artigos relacionados",
+  "viewAllPosts": "Ver todos os artigos",
+  "noResults": "Nenhum artigo encontrado",
+  "searchPlaceholder": "Pesquisar no blog...",
   "filter": {
     "title": "Filtrar por",
-    "tag": "Etiqueta",
+    "tag": "Tag",
     "author": "Autor",
-    "date": "Fecha"
+    "date": "Data"
   },
   "sort": {
     "title": "Ordenar por",
-    "newest": "Más reciente",
-    "oldest": "Más antiguo",
-    "popular": "Popular"
+    "newest": "Mais recentes",
+    "oldest": "Mais antigos",
+    "popular": "Populares"
   }
 }
