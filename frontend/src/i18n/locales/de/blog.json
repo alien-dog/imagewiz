@@ -1,24 +1,25 @@
 {
-  "title": "Blog",
-  "readingTime": "{{time}} min de lectura",
-  "publishedOn": "Publicado el {{date}}",
-  "lastUpdated": "Última actualización: {{date}}",
+  "title": "Entdecken Sie Foto- und Design-Tipps",
+  "description": "Lernen Sie KI-gestützte Bildbearbeitung, Hintergrundentfernungstechniken und kreative Designstrategien für Ihr Unternehmen",
+  "readingTime": "{{time}} Min. Lesezeit",
+  "publishedOn": "Veröffentlicht am {{date}}",
+  "lastUpdated": "Letzte Aktualisierung: {{date}}",
   "author": "Autor",
-  "tags": "Etiquetas",
-  "relatedPosts": "Artículos relacionados",
-  "viewAllPosts": "Ver todos los artículos",
-  "noResults": "No se encontraron artículos",
-  "searchPlaceholder": "Buscar en el blog...",
+  "tags": "Tags",
+  "relatedPosts": "Verwandte Artikel",
+  "viewAllPosts": "Alle Artikel anzeigen",
+  "noResults": "Keine Artikel gefunden",
+  "searchPlaceholder": "Blog durchsuchen...",
   "filter": {
-    "title": "Filtrar por",
-    "tag": "Etiqueta",
+    "title": "Filtern nach",
+    "tag": "Tag",
     "author": "Autor",
-    "date": "Fecha"
+    "date": "Datum"
   },
   "sort": {
-    "title": "Ordenar por",
-    "newest": "Más reciente",
-    "oldest": "Más antiguo",
-    "popular": "Popular"
+    "title": "Sortieren nach",
+    "newest": "Neueste",
+    "oldest": "Älteste",
+    "popular": "Beliebt"
   }
 }

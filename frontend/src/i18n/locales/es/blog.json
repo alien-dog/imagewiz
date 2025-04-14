@@ -1,5 +1,6 @@
 {
-  "title": "Blog",
+  "title": "Descubre Consejos de Fotografía y Diseño",
+  "description": "Aprende sobre edición de imágenes con IA, técnicas de eliminación de fondos y estrategias creativas de diseño para tu negocio",
   "readingTime": "{{time}} min de lectura",
   "publishedOn": "Publicado el {{date}}",
   "lastUpdated": "Última actualización: {{date}}",

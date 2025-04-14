@@ -1,24 +1,25 @@
 {
-  "title": "Blog",
-  "readingTime": "{{time}} min de lectura",
-  "publishedOn": "Publicado el {{date}}",
-  "lastUpdated": "Última actualización: {{date}}",
-  "author": "Autor",
-  "tags": "Etiquetas",
-  "relatedPosts": "Artículos relacionados",
-  "viewAllPosts": "Ver todos los artículos",
-  "noResults": "No se encontraron artículos",
-  "searchPlaceholder": "Buscar en el blog...",
+  "title": "写真とデザインのヒント",
+  "description": "AI駆動の画像編集、背景除去技術、およびビジネスのためのクリエイティブデザイン戦略について学ぶ",
+  "readingTime": "{{time}}分の読み時間",
+  "publishedOn": "公開日: {{date}}",
+  "lastUpdated": "最終更新日: {{date}}",
+  "author": "著者",
+  "tags": "タグ",
+  "relatedPosts": "関連記事",
+  "viewAllPosts": "すべての記事を見る",
+  "noResults": "記事が見つかりませんでした",
+  "searchPlaceholder": "ブログを検索...",
   "filter": {
-    "title": "Filtrar por",
-    "tag": "Etiqueta",
-    "author": "Autor",
-    "date": "Fecha"
+    "title": "フィルタ",
+    "tag": "タグ",
+    "author": "著者",
+    "date": "日付"
   },
   "sort": {
-    "title": "Ordenar por",
-    "newest": "Más reciente",
-    "oldest": "Más antiguo",
-    "popular": "Popular"
+    "title": "並び替え",
+    "newest": "最新",
+    "oldest": "最古",
+    "popular": "人気"
   }
 }
