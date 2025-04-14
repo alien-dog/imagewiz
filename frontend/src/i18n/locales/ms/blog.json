@@ -1,24 +1,25 @@
 {
-  "title": "Blog",
-  "readingTime": "{{time}} min de lectura",
-  "publishedOn": "Publicado el {{date}}",
-  "lastUpdated": "Última actualización: {{date}}",
-  "author": "Autor",
-  "tags": "Etiquetas",
-  "relatedPosts": "Artículos relacionados",
-  "viewAllPosts": "Ver todos los artículos",
-  "noResults": "No se encontraron artículos",
-  "searchPlaceholder": "Buscar en el blog...",
+  "title": "Temui Tip Fotografi dan Reka Bentuk",
+  "description": "Belajar tentang penyuntingan imej berteknologi AI, teknik penyingkiran latar belakang, dan strategi reka bentuk kreatif untuk perniagaan anda",
+  "readingTime": "{{time}} minit membaca",
+  "publishedOn": "Diterbitkan pada {{date}}",
+  "lastUpdated": "Dikemas kini terakhir: {{date}}",
+  "author": "Penulis",
+  "tags": "Tag",
+  "relatedPosts": "Artikel Berkaitan",
+  "viewAllPosts": "Lihat Semua Artikel",
+  "noResults": "Tiada artikel ditemui",
+  "searchPlaceholder": "Cari di blog...",
   "filter": {
-    "title": "Filtrar por",
-    "tag": "Etiqueta",
-    "author": "Autor",
-    "date": "Fecha"
+    "title": "Tapis mengikut",
+    "tag": "Tag",
+    "author": "Penulis",
+    "date": "Tarikh"
   },
   "sort": {
-    "title": "Ordenar por",
-    "newest": "Más reciente",
-    "oldest": "Más antiguo",
+    "title": "Susun mengikut",
+    "newest": "Terbaru",
+    "oldest": "Terlama",
     "popular": "Popular"
   }
 }

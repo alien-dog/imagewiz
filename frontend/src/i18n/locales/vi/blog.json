@@ -1,6 +1,7 @@
 {
-  "title": "Blog",
-  "readingTime": "{{time}} min de lectura",
+  "title": "Khám Phá Các Mẹo Nhiếp Ảnh và Thiết Kế",
+  "description": "Tìm hiểu về chỉnh sửa hình ảnh bằng AI, kỹ thuật xóa nền và các chiến lược thiết kế sáng tạo cho doanh nghiệp của bạn",
+  "readingTime": "{{time}} phút đọc",
   "publishedOn": "Publicado el {{date}}",
   "lastUpdated": "Última actualización: {{date}}",
   "author": "Autor",
