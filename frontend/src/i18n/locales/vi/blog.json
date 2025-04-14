@@ -2,24 +2,24 @@
   "title": "Khám Phá Các Mẹo Nhiếp Ảnh và Thiết Kế",
   "description": "Tìm hiểu về chỉnh sửa hình ảnh bằng AI, kỹ thuật xóa nền và các chiến lược thiết kế sáng tạo cho doanh nghiệp của bạn",
   "readingTime": "{{time}} phút đọc",
-  "publishedOn": "Publicado el {{date}}",
-  "lastUpdated": "Última actualización: {{date}}",
-  "author": "Autor",
-  "tags": "Etiquetas",
-  "relatedPosts": "Artículos relacionados",
-  "viewAllPosts": "Ver todos los artículos",
-  "noResults": "No se encontraron artículos",
-  "searchPlaceholder": "Buscar en el blog...",
+  "publishedOn": "Đăng ngày {{date}}",
+  "lastUpdated": "Cập nhật lần cuối: {{date}}",
+  "author": "Tác giả",
+  "tags": "Thẻ",
+  "relatedPosts": "Bài viết liên quan",
+  "viewAllPosts": "Xem tất cả bài viết",
+  "noResults": "Không tìm thấy bài viết nào",
+  "searchPlaceholder": "Tìm kiếm trên blog...",
   "filter": {
-    "title": "Filtrar por",
-    "tag": "Etiqueta",
-    "author": "Autor",
-    "date": "Fecha"
+    "title": "Lọc theo",
+    "tag": "Thẻ",
+    "author": "Tác giả",
+    "date": "Ngày"
   },
   "sort": {
-    "title": "Ordenar por",
-    "newest": "Más reciente",
-    "oldest": "Más antiguo",
-    "popular": "Popular"
+    "title": "Sắp xếp theo",
+    "newest": "Mới nhất",
+    "oldest": "Cũ nhất",
+    "popular": "Phổ biến"
   }
 }
