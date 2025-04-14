@@ -1,24 +1,25 @@
 {
-  "title": "Blog",
-  "readingTime": "{{time}} min de lectura",
-  "publishedOn": "Publicado el {{date}}",
-  "lastUpdated": "Última actualización: {{date}}",
-  "author": "Autor",
-  "tags": "Etiquetas",
-  "relatedPosts": "Artículos relacionados",
-  "viewAllPosts": "Ver todos los artículos",
-  "noResults": "No se encontraron artículos",
-  "searchPlaceholder": "Buscar en el blog...",
+  "title": "ค้นพบเคล็ดลับการถ่ายภาพและการออกแบบ",
+  "description": "เรียนรู้เกี่ยวกับการแก้ไขภาพด้วย AI เทคนิคการลบพื้นหลัง และกลยุทธ์การออกแบบที่สร้างสรรค์สำหรับธุรกิจของคุณ",
+  "readingTime": "ใช้เวลาอ่าน {{time}} นาที",
+  "publishedOn": "เผยแพร่เมื่อ {{date}}",
+  "lastUpdated": "อัปเดตล่าสุด: {{date}}",
+  "author": "ผู้เขียน",
+  "tags": "แท็ก",
+  "relatedPosts": "บทความที่เกี่ยวข้อง",
+  "viewAllPosts": "ดูบทความทั้งหมด",
+  "noResults": "ไม่พบบทความ",
+  "searchPlaceholder": "ค้นหาในบล็อก...",
   "filter": {
-    "title": "Filtrar por",
-    "tag": "Etiqueta",
-    "author": "Autor",
-    "date": "Fecha"
+    "title": "กรองตาม",
+    "tag": "แท็ก",
+    "author": "ผู้เขียน",
+    "date": "วันที่"
   },
   "sort": {
-    "title": "Ordenar por",
-    "newest": "Más reciente",
-    "oldest": "Más antiguo",
-    "popular": "Popular"
+    "title": "เรียงตาม",
+    "newest": "ใหม่ล่าสุด",
+    "oldest": "เก่าสุด",
+    "popular": "ยอดนิยม"
   }
 }

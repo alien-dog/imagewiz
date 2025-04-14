@@ -1,24 +1,25 @@
 {
-  "title": "Blog",
-  "readingTime": "{{time}} min de lectura",
-  "publishedOn": "Publicado el {{date}}",
-  "lastUpdated": "Última actualización: {{date}}",
-  "author": "Autor",
-  "tags": "Etiquetas",
-  "relatedPosts": "Artículos relacionados",
-  "viewAllPosts": "Ver todos los artículos",
-  "noResults": "No se encontraron artículos",
-  "searchPlaceholder": "Buscar en el blog...",
+  "title": "Upptäck Foto- och Designtips",
+  "description": "Lär dig om AI-driven bildredigering, bakgrundsborttagningstekniker och kreativa designstrategier för ditt företag",
+  "readingTime": "{{time}} min lästid",
+  "publishedOn": "Publicerad {{date}}",
+  "lastUpdated": "Senast uppdaterad: {{date}}",
+  "author": "Författare",
+  "tags": "Taggar",
+  "relatedPosts": "Relaterade inlägg",
+  "viewAllPosts": "Visa alla inlägg",
+  "noResults": "Inga inlägg hittades",
+  "searchPlaceholder": "Sök i bloggen...",
   "filter": {
-    "title": "Filtrar por",
-    "tag": "Etiqueta",
-    "author": "Autor",
-    "date": "Fecha"
+    "title": "Filtrera efter",
+    "tag": "Tagg",
+    "author": "Författare",
+    "date": "Datum"
   },
   "sort": {
-    "title": "Ordenar por",
-    "newest": "Más reciente",
-    "oldest": "Más antiguo",
-    "popular": "Popular"
+    "title": "Sortera efter",
+    "newest": "Nyast",
+    "oldest": "Äldst",
+    "popular": "Populärt"
   }
 }
