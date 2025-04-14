@@ -1,24 +1,25 @@
 {
-  "title": "Blog",
-  "readingTime": "{{time}} min de lectura",
-  "publishedOn": "Publicado el {{date}}",
-  "lastUpdated": "Última actualización: {{date}}",
-  "author": "Autor",
-  "tags": "Etiquetas",
-  "relatedPosts": "Artículos relacionados",
-  "viewAllPosts": "Ver todos los artículos",
-  "noResults": "No se encontraron artículos",
-  "searchPlaceholder": "Buscar en el blog...",
+  "title": "Откройте для себя советы по фотографии и дизайну",
+  "description": "Узнайте о редактировании изображений с помощью ИИ, методах удаления фона и креативных стратегиях дизайна для вашего бизнеса",
+  "readingTime": "{{time}} мин. чтения",
+  "publishedOn": "Опубликовано {{date}}",
+  "lastUpdated": "Последнее обновление: {{date}}",
+  "author": "Автор",
+  "tags": "Теги",
+  "relatedPosts": "Похожие статьи",
+  "viewAllPosts": "Посмотреть все статьи",
+  "noResults": "Статьи не найдены",
+  "searchPlaceholder": "Поиск в блоге...",
   "filter": {
-    "title": "Filtrar por",
-    "tag": "Etiqueta",
-    "author": "Autor",
-    "date": "Fecha"
+    "title": "Фильтровать по",
+    "tag": "Тегу",
+    "author": "Автору",
+    "date": "Дате"
   },
   "sort": {
-    "title": "Ordenar por",
-    "newest": "Más reciente",
-    "oldest": "Más antiguo",
-    "popular": "Popular"
+    "title": "Сортировать по",
+    "newest": "Сначала новые",
+    "oldest": "Сначала старые",
+    "popular": "Популярные"
   }
 }

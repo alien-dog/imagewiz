@@ -1,24 +1,25 @@
 {
-  "title": "Blog",
-  "readingTime": "{{time}} min de lectura",
-  "publishedOn": "Publicado el {{date}}",
-  "lastUpdated": "Última actualización: {{date}}",
-  "author": "Autor",
-  "tags": "Etiquetas",
-  "relatedPosts": "Artículos relacionados",
-  "viewAllPosts": "Ver todos los artículos",
-  "noResults": "No se encontraron artículos",
-  "searchPlaceholder": "Buscar en el blog...",
+  "title": "探索攝影和設計技巧",
+  "description": "了解AI驅動的圖像編輯、背景移除技術和適合您業務的創意設計策略",
+  "readingTime": "閱讀時間 {{time}} 分鐘",
+  "publishedOn": "發布於 {{date}}",
+  "lastUpdated": "最後更新: {{date}}",
+  "author": "作者",
+  "tags": "標籤",
+  "relatedPosts": "相關文章",
+  "viewAllPosts": "查看所有文章",
+  "noResults": "未找到文章",
+  "searchPlaceholder": "搜尋部落格...",
   "filter": {
-    "title": "Filtrar por",
-    "tag": "Etiqueta",
-    "author": "Autor",
-    "date": "Fecha"
+    "title": "篩選條件",
+    "tag": "標籤",
+    "author": "作者",
+    "date": "日期"
   },
   "sort": {
-    "title": "Ordenar por",
-    "newest": "Más reciente",
-    "oldest": "Más antiguo",
-    "popular": "Popular"
+    "title": "排序方式",
+    "newest": "最新",
+    "oldest": "最舊",
+    "popular": "熱門"
   }
 }

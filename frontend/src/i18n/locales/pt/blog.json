@@ -1,6 +1,7 @@
 {
-  "title": "Blog",
-  "readingTime": "{{time}} min de lectura",
+  "title": "Descubra Dicas de Fotografia e Design",
+  "description": "Aprenda sobre edição de imagens com IA, técnicas de remoção de fundo e estratégias de design criativo para o seu negócio",
+  "readingTime": "{{time}} min de leitura",
   "publishedOn": "Publicado el {{date}}",
   "lastUpdated": "Última actualización: {{date}}",
   "author": "Autor",
