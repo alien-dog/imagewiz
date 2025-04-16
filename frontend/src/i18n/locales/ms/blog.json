@@ -1,15 +1,109 @@
 {
   "title": "Temui Tip Fotografi dan Reka Bentuk",
   "description": "Belajar tentang penyuntingan imej berteknologi AI, teknik penyingkiran latar belakang, dan strategi reka bentuk kreatif untuk perniagaan anda",
-  "readingTime": "{{time}} minit membaca",
-  "publishedOn": "Diterbitkan pada {{date}}",
-  "lastUpdated": "Dikemas kini terakhir: {{date}}",
-  "author": "Penulis",
-  "tags": "Tag",
-  "relatedPosts": "Artikel Berkaitan",
-  "viewAllPosts": "Lihat Semua Artikel",
-  "noResults": "Tiada artikel ditemui",
-  "searchPlaceholder": "Cari di blog...",
+  "searchPlaceholder": "Cari artikel blog...",
+  "featuredTopics": "Topik Pilihan",
+  "viewAllTopics": "Lihat Semua Topik",
+  "allCategories": "Semua Kategori",
+  "latestArticles": "Artikel Terbaru",
+  "filteredArticles": "Artikel Tertapis",
+  "searchResults": "Hasil Carian",
+  "category": "Kategori",
+  "searchTerm": "Kata Carian",
+  "tagged": "Bertag",
+  "articles": "Artikel",
+  "header": {
+    "title": "Blog",
+    "subtitle": "Berita terkini, tip, dan pandangan",
+    "search": "Cari artikel blog"
+  },
+  "featuredPost": {
+    "label": "Pilihan",
+    "readMore": "Baca Selanjutnya"
+  },
+  "categories": {
+    "all": "Semua Artikel",
+    "tutorials": "Tutorial",
+    "news": "Berita",
+    "tips": "Tip & Panduan",
+    "casestudies": "Kajian Kes",
+    "technology": "Teknologi",
+    "design": "Reka Bentuk"
+  },
+  "postInfo": {
+    "by": "Oleh",
+    "on": "pada",
+    "readingTime": "{{time}} minit membaca",
+    "comments": "{{count}} Komen",
+    "views": "{{count}} Paparan",
+    "tags": "Tag:",
+    "lastUpdated": "Dikemas kini terakhir pada",
+    "role": "Penulis Kandungan"
+  },
+  "subscription": {
+    "title": "Langgan surat berita kami",
+    "description": "Dapatkan artikel dan berita terkini terus ke peti masuk anda",
+    "placeholder": "Alamat e-mel anda",
+    "button": "Langgan",
+    "success": "Terima kasih kerana melanggan!",
+    "error": "Ralat telah berlaku. Sila cuba lagi."
+  },
+  "tableOfContents": {
+    "title": "Jadual Kandungan"
+  },
+  "share": {
+    "title": "Kongsi artikel ini",
+    "twitter": "Kongsi di Twitter",
+    "facebook": "Kongsi di Facebook",
+    "linkedin": "Kongsi di LinkedIn",
+    "copyLink": "Salin pautan",
+    "linkCopied": "Pautan disalin ke papan keratan!",
+    "facebook_short": "Facebook",
+    "twitter_short": "Twitter",
+    "linkedin_short": "LinkedIn",
+    "copyLink_short": "Salin Pautan"
+  },
+  "relatedPosts": {
+    "title": "Artikel Berkaitan",
+    "empty": "Tiada artikel berkaitan ditemui",
+    "backToAll": "Kembali ke Semua Artikel",
+    "browseAll": "Layari Semua Artikel"
+  },
+  "comments": {
+    "title": "Komen",
+    "writeComment": "Tulis komen",
+    "placeholder": "Kongsi pendapat anda...",
+    "submit": "Hantar Komen",
+    "reply": "Balas",
+    "edit": "Edit",
+    "delete": "Padam",
+    "noComments": "Belum ada komen. Jadilah yang pertama untuk komen!",
+    "loadMore": "Muat lebih banyak komen",
+    "anonymous": "Tanpa Nama",
+    "loginToComment": "Sila log masuk untuk komen"
+  },
+  "pagination": {
+    "previous": "Sebelumnya",
+    "next": "Seterusnya",
+    "page": "Halaman {{current}} daripada {{total}}"
+  },
+  "notFound": {
+    "title": "Artikel Tidak Dijumpai",
+    "description": "Artikel blog yang anda cari tidak wujud atau telah dipadam.",
+    "button": "Kembali ke Blog"
+  },
+  "status": {
+    "notFound": "Artikel Tidak Dijumpai",
+    "notFoundDesc": "Artikel blog yang anda cari tidak wujud atau telah dipadam.",
+    "error": "Ralat Memuat Artikel",
+    "errorDesc": "Terdapat masalah memuatkan artikel blog. Sila cuba lagi kemudian.",
+    "loading": "Memuatkan artikel..."
+  },
+  "author": {
+    "aboutTitle": "Tentang Penulis",
+    "defaultName": "Pasukan iMagenWiz",
+    "bio": "Penulis kandungan di iMagenWiz. Bersemangat untuk meneroka persilangan teknologi AI dan reka bentuk kreatif untuk membantu perniagaan mencapai hasil visual yang lebih baik."
+  },
   "filter": {
     "title": "Tapis mengikut",
     "tag": "Tag",
