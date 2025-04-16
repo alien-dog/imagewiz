@@ -58,13 +58,11 @@
   },
   "home": {
     "hero": {
-      "title": "Buang",
-      "titleHighlight": "latar belakang",
-      "titleEnd": "dalam beberapa saat",
-      "subtitle": "Teknologi AI kami menjadikan penghapusan latar belakang cepat, mudah dan tepat. Sempurna untuk e-dagang, pemasaran atau projek peribadi.",
-      "getStarted": "Mula secara percuma",
-      "secondaryCta": "Lihat harga",
-      "tag": "Teknologi AI Baharu",
+      "title": "Buang Latar Belakang dengan AI",
+      "subtitle": "Penghapusan latar belakang yang cepat, mudah dan tepat dikuasakan oleh teknologi AI termaju",
+      "cta": "Mula Secara Percuma",
+      "secondaryCta": "Lihat Harga",
+      "tag": "Teknologi AI Termaju",
       "trust": "Dipercayai oleh lebih 10,000 pengguna di seluruh dunia",
       "imageCaption": "Pemprosesan AI masa nyata"
     },
