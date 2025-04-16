@@ -1,7 +1,6 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import Backend from 'i18next-http-backend';
 
 // Define supported languages with their native names and flags
 export const SUPPORTED_LANGUAGES = [
@@ -282,8 +281,6 @@ SUPPORTED_LANGUAGES.forEach(lang => {
 
 // Initialize i18next
 i18n
-  // Enable loading translations via HTTP for lazy loading
-  .use(Backend)
   // Detect user language
   .use(LanguageDetector)
   // Pass the i18n instance to react-i18next
@@ -299,16 +296,6 @@ i18n
     
     // Namespace configuration
     ns: ['common', 'auth', 'pricing', 'blog', 'cms', 'dashboard', 'editor'],
-    
-    // Enable HTTP loading (backend setup)
-    backend: {
-      // Path to load resources from
-      loadPath: '/locales/{{lng}}/{{ns}}.json',
-      // HTTP method for fetching resources
-      requestOptions: {
-        cache: 'no-cache'
-      }
-    },
     
     // Debugging in development mode
     debug: process.env.NODE_ENV === 'development',
