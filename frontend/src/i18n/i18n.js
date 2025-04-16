@@ -70,9 +70,11 @@ import commonTH from './locales/th/common.json';
 
 // Import Indonesian resources
 import commonID from './locales/id/common.json';
+import blogID from './locales/id/blog.json';
 
 // Import Malaysian resources
 import commonMS from './locales/ms/common.json';
+import blogMS from './locales/ms/blog.json';
 
 // Import Dutch resources
 import commonNL from './locales/nl/common.json';
@@ -190,14 +192,14 @@ const resources = {
     common: commonID,
     auth: authEN,
     pricing: pricingEN,
-    blog: blogEN,
+    blog: blogID,
     cms: cmsEN
   },
   ms: {
     common: commonMS,
     auth: authEN,
     pricing: pricingEN,
-    blog: blogEN,
+    blog: blogMS,
     cms: cmsEN
   },
   nl: {
