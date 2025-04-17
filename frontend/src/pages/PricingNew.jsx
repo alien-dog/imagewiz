@@ -84,7 +84,16 @@ const pricingPlans = [
 ];
 
 const PricingNew = () => {
-  const { t } = useTranslation('pricing'); // Use pricing namespace
+  const { t, i18n } = useTranslation('pricing'); // Use pricing namespace
+  
+  // Debug translations
+  useEffect(() => {
+    console.log('Current language in PricingNew:', i18n.language);
+    console.log('Translation for "title":', t('title'));
+    console.log('Translation for "monthly":', t('monthly'));
+    console.log('All available namespaces:', i18n.options.ns);
+    console.log('Current namespace resources:', i18n.options.resources?.[i18n.language]?.pricing);
+  }, [i18n.language, t]);
   const [yearlyBilling, setYearlyBilling] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
