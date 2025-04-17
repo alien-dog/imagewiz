@@ -88,11 +88,32 @@ const PricingNew = () => {
   
   // Debug translations
   useEffect(() => {
+    console.log('-----------------------------------');
+    console.log('PRICING PAGE TRANSLATION DEBUGGING');
+    console.log('-----------------------------------');
     console.log('Current language in PricingNew:', i18n.language);
     console.log('Translation for "title":', t('title'));
     console.log('Translation for "monthly":', t('monthly'));
+    console.log('Translation for "perYear":', t('perYear'));
     console.log('All available namespaces:', i18n.options.ns);
-    console.log('Current namespace resources:', i18n.options.resources?.[i18n.language]?.pricing);
+    
+    // Check all available translations
+    const availableLanguages = ['en', 'es', 'fr'];
+    availableLanguages.forEach(lang => {
+      console.log(`Resources for ${lang}:`, i18n.options.resources?.[lang]?.pricing ? 'AVAILABLE' : 'NOT AVAILABLE');
+      if (i18n.options.resources?.[lang]?.pricing) {
+        console.log(`Sample translations for ${lang}:`, {
+          title: i18n.options.resources[lang].pricing.title,
+          monthly: i18n.options.resources[lang].pricing.monthly
+        });
+      }
+    });
+    
+    // Check current language in more detail
+    console.log('CURRENT LANGUAGE RESOURCES:', i18n.options.resources?.[i18n.language]?.pricing);
+    
+    // Check if the namespace is properly loaded
+    console.log('Is "pricing" namespace loaded?', i18n.hasResourceBundle(i18n.language, 'pricing'));
   }, [i18n.language, t]);
   const [yearlyBilling, setYearlyBilling] = useState(false);
   const [loading, setLoading] = useState(false);
