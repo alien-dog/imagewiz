@@ -47,15 +47,18 @@ import pricingES from './locales/es/pricing.json';
 
 // Import Japanese resources
 import commonJA from './locales/ja/common.json';
+import pricingJA from './locales/ja/pricing.json';
 
 // Import Arabic resources
 import commonAR from './locales/ar/common.json';
 
 // Import German resources
 import commonDE from './locales/de/common.json';
+import pricingDE from './locales/de/pricing.json';
 
 // Import Russian resources
 import commonRU from './locales/ru/common.json';
+import pricingRU from './locales/ru/pricing.json';
 
 // Import Portuguese resources
 import commonPT from './locales/pt/common.json';
@@ -136,7 +139,7 @@ const resources = {
   ja: {
     common: commonJA,
     auth: authEN,
-    pricing: pricingEN,
+    pricing: pricingJA,
     blog: blogEN,
     cms: cmsEN
   },
@@ -150,14 +153,14 @@ const resources = {
   de: {
     common: commonDE,
     auth: authEN,
-    pricing: pricingEN,
+    pricing: pricingDE,
     blog: blogEN,
     cms: cmsEN
   },
   ru: {
     common: commonRU,
     auth: authEN,
-    pricing: pricingEN,
+    pricing: pricingRU,
     blog: blogEN,
     cms: cmsEN
   },

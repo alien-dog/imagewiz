@@ -1,0 +1,101 @@
+{
+  "title": "プランを選択",
+  "subtitle": "シンプルな料金設定",
+  "selectPlan": "あなたに合ったプランを選択してください",
+  "monthly": "月額",
+  "yearly": "年額",
+  "yearlyDiscount": "年間請求でお得",
+  "credits": "クレジット",
+  "perMonth": "/月",
+  "perYear": "/年",
+  "forever": "永久",
+  "currentPlan": "現在のプラン",
+  "popular": "人気",
+  "getStarted": "始める",
+  "upgrade": "今すぐアップグレード",
+  "contactSales": "営業に問い合わせ",
+  "creditBalance": "クレジット残高",
+  "remainingCredits": "残り{{count}}クレジット",
+  "plans": {
+    "free": {
+      "name": "無料",
+      "description": "サービスを試すのに最適",
+      "price": "0",
+      "credits": "3",
+      "features": [
+        "3つの画像処理",
+        "基本品質",
+        "手動背景削除",
+        "PNG形式でのダウンロード",
+        "7日間の履歴保持"
+      ]
+    },
+    "lite": {
+      "name": "ライト",
+      "description": "カジュアルユーザーに最適",
+      "priceMonthly": "9.90",
+      "priceYearly": "106.80",
+      "creditsMonthly": "50",
+      "creditsYearly": "600",
+      "features": [
+        "月50/年600の画像処理",
+        "高品質処理",
+        "AI搭載の背景削除",
+        "PNG＆JPGダウンロード",
+        "30日間の履歴保持",
+        "優先処理"
+      ]
+    },
+    "pro": {
+      "name": "プロ",
+      "description": "プロフェッショナルユーザーに最適",
+      "priceMonthly": "24.90",
+      "priceYearly": "262.80",
+      "creditsMonthly": "250",
+      "creditsYearly": "3000",
+      "features": [
+        "月250/年3000の画像処理",
+        "プレミアム品質処理",
+        "AI搭載の背景削除",
+        "すべてのファイル形式をサポート",
+        "90日間の履歴保持",
+        "最高優先度での処理",
+        "バッチ処理（最大20画像）",
+        "基本的なAPI利用"
+      ]
+    }
+  },
+  "faq": {
+    "title": "よくある質問",
+    "items": [
+      {
+        "question": "クレジットはどのように機能しますか？",
+        "answer": "各クレジットで1つの画像を処理できます。クレジットは処理成功後にアカウントから差し引かれます。"
+      },
+      {
+        "question": "クレジットは期限切れになりますか？",
+        "answer": "はい、クレジットは請求期間の終わりに期限切れになります。月額プランは毎月、年額プランは毎年リセットされます。"
+      },
+      {
+        "question": "プランをアップグレードできますか？",
+        "answer": "はい、いつでもプランをアップグレードできます。新しいプランはすぐに開始され、比例配分された差額が請求されます。"
+      },
+      {
+        "question": "どの支払い方法を受け付けていますか？",
+        "answer": "安全な決済プロセッサーであるStripeを通じて、Visa、Mastercard、American Expressなど、主要なクレジットカードをすべて受け付けています。"
+      }
+    ]
+  },
+  "cta": {
+    "title": "始める準備はできましたか？",
+    "description": "無料プランから始めて、いつでもアップグレードできます",
+    "button": "無料トライアル"
+  },
+  "notIncluded": "含まれていません",
+  "subscribe": "購読する",
+  "signUp": "登録",
+  "moreInfoNeeded": "より多くのクレジットやカスタム機能が必要ですか？",
+  "enterpriseText": "より大きなボリュームと追加機能のあるエンタープライズプランについては、お問い合わせください。",
+  "savingsPercentage": "年間請求で{{percent}}%節約",
+  "creditsMonthlySuffix": "（月額{{credits}}クレジット）"
+}

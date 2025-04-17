@@ -1,0 +1,101 @@
+{
+  "title": "Wählen Sie Ihren Plan",
+  "subtitle": "Einfache Preise für jeden",
+  "selectPlan": "Wählen Sie einen Plan, der zu Ihnen passt",
+  "monthly": "Monatlich",
+  "yearly": "Jährlich",
+  "yearlyDiscount": "Sparen Sie mit jährlicher Abrechnung",
+  "credits": "Kredite",
+  "perMonth": "/Monat",
+  "perYear": "/Jahr",
+  "forever": "für immer",
+  "currentPlan": "Aktueller Plan",
+  "popular": "Am beliebtesten",
+  "getStarted": "Loslegen",
+  "upgrade": "Jetzt upgraden",
+  "contactSales": "Vertrieb kontaktieren",
+  "creditBalance": "Kredit-Guthaben",
+  "remainingCredits": "Sie haben {{count}} Kredite übrig",
+  "plans": {
+    "free": {
+      "name": "Kostenlos",
+      "description": "Perfekt zum Ausprobieren unseres Dienstes",
+      "price": "0",
+      "credits": "3",
+      "features": [
+        "3 Bildprozesse",
+        "Basisqualität",
+        "Manuelle Hintergrundentfernung",
+        "PNG-Download",
+        "7-tägige Verlaufsaufbewahrung"
+      ]
+    },
+    "lite": {
+      "name": "Lite",
+      "description": "Ideal für gelegentliche Nutzer",
+      "priceMonthly": "9.90",
+      "priceYearly": "106.80",
+      "creditsMonthly": "50",
+      "creditsYearly": "600",
+      "features": [
+        "50 monatliche/600 jährliche Bildprozesse",
+        "Verarbeitung in hoher Qualität",
+        "KI-gestützte Hintergrundentfernung",
+        "PNG & JPG Downloads",
+        "30-tägige Verlaufsaufbewahrung",
+        "Priorisierte Verarbeitung"
+      ]
+    },
+    "pro": {
+      "name": "Pro",
+      "description": "Am besten für professionelle Nutzer",
+      "priceMonthly": "24.90",
+      "priceYearly": "262.80",
+      "creditsMonthly": "250",
+      "creditsYearly": "3000",
+      "features": [
+        "250 monatliche/3000 jährliche Bildprozesse",
+        "Premium-Qualitätsverarbeitung",
+        "KI-gestützte Hintergrundentfernung",
+        "Alle Dateiformate unterstützt",
+        "90-tägige Verlaufsaufbewahrung",
+        "Höchste Priorität bei der Verarbeitung",
+        "Stapelverarbeitung (bis zu 20 Bilder)",
+        "Grundlegender API-Zugriff"
+      ]
+    }
+  },
+  "faq": {
+    "title": "Häufig gestellte Fragen",
+    "items": [
+      {
+        "question": "Wie funktionieren die Kredite?",
+        "answer": "Jeder Kredit ermöglicht Ihnen die Verarbeitung eines Bildes. Kredite werden nach erfolgreicher Verarbeitung von Ihrem Konto abgezogen."
+      },
+      {
+        "question": "Verfallen die Kredite?",
+        "answer": "Ja, Kredite verfallen am Ende Ihres Abrechnungszeitraums. Monatliche Pläne werden jeden Monat erneuert, und jährliche Pläne werden jährlich erneuert."
+      },
+      {
+        "question": "Kann ich meinen Plan upgraden?",
+        "answer": "Ja, Sie können Ihren Plan jederzeit upgraden. Ihr neuer Plan beginnt sofort, und Ihnen wird die anteilige Differenz in Rechnung gestellt."
+      },
+      {
+        "question": "Welche Zahlungsmethoden akzeptieren Sie?",
+        "answer": "Wir akzeptieren alle gängigen Kreditkarten, einschließlich Visa, Mastercard und American Express über unseren sicheren Zahlungsabwickler, Stripe."
+      }
+    ]
+  },
+  "cta": {
+    "title": "Bereit loszulegen?",
+    "description": "Beginnen Sie mit unserem kostenlosen Plan und upgraden Sie jederzeit",
+    "button": "Kostenlos testen"
+  },
+  "notIncluded": "Nicht enthalten",
+  "subscribe": "Abonnieren",
+  "signUp": "Registrieren",
+  "moreInfoNeeded": "Benötigen Sie mehr Kredite oder individuelle Funktionen?",
+  "enterpriseText": "Kontaktieren Sie uns für Unternehmenspläne mit höheren Volumina und zusätzlichen Funktionen.",
+  "savingsPercentage": "Sparen Sie {{percent}}% mit jährlicher Abrechnung",
+  "creditsMonthlySuffix": "({{credits}} Kredite pro Monat)"
+}
