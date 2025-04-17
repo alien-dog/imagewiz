@@ -1,5 +1,6 @@
 {pkgs}: {
   deps = [
+    pkgs.vim
     pkgs.jq
     pkgs.rustc
     pkgs.openssl
