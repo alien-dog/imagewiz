@@ -38,10 +38,12 @@ import cmsEN from './locales/en/cms.json';
 // Import French resources
 import commonFR from './locales/fr/common.json';
 import blogFR from './locales/fr/blog.json';
+import pricingFR from './locales/fr/pricing.json';
 
 // Import Spanish resources
 import commonES from './locales/es/common.json';
 import blogES from './locales/es/blog.json';
+import pricingES from './locales/es/pricing.json';
 
 // Import Japanese resources
 import commonJA from './locales/ja/common.json';
@@ -120,14 +122,14 @@ const resources = {
   fr: {
     common: commonFR,
     auth: authEN,
-    pricing: pricingEN,
+    pricing: pricingFR,
     blog: blogFR,
     cms: cmsEN
   },
   es: {
     common: commonES,
     auth: authEN,
-    pricing: pricingEN,
+    pricing: pricingES,
     blog: blogES,
     cms: cmsEN
   },
