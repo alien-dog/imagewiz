@@ -1,0 +1,101 @@
+{
+  "title": "Choisissez Votre Plan",
+  "subtitle": "Des tarifs simples pour tous",
+  "selectPlan": "Sélectionnez un plan qui vous convient",
+  "monthly": "Mensuel",
+  "yearly": "Annuel",
+  "yearlyDiscount": "Économisez avec la facturation annuelle",
+  "credits": "crédits",
+  "perMonth": "/mois",
+  "perYear": "/an",
+  "forever": "pour toujours",
+  "currentPlan": "Plan Actuel",
+  "popular": "Le Plus Populaire",
+  "getStarted": "Commencer",
+  "upgrade": "Mettre à Niveau Maintenant",
+  "contactSales": "Contacter les Ventes",
+  "creditBalance": "Solde de Crédit",
+  "remainingCredits": "Il vous reste {{count}} crédits",
+  "plans": {
+    "free": {
+      "name": "Gratuit",
+      "description": "Parfait pour essayer notre service",
+      "price": "0",
+      "credits": "3",
+      "features": [
+        "3 processus d'image",
+        "Qualité de base",
+        "Suppression manuelle de l'arrière-plan",
+        "Téléchargement en PNG",
+        "Conservation de l'historique pendant 7 jours"
+      ]
+    },
+    "lite": {
+      "name": "Lite",
+      "description": "Idéal pour les utilisateurs occasionnels",
+      "priceMonthly": "9.90",
+      "priceYearly": "106.80",
+      "creditsMonthly": "50",
+      "creditsYearly": "600",
+      "features": [
+        "50 processus d'image mensuels/600 annuels",
+        "Traitement de haute qualité",
+        "Suppression d'arrière-plan par IA",
+        "Téléchargements en PNG et JPG",
+        "Conservation de l'historique pendant 30 jours",
+        "Traitement prioritaire"
+      ]
+    },
+    "pro": {
+      "name": "Pro",
+      "description": "Idéal pour les utilisateurs professionnels",
+      "priceMonthly": "24.90",
+      "priceYearly": "262.80",
+      "creditsMonthly": "250",
+      "creditsYearly": "3000",
+      "features": [
+        "250 processus d'image mensuels/3000 annuels",
+        "Traitement de qualité premium",
+        "Suppression d'arrière-plan par IA",
+        "Tous les formats de fichiers pris en charge",
+        "Conservation de l'historique pendant 90 jours",
+        "Traitement prioritaire maximal",
+        "Traitement par lots (jusqu'à 20 images)",
+        "Accès API de base"
+      ]
+    }
+  },
+  "faq": {
+    "title": "Questions Fréquemment Posées",
+    "items": [
+      {
+        "question": "Comment fonctionnent les crédits ?",
+        "answer": "Chaque crédit vous permet de traiter une image. Les crédits sont déduits de votre compte après un traitement réussi."
+      },
+      {
+        "question": "Les crédits expirent-ils ?",
+        "answer": "Oui, les crédits expirent à la fin de votre période de facturation. Les forfaits mensuels sont réinitialisés chaque mois, et les forfaits annuels sont réinitialisés annuellement."
+      },
+      {
+        "question": "Puis-je mettre à niveau mon plan ?",
+        "answer": "Oui, vous pouvez mettre à niveau votre plan à tout moment. Votre nouveau plan commencera immédiatement, et vous serez facturé de la différence au prorata."
+      },
+      {
+        "question": "Quels modes de paiement acceptez-vous ?",
+        "answer": "Nous acceptons toutes les principales cartes de crédit, y compris Visa, Mastercard et American Express via notre processeur de paiement sécurisé, Stripe."
+      }
+    ]
+  },
+  "cta": {
+    "title": "Prêt à commencer ?",
+    "description": "Commencez avec notre plan gratuit et mettez à niveau à tout moment",
+    "button": "Essayer Gratuitement"
+  },
+  "notIncluded": "Non inclus",
+  "subscribe": "S'abonner",
+  "signUp": "S'inscrire",
+  "moreInfoNeeded": "Besoin de plus de crédits ou de fonctionnalités personnalisées ?",
+  "enterpriseText": "Contactez-nous pour des plans d'entreprise avec des volumes plus élevés et des fonctionnalités supplémentaires.",
+  "savingsPercentage": "Économisez {{percent}}% avec la facturation annuelle",
+  "creditsMonthlySuffix": "({{credits}} crédits par mois)"
+}

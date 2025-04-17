@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import { CheckIcon, XIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { PRICE_IDS } from '../lib/stripe';
 
@@ -83,6 +84,7 @@ const pricingPlans = [
 ];
 
 const PricingNew = () => {
+  const { t } = useTranslation('pricing'); // Use pricing namespace
   const [yearlyBilling, setYearlyBilling] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -172,10 +174,10 @@ const PricingNew = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight">
-            Simple, Transparent Pricing
+            {t('title')}
           </h1>
           <p className="mt-5 text-xl text-gray-500 max-w-3xl mx-auto">
-            Choose the plan that's right for you. Pay only for what you need with no hidden fees.
+            {t('subtitle')}
           </p>
           
           {/* Billing toggle */}
@@ -188,7 +190,7 @@ const PricingNew = () => {
                 } relative py-2 px-6 border-transparent rounded-md shadow-sm text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-teal-500 focus:z-10 transition-all`}
                 onClick={handleBillingToggle}
               >
-                Monthly billing
+                {t('monthly')}
               </button>
               <button
                 type="button"
@@ -197,11 +199,11 @@ const PricingNew = () => {
                 } ml-0.5 relative py-2 px-6 border-transparent rounded-md shadow-sm text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-teal-500 focus:z-10 transition-all`}
                 onClick={handleBillingToggle}
               >
-                Yearly billing
+                {t('yearly')}
               </button>
               {yearlyBilling && (
                 <div className="absolute -top-3 right-6 rounded-full bg-green-100 px-3 py-0.5 text-xs font-semibold text-green-800">
-                  Save up to 15%
+                  {t('yearlyDiscount')}
                 </div>
               )}
             </div>
@@ -232,34 +234,38 @@ const PricingNew = () => {
               {plan.mostPopular && (
                 <div className="bg-teal-500 rounded-t-lg py-1.5">
                   <p className="text-xs font-semibold uppercase tracking-wide text-white text-center">
-                    Most popular
+                    {t('popular')}
                   </p>
                 </div>
               )}
 
               <div className="p-6">
-                <h2 className="text-xl leading-6 font-bold text-gray-900">{plan.name}</h2>
-                <p className="mt-2 text-sm text-gray-500">{plan.description}</p>
+                <h2 className="text-xl leading-6 font-bold text-gray-900">
+                  {t(`plans.${plan.id.split('_')[0]}.name`)}
+                </h2>
+                <p className="mt-2 text-sm text-gray-500">
+                  {t(`plans.${plan.id.split('_')[0]}.description`)}
+                </p>
                 <p className="mt-4">
                   <span className="text-4xl font-extrabold text-gray-900">
                     ${yearlyBilling ? plan.yearlyPrice : plan.monthlyPrice}
                   </span>
                   <span className="text-base font-medium text-gray-500">
-                    {yearlyBilling ? '/year' : '/month'}
+                    {yearlyBilling ? t('perYear') : t('perMonth')}
                   </span>
                 </p>
                 {yearlyBilling && plan.id !== 'free' && (
                   <p className="mt-1 text-sm text-green-700">
-                    Save {calculateSavings(plan.monthlyPrice, plan.yearlyPrice)}% with yearly billing
+                    {t('savingsPercentage', { percent: calculateSavings(plan.monthlyPrice, plan.yearlyPrice) })}
                   </p>
                 )}
                 <p className="mt-4 text-sm text-gray-500">
                   <span className="font-medium text-gray-800">
                     {yearlyBilling ? plan.yearlyCredits : plan.monthlyCredits} 
-                  </span> image processing credits
+                  </span> {t('credits')}
                   {plan.id !== 'free' && yearlyBilling && (
                     <span className="block text-xs mt-1 text-gray-500">
-                      ({Math.round(plan.yearlyCredits / 12)} credits per month)
+                      {t('creditsMonthlySuffix', { credits: Math.round(plan.yearlyCredits / 12) })}
                     </span>
                   )}
                 </p>
@@ -272,7 +278,9 @@ const PricingNew = () => {
                       <div className="flex-shrink-0">
                         <CheckIcon className="h-5 w-5 text-teal-500" />
                       </div>
-                      <p className="ml-3 text-sm text-gray-500">{feature}</p>
+                      <p className="ml-3 text-sm text-gray-500">
+                        {t(`plans.${plan.id.split('_')[0]}.features.${index}`, { defaultValue: feature })}
+                      </p>
                     </li>
                   ))}
                   {plan.notIncluded.map((feature, index) => (
@@ -299,7 +307,7 @@ const PricingNew = () => {
                       loading ? 'opacity-70 cursor-not-allowed' : ''
                     }`}
                   >
-                    {loading ? 'Processing...' : plan.id === 'free' ? 'Sign Up' : 'Subscribe'}
+                    {loading ? 'Processing...' : plan.id === 'free' ? t('signUp') : t('subscribe')}
                   </button>
                 </div>
               </div>
@@ -308,49 +316,28 @@ const PricingNew = () => {
         </div>
 
         <div className="mt-16 text-center">
-          <h3 className="text-lg font-medium text-gray-900">Need more credits or custom features?</h3>
+          <h3 className="text-lg font-medium text-gray-900">{t('moreInfoNeeded')}</h3>
           <p className="mt-2 text-gray-500">
-            Contact us for enterprise plans with higher volumes and additional features.
+            {t('enterpriseText')}
           </p>
           <a
             href="mailto:enterprise@imagenwiz.com"
             className="mt-4 inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-teal-600 bg-white hover:bg-teal-50"
           >
-            Contact Sales
+            {t('contactSales')}
           </a>
         </div>
 
         <div className="max-w-4xl mx-auto mt-16 bg-white rounded-lg shadow-md p-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Frequently Asked Questions</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('faq.title')}</h2>
           
           <div className="space-y-6">
-            <div>
-              <h3 className="text-lg font-medium text-gray-800 mb-2">How do credits work?</h3>
-              <p className="text-gray-600">
-                Each credit allows you to process one image. Credits are deducted from your account after successful processing.
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="text-lg font-medium text-gray-800 mb-2">Do credits expire?</h3>
-              <p className="text-gray-600">
-                Yes, credits expire at the end of your billing period. Monthly plans reset every month, and yearly plans reset annually.
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="text-lg font-medium text-gray-800 mb-2">Can I upgrade my plan?</h3>
-              <p className="text-gray-600">
-                Yes, you can upgrade your plan at any time. Your new plan will start immediately, and you'll be charged the prorated difference.
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="text-lg font-medium text-gray-800 mb-2">What payment methods do you accept?</h3>
-              <p className="text-gray-600">
-                We accept all major credit cards, including Visa, Mastercard, and American Express through our secure payment processor, Stripe.
-              </p>
-            </div>
+            {t('faq.items', { returnObjects: true }).map((item, index) => (
+              <div key={index}>
+                <h3 className="text-lg font-medium text-gray-800 mb-2">{item.question}</h3>
+                <p className="text-gray-600">{item.answer}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>

@@ -1,0 +1,101 @@
+{
+  "title": "Elige Tu Plan",
+  "subtitle": "Precios simples para todos",
+  "selectPlan": "Selecciona un plan que funcione para ti",
+  "monthly": "Mensual",
+  "yearly": "Anual",
+  "yearlyDiscount": "Ahorra con facturación anual",
+  "credits": "créditos",
+  "perMonth": "/mes",
+  "perYear": "/año",
+  "forever": "para siempre",
+  "currentPlan": "Plan Actual",
+  "popular": "Más Popular",
+  "getStarted": "Comenzar",
+  "upgrade": "Actualizar Ahora",
+  "contactSales": "Contactar Ventas",
+  "creditBalance": "Saldo de Crédito",
+  "remainingCredits": "Tienes {{count}} créditos restantes",
+  "plans": {
+    "free": {
+      "name": "Gratis",
+      "description": "Perfecto para probar nuestro servicio",
+      "price": "0",
+      "credits": "3",
+      "features": [
+        "3 procesos de imagen",
+        "Calidad básica",
+        "Eliminación manual de fondo",
+        "Descarga en PNG",
+        "Retención de historial por 7 días"
+      ]
+    },
+    "lite": {
+      "name": "Lite",
+      "description": "Excelente para usuarios ocasionales",
+      "priceMonthly": "9.90",
+      "priceYearly": "106.80",
+      "creditsMonthly": "50",
+      "creditsYearly": "600",
+      "features": [
+        "50 procesos de imagen mensuales/600 anuales",
+        "Procesamiento de alta calidad",
+        "Eliminación de fondo con IA",
+        "Descargas en PNG y JPG",
+        "Retención de historial por 30 días",
+        "Procesamiento prioritario"
+      ]
+    },
+    "pro": {
+      "name": "Pro",
+      "description": "Lo mejor para usuarios profesionales",
+      "priceMonthly": "24.90",
+      "priceYearly": "262.80",
+      "creditsMonthly": "250",
+      "creditsYearly": "3000",
+      "features": [
+        "250 procesos de imagen mensuales/3000 anuales",
+        "Procesamiento de calidad premium",
+        "Eliminación de fondo con IA",
+        "Todos los formatos de archivo soportados",
+        "Retención de historial por 90 días",
+        "Procesamiento de máxima prioridad",
+        "Procesamiento por lotes (hasta 20 imágenes)",
+        "Acceso básico a la API"
+      ]
+    }
+  },
+  "faq": {
+    "title": "Preguntas Frecuentes",
+    "items": [
+      {
+        "question": "¿Cómo funcionan los créditos?",
+        "answer": "Cada crédito te permite procesar una imagen. Los créditos se deducen de tu cuenta después de un procesamiento exitoso."
+      },
+      {
+        "question": "¿Caducan los créditos?",
+        "answer": "Sí, los créditos caducan al final de tu período de facturación. Los planes mensuales se reinician cada mes, y los planes anuales se reinician anualmente."
+      },
+      {
+        "question": "¿Puedo actualizar mi plan?",
+        "answer": "Sí, puedes actualizar tu plan en cualquier momento. Tu nuevo plan comenzará inmediatamente, y se te cobrará la diferencia prorrateada."
+      },
+      {
+        "question": "¿Qué métodos de pago aceptan?",
+        "answer": "Aceptamos todas las principales tarjetas de crédito, incluyendo Visa, Mastercard y American Express a través de nuestro procesador de pagos seguro, Stripe."
+      }
+    ]
+  },
+  "cta": {
+    "title": "¿Listo para empezar?",
+    "description": "Comienza con nuestro plan gratuito y actualiza en cualquier momento",
+    "button": "Prueba Gratis"
+  },
+  "notIncluded": "No incluido",
+  "subscribe": "Suscribirse",
+  "signUp": "Registrarse",
+  "moreInfoNeeded": "¿Necesitas más créditos o características personalizadas?",
+  "enterpriseText": "Contáctanos para planes empresariales con mayores volúmenes y características adicionales.",
+  "savingsPercentage": "Ahorra un {{percent}}% con facturación anual",
+  "creditsMonthlySuffix": "({{credits}} créditos por mes)"
+}
