@@ -22,27 +22,20 @@ def create_app():
     app = Flask(__name__, static_folder='static')
     
     # Configure the application
-    # Use PostgreSQL database from DATABASE_URL
+    # Use MySQL database from environment variables
     from urllib.parse import quote_plus
     
-    # Get the DATABASE_URL from environment variables
-    database_url = os.environ.get('DATABASE_URL')
+    # Get MySQL credentials from environment variables
+    mysql_user = os.environ.get('DB_USER', 'root')
+    mysql_password = quote_plus(os.environ.get('DB_PASSWORD', ''))
+    mysql_host = os.environ.get('DB_HOST', 'localhost')
+    mysql_db = os.environ.get('DB_NAME', 'mat_db')
+    mysql_port = os.environ.get('DB_PORT', '3306')
     
-    if database_url:
-        print(f"Using DATABASE_URL for PostgreSQL connection")
-        app.config['SQLALCHEMY_DATABASE_URI'] = database_url
-    else:
-        # Fallback to direct PostgreSQL configuration
-        pg_user = os.environ.get('PGUSER', 'postgres')
-        pg_password = quote_plus(os.environ.get('PGPASSWORD', ''))
-        pg_host = os.environ.get('PGHOST', 'localhost')
-        pg_db = os.environ.get('PGDATABASE', 'postgres')
-        pg_port = os.environ.get('PGPORT', '5432')
-        
-        print(f"Connecting to PostgreSQL: {pg_user}@{pg_host}:{pg_port}/{pg_db}")
-        
-        # Configure connection with SSL mode
-        app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{pg_user}:{pg_password}@{pg_host}:{pg_port}/{pg_db}'
+    print(f"Connecting to MySQL: {mysql_user}@{mysql_host}:{mysql_port}/{mysql_db}")
+    
+    # Configure MySQL connection
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{mysql_user}:{mysql_password}@{mysql_host}:{mysql_port}/{mysql_db}'
     
     # Add connection pool settings separately
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {

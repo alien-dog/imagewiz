@@ -36,7 +36,7 @@ def run_migration():
         # Perform migrations for missing columns
         if not is_yearly_exists:
             print("Adding is_yearly column to recharge_history table...")
-            db.session.execute(text("ALTER TABLE recharge_history ADD COLUMN is_yearly BOOLEAN DEFAULT false"))
+            db.session.execute(text("ALTER TABLE recharge_history ADD COLUMN is_yearly TINYINT(1) DEFAULT 0"))
             print("is_yearly column added successfully!")
             
         if not package_id_exists:
